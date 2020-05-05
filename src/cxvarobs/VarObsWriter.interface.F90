@@ -8,6 +8,7 @@ module cxvarobs_varobswriter_mod_c
 
 use iso_c_binding
 use cxvarobs_varobswriter_mod
+use string_f_c_mod
 use ufo_geovals_mod
 use ufo_geovals_mod_c,   only: ufo_geovals_registry
 use fckit_configuration_module, only: fckit_configuration 
@@ -46,7 +47,8 @@ call cxvarobs_varobswriter_create(self, f_conf)
 
 !> Update C++ ObsFilter with geovals variables list
 if (allocated(self%geovars)) then
-  call f_c_push_string_varlist(c_varlist, self%geovars)
+! TODO(wsmigaj) this doesn't compile, why?
+!  call f_c_push_string_varlist(c_varlist, self%geovars)
 endif
 
 end subroutine cxvarobs_varobswriter_create_c

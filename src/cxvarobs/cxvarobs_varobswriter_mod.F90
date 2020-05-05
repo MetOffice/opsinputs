@@ -14,6 +14,8 @@ use ufo_geovals_mod
 use obsspace_mod
 use ufo_vars_mod
 
+use opsmod_obsinfo
+
 implicit none
 public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, cxvarobs_varobswriter_prior, cxvarobs_varobswriter_post
 private
@@ -36,6 +38,12 @@ type(cxvarobs_varobswriter), intent(inout)      :: self
 type(fckit_configuration), intent(in) :: f_conf
 
 ! TODO: set self%geovars (list of variables to use from GeoVaLs) if needed
+
+type(OB_type)                  :: obs
+
+print *, 'Calling Ops_InitObs in constructor'
+call Ops_InitObs(obs)
+print *, 'Called Ops_InitObs'
 
 end subroutine cxvarobs_varobswriter_create
 
@@ -67,6 +75,12 @@ type(cxvarobs_varobswriter),  intent(in) :: self
 type(c_ptr), value, intent(in) :: obspace
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
+
+type(OB_type)                  :: obs
+
+print *, 'Calling Ops_InitObs in post'
+call Ops_InitObs(obs)
+print *, 'Called Ops_InitObs'
 
 end subroutine cxvarobs_varobswriter_post
 

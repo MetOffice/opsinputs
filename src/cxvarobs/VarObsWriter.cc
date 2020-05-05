@@ -19,10 +19,7 @@
 
 namespace cxvarobs {
 
-// -----------------------------------------------------------------------------
-static oops::FilterMaker<ufo::UfoTrait, oops::ObsFilter<ufo::UfoTrait, VarObsWriter> >
-  makerVarObsWriter_("VarObsWriter");
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                      boost::shared_ptr<ioda::ObsDataVector<int> > flags,
