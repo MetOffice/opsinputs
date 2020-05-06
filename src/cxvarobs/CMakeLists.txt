@@ -18,13 +18,18 @@ set(OPS_ROOT "/net/data/users/wsmigaj/cylc-run/r12482_2330_buddy_check_near_lon_
 
 set(OPS_INCLUDE_DIR "${OPS_ROOT}/include")
 set(OPS_OBJECT_DIR "${OPS_ROOT}/o")
-
+set(SHUM_LIB_DIR "${OPS_ROOT}/installs/shumlib/lib")
+set(SHUM_LIBS 
+    "${SHUM_LIB_DIR}/libshum_byteswap.so"
+    "${SHUM_LIB_DIR}/libshum_string_conv.so"
+    "${SHUM_LIB_DIR}/libshum_wgdos_packing.so")
 file(GLOB OPS_OBJ_FILES LIST_DIRECTORIES false "${OPS_OBJECT_DIR}/*.o")
 
 ecbuild_add_library( TARGET   ops
                      SOURCES  ${OPS_OBJ_FILES}
                      LINKER_LANGUAGE Fortran
                      TYPE STATIC
+                     LIBS ${SHUM_LIBS}
                     )
 
 list( APPEND CXVAROBS_LIBS_DEP oops ioda ufo ${NETCDF_LIBRARIES} ops )

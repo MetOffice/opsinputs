@@ -12,5 +12,6 @@ Observations:
                     eastward_wind, northward_wind]
     ObsFilters:
     - Filter: VarObsWriter
+      obs_group: Aircraft
     HofX: GsiHofX
     failedBenchmark: 0

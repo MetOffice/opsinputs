@@ -16,6 +16,7 @@
 #include "oops/util/Logger.h"
 
 #include "ufo/UfoTrait.h"
+#include "ufo/filters/Variables.h"
 
 namespace cxvarobs {
 
@@ -25,10 +26,10 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
                      boost::shared_ptr<ioda::ObsDataVector<int> > flags,
                      boost::shared_ptr<ioda::ObsDataVector<float> >)
   : obsdb_(obsdb), geovars_(), flags_(*flags) {
-  oops::Log::trace() << "VarObsWriter contructor starting" << std::endl;
+  oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
   const eckit::Configuration * conf = &config;
   cxvarobs_varobswriter_create_f90(key_, conf, geovars_);
-  oops::Log::debug() << "VarObsWriter contructor key = " << key_ << std::endl;
+  oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;
 }
 
 // -----------------------------------------------------------------------------
