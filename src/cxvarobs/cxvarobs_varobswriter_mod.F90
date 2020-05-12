@@ -8,17 +8,21 @@
 module cxvarobs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
-use iso_c_binding
+use, intrinsic :: iso_c_binding
 use kinds
-use ufo_geovals_mod
+use missing_values_mod
 use obsspace_mod
+use ufo_geovals_mod
 use ufo_vars_mod
+use cxvarobs_obsdatavector_mod
 
-use opsmod_obsinfo
-
+USE GenMod_Control, ONLY:   &
+    DebugMode,              &
+    GeneralMode,            &
+    mype,                   &
+    nproc
 USE GenMod_Core, ONLY: &
     gen_warn          
-
 USE GenMod_ModelIO, ONLY: LenFixHd, UM_header_type
 USE GenMod_Setup, ONLY: Gen_SetupControl
 USE GenMod_UMHeaderConstants
@@ -33,6 +37,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind
+USE OpsMod_ObsInfo
 USE OpsMod_Varfields
 USE OpsMod_Varobs
 
@@ -52,6 +57,8 @@ private
   integer(kind=8) :: obsgroup
 end type cxvarobs_varobswriter
 
+! #include "obsdatavector_interface.f90"
+
 ! ------------------------------------------------------------------------------
 contains
 ! ------------------------------------------------------------------------------
@@ -63,6 +70,8 @@ type(fckit_configuration), intent(in) :: f_conf
 
 CALL Gen_SetupControl(DefaultDocURL)
 CALL Ops_InitMPI
+
+GeneralMode = DebugMode
 
 self % obsgroup = cxvarobs_varobswriter_getobsgroup(self, f_conf)
 
@@ -92,17 +101,17 @@ end subroutine cxvarobs_varobswriter_prior
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_post(self, obspace, nvars, nlocs, hofx)
+subroutine cxvarobs_varobswriter_post(self, obspace, ObsErrors, nvars, nlocs, hofx)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
 type(c_ptr), value, intent(in) :: obspace
+type(c_ptr), value, intent(in) :: ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
 
 type(OB_type)                  :: obs
 type(UM_header_type)           :: CxHeader
 integer(kind=8)                :: varfields(ActualMaxVarfield)
-integer, parameter             :: nproc = 1, rank = 0
 integer(kind=8)                :: NumVarObsTotal
 
 obs % header % obsgroup = self % obsgroup
@@ -118,14 +127,12 @@ print *, 'obsspace_get_gnlocs: ', obs % header % numobstotal
 print *, 'obsspace_get_gnlocs: ', obsspace_get_gnlocs(obspace) 
 print *, 'obsspace_get_nlocs: ', obs % header % numobslocal 
 
-! TODO: deal with MPI
-
 Obs % Header % NumCXBatches = 1
 ALLOCATE(Obs % Header % ObsPerBatchPerPE(Obs % Header % NumCXBatches, 0:nproc - 1))
-Obs % Header % ObsPerBatchPerPE(1,rank) = obs % header % numobslocal
+Obs % Header % ObsPerBatchPerPE(1,mype) = obs % header % numobslocal
 
 call Ops_ReadVarobsControlNL (self % obsgroup, varfields) ! TODO(wsmigaj): move to separate function?
-call cxvarobs_varobswriter_populateobservations(self, varfields, obs)
+call cxvarobs_varobswriter_populateobservations(self, varfields, obspace, ObsErrors, obs)
 
 CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 CxHeader % FixHd(FH_IntCSize) = 49
@@ -158,10 +165,12 @@ end function cxvarobs_varobswriter_getobsgroup
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_populateobservations(self, varfields, Ob)
+subroutine cxvarobs_varobswriter_populateobservations(self, varfields, obspace, ObsErrors, Ob)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
 integer(kind=8), intent(in)              :: varfields(:)
+type(c_ptr), value, intent(in)           :: obspace
+type(c_ptr), value, intent(in)           :: ObsErrors
 type(OB_type), intent(inout)             :: Ob
 
 CHARACTER(len=*), PARAMETER          :: RoutineName = "cxvarobs_varobswriter_populateobservations"
@@ -170,8 +179,6 @@ CHARACTER(len=80)                    :: ErrorMessage
 integer :: nvarfields
 integer :: Ivar
 
-TYPE (ElementHeader_type)            :: ObHdrVrbl
-INTEGER                              :: FieldSize
 INTEGER                              :: NumLevs
 INTEGER                              :: Zcode
 LOGICAL                              :: UseLevelSubset
@@ -183,6 +190,8 @@ CALL Ops_Alloc(Ob % header % Longitude, "Longitude", Ob % Header % NumObsLocal, 
 CALL Ops_Alloc(Ob % header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
 CALL Ops_Alloc(Ob % header % ReportFlags, "ReportFlags", Ob % Header % NumObsLocal, Ob % ReportFlags)
 CALL Ops_Alloc(Ob % header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+CALL obsspace_get_db(obspace, "MetaData", "latitude", Ob % Latitude)
+CALL obsspace_get_db(obspace, "MetaData", "longitude", Ob % Longitude)
 
 ! TODO: Num levels
 SELECT CASE (Ob % header % ObsGroup)
@@ -199,32 +208,44 @@ do Ivar = 1, nvarfields
     CASE (IMDI)
       CYCLE
     CASE (VarField_pstar)
-      CALL Ops_Alloc(Ob % header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar)
+      CALL cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+        Ob % header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, "surface_pressure", &
+        obspace, ObsErrors)
     CASE (VarField_theta)
       CALL Ops_Alloc(Ob % header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
     CASE (VarField_temperature)
       IF (Ob % header % ObsGroup == ObsGroupSurface) THEN
-        CALL Ops_Alloc(Ob % header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2)
+        CALL cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+          Ob % header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, "air_temperature", &
+          obspace, ObsErrors)
       ELSE
         CALL Ops_Alloc(Ob % header % t, "t", Ob % Header % NumObsLocal, Ob % t)
+!        CALL cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+!          Ob % header % t, "t", Ob % Header % NumObsLocal, Ob % t, "air_temperature", obspace)
       END IF
     CASE (VarField_rh)
       IF (Ob % header % ObsGroup == ObsGroupSurface) THEN
-        CALL Ops_Alloc(Ob % header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2)
+        CALL cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+          Ob % header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, "air_temperature", &
+          obspace, ObsErrors)
       ELSE
         CALL Ops_Alloc(Ob % header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh)
       END IF
     CASE (VarField_u)
       IF (Ob % header % ObsGroup == ObsGroupSurface .OR. &
           Ob % header % ObsGroup == ObsGroupScatwind) THEN
-        CALL Ops_Alloc(Ob % header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10)
+        CALL cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+          Ob % header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, "eastward_wind", &
+          obspace, ObsErrors)
       ELSE
         CALL Ops_Alloc(Ob % header % u, "u", Ob % Header % NumObsLocal, Ob % u)
       END IF
     CASE (VarField_v)
       IF (Ob % header % ObsGroup == ObsGroupSurface .OR. &
           Ob % header % ObsGroup == ObsGroupScatwind) THEN
-        CALL Ops_Alloc(Ob % header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10)
+        CALL cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+          Ob % header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, "northward_wind", &
+          obspace, ObsErrors)
       ELSE
         CALL Ops_Alloc(Ob % header % v, "v", Ob % Header % NumObsLocal, Ob % v)
       END IF
@@ -437,24 +458,54 @@ end do
 
 end subroutine cxvarobs_varobswriter_populateobservations
 
-! subroutine InitElementHeader(NumLevels, ElementHeader)
-!   implicit none
-!   integer, intent(in) :: NumLevels
-!   type(ElementHeader_type), intent(inout) :: ElementHeader
-    
-!   Header % Present = .TRUE.
-!   Header % NumLev = NumLevels
-!   ! Header % Zcode = Zcode ! TODO: Is this needed?
-! end subroutine InitHeader
+subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d(Hdr,           &
+                                                         OpsVarName,    &
+                                                         NumObs,        &
+                                                         El1,           &
+                                                         JediVarName,   &
+                                                         ObsSpace,      &
+                                                         ObsErrors,     &
+                                                         HdrIn,         &
+                                                         initial_value)
+IMPLICIT NONE
 
-! subroutine InitSingleLevelElements(Ob % Header % NumObsLocal, Elements)
-! implicit none
-! integer, intent(in) :: Ob % Header % NumObsLocal
-! type(Element_type), pointer, intent(inout) :: Elements(:)
-  
-! ALLOCATE(Elements(Ob % Header % NumObsLocal))
-! Elements = RMDI
+! Subroutine arguments:
+TYPE (ElementHeader_Type), INTENT(INOUT)        :: Hdr
+CHARACTER(len=*), INTENT(IN)                    :: OpsVarName
+INTEGER(KIND=8), INTENT(IN)                     :: NumObs
+TYPE(Element_type), POINTER                     :: El1(:)
+CHARACTER(len=*), INTENT(IN)                    :: JediVarName
+TYPE(c_ptr), VALUE, INTENT(IN)                  :: ObsSpace
+TYPE(c_ptr), VALUE, INTENT(IN)                  :: ObsErrors
+TYPE (ElementHeader_Type), OPTIONAL, INTENT(IN) :: HdrIn
+TYPE(Element_Type), OPTIONAL, INTENT(IN)        :: initial_value
 
-! end subroutine InitSingleLevelElements
+! Local declarations:
+REAL(KIND=c_double)                             :: ObsValue(NumObs)
+REAL(KIND=c_float)                              :: ObsError(NumObs)
+REAL(KIND=c_double)                             :: MissingDouble
+REAL(KIND=c_float)                              :: MissingFloat
+INTEGER                                         :: i
+
+! Body:
+
+! The types of floating-point numbers used in this function are a bit confusing. OPS stores
+! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
+! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
+! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles. Observation
+! errors, though, are retrieved as floats.
+
+MissingDouble = missing_value(0.0_c_double)
+MissingFloat  = missing_value(0.0_c_float)
+
+CALL Ops_Alloc(Hdr, OpsVarName, NumObs, El1, HdrIn, initial_value)
+CALL obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+CALL cxvarobs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
+DO i = 1, NumObs
+  IF (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
+  IF (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
+  ! TODO: Flags, PGEFinal
+END DO
+end subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d
 
 end module cxvarobs_varobswriter_mod

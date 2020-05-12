@@ -19,6 +19,7 @@ namespace eckit {
 
 namespace ioda {
   class ObsSpace;
+  template <typename T> class ObsDataVector;
 }
 
 namespace cxvarobs {
@@ -33,8 +34,10 @@ extern "C" {
   void cxvarobs_varobswriter_delete_f90(F90check &);
   void cxvarobs_varobswriter_prior_f90(const F90check &, const ioda::ObsSpace &,
                                        const ufo::F90goms &);
-  void cxvarobs_varobswriter_post_f90(const F90check &, const ioda::ObsSpace &, const int &,
-                            const int &, const double &);
+  void cxvarobs_varobswriter_post_f90(const F90check &self,
+                                      const ioda::ObsSpace &obsSpace,
+                                      const ioda::ObsDataVector<float> &obsErrors,
+                                      const int &nvars, const int &nlocs, const double &hofx);
 }  // extern C
 
 }  // namespace cxvarobs

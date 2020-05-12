@@ -41,8 +41,8 @@ class VarObsWriter : public util::Printable,
   static const std::string classname() {return "ufo::VarObsWriter";}
 
   VarObsWriter(ioda::ObsSpace &, const eckit::Configuration &,
-            boost::shared_ptr<ioda::ObsDataVector<int> >,
-            boost::shared_ptr<ioda::ObsDataVector<float> >);
+            boost::shared_ptr<ioda::ObsDataVector<int> > flags,
+            boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~VarObsWriter();
 
   void preProcess() const {}
@@ -59,7 +59,8 @@ class VarObsWriter : public util::Printable,
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::Variables extradiagvars_;
-  ioda::ObsDataVector<int> & flags_;
+  boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
+  boost::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
 };
 
 }  // namespace cxvarobs

@@ -14,4 +14,19 @@ Observations:
     - Filter: VarObsWriter
       obs_group: Aircraft
     HofX: GsiHofX
-    failedBenchmark: 0
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: Surface
+      ObsDataIn:
+        obsfile: Data/ioda/testinput_tier_1/sfc_obs_2018041500_m.nc4
+      simulate:
+        variables: [surface_pressure, specific_humidity,
+                    air_temperature, virtual_temperature,
+                    eastward_wind, northward_wind]
+    ObsFilters:
+    - Filter: VarObsWriter
+      obs_group: Surface
+    HofX: GsiHofX
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0

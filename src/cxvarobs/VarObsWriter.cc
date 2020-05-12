@@ -23,9 +23,9 @@ namespace cxvarobs {
 // -------------------------------------------------------------------------
 
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
-                     boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                     boost::shared_ptr<ioda::ObsDataVector<float> >)
-  : obsdb_(obsdb), geovars_(), flags_(*flags) {
+                           boost::shared_ptr<ioda::ObsDataVector<int> > flags,
+                           boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
+  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)) {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
   const eckit::Configuration * conf = &config;
   cxvarobs_varobswriter_create_f90(key_, conf, geovars_);
@@ -48,9 +48,11 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 
 // -----------------------------------------------------------------------------
 
-void VarObsWriter::postFilter(const ioda::ObsVector & hofxb, const ufo::ObsDiagnostics & diags) const {
+void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
+                              const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
-  cxvarobs_varobswriter_post_f90(key_, obsdb_, hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
+  cxvarobs_varobswriter_post_f90(key_, obsdb_, *obsErrors_,
+                                 hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
 }
 
 // -----------------------------------------------------------------------------
