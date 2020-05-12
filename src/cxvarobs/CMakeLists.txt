@@ -6,6 +6,9 @@
 list( APPEND cxvarobs_src_files
     cxvarobs_varobswriter_mod.F90
     instantiateObsFilterFactory.h
+    obsdatavector_f.cc
+    obsdatavector_f.h
+    obsdatavector_mod.F90
     VarObsWriter.h
     VarObsWriter.cc
     VarObsWriter.interface.F90
