@@ -9,7 +9,6 @@ module cxvarobs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding
-use kinds
 use missing_values_mod
 use obsspace_mod
 use ufo_geovals_mod
@@ -45,7 +44,8 @@ use OpsMod_SatRad_RTmodel, only: &
     nlevels_strat_varobs
 
 implicit none
-public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, cxvarobs_varobswriter_prior, cxvarobs_varobswriter_post
+public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, &
+          cxvarobs_varobswriter_prior, cxvarobs_varobswriter_post
 private
 integer, parameter :: max_string=800
 
@@ -91,48 +91,48 @@ end subroutine cxvarobs_varobswriter_delete
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_prior(self, obspace, geovals)
+subroutine cxvarobs_varobswriter_prior(self, ObsSpace, GeoVals)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
-type(c_ptr), value, intent(in) :: obspace
-type(ufo_geovals),  intent(in) :: geovals
+type(c_ptr), value, intent(in) :: ObsSpace
+type(ufo_geovals),  intent(in) :: GeoVals
 
 end subroutine cxvarobs_varobswriter_prior
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_post(self, obspace, ObsErrors, nvars, nlocs, hofx)
+subroutine cxvarobs_varobswriter_post(self, ObsSpace, ObsErrors, nvars, nlocs, hofx)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
-type(c_ptr), value, intent(in) :: obspace
+type(c_ptr), value, intent(in) :: ObsSpace
 type(c_ptr), value, intent(in) :: ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
 
 type(OB_type)                  :: obs
 type(UM_header_type)           :: CxHeader
-integer(kind=8)                :: varfields(ActualMaxVarfield)
+integer(kind=8)                :: VarFields(ActualMaxVarfield)
 integer(kind=8)                :: NumVarObsTotal
 
-obs % header % obsgroup = self % obsgroup
+obs % Header % obsgroup = self % obsgroup
 
 print *, 'Calling Ops_SetupObType in post'
 call Ops_SetupObType(obs)
 print *, 'Called Ops_SetupObType'
 
-obs % header % numobstotal = obsspace_get_gnlocs(obspace)
-obs % header % numobslocal = obsspace_get_nlocs(obspace)
+obs % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
+obs % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
 
-print *, 'obsspace_get_gnlocs: ', obs % header % numobstotal 
-print *, 'obsspace_get_gnlocs: ', obsspace_get_gnlocs(obspace) 
-print *, 'obsspace_get_nlocs: ', obs % header % numobslocal 
+print *, 'obsspace_get_gnlocs: ', obs % Header % numobstotal
+print *, 'obsspace_get_gnlocs: ', obsspace_get_gnlocs(ObsSpace)
+print *, 'obsspace_get_nlocs: ', obs % Header % numobslocal
 
 Obs % Header % NumCXBatches = 1
 allocate(Obs % Header % ObsPerBatchPerPE(Obs % Header % NumCXBatches, 0:nproc - 1))
-Obs % Header % ObsPerBatchPerPE(1,mype) = obs % header % numobslocal
+Obs % Header % ObsPerBatchPerPE(1,mype) = obs % Header % numobslocal
 
-call Ops_ReadVarobsControlNL (self % obsgroup, varfields) ! TODO(wsmigaj): move to separate function?
-call cxvarobs_varobswriter_populateobservations(self, varfields, obspace, ObsErrors, obs)
+call Ops_ReadVarobsControlNL (self % obsgroup, VarFields) ! TODO(wsmigaj): move to separate function?
+call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, ObsErrors, obs)
 
 CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 CxHeader % FixHd(FH_IntCSize) = 49
@@ -165,298 +165,289 @@ end function cxvarobs_varobswriter_getobsgroup
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_populateobservations(self, varfields, obspace, ObsErrors, Ob)
+subroutine cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, ObsErrors, Ob)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
-integer(kind=8), intent(in)              :: varfields(:)
-type(c_ptr), value, intent(in)           :: obspace
+integer(kind=8), intent(in)              :: VarFields(:)
+type(c_ptr), value, intent(in)           :: ObsSpace
 type(c_ptr), value, intent(in)           :: ObsErrors
 type(OB_type), intent(inout)             :: Ob
 
-character(len=*), parameter          :: RoutineName = "cxvarobs_varobswriter_populateobservations"
-character(len=80)                    :: ErrorMessage
+character(len=*), parameter              :: RoutineName = "cxvarobs_varobswriter_populateobservations"
+character(len=80)                        :: ErrorMessage
 
-integer :: nvarfields
-integer :: Ivar
+integer                                  :: nVarFields
+integer                                  :: iVarField
 
-integer                              :: NumLevs
-integer                              :: Zcode
-logical                              :: UseLevelSubset
+integer                                  :: NumLevs
+integer                                  :: Zcode
+logical                                  :: UseLevelSubset
 
-nvarfields = size(varfields)
+nVarFields = size(VarFields)
 
-call Ops_Alloc(Ob % header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
-call Ops_Alloc(Ob % header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
-call Ops_Alloc(Ob % header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
-call Ops_Alloc(Ob % header % ReportFlags, "ReportFlags", Ob % Header % NumObsLocal, Ob % ReportFlags)
-call Ops_Alloc(Ob % header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
-call obsspace_get_db(obspace, "MetaData", "latitude", Ob % Latitude)
-call obsspace_get_db(obspace, "MetaData", "longitude", Ob % Longitude)
+call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
+call Ops_Alloc(Ob % Header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
+call Ops_Alloc(Ob % Header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
+call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", Ob % Header % NumObsLocal, Ob % ReportFlags)
+call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+call obsspace_get_db(ObsSpace, "MetaData", "latitude", Ob % Latitude)
+call obsspace_get_db(ObsSpace, "MetaData", "longitude", Ob % Longitude)
 
 ! TODO: Num levels
-select case (Ob % header % ObsGroup)
+select case (Ob % Header % ObsGroup)
 case (ObsGroupAircraft, ObsGroupSatwind)
-  call Ops_Alloc(Ob % header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA)
+  call Ops_Alloc(Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA)
 end select
 
-do Ivar = 1, nvarfields
+do iVarField = 1, nVarFields
   NumLevs = 1         ! TODO: Extend to multilevel quantities
   Zcode = ZcodeUnused ! TODO: fill in correctly
 
   UseLevelSubset = .false.
-  select case (varfields(Ivar))
+  select case (VarFields(iVarField))
     case (imdi)
       cycle
     case (VarField_pstar)
       call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-        Ob % header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, "surface_pressure", &
-        obspace, ObsErrors)
+        Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, "surface_pressure", &
+        ObsSpace, ObsErrors)
     case (VarField_theta)
-      call Ops_Alloc(Ob % header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
+      call Ops_Alloc(Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
     case (VarField_temperature)
-      if (Ob % header % ObsGroup == ObsGroupSurface) then
+      if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, "air_temperature", &
-          obspace, ObsErrors)
+          Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, "air_temperature", &
+          ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % header % t, "t", Ob % Header % NumObsLocal, Ob % t)
+        call Ops_Alloc(Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t)
 !        CALL cxvarobs_varobswriter_fillobsvalueanderror_2d( &
-!          Ob % header % t, "t", Ob % Header % NumObsLocal, Ob % t, "air_temperature", obspace)
+!          Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, "air_temperature", ObsSpace)
       end if
     case (VarField_rh)
-      if (Ob % header % ObsGroup == ObsGroupSurface) then
+      if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, "air_temperature", &
-          obspace, ObsErrors)
+          Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, "air_temperature", &
+          ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh)
+        call Ops_Alloc(Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh)
       end if
     case (VarField_u)
-      if (Ob % header % ObsGroup == ObsGroupSurface .or. &
-          Ob % header % ObsGroup == ObsGroupScatwind) then
+      if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
+          Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, "eastward_wind", &
-          obspace, ObsErrors)
+          Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, "eastward_wind", &
+          ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % header % u, "u", Ob % Header % NumObsLocal, Ob % u)
+        call Ops_Alloc(Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u)
       end if
     case (VarField_v)
-      if (Ob % header % ObsGroup == ObsGroupSurface .or. &
-          Ob % header % ObsGroup == ObsGroupScatwind) then
+      if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
+          Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, "northward_wind", &
-          obspace, ObsErrors)
+          Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, "northward_wind", &
+          ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % header % v, "v", Ob % Header % NumObsLocal, Ob % v)
+        call Ops_Alloc(Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v)
       end if
     case (VarField_logvis)
-      call Ops_Alloc(Ob % header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
+      call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
     case (VarField_tcwv)
-      call Ops_Alloc(Ob % header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv)
+      call Ops_Alloc(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv)
     case (VarField_windspeed)
-      call Ops_Alloc(Ob % header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed)
+      call Ops_Alloc(Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed)
     case (VarField_lwp)
-      call Ops_Alloc(Ob % header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
+      call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
     case (VarField_britemp)
-      call Ops_Alloc(Ob % header % CorBriTemp, "CorBriTemp", Ob % Header % NumObsLocal, Ob % CorBriTemp)
+      call Ops_Alloc(Ob % Header % CorBriTemp, "CorBriTemp", Ob % Header % NumObsLocal, Ob % CorBriTemp)
     case (VarField_tskin)
-      call Ops_Alloc(Ob % header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin)
+      call Ops_Alloc(Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin)
     case (VarField_gpstzdelay)
-      call Ops_Alloc(Ob % header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
+      call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
     case (VarField_GPS_Station_Height)
-      call Ops_Alloc(Ob % header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
+      call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
     case (VarField_mwemiss)
-      call Ops_Alloc(Ob % header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss)
+      call Ops_Alloc(Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss)
     case (VarField_TCozone)
-      call Ops_Alloc(Ob % header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone)
+      call Ops_Alloc(Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone)
     case (VarField_satzenith)
-      call Ops_Alloc(Ob % header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle)
+      call Ops_Alloc(Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle)
     case (VarField_scanpos)
-      call Ops_Alloc(Ob % header % ScanPosition, "ScanPosition", Ob % Header % NumObsLocal, Ob % ScanPosition)
+      call Ops_Alloc(Ob % Header % ScanPosition, "ScanPosition", Ob % Header % NumObsLocal, Ob % ScanPosition)
     case (VarField_surface)
-      call Ops_Alloc(Ob % header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface)
+      call Ops_Alloc(Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface)
     case (VarField_elevation)
-      call Ops_Alloc(Ob % header % elevation, "elevation", Ob % Header % NumObsLocal, Ob % elevation)
+      call Ops_Alloc(Ob % Header % elevation, "elevation", Ob % Header % NumObsLocal, Ob % elevation)
     case (VarField_modelsurface)
-      call Ops_Alloc(Ob % header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface)
+      call Ops_Alloc(Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface)
     case (VarField_modelorog)
-      call Ops_Alloc(Ob % header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
+      call Ops_Alloc(Ob % Header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
     case (VarField_stratt)
       UseLevelSubset = .true.
       NumLevs = nlevels_strat_varobs
-      call Ops_Alloc(Ob % header % t, "t", Ob % Header % NumObsLocal, Ob % t)
+      call Ops_Alloc(Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t)
     case (VarField_satid)
-      call Ops_Alloc(Ob % header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId)
+      call Ops_Alloc(Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId)
     case (VarField_satazimth)
-      call Ops_Alloc(Ob % header % SatAzimth, "SatAzimth", Ob % Header % NumObsLocal, Ob % SatAzimth)
+      call Ops_Alloc(Ob % Header % SatAzimth, "SatAzimth", Ob % Header % NumObsLocal, Ob % SatAzimth)
     case (VarField_localazimuth)
-      call Ops_Alloc(Ob % header % LocalAzimuth, "LocalAzimuth", Ob % Header % NumObsLocal, Ob % LocalAzimuth)
+      call Ops_Alloc(Ob % Header % LocalAzimuth, "LocalAzimuth", Ob % Header % NumObsLocal, Ob % LocalAzimuth)
     case (VarField_solzenith)
-      call Ops_Alloc(Ob % header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith)
+      call Ops_Alloc(Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith)
     case (VarField_solazimth)
-      call Ops_Alloc(Ob % header % SolarAzimth, "SolarAzimth", Ob % Header % NumObsLocal, Ob % SolarAzimth)
+      call Ops_Alloc(Ob % Header % SolarAzimth, "SolarAzimth", Ob % Header % NumObsLocal, Ob % SolarAzimth)
     case (VarField_iremiss)
-      call Ops_Alloc(Ob % header % IREmiss, "IREmiss", Ob % Header % NumObsLocal, Ob % IREmiss)
+      call Ops_Alloc(Ob % Header % IREmiss, "IREmiss", Ob % Header % NumObsLocal, Ob % IREmiss)
     case (VarField_cloudtopp)
-      call Ops_Alloc(Ob % header % CloudTopP, "CloudTopP", Ob % Header % NumObsLocal, Ob % CloudTopP)
+      call Ops_Alloc(Ob % Header % CloudTopP, "CloudTopP", Ob % Header % NumObsLocal, Ob % CloudTopP)
     case (VarField_cloudfrac)
-      call Ops_Alloc(Ob % header % CloudFrac, "CloudFrac", Ob % Header % NumObsLocal, Ob % CloudFrac)
+      call Ops_Alloc(Ob % Header % CloudFrac, "CloudFrac", Ob % Header % NumObsLocal, Ob % CloudFrac)
     case (VarField_vnatovpp)
-      call Ops_Alloc(Ob % header % VnATOVPP, "VnATOVPP", Ob % Header % NumObsLocal, Ob % VnATOVPP)
+      call Ops_Alloc(Ob % Header % VnATOVPP, "VnATOVPP", Ob % Header % NumObsLocal, Ob % VnATOVPP)
     case (VarField_procoption)
-      call Ops_Alloc(Ob % header % ATOVSProcOption, "ATOVSProcOption", Ob % Header % NumObsLocal, Ob % ATOVSProcOption)
+      call Ops_Alloc(Ob % Header % ATOVSProcOption, "ATOVSProcOption", Ob % Header % NumObsLocal, Ob % ATOVSProcOption)
     case (VarField_amsusurface)
-      call Ops_Alloc(Ob % header % AMSUsurface, "AMSUsurface", Ob % Header % NumObsLocal, Ob % AMSUsurface)
+      call Ops_Alloc(Ob % Header % AMSUsurface, "AMSUsurface", Ob % Header % NumObsLocal, Ob % AMSUsurface)
     case (VarField_hirs_temp)
-      call Ops_Alloc(Ob % header % HIRS_Temp, "HIRS_Temp", Ob % Header % NumObsLocal, Ob % HIRS_Temp)
+      call Ops_Alloc(Ob % Header % HIRS_Temp, "HIRS_Temp", Ob % Header % NumObsLocal, Ob % HIRS_Temp)
     case (VarField_amsua1_temp)
-      call Ops_Alloc(Ob % header % AMSUa1_Temp, "AMSUa1_Temp", Ob % Header % NumObsLocal, Ob % AMSUa1_Temp)
+      call Ops_Alloc(Ob % Header % AMSUa1_Temp, "AMSUa1_Temp", Ob % Header % NumObsLocal, Ob % AMSUa1_Temp)
     case (VarField_amsua2_temp)
-      call Ops_Alloc(Ob % header % AMSUa2_Temp, "AMSUa2_Temp", Ob % Header % NumObsLocal, Ob % AMSUa2_Temp)
+      call Ops_Alloc(Ob % Header % AMSUa2_Temp, "AMSUa2_Temp", Ob % Header % NumObsLocal, Ob % AMSUa2_Temp)
     case (VarField_amsub_temp)
-      call Ops_Alloc(Ob % header % AMSUb_Temp, "AMSUb_Temp", Ob % Header % NumObsLocal, Ob % AMSUb_Temp)
+      call Ops_Alloc(Ob % Header % AMSUb_Temp, "AMSUb_Temp", Ob % Header % NumObsLocal, Ob % AMSUb_Temp)
     case (VarField_cloud)
-      call Ops_Alloc(Ob % header % Cloud, "Cloud", Ob % Header % NumObsLocal, Ob % Cloud)
+      call Ops_Alloc(Ob % Header % Cloud, "Cloud", Ob % Header % NumObsLocal, Ob % Cloud)
     case (VarField_rainrate)
-      call Ops_Alloc(Ob % header % Rainrate, "Rainrate", Ob % Header % NumObsLocal, Ob % Rainrate)
+      call Ops_Alloc(Ob % Header % Rainrate, "Rainrate", Ob % Header % NumObsLocal, Ob % Rainrate)
     case (VarField_snowrate)
-      call Ops_Alloc(Ob % header % Snowrate, "Snowrate", Ob % Header % NumObsLocal, Ob % Snowrate)
+      call Ops_Alloc(Ob % Header % Snowrate, "Snowrate", Ob % Header % NumObsLocal, Ob % Snowrate)
     case (VarField_u10ambwind)
-      call Ops_Alloc(Ob % header % u10AmbWind, "u10AmbWind", Ob % Header % NumObsLocal, Ob % u10AmbWind)
+      call Ops_Alloc(Ob % Header % u10AmbWind, "u10AmbWind", Ob % Header % NumObsLocal, Ob % u10AmbWind)
     case (VarField_v10ambwind)
-      call Ops_Alloc(Ob % header % v10AmbWind, "v10AmbWind", Ob % Header % NumObsLocal, Ob % v10AmbWind)
+      call Ops_Alloc(Ob % Header % v10AmbWind, "v10AmbWind", Ob % Header % NumObsLocal, Ob % v10AmbWind)
     case (VarField_pcorrect)
-      call Ops_Alloc(Ob % header % AWPriorPCorrect, "AWPriorPCorrect", Ob % Header % NumObsLocal, Ob % AWPriorPCorrect)
+      call Ops_Alloc(Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", Ob % Header % NumObsLocal, Ob % AWPriorPCorrect)
     case (VarField_NumChans)
-      call Ops_Alloc(Ob % header % NumChans, "NumChans", Ob % Header % NumObsLocal, Ob % NumChans)
+      call Ops_Alloc(Ob % Header % NumChans, "NumChans", Ob % Header % NumObsLocal, Ob % NumChans)
     case (VarField_ChanNum)
-      call Ops_Alloc(Ob % header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum)
+      call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum)
     case (VarField_Emissivity)
-      call Ops_Alloc(Ob % header % Emissivity, "Emissivity", Ob % Header % NumObsLocal, Ob % Emissivity)
+      call Ops_Alloc(Ob % Header % Emissivity, "Emissivity", Ob % Header % NumObsLocal, Ob % Emissivity)
     case (VarField_QCinfo)
-      call Ops_Alloc(Ob % header % QCinfo, "QCinfo", Ob % Header % NumObsLocal, Ob % QCinfo)
+      call Ops_Alloc(Ob % Header % QCinfo, "QCinfo", Ob % Header % NumObsLocal, Ob % QCinfo)
     case (VarField_SBUVozone)
-      call Ops_Alloc(Ob % header % SBUVozone, "SBUVozone", Ob % Header % NumObsLocal, Ob % SBUVozone)
+      call Ops_Alloc(Ob % Header % SBUVozone, "SBUVozone", Ob % Header % NumObsLocal, Ob % SBUVozone)
     case (VarField_RadialVelocity)
-        call Ops_Alloc(Ob % header % RadialVelocSO, "RadialVelocSO", Ob % Header % NumObsLocal, Ob % RadialVelocSO)
+        call Ops_Alloc(Ob % Header % RadialVelocSO, "RadialVelocSO", Ob % Header % NumObsLocal, Ob % RadialVelocSO)
     case (VarField_Reflectivity)
-      call Ops_Alloc(Ob % header % ReflectivitySO, "ReflectivitySO", Ob % Header % NumObsLocal, Ob % ReflectivitySO)
+      call Ops_Alloc(Ob % Header % ReflectivitySO, "ReflectivitySO", Ob % Header % NumObsLocal, Ob % ReflectivitySO)
     case (VarField_ReflectivityR)
-      call Ops_Alloc(Ob % header % ReflectivityR, "ReflectivityR", Ob % Header % NumObsLocal, Ob % ReflectivityR)
+      call Ops_Alloc(Ob % Header % ReflectivityR, "ReflectivityR", Ob % Header % NumObsLocal, Ob % ReflectivityR)
     case (VarField_ReflectivityI)
-      call Ops_Alloc(Ob % header % ReflectivityI, "ReflectivityI", Ob % Header % NumObsLocal, Ob % ReflectivityI)
+      call Ops_Alloc(Ob % Header % ReflectivityI, "ReflectivityI", Ob % Header % NumObsLocal, Ob % ReflectivityI)
     case (VarField_RadarBeamElev)
-      call Ops_Alloc(Ob % header % RadarBeamElev, "RadarBeamElev", Ob % Header % NumObsLocal, Ob % RadarBeamElev)
+      call Ops_Alloc(Ob % Header % RadarBeamElev, "RadarBeamElev", Ob % Header % NumObsLocal, Ob % RadarBeamElev)
     case (VarField_RadarObRange)
-      call Ops_Alloc(Ob % header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
+      call Ops_Alloc(Ob % Header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
     case (VarField_RadarObAzim)
-      call Ops_Alloc(Ob % header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim)
+      call Ops_Alloc(Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim)
     case (VarField_RadIdent)
-      call Ops_Alloc(Ob % header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
+      call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
     case (VarField_RadAltAboveMSL)
-      call Ops_Alloc(Ob % header % RadAltAboveMSL, "RadAltAboveMSL", Ob % Header % NumObsLocal, Ob % RadAltAboveMSL)
+      call Ops_Alloc(Ob % Header % RadAltAboveMSL, "RadAltAboveMSL", Ob % Header % NumObsLocal, Ob % RadAltAboveMSL)
     case (VarField_RadNoiseLvl)
-      call Ops_Alloc(Ob % header % RadNoiseLvl, "RadNoiseLvl", Ob % Header % NumObsLocal, Ob % RadNoiseLvl)
+      call Ops_Alloc(Ob % Header % RadNoiseLvl, "RadNoiseLvl", Ob % Header % NumObsLocal, Ob % RadNoiseLvl)
     case (VarField_RadFlag)
-      call Ops_Alloc(Ob % header % RadFlag, "RadFlag", Ob % Header % NumObsLocal, Ob % RadFlag)
+      call Ops_Alloc(Ob % Header % RadFlag, "RadFlag", Ob % Header % NumObsLocal, Ob % RadFlag)
     case (VarField_clw)
-      call Ops_Alloc(Ob % header % clw, "clw", Ob % Header % NumObsLocal, Ob % clw)
+      call Ops_Alloc(Ob % Header % clw, "clw", Ob % Header % NumObsLocal, Ob % clw)
     case (VarField_refrac)
-      call Ops_Alloc(Ob % header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
+      call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
     case (VarField_z)
-      call Ops_Alloc(Ob % header % z, "z", Ob % Header % NumObsLocal, Ob % z)
+      call Ops_Alloc(Ob % Header % z, "z", Ob % Header % NumObsLocal, Ob % z)
     case (VarField_BendingAngle)
       ! IF (GPSRO_TPD) THEN
-      !   CALL Ops_Alloc(Ob % header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll)
+      !   CALL Ops_Alloc(Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll)
       ! ELSE
-      !   CALL Ops_Alloc(Ob % header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle)
+      !   CALL Ops_Alloc(Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle)
       ! END IF
     case (VarField_ImpactParam)
       ! IF (GPSRO_TPD) THEN
-      !   CALL Ops_Alloc(Ob % header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll)
+      !   CALL Ops_Alloc(Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll)
       ! ELSE
-      !   CALL Ops_Alloc(Ob % header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam)
+      !   CALL Ops_Alloc(Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam)
       ! END IF
     case (VarField_RO_Rad_Curv)
-      call Ops_Alloc(Ob % header % RO_Rad_Curv, "RO_Rad_Curv", Ob % Header % NumObsLocal, Ob % RO_Rad_Curv)
+      call Ops_Alloc(Ob % Header % RO_Rad_Curv, "RO_Rad_Curv", Ob % Header % NumObsLocal, Ob % RO_Rad_Curv)
     case (VarField_RO_geoid_und)
-      call Ops_Alloc(Ob % header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und)
+      call Ops_Alloc(Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und)
     case (VarField_AOD)
-      call Ops_Alloc(Ob % header % aod, "AOD", Ob % Header % NumObsLocal, Ob % aod)
+      call Ops_Alloc(Ob % Header % aod, "AOD", Ob % Header % NumObsLocal, Ob % aod)
     case (VarField_BriTempVarError)
-      call Ops_Alloc(Ob % header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
+      call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
     case (VarField_CloudRTError)
-      call Ops_Alloc(Ob % header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
+      call Ops_Alloc(Ob % Header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
     case (VarField_CloudRTBias)
-      call Ops_Alloc(Ob % header % CloudRTBias, "CloudRTBias", Ob % Header % NumObsLocal, Ob % CloudRTBias)
+      call Ops_Alloc(Ob % Header % CloudRTBias, "CloudRTBias", Ob % Header % NumObsLocal, Ob % CloudRTBias)
     case (VarField_BiasPredictors)
-      call Ops_Alloc(Ob % header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors)
+      call Ops_Alloc(Ob % Header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors)
     case (VarField_LevelTime)
       ! IF (PRESENT (RepObs)) THEN
-      !   ObHdrVrbl = RepObs % header % model_level_time
+      !   ObHdrVrbl = RepObs % Header % model_level_time
       ! ELSE
-      !   CALL Ops_Alloc(Ob % header % level_time, "level_time", Ob % Header % NumObsLocal, Ob % level_time)
+      !   CALL Ops_Alloc(Ob % Header % level_time, "level_time", Ob % Header % NumObsLocal, Ob % level_time)
       ! END IF
     case (VarField_LevelLat)
       ! IF (PRESENT (RepObs)) THEN
-      !   ObHdrVrbl = RepObs % header % model_level_lat
+      !   ObHdrVrbl = RepObs % Header % model_level_lat
       ! ELSE
-      !   CALL Ops_Alloc(Ob % header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat)
+      !   CALL Ops_Alloc(Ob % Header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat)
       ! END IF
     case (VarField_LevelLon)
       ! IF (PRESENT (RepObs)) THEN
-      !   ObHdrVrbl = RepObs % header % model_level_lon
+      !   ObHdrVrbl = RepObs % Header % model_level_lon
       ! ELSE
-      !   CALL Ops_Alloc(Ob % header % level_lon, "level_lon", Ob % Header % NumObsLocal, Ob % level_lon)
+      !   CALL Ops_Alloc(Ob % Header % level_lon, "level_lon", Ob % Header % NumObsLocal, Ob % level_lon)
       ! END IF
     case (VarField_RainAccum)
-      call Ops_Alloc(Ob % header % RainAccum, "RainAccum", Ob % Header % NumObsLocal, Ob % RainAccum)
+      call Ops_Alloc(Ob % Header % RainAccum, "RainAccum", Ob % Header % NumObsLocal, Ob % RainAccum)
     case (VarField_CeilBackscatter)
-      call Ops_Alloc(Ob % header % CeilBackscatter, "CeilBackscatter", Ob % Header % NumObsLocal, Ob % CeilBackscatter)
+      call Ops_Alloc(Ob % Header % CeilBackscatter, "CeilBackscatter", Ob % Header % NumObsLocal, Ob % CeilBackscatter)
     case (VarField_CeilRange)
-      call Ops_Alloc(Ob % header % CeilRange, "CeilRange", Ob % Header % NumObsLocal, Ob % CeilRange)
+      call Ops_Alloc(Ob % Header % CeilRange, "CeilRange", Ob % Header % NumObsLocal, Ob % CeilRange)
     case (VarField_CeilSiteId)
-      call Ops_Alloc(Ob % header % CeilSiteID, "CeilSiteID", Ob % Header % NumObsLocal, Ob % CeilSiteID)
+      call Ops_Alloc(Ob % Header % CeilSiteID, "CeilSiteID", Ob % Header % NumObsLocal, Ob % CeilSiteID)
     case (VarField_CeilScanIdent)
-      call Ops_Alloc(Ob % header % CeilScanIdent, "CeilScanIdent", Ob % Header % NumObsLocal, Ob % CeilScanIdent)
+      call Ops_Alloc(Ob % Header % CeilScanIdent, "CeilScanIdent", Ob % Header % NumObsLocal, Ob % CeilScanIdent)
     case (VarField_airqal_consttype)
-      call Ops_Alloc(Ob % header % csnt_typ, "CSNT_TYP", Ob % Header % NumObsLocal, Ob % csnt_typ)
+      call Ops_Alloc(Ob % Header % csnt_typ, "CSNT_TYP", Ob % Header % NumObsLocal, Ob % csnt_typ)
     case (VarField_airqal_massdensity)
-      call Ops_Alloc(Ob % header % mass_dnsty, "MASS_DNSTY", Ob % Header % NumObsLocal, Ob % mass_dnsty)
+      call Ops_Alloc(Ob % Header % mass_dnsty, "MASS_DNSTY", Ob % Header % NumObsLocal, Ob % mass_dnsty)
     case (VarField_airqal_massdensityscale)
-      call Ops_Alloc(Ob % header % dcml_scl_mass_dnsty, "DCML_SCL_MASS_DNSTY", Ob % Header % NumObsLocal, Ob % dcml_scl_mass_dnsty)
+      call Ops_Alloc(Ob % Header % dcml_scl_mass_dnsty, "DCML_SCL_MASS_DNSTY", Ob % Header % NumObsLocal, Ob % dcml_scl_mass_dnsty)
     case (VarField_HLOSwind)
-      call Ops_Alloc(Ob % header % HLOSwind, "HLOSwind", Ob % Header % NumObsLocal, Ob % HLOSwind)
+      call Ops_Alloc(Ob % Header % HLOSwind, "HLOSwind", Ob % Header % NumObsLocal, Ob % HLOSwind)
     case (VarField_ProfileNo)
-      call Ops_Alloc(Ob % header % ProfileNo, "ProfileNo", Ob % Header % NumObsLocal, Ob % ProfileNo)
+      call Ops_Alloc(Ob % Header % ProfileNo, "ProfileNo", Ob % Header % NumObsLocal, Ob % ProfileNo)
     case (VarField_dWinddT)
-      call Ops_Alloc(Ob % header % dWinddT, "dWinddT", Ob % Header % NumObsLocal, Ob % dWinddT)
+      call Ops_Alloc(Ob % Header % dWinddT, "dWinddT", Ob % Header % NumObsLocal, Ob % dWinddT)
     case (VarField_dWinddP)
-      call Ops_Alloc(Ob % header % dWinddP, "dWinddP", Ob % Header % NumObsLocal, Ob % dWinddP)
+      call Ops_Alloc(Ob % Header % dWinddP, "dWinddP", Ob % Header % NumObsLocal, Ob % dWinddP)
     case (VarField_AzimuthCOG)
-      call Ops_Alloc(Ob % header % AzimuthCOG, "AzimuthCOG", Ob % Header % NumObsLocal, Ob % AzimuthCOG)
+      call Ops_Alloc(Ob % Header % AzimuthCOG, "AzimuthCOG", Ob % Header % NumObsLocal, Ob % AzimuthCOG)
     case (VarField_HeightCOG)
-      call Ops_Alloc(Ob % header % HeightCOG, "HeightCOG", Ob % Header % NumObsLocal, Ob % HeightCOG)
+      call Ops_Alloc(Ob % Header % HeightCOG, "HeightCOG", Ob % Header % NumObsLocal, Ob % HeightCOG)
     case default
-      write (ErrorMessage, '(A,I0)') "VarField code not recognised ", VarFields(Ivar)
+      write (ErrorMessage, '(A,I0)') "VarField code not recognised ", VarFields(iVarField)
       call gen_warn (RoutineName,  &
                       ErrorMessage)
       cycle
   end select
-  
-!   case (Varfield_theta)
-!     self%geovars(i) = "air_temperature"
-!   case (Varfield_u)
-!     self%geovars(i) = "eastward_wind"
-
-!   case (Varfield_v)
-!     self%geovars(i) = "northward_wind"
-!   case (Varfield_rh)
-!     self%geovars(i) = "relative_humidity"
-!   end select
 end do
 
 end subroutine cxvarobs_varobswriter_populateobservations
+
+! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d(Hdr,           &
                                                          OpsVarName,    &
@@ -470,14 +461,14 @@ subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d(Hdr,           &
 implicit none
 
 ! Subroutine arguments:
-type (ElementHeader_Type), intent(inout)        :: Hdr
+type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 type(Element_type), pointer                     :: El1(:)
 character(len=*), intent(in)                    :: JediVarName
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: ObsErrors
-type (ElementHeader_Type), optional, intent(in) :: HdrIn
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
 type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
