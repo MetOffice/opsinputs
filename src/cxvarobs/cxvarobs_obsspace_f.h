@@ -29,6 +29,10 @@ extern "C" {
       const ioda::ObsSpace &obsspace, const char *group, const char *vname,
       const util::DateTime &reference, const size_t &length, int64_t *offsets);
 
+  void cxvarobs_obsspace_get_db_string_f(
+      const ioda::ObsSpace &obsspace, const char *group, const char *vname,
+      const size_t &string_length, const size_t &num_strings, char *characters);
+
 }
 
 }  // namespace cxvarobs

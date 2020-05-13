@@ -36,6 +36,29 @@ void cxvarobs_obsspace_get_db_datetime_offset_in_seconds_f(
     offsets[i] = (datetimes[i] - reference).toSeconds();
   }
 }
+
+void cxvarobs_obsspace_get_db_string_f(
+    const ioda::ObsSpace &obsspace, const char *group, const char *vname,
+    const size_t &string_length, const size_t &num_strings, char *characters) {
+  if (std::string(group) == "VarMetaData")
+    ASSERT(num_strings >= obsspace.nvars());
+  else
+    ASSERT(num_strings >= obsspace.nlocs());
+
+  const size_t output_string_length = string_length;
+
+  std::vector<std::string> strings(num_strings);
+  obsspace.get_db(std::string(group), std::string(vname), strings);
+
+  for (size_t string_index = 0; string_index < num_strings; ++string_index) {
+    const std::string &input_string = strings[string_index];
+    const size_t input_string_length = input_string.size();
+    size_t char_index = 0;
+    char *outputString = characters + string_index *output_string_length;
+    for (; char_index < input_string_length &&char_index < output_string_length; ++char_index)
+      outputString[char_index] = input_string[char_index];
+    for (; char_index < output_string_length; ++char_index)
+      outputString[char_index] = ' ';
   }
 }
 

@@ -12,7 +12,8 @@ use string_f_c_mod
 
 implicit none
 
-public cxvarobs_obsspace_get_db_datetime_offset_in_seconds
+public cxvarobs_obsspace_get_db_datetime_offset_in_seconds, &
+       cxvarobs_obsspace_get_db_string
 
 #include "cxvarobs_obsspace_interface.f90"
 
@@ -44,5 +45,29 @@ subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vnam
 
   deallocate(c_group, c_vname)
 end subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds
+
+!> Get a string variable from ObsSpace.
+subroutine cxvarobs_obsspace_get_db_string(obss, group, vname, string_length, strings)
+  use, intrinsic :: iso_c_binding
+  implicit none
+  type(c_ptr), value, intent(in) :: obss
+  character(len=*), intent(in) :: group
+  character(len=*), intent(in) :: vname
+  integer, intent(in) :: string_length
+  character(len=string_length), intent(inout) :: strings(:)
+
+  character(kind=c_char,len=1), allocatable :: c_group(:), c_vname(:)
+  integer(c_size_t) :: num_strings
+
+  !  Translate query from Fortran string to C++ char[].
+  call f_c_string(group, c_group)
+  call f_c_string(vname, c_vname)
+  num_strings = size(strings)
+
+  call c_cxvarobs_obsspace_get_db_string(obss, c_group, c_vname, &
+                                         int(string_length, kind=8), num_strings, strings)
+
+  deallocate(c_group, c_vname)
+end subroutine cxvarobs_obsspace_get_db_string
 
 end module cxvarobs_obsspace_mod
