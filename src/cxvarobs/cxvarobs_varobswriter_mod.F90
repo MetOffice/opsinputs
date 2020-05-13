@@ -474,6 +474,8 @@ real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 integer                                         :: i
+character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillobsvalueanderror_1d"
+character(len=256)                              :: ErrorMessage
 
 ! Body:
 
@@ -486,14 +488,25 @@ integer                                         :: i
 MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
-call Ops_Alloc(Hdr, OpsVarName, NumObs, El1, HdrIn, initial_value)
-call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
-call cxvarobs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
-do i = 1, NumObs
-  if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
-  if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
-  ! TODO: Flags, PGEFinal
-end do
+if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
+  ! Retrieve data from JEDI
+  call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+  if (cxvarobs_obsdatavector_float_has(ObsErrors, JediVarName)) then
+    call cxvarobs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
+  else
+    write (ErrorMessage, '(A,A,A)') "Variable ", JediVarName, "@ObsError not found"
+    call gen_warn(RoutineName, ErrorMessage)
+    ObsError = RMDI
+  end if
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1, HdrIn, initial_value)
+  do i = 1, NumObs
+    if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
+    if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
+    ! TODO: Flags, PGEFinal
+  end do
+end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d
 
 end module cxvarobs_varobswriter_mod
