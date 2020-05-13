@@ -225,7 +225,7 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
-          "air_temperature", ObsSpace, ObsErrors)
+          "relative_humidity", ObsSpace, ObsErrors)
       else
         call Ops_Alloc(Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh)
       end if
