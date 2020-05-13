@@ -209,25 +209,23 @@ do iVarField = 1, nVarFields
       cycle
     case (VarField_pstar)
       call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-        Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, "surface_pressure", &
-        ObsSpace, ObsErrors)
+        Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
+        "surface_pressure", ObsSpace, ObsErrors)
     case (VarField_theta)
       call Ops_Alloc(Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, "air_temperature", &
-          ObsSpace, ObsErrors)
+          Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
+          "air_temperature", ObsSpace, ObsErrors)
       else
         call Ops_Alloc(Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t)
-!        CALL cxvarobs_varobswriter_fillobsvalueanderror_2d( &
-!          Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, "air_temperature", ObsSpace)
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, "air_temperature", &
-          ObsSpace, ObsErrors)
+          Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
+          "air_temperature", ObsSpace, ObsErrors)
       else
         call Ops_Alloc(Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh)
       end if
@@ -235,8 +233,8 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, "eastward_wind", &
-          ObsSpace, ObsErrors)
+          Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
+          "eastward_wind", ObsSpace, ObsErrors)
       else
         call Ops_Alloc(Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u)
       end if
@@ -244,8 +242,8 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
-          Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, "northward_wind", &
-          ObsSpace, ObsErrors)
+          Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
+          "northward_wind", ObsSpace, ObsErrors)
       else
         call Ops_Alloc(Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v)
       end if
@@ -439,8 +437,7 @@ do iVarField = 1, nVarFields
       call Ops_Alloc(Ob % Header % HeightCOG, "HeightCOG", Ob % Header % NumObsLocal, Ob % HeightCOG)
     case default
       write (ErrorMessage, '(A,I0)') "VarField code not recognised ", VarFields(iVarField)
-      call gen_warn (RoutineName,  &
-                      ErrorMessage)
+      call gen_warn(RoutineName, ErrorMessage)
       cycle
   end select
 end do
