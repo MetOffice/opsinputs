@@ -9,7 +9,7 @@
 interface
 
 subroutine c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
-    obss, group, variable, reference, length, offset) &
+    obss, group, variable, reference, length, offsets) &
     bind(C,name='cxvarobs_obsspace_get_db_datetime_offset_in_seconds_f')
   use, intrinsic :: iso_c_binding, only: c_ptr, c_char, c_size_t, c_int64_t
   implicit none
@@ -18,7 +18,7 @@ subroutine c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
   character(kind=c_char, len=1), intent(in) :: variable(*)
   type(c_ptr), value :: reference
   integer(c_size_t), intent(in) :: length
-  integer(c_int64_t), intent(inout) :: offset(length)
+  integer(c_int64_t), intent(inout) :: offsets(length)
 end subroutine c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds
 
 end interface

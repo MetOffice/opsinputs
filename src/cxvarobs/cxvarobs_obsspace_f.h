@@ -26,8 +26,8 @@ namespace cxvarobs {
 extern "C" {
 
   void cxvarobs_obsspace_get_db_datetime_offset_in_seconds_f(
-      const ioda::ObsSpace & obsspace, const char * group, const char * vname,
-      const util::DateTime & reference, const size_t & length, int64_t* offset);
+      const ioda::ObsSpace &obsspace, const char *group, const char *vname,
+      const util::DateTime &reference, const size_t &length, int64_t *offsets);
 
 }
 

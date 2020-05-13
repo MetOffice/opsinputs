@@ -20,14 +20,14 @@ contains
 
 !> Get a datetime variable from ObsSpace, representing it as an array of offsets (in seconds)
 !> with respect to a reference datetime.
-subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vname, reference, offset)
+subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vname, reference, offsets)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), value, intent(in) :: obss
   character(len=*), intent(in) :: group
   character(len=*), intent(in) :: vname
   type(datetime), intent(in) :: reference
-  integer(c_int64_t), intent(inout) :: offset(:)
+  integer(c_int64_t), intent(inout) :: offsets(:)
 
   character(kind=c_char,len=1), allocatable :: c_group(:), c_vname(:)
   type(c_ptr) :: c_reference
@@ -37,10 +37,10 @@ subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vnam
   call f_c_string(group, c_group)
   call f_c_string(vname, c_vname)
   call f_c_datetime(reference, c_reference)
-  length = size(offset)
+  length = size(offsets)
 
   call c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, c_group, c_vname, c_reference, &
-                                                             length, offset)
+                                                             length, offsets)
 
   deallocate(c_group, c_vname)
 end subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds
