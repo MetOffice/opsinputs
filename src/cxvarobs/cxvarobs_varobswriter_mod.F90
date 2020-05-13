@@ -9,11 +9,13 @@ module cxvarobs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding
+use datetime_mod
 use missing_values_mod
 use obsspace_mod
 use ufo_geovals_mod
 use ufo_vars_mod
 use cxvarobs_obsdatavector_mod
+use cxvarobs_obsspace_mod
 
 use GenMod_Control, only:   &
     DebugMode,              &
@@ -55,9 +57,8 @@ type, public :: cxvarobs_varobswriter
 private
   character(len=max_string), public, allocatable :: geovars(:)
   integer(kind=8) :: obsgroup
+  type(datetime)  :: validitytime  ! Corresponds to OPS validity time
 end type cxvarobs_varobswriter
-
-! #include "obsdatavector_interface.f90"
 
 ! ------------------------------------------------------------------------------
 contains
@@ -74,7 +75,7 @@ call Ops_InitMPI
 GeneralMode = DebugMode
 
 self % obsgroup = cxvarobs_varobswriter_getobsgroup(self, f_conf)
-
+self % validitytime = cxvarobs_varobswriter_getvaliditytime(self, f_conf)
 ! TODO: set self%geovars (list of variables to use from GeoVaLs) if needed
 
 end subroutine cxvarobs_varobswriter_create
@@ -85,6 +86,7 @@ subroutine cxvarobs_varobswriter_delete(self)
 implicit none
 type(cxvarobs_varobswriter), intent(inout) :: self
 
+call datetime_delete(self % validitytime)
 if (allocated(self%geovars))   deallocate(self%geovars)
 
 end subroutine cxvarobs_varobswriter_delete
@@ -153,15 +155,28 @@ end subroutine cxvarobs_varobswriter_post
 ! ------------------------------------------------------------------------------
 
 integer function cxvarobs_varobswriter_getobsgroup(self, f_conf)
-  implicit none
-  type(cxvarobs_varobswriter),  intent(in) :: self
-  type(fckit_configuration), intent(in) :: f_conf
+implicit none
+type(cxvarobs_varobswriter), intent(in) :: self
+type(fckit_configuration), intent(in) :: f_conf
 
-  character(len=:),allocatable :: obsgroupname
+character(len=:),allocatable :: obsgroupname
 
-  call f_conf % get_or_die("obs_group", obsgroupname)
-  cxvarobs_varobswriter_getobsgroup = OpsFn_ObsGroupNameToNum(obsgroupname)
+call f_conf % get_or_die("obs_group", obsgroupname)
+cxvarobs_varobswriter_getobsgroup = OpsFn_ObsGroupNameToNum(obsgroupname)
 end function cxvarobs_varobswriter_getobsgroup
+
+! ------------------------------------------------------------------------------
+
+type(datetime) function cxvarobs_varobswriter_getvaliditytime(self, f_conf)
+implicit none
+type(cxvarobs_varobswriter), intent(in) :: self
+type(fckit_configuration), intent(in) :: f_conf
+
+character(len=:),allocatable :: validitytimestr
+
+call f_conf % get_or_die("validity_time", validitytimestr)
+call datetime_create(validitytimestr, cxvarobs_varobswriter_getvaliditytime)
+end function cxvarobs_varobswriter_getvaliditytime
 
 ! ------------------------------------------------------------------------------
 
@@ -179,6 +194,8 @@ character(len=80)                        :: ErrorMessage
 integer                                  :: nVarFields
 integer                                  :: iVarField
 
+integer(c_int64_t)                       :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
+
 integer                                  :: NumLevs
 integer                                  :: Zcode
 logical                                  :: UseLevelSubset
@@ -192,6 +209,10 @@ call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", Ob % Header % NumObsLoc
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
 call obsspace_get_db(ObsSpace, "MetaData", "latitude", Ob % Latitude)
 call obsspace_get_db(ObsSpace, "MetaData", "longitude", Ob % Longitude)
+
+call cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
+  ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
+Ob % Time = TimeOffsetsInSeconds
 
 ! TODO: Num levels
 select case (Ob % Header % ObsGroup)

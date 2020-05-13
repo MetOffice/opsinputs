@@ -5,6 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
+#include <unistd.h>
+
 #include "cxvarobs/VarObsWriter.h"
 
 #include "eckit/config/Configuration.h"
@@ -27,8 +29,10 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
                            boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)) {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
-  const eckit::Configuration * conf = &config;
-  cxvarobs_varobswriter_create_f90(key_, conf, geovars_);
+  eckit::LocalConfiguration conf(config);
+  // TODO(wsmigaj): is this the correct definition of the validity time?
+  conf.set("validity_time", obsdb.windowEnd().toString());
+  cxvarobs_varobswriter_create_f90(key_, &conf, geovars_);
   oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;
 }
 
