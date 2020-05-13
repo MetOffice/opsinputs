@@ -30,3 +30,16 @@ Observations:
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/ioda/testinput_tier_1/amsua_metop-b_obs_2018041500_m.nc4
+      simulate:
+        variables: [brightness_temperature]
+        channels: 1-15
+    ObsFilters:
+    - Filter: VarObsWriter
+      obs_group: AMSUB
+    HofX: GsiHofX
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0

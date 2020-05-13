@@ -268,7 +268,9 @@ do iVarField = 1, nVarFields
     case (VarField_TCozone)
       call Ops_Alloc(Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone)
     case (VarField_satzenith)
-      call Ops_Alloc(Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle)
+      call cxvarobs_varobswriter_fillvariable_1d( &
+        Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle, &
+        "sensor_zenith_angle", "MetaData", ObsSpace)
     case (VarField_scanpos)
       call Ops_Alloc(Ob % Header % ScanPosition, "ScanPosition", Ob % Header % NumObsLocal, Ob % ScanPosition)
     case (VarField_surface)
@@ -290,7 +292,9 @@ do iVarField = 1, nVarFields
     case (VarField_localazimuth)
       call Ops_Alloc(Ob % Header % LocalAzimuth, "LocalAzimuth", Ob % Header % NumObsLocal, Ob % LocalAzimuth)
     case (VarField_solzenith)
-      call Ops_Alloc(Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith)
+      call cxvarobs_varobswriter_fillvariable_1d( &
+        Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith, &
+        "solar_zenith_angle", "MetaData", ObsSpace)
     case (VarField_solazimth)
       call Ops_Alloc(Ob % Header % SolarAzimth, "SolarAzimth", Ob % Header % NumObsLocal, Ob % SolarAzimth)
     case (VarField_iremiss)
@@ -508,5 +512,55 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_fillvariable_1d(Hdr,           &
+                                                 OpsVarName,    &
+                                                 NumObs,        &
+                                                 Real1,         &
+                                                 JediVarName,   &
+                                                 JediVarGroup,  &
+                                                 ObsSpace,      &
+                                                 HdrIn,         &
+                                                 initial_value)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(kind=8), intent(in)                     :: NumObs
+real(kind=8), pointer                           :: Real1(:)
+character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediVarGroup
+type(c_ptr), value, intent(in)                  :: ObsSpace
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
+real(kind=8), optional, intent(in)              :: initial_value
+
+! Local declarations:
+real(kind=c_double)                             :: VarValue(NumObs)
+real(kind=c_double)                             :: MissingDouble
+integer                                         :: i
+
+! Body:
+
+! The types of floating-point numbers used in this function are a bit confusing. OPS stores
+! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
+! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
+! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles.
+
+MissingDouble = missing_value(0.0_c_double)
+
+if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
+  ! Retrieve data from JEDI
+  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1, HdrIn, initial_value)
+  do i = 1, NumObs
+    if (VarValue(i) /= MissingDouble) Real1(i) = VarValue(i)
+  end do
+end if
+end subroutine cxvarobs_varobswriter_fillvariable_1d
 
 end module cxvarobs_varobswriter_mod
