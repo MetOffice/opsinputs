@@ -203,16 +203,24 @@ logical                                  :: UseLevelSubset
 nVarFields = size(VarFields)
 
 call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
-call Ops_Alloc(Ob % Header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
-call Ops_Alloc(Ob % Header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
-call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", Ob % Header % NumObsLocal, Ob % ReportFlags)
-call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
 call obsspace_get_db(ObsSpace, "MetaData", "latitude", Ob % Latitude)
+
+call Ops_Alloc(Ob % Header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
 call obsspace_get_db(ObsSpace, "MetaData", "longitude", Ob % Longitude)
 
+call Ops_Alloc(Ob % Header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
 call cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
   ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
 Ob % Time = TimeOffsetsInSeconds
+
+call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", Ob % Header % NumObsLocal, Ob % ReportFlags)
+call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+
+if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
+  call Ops_Alloc(Ob % Header % Callsign, "Callsign", Ob % Header % NumObsLocal, Ob % Callsign)
+  call cxvarobs_obsspace_get_db_string( &
+    ObsSpace, "MetaData", "station_id", int(LenCallSign, kind=4), Ob % Callsign)
+end if
 
 ! TODO: Num levels
 select case (Ob % Header % ObsGroup)
