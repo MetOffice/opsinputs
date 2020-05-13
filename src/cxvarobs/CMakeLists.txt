@@ -4,6 +4,9 @@
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 list( APPEND cxvarobs_src_files
+    cxvarobs_obsspace_f.cc
+    cxvarobs_obsspace_f.h
+    cxvarobs_obsspace_mod.F90
     cxvarobs_varobswriter_mod.F90
     instantiateObsFilterFactory.h
     obsdatavector_f.cc
