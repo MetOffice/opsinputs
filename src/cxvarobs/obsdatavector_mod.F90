@@ -24,7 +24,7 @@ public cxvarobs_obsdatavector_float_get
 
 contains
 
-!>  Return the number of observational locations in this ObsDataVector<int> object.
+!> Return the number of observational locations in this ObsDataVector<int> object.
 
 integer function cxvarobs_obsdatavector_int_nlocs(c_vec)
   use, intrinsic :: iso_c_binding
@@ -34,7 +34,18 @@ integer function cxvarobs_obsdatavector_int_nlocs(c_vec)
   cxvarobs_obsdatavector_int_nlocs = c_cxvarobs_obsdatavector_int_nlocs(c_vec)
 end function cxvarobs_obsdatavector_int_nlocs
 
-!>  Return true if this ObsDataVector<int> object contains a given variable.
+!> Return an object wrapping the list of names of variables held in this ObsDataVector<int> object.
+
+type(oops_variables) function cxvarobs_obsdatavector_int_varnames(c_vec)
+  use, intrinsic :: iso_c_binding
+  use oops_variables_mod
+  implicit none
+  type(c_ptr), value, intent(in) :: c_vec
+
+  cxvarobs_obsdatavector_int_varnames = oops_variables(c_cxvarobs_obsdatavector_int_varnames(c_vec))
+end function cxvarobs_obsdatavector_int_varnames
+
+!> Return true if this ObsDataVector<int> object contains a given variable.
 
 logical function cxvarobs_obsdatavector_int_has(c_vec, variable)
   use, intrinsic :: iso_c_binding
@@ -71,7 +82,7 @@ subroutine cxvarobs_obsdatavector_int_get(c_vec, variable, vect)
 end subroutine cxvarobs_obsdatavector_int_get
 
 
-!>  Return the number of observational locations in this ObsDataVector<float> object.
+!> Return the number of observational locations in this ObsDataVector<float> object.
 
 integer function cxvarobs_obsdatavector_float_nlocs(c_vec)
   use, intrinsic :: iso_c_binding
@@ -81,7 +92,19 @@ integer function cxvarobs_obsdatavector_float_nlocs(c_vec)
   cxvarobs_obsdatavector_float_nlocs = c_cxvarobs_obsdatavector_float_nlocs(c_vec)
 end function cxvarobs_obsdatavector_float_nlocs
 
-!>  Return true if this ObsDataVector<float> object contains a given variable.
+!> Return an object wrapping the list of names of variables held in this ObsDataVector<int> object.
+
+type(oops_variables) function cxvarobs_obsdatavector_float_varnames(c_vec)
+  use, intrinsic :: iso_c_binding
+  use oops_variables_mod
+  implicit none
+  type(c_ptr), value, intent(in) :: c_vec
+
+  cxvarobs_obsdatavector_float_varnames = &
+    oops_variables(c_cxvarobs_obsdatavector_float_varnames(c_vec))
+end function cxvarobs_obsdatavector_float_varnames
+
+!> Return true if this ObsDataVector<float> object contains a given variable.
 
 logical function cxvarobs_obsdatavector_float_has(c_vec, variable)
   use, intrinsic :: iso_c_binding

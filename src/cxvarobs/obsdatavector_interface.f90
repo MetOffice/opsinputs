@@ -16,6 +16,13 @@ integer(kind=c_int) function c_cxvarobs_obsdatavector_int_nlocs(vec) &
   type(c_ptr), value :: vec
 end function c_cxvarobs_obsdatavector_int_nlocs
 
+type(c_ptr) function c_cxvarobs_obsdatavector_int_varnames(vec) &
+    bind(C, name='cxvarobs_obsdatavector_int_varnames_f')
+  use, intrinsic :: iso_c_binding, only: c_ptr
+  implicit none
+  type(c_ptr), value :: vec
+end function c_cxvarobs_obsdatavector_int_varnames
+
 logical(kind=c_bool) function c_cxvarobs_obsdatavector_int_has(vec, variable) &
     bind(C,name='cxvarobs_obsdatavector_int_has_f')
   use, intrinsic :: iso_c_binding
@@ -42,6 +49,13 @@ integer(kind=c_int) function c_cxvarobs_obsdatavector_float_nlocs(vec) &
 
   type(c_ptr), value :: vec
 end function c_cxvarobs_obsdatavector_float_nlocs
+
+type(c_ptr) function c_cxvarobs_obsdatavector_float_varnames(vec) &
+    bind(C, name='cxvarobs_obsdatavector_float_varnames_f')
+  use, intrinsic :: iso_c_binding, only: c_ptr
+  implicit none
+  type(c_ptr), value :: vec
+end function c_cxvarobs_obsdatavector_float_varnames
 
 logical(kind=c_bool) function c_cxvarobs_obsdatavector_float_has(vec, variable) &
     bind(C,name='cxvarobs_obsdatavector_float_has_f')

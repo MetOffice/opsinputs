@@ -22,6 +22,11 @@ int cxvarobs_obsdatavector_int_nlocs_f(const ioda::ObsDataVector<int> &vec) {
   return vec.nlocs();
 }
 
+const oops::Variables * cxvarobs_obsdatavector_int_varnames_f(
+    const ioda::ObsDataVector<int> &vec) {
+  return &vec.varnames();
+}
+
 bool cxvarobs_obsdatavector_int_has_f(const ioda::ObsDataVector<int> &vec,
                                       const char *variable) {
   return vec.has(variable);
@@ -37,6 +42,11 @@ void cxvarobs_obsdatavector_int_get_f(const ioda::ObsDataVector<int> &vec,
 
 int cxvarobs_obsdatavector_float_nlocs_f(const ioda::ObsDataVector<float> &vec) {
   return vec.nlocs();
+}
+
+const oops::Variables * cxvarobs_obsdatavector_float_varnames_f(
+    const ioda::ObsDataVector<float> &vec) {
+  return &vec.varnames();
 }
 
 bool cxvarobs_obsdatavector_float_has_f(const ioda::ObsDataVector<float> &vec,

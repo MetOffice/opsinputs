@@ -16,10 +16,16 @@ namespace ioda {
   template <typename T> class ObsDataVector;
 }  // namespace ioda
 
+namespace oops {
+  class Variables;
+}  // namespace oops
+
 namespace cxvarobs {
 
 extern "C" {
   int cxvarobs_obsdatavector_int_nlocs_f(const ioda::ObsDataVector<int> &vec);
+  const oops::Variables * cxvarobs_obsdatavector_int_varnames_f(
+      const ioda::ObsDataVector<int> &vec);
   bool cxvarobs_obsdatavector_int_has_f(const ioda::ObsDataVector<int> &vec,
                                         const char *variable);
   void cxvarobs_obsdatavector_int_get_f(const ioda::ObsDataVector<int> &vec,
@@ -27,6 +33,8 @@ extern "C" {
                                         const size_t &length, int* data);
 
   int cxvarobs_obsdatavector_float_nlocs_f(const ioda::ObsDataVector<float> &vec);
+  const oops::Variables * cxvarobs_obsdatavector_float_varnames_f(
+      const ioda::ObsDataVector<float> &vec);
   bool cxvarobs_obsdatavector_float_has_f(const ioda::ObsDataVector<float> &vec,
                                           const char *variable);
   void cxvarobs_obsdatavector_float_get_f(const ioda::ObsDataVector<float> &vec,
