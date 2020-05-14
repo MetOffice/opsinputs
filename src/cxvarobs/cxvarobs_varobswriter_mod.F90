@@ -248,14 +248,14 @@ do iVarField = 1, nVarFields
     case (imdi)
       cycle
     case (VarField_pstar)
-      call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+      call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         "surface_pressure", ObsSpace, ObsErrors)
     case (VarField_theta)
       call Ops_Alloc(Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
-        call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+        call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
           "air_temperature", ObsSpace, ObsErrors)
       else
@@ -265,7 +265,7 @@ do iVarField = 1, nVarFields
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
-        call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+        call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
           "relative_humidity", ObsSpace, ObsErrors)
       else
@@ -276,7 +276,7 @@ do iVarField = 1, nVarFields
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
-        call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+        call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
           "eastward_wind", ObsSpace, ObsErrors)
       else
@@ -287,7 +287,7 @@ do iVarField = 1, nVarFields
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
-        call cxvarobs_varobswriter_fillobsvalueanderror_1d( &
+        call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
           "northward_wind", ObsSpace, ObsErrors)
       else
@@ -316,7 +316,7 @@ do iVarField = 1, nVarFields
     case (VarField_TCozone)
       call Ops_Alloc(Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone)
     case (VarField_satzenith)
-      call cxvarobs_varobswriter_fillvariable_1d( &
+      call cxvarobs_varobswriter_fillreal( &
         Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle, &
         "sensor_zenith_angle", "MetaData", ObsSpace)
     case (VarField_scanpos)
@@ -340,7 +340,7 @@ do iVarField = 1, nVarFields
     case (VarField_localazimuth)
       call Ops_Alloc(Ob % Header % LocalAzimuth, "LocalAzimuth", Ob % Header % NumObsLocal, Ob % LocalAzimuth)
     case (VarField_solzenith)
-      call cxvarobs_varobswriter_fillvariable_1d( &
+      call cxvarobs_varobswriter_fillreal( &
         Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith, &
         "solar_zenith_angle", "MetaData", ObsSpace)
     case (VarField_solazimth)
@@ -500,7 +500,7 @@ end subroutine cxvarobs_varobswriter_populateobservations
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d(Hdr,           &
+subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable(Hdr,           &
                                                          OpsVarName,    &
                                                          NumObs,        &
                                                          El1,           &
@@ -528,7 +528,7 @@ real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 integer                                         :: i
-character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillobsvalueanderror_1d"
+character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillelementtypefromsimulatedvariable"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
@@ -561,7 +561,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     ! TODO: Flags, PGEFinal
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d
+end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 
 ! ------------------------------------------------------------------------------
 
@@ -644,29 +644,7 @@ end subroutine cxvarobs_varobswriter_fillobsvalueanderror_2d
 
 ! ------------------------------------------------------------------------------
 
-!> Return an array containing the names of JEDI variables storing individual channels of the
-!> variable VarName. If the list of channels is empty, this means the variable in question is
-!> 1D and hence the returned array contains just the single string VarName.
-function cxvarobs_varobswriter_varnames_with_channels(VarName, Channels) result(VarNames)
-implicit none
-character(len=*), intent(in)                   :: VarName
-integer(c_int), intent(in)                     :: Channels(:)
-
-character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
-integer                                        :: i
-
-if (size(Channels) == 0) then
-  VarNames(1) = VarName
-else
-  do i = 1, size(Channels)
-    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
-  end do
-end if
-end function cxvarobs_varobswriter_varnames_with_channels
-
-! ------------------------------------------------------------------------------
-
-subroutine cxvarobs_varobswriter_fillvariable_1d(Hdr,           &
+subroutine cxvarobs_varobswriter_fillreal(Hdr,           &
                                                  OpsVarName,    &
                                                  NumObs,        &
                                                  Real1,         &
@@ -695,11 +673,6 @@ integer                                         :: i
 
 ! Body:
 
-! The types of floating-point numbers used in this function are a bit confusing. OPS stores
-! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
-! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
-! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles.
-
 MissingDouble = missing_value(0.0_c_double)
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
@@ -712,7 +685,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (VarValue(i) /= MissingDouble) Real1(i) = VarValue(i)
   end do
 end if
-end subroutine cxvarobs_varobswriter_fillvariable_1d
+end subroutine cxvarobs_varobswriter_fillreal
+
 
 ! ------------------------------------------------------------------------------
 
@@ -752,5 +726,26 @@ end do
 
 end subroutine cxvarobs_varobswriter_fillreportflags
 
+! ------------------------------------------------------------------------------
+
+!> Return an array containing the names of JEDI variables storing individual channels of the
+!> variable VarName. If the list of channels is empty, this means the variable in question is
+!> 1D and hence the returned array contains just the single string VarName.
+function cxvarobs_varobswriter_varnames_with_channels(VarName, Channels) result(VarNames)
+implicit none
+character(len=*), intent(in)                   :: VarName
+integer(c_int), intent(in)                     :: Channels(:)
+
+character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
+integer                                        :: i
+
+if (size(Channels) == 0) then
+  VarNames(1) = VarName
+else
+  do i = 1, size(Channels)
+    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
+  end do
+end if
+end function cxvarobs_varobswriter_varnames_with_channels
 
 end module cxvarobs_varobswriter_mod
