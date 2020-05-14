@@ -30,7 +30,8 @@ contains
 #include "oops/util/linkedList_c.f"
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_create_c(c_self, c_conf, c_varlist) bind(c,name='cxvarobs_varobswriter_create_f90')
+subroutine cxvarobs_varobswriter_create_c(c_self, c_conf, c_varlist) &
+  bind(c,name='cxvarobs_varobswriter_create_f90')
 use string_f_c_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
@@ -55,7 +56,8 @@ end subroutine cxvarobs_varobswriter_create_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_delete_c(c_self) bind(c,name='cxvarobs_varobswriter_delete_f90')
+subroutine cxvarobs_varobswriter_delete_c(c_self) &
+  bind(c,name='cxvarobs_varobswriter_delete_f90')
 implicit none
 integer(c_int), intent(inout) :: c_self
 
@@ -69,7 +71,8 @@ end subroutine cxvarobs_varobswriter_delete_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_prior_c(c_self, c_obspace, c_geovals) bind(c,name='cxvarobs_varobswriter_prior_f90')
+subroutine cxvarobs_varobswriter_prior_c(c_self, c_obspace, c_geovals) &
+  bind(c,name='cxvarobs_varobswriter_prior_f90')
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
@@ -87,12 +90,15 @@ end subroutine cxvarobs_varobswriter_prior_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_post_c(c_self, c_obspace, c_flags, c_obserrors, &
-                                        c_nvars, c_nlocs, c_hofx) &
+subroutine cxvarobs_varobswriter_post_c(c_self, c_obspace, c_nchannels, c_channels, &
+                                        c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx) &
   bind(c,name='cxvarobs_varobswriter_post_f90')
 implicit none
 integer(c_int), intent(in) :: c_self
-type(c_ptr), value, intent(in) :: c_obspace, c_flags, c_obserrors
+type(c_ptr), value, intent(in) :: c_obspace
+integer(c_int), intent(in) :: c_nchannels
+integer(c_int), intent(in) :: c_channels(c_nchannels)
+type(c_ptr), value, intent(in) :: c_flags, c_obserrors
 integer(c_int), intent(in) :: c_nvars, c_nlocs
 real(c_double), intent(in) :: c_hofx(c_nvars, c_nlocs)
 
@@ -100,7 +106,8 @@ type(cxvarobs_varobswriter), pointer :: self
 
 call cxvarobs_varobswriter_registry%get(c_self, self)
 
-call cxvarobs_varobswriter_post(self, c_obspace, c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx)
+call cxvarobs_varobswriter_post(self, c_obspace, c_nchannels, c_channels, &
+                                c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx)
 
 end subroutine cxvarobs_varobswriter_post_c
 

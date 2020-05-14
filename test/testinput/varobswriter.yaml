@@ -43,3 +43,17 @@ Observations:
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
+  - ObsSpace:
+      name: AOD
+      ObsDataIn:
+        obsfile: Data/ioda/testinput_tier_1/aod_viirs_obs_2018041500_m.nc4
+      simulate:
+        variables: [aerosol_optical_depth]
+        channels: 4
+    ObsFilters:
+    - Filter: VarObsWriter
+      obs_group: AOD
+    HofX: ObsValue # there's no GsiHofX
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0
+

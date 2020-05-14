@@ -50,6 +50,10 @@ public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, &
           cxvarobs_varobswriter_prior, cxvarobs_varobswriter_post
 private
 integer, parameter :: max_string=800
+! Maximum length of a variable name
+integer, parameter :: max_varname_length=MAXVARLEN
+! Maximum length of a variable name with channel suffix
+integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 
 ! ------------------------------------------------------------------------------
 !> TODO: fill in this type
@@ -103,10 +107,14 @@ end subroutine cxvarobs_varobswriter_prior
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_post(self, ObsSpace, Flags, ObsErrors, nvars, nlocs, hofx)
+subroutine cxvarobs_varobswriter_post(self, ObsSpace, nchannels, Channels, &
+                                      Flags, ObsErrors, nvars, nlocs, hofx)
 implicit none
-type(cxvarobs_varobswriter),  intent(in) :: self
-type(c_ptr), value, intent(in) :: ObsSpace, Flags, ObsErrors
+type(cxvarobs_varobswriter), intent(in) :: self
+type(c_ptr), value, intent(in) :: ObsSpace
+integer,            intent(in) :: nchannels
+integer,            intent(in) :: Channels(nchannels)
+type(c_ptr), value, intent(in) :: Flags, ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
 
@@ -132,8 +140,9 @@ Obs % Header % NumCXBatches = 1
 allocate(Obs % Header % ObsPerBatchPerPE(Obs % Header % NumCXBatches, 0:nproc - 1))
 Obs % Header % ObsPerBatchPerPE(1,mype) = obs % Header % numobslocal
 
-call Ops_ReadVarobsControlNL (self % obsgroup, VarFields) ! TODO(wsmigaj): move to separate function?
-call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Flags, ObsErrors, obs)
+call Ops_ReadVarobsControlNL(self % obsgroup, VarFields) ! TODO(wsmigaj): move to separate function?
+call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Channels, &
+                                                Flags, ObsErrors, obs)
 
 CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 CxHeader % FixHd(FH_IntCSize) = 49
@@ -179,12 +188,14 @@ end function cxvarobs_varobswriter_getvaliditytime
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, &
+subroutine cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Channels, &
                                                       Flags, ObsErrors, Ob)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
 integer(kind=8), intent(in)              :: VarFields(:)
-type(c_ptr), value, intent(in)           :: ObsSpace, Flags, ObsErrors
+type(c_ptr), value, intent(in)           :: ObsSpace
+integer(c_int), intent(in)               :: Channels(:)
+type(c_ptr), value, intent(in)           :: Flags, ObsErrors
 type(OB_type), intent(inout)             :: Ob
 
 character(len=*), parameter              :: RoutineName = "cxvarobs_varobswriter_populateobservations"
@@ -248,7 +259,9 @@ do iVarField = 1, nVarFields
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
           "air_temperature", ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t)
+        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+          Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
+          "air_temperature", ObsSpace, Channels, ObsErrors)
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -256,7 +269,9 @@ do iVarField = 1, nVarFields
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
           "relative_humidity", ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh)
+        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+          Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
+          "relative_humidity", ObsSpace, Channels, ObsErrors)
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -265,7 +280,9 @@ do iVarField = 1, nVarFields
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
           "eastward_wind", ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u)
+        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+          Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
+          "eastward_wind", ObsSpace, Channels, ObsErrors)
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -274,7 +291,9 @@ do iVarField = 1, nVarFields
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
           "northward_wind", ObsSpace, ObsErrors)
       else
-        call Ops_Alloc(Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v)
+        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+          Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
+          "northward_wind", ObsSpace, Channels, ObsErrors)
       end if
     case (VarField_logvis)
       call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
@@ -413,7 +432,9 @@ do iVarField = 1, nVarFields
     case (VarField_RO_geoid_und)
       call Ops_Alloc(Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und)
     case (VarField_AOD)
-      call Ops_Alloc(Ob % Header % aod, "AOD", Ob % Header % NumObsLocal, Ob % aod)
+      call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+        Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
+        "aerosol_optical_depth", ObsSpace, Channels, ObsErrors)
     case (VarField_BriTempVarError)
       call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
     case (VarField_CloudRTError)
@@ -544,6 +565,107 @@ end subroutine cxvarobs_varobswriter_fillobsvalueanderror_1d
 
 ! ------------------------------------------------------------------------------
 
+subroutine cxvarobs_varobswriter_fillobsvalueanderror_2d(Hdr,           &
+                                                         OpsVarName,    &
+                                                         NumObs,        &
+                                                         El2,           &
+                                                         JediVarName,   &
+                                                         ObsSpace,      &
+                                                         Channels,      &
+                                                         ObsErrors,     &
+                                                         HdrIn,         &
+                                                         initial_value)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(kind=8), intent(in)                     :: NumObs
+type(Element_type), pointer                     :: El2(:,:)
+character(len=*), intent(in)                    :: JediVarName
+type(c_ptr), value, intent(in)                  :: ObsSpace
+integer(c_int), intent(in)                      :: Channels(:)
+type(c_ptr), value, intent(in)                  :: ObsErrors
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
+type(Element_Type), optional, intent(in)        :: initial_value
+
+! Local declarations:
+real(kind=c_double)                             :: ObsValue(NumObs)
+real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: MissingDouble
+real(kind=c_float)                              :: MissingFloat
+character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+
+integer                                         :: iChannel, iObs
+character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillobsvalueanderror_2d"
+character(len=256)                              :: ErrorMessage
+
+! Body:
+
+! The types of floating-point numbers used in this function are a bit confusing. OPS stores
+! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
+! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
+! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles. Observation
+! errors, though, are retrieved as floats.
+
+MissingDouble = missing_value(0.0_c_double)
+MissingFloat  = missing_value(0.0_c_float)
+
+JediVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels(JediVarName, Channels)
+
+if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
+  ! Allocate OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
+                 HdrIn = HdrIn, &
+                 num_levels = int(size(JediVarNamesWithChannels), kind=8), &
+                 initial_value = initial_value)
+
+  do iChannel = 1, size(JediVarNamesWithChannels)
+    ! Retrieve data from JEDI
+    call obsspace_get_db(ObsSpace, "ObsValue", JediVarNamesWithChannels(iChannel), ObsValue)
+    if (cxvarobs_obsdatavector_float_has(ObsErrors, JediVarNamesWithChannels(iChannel))) then
+      call cxvarobs_obsdatavector_float_get(ObsErrors, JediVarNamesWithChannels(iChannel), ObsError)
+    else
+      write (ErrorMessage, '(A,A,A)') &
+        "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
+      call gen_warn(RoutineName, ErrorMessage)
+      ObsError = RMDI
+    end if
+
+    ! Fill the OPS data structures
+    do iObs = 1, NumObs
+      if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
+      if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
+      ! TODO: Flags, PGEFinal
+    end do
+  end do
+end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
+end subroutine cxvarobs_varobswriter_fillobsvalueanderror_2d
+
+! ------------------------------------------------------------------------------
+
+!> Return an array containing the names of JEDI variables storing individual channels of the
+!> variable VarName. If the list of channels is empty, this means the variable in question is
+!> 1D and hence the returned array contains just the single string VarName.
+function cxvarobs_varobswriter_varnames_with_channels(VarName, Channels) result(VarNames)
+implicit none
+character(len=*), intent(in)                   :: VarName
+integer(c_int), intent(in)                     :: Channels(:)
+
+character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
+integer                                        :: i
+
+if (size(Channels) == 0) then
+  VarNames(1) = VarName
+else
+  do i = 1, size(Channels)
+    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
+  end do
+end if
+end function cxvarobs_varobswriter_varnames_with_channels
+
+! ------------------------------------------------------------------------------
+
 subroutine cxvarobs_varobswriter_fillvariable_1d(Hdr,           &
                                                  OpsVarName,    &
                                                  NumObs,        &
@@ -604,7 +726,7 @@ type(c_ptr), value, intent(in)           :: ObsSpace, Flags
 
 ! Local declarations:
 type(oops_variables)                     :: ObsVariables
-character(MAXVARLEN)                     :: VarName
+character(max_varname_length)            :: VarName
 integer                                  :: NumObsVariables, iVar
 integer(c_int)                           :: VarFlags(Ob % Header % NumObsLocal)
 

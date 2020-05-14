@@ -53,7 +53,12 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
                               const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
-  cxvarobs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
+  // We need to pass the list of channels separately because the Fortran interface to
+  // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
+  // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
+  const std::vector<int> &channels = obsdb_.obsvariables().channels();
+  cxvarobs_varobswriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
+                                 *flags_, *obsErrors_,
                                  hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
 }
 
