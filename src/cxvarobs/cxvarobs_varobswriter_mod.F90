@@ -103,11 +103,10 @@ end subroutine cxvarobs_varobswriter_prior
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_post(self, ObsSpace, ObsErrors, nvars, nlocs, hofx)
+subroutine cxvarobs_varobswriter_post(self, ObsSpace, Flags, ObsErrors, nvars, nlocs, hofx)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
-type(c_ptr), value, intent(in) :: ObsSpace
-type(c_ptr), value, intent(in) :: ObsErrors
+type(c_ptr), value, intent(in) :: ObsSpace, Flags, ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
 
@@ -134,7 +133,7 @@ allocate(Obs % Header % ObsPerBatchPerPE(Obs % Header % NumCXBatches, 0:nproc - 
 Obs % Header % ObsPerBatchPerPE(1,mype) = obs % Header % numobslocal
 
 call Ops_ReadVarobsControlNL (self % obsgroup, VarFields) ! TODO(wsmigaj): move to separate function?
-call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, ObsErrors, obs)
+call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Flags, ObsErrors, obs)
 
 CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 CxHeader % FixHd(FH_IntCSize) = 49
@@ -180,12 +179,12 @@ end function cxvarobs_varobswriter_getvaliditytime
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, ObsErrors, Ob)
+subroutine cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, &
+                                                      Flags, ObsErrors, Ob)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
 integer(kind=8), intent(in)              :: VarFields(:)
-type(c_ptr), value, intent(in)           :: ObsSpace
-type(c_ptr), value, intent(in)           :: ObsErrors
+type(c_ptr), value, intent(in)           :: ObsSpace, Flags, ObsErrors
 type(OB_type), intent(inout)             :: Ob
 
 character(len=*), parameter              :: RoutineName = "cxvarobs_varobswriter_populateobservations"
@@ -213,7 +212,8 @@ call cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
   ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
 Ob % Time = TimeOffsetsInSeconds
 
-call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", Ob % Header % NumObsLocal, Ob % ReportFlags)
+call cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags)
+
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
@@ -591,5 +591,40 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   end do
 end if
 end subroutine cxvarobs_varobswriter_fillvariable_1d
+
+subroutine cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags)
+use oops_variables_mod
+implicit none
+
+! Subroutine arguments:
+type(OB_type), intent(inout)             :: Ob
+type(c_ptr), value, intent(in)           :: ObsSpace, Flags
+
+! Local declarations:
+type(oops_variables)                     :: ObsVariables
+character(MAXVARLEN)                     :: VarName
+integer                                  :: NumObsVariables, iVar
+integer(c_int)                           :: VarFlags(Ob % Header % NumObsLocal)
+
+! Body:
+call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
+               Ob % Header % NumObsLocal, Ob % ReportFlags)
+Ob % ReportFlags = 0
+
+! Toggle on the FinalRejectReport bit in ReportFlags for observations with a non-zero flag
+! in at least one variable.
+! TODO(wsmigaj): Is this the right thing to do?
+ObsVariables = cxvarobs_obsdatavector_int_varnames(Flags)
+NumObsVariables = ObsVariables % nvars()
+do iVar = 1, NumObsVariables
+  VarName = ObsVariables % variable(iVar)
+  call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
+  where (VarFlags /= 0)
+    Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
+  end where
+end do
+
+end subroutine cxvarobs_varobswriter_fillreportflags
+
 
 end module cxvarobs_varobswriter_mod

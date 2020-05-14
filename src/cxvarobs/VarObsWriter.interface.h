@@ -36,6 +36,7 @@ extern "C" {
                                        const ufo::F90goms &);
   void cxvarobs_varobswriter_post_f90(const F90check &self,
                                       const ioda::ObsSpace &obsSpace,
+                                      const ioda::ObsDataVector<int> &flags,
                                       const ioda::ObsDataVector<float> &obsErrors,
                                       const int &nvars, const int &nlocs, const double &hofx);
 }  // extern C

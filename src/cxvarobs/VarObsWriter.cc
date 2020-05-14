@@ -53,7 +53,7 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
                               const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
-  cxvarobs_varobswriter_post_f90(key_, obsdb_, *obsErrors_,
+  cxvarobs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
                                  hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
 }
 
