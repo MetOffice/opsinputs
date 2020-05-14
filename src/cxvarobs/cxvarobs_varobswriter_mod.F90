@@ -592,6 +592,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
 end if
 end subroutine cxvarobs_varobswriter_fillvariable_1d
 
+! ------------------------------------------------------------------------------
+
 subroutine cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags)
 use oops_variables_mod
 implicit none
