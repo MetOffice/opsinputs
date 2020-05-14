@@ -619,7 +619,9 @@ NumObsVariables = ObsVariables % nvars()
 do iVar = 1, NumObsVariables
   VarName = ObsVariables % variable(iVar)
   call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
-  where (VarFlags /= 0)
+  ! TODO(wsmigaj): during development, we leave ReportFlags = 0 for observations with missing data
+  ! (as otherwise all observations in some of the IODA test files would be rejected).
+  where (VarFlags > 1)
     Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
   end where
 end do
