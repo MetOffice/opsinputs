@@ -259,7 +259,7 @@ do iVarField = 1, nVarFields
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
           "air_temperature", ObsSpace, ObsErrors)
       else
-        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+        call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
           "air_temperature", ObsSpace, Channels, ObsErrors)
       end if
@@ -269,7 +269,7 @@ do iVarField = 1, nVarFields
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
           "relative_humidity", ObsSpace, ObsErrors)
       else
-        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+        call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
           "relative_humidity", ObsSpace, Channels, ObsErrors)
       end if
@@ -280,7 +280,7 @@ do iVarField = 1, nVarFields
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
           "eastward_wind", ObsSpace, ObsErrors)
       else
-        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+        call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
           "eastward_wind", ObsSpace, Channels, ObsErrors)
       end if
@@ -291,7 +291,7 @@ do iVarField = 1, nVarFields
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
           "northward_wind", ObsSpace, ObsErrors)
       else
-        call cxvarobs_varobswriter_fillobsvalueanderror_2d( &
+        call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
           "northward_wind", ObsSpace, Channels, ObsErrors)
       end if
@@ -565,7 +565,7 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillobsvalueanderror_2d(Hdr,           &
+subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable(Hdr,           &
                                                          OpsVarName,    &
                                                          NumObs,        &
                                                          El2,           &
@@ -597,7 +597,7 @@ real(kind=c_float)                              :: MissingFloat
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 
 integer                                         :: iChannel, iObs
-character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillobsvalueanderror_2d"
+character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
@@ -640,7 +640,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine cxvarobs_varobswriter_fillobsvalueanderror_2d
+end subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable
 
 ! ------------------------------------------------------------------------------
 
