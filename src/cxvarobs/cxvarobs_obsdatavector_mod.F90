@@ -20,7 +20,7 @@ public cxvarobs_obsdatavector_float_nlocs
 public cxvarobs_obsdatavector_float_has
 public cxvarobs_obsdatavector_float_get
 
-#include "obsdatavector_interface.f90"
+#include "cxvarobs_obsdatavector_interface.f90"
 
 contains
 

@@ -5,7 +5,7 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#include "cxvarobs/obsdatavector_f.h"
+#include "cxvarobs/cxvarobs_obsdatavector_f.h"
 
 #include <algorithm>
 #include <cstring>
