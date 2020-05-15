@@ -873,7 +873,7 @@ MissingDouble = missing_value(0.0_c_double)
 
 JediVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels(JediVarName, Channels)
 
-if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
+if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  HdrIn = HdrIn, &
