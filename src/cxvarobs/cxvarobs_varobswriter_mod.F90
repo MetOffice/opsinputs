@@ -207,9 +207,7 @@ integer                                  :: iVarField
 
 integer(c_int64_t)                       :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
 
-integer                                  :: NumLevs
 integer                                  :: Zcode
-logical                                  :: UseLevelSubset
 
 logical                                  :: FillChanNum = .false.
 logical                                  :: FillNumChans = .false.
@@ -244,60 +242,58 @@ case (ObsGroupAircraft, ObsGroupSatwind)
 end select
 
 do iVarField = 1, nVarFields
-  NumLevs = 1         ! TODO: Extend to multilevel quantities
   Zcode = ZcodeUnused ! TODO: fill in correctly
 
-  UseLevelSubset = .false.
   select case (VarFields(iVarField))
     case (imdi)
       cycle
     case (VarField_pstar)
       call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
-        "surface_pressure", ObsSpace, ObsErrors)
+        "surface_pressure", ObsSpace, Flags, ObsErrors)
     case (VarField_theta)
       call Ops_Alloc(Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
-          "air_temperature", ObsSpace, ObsErrors)
+          "air_temperature", ObsSpace, Flags, ObsErrors)
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
-          "air_temperature", ObsSpace, Channels, ObsErrors)
+          "air_temperature", ObsSpace, Channels, Flags, ObsErrors)
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
-          "relative_humidity", ObsSpace, ObsErrors)
+          "relative_humidity", ObsSpace, Flags, ObsErrors)
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
-          "relative_humidity", ObsSpace, Channels, ObsErrors)
+          "relative_humidity", ObsSpace, Channels, Flags, ObsErrors)
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
-          "eastward_wind", ObsSpace, ObsErrors)
+          "eastward_wind", ObsSpace, Flags, ObsErrors)
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
-          "eastward_wind", ObsSpace, Channels, ObsErrors)
+          "eastward_wind", ObsSpace, Channels, Flags, ObsErrors)
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
-          "northward_wind", ObsSpace, ObsErrors)
+          "northward_wind", ObsSpace, Flags, ObsErrors)
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
-          "northward_wind", ObsSpace, Channels, ObsErrors)
+          "northward_wind", ObsSpace, Channels, Flags, ObsErrors)
       end if
     case (VarField_logvis)
       call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
@@ -472,7 +468,7 @@ do iVarField = 1, nVarFields
     case (VarField_AOD)
       call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
-        "aerosol_optical_depth", ObsSpace, Channels, ObsErrors)
+        "aerosol_optical_depth", ObsSpace, Channels, Flags, ObsErrors)
     case (VarField_BriTempVarError)
       call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
     case (VarField_CloudRTError)
@@ -544,15 +540,8 @@ end subroutine cxvarobs_varobswriter_populateobservations
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable(Hdr,           &
-                                                         OpsVarName,    &
-                                                         NumObs,        &
-                                                         El1,           &
-                                                         JediVarName,   &
-                                                         ObsSpace,      &
-                                                         ObsErrors,     &
-                                                         HdrIn,         &
-                                                         initial_value)
+subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
+  Hdr, OpsVarName, NumObs, El1, JediVarName, ObsSpace, Flags, ObsErrors, HdrIn, initial_value)
 implicit none
 
 ! Subroutine arguments:
@@ -562,12 +551,14 @@ integer(kind=8), intent(in)                     :: NumObs
 type(Element_type), pointer                     :: El1(:)
 character(len=*), intent(in)                    :: JediVarName
 type(c_ptr), value, intent(in)                  :: ObsSpace
+type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 type(ElementHeader_Type), optional, intent(in)  :: HdrIn
 type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
+integer(kind=c_int)                             :: Flag(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
@@ -587,8 +578,18 @@ MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
 if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
-  ! Retrieve data from JEDI
+  ! Retrieve data from JEDI:
+  ! - observation value
   call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+  ! - QC flag
+  if (cxvarobs_obsdatavector_int_has(Flags, JediVarName)) then
+    call cxvarobs_obsdatavector_int_get(Flags, JediVarName, Flag)
+  else
+    write (ErrorMessage, '(A,A)') "QC flags not found for variable ", JediVarName
+    call gen_warn(RoutineName, ErrorMessage)
+    Flag = 0 ! assume all observations passed QC
+  end if
+  ! - observation error
   if (cxvarobs_obsdatavector_float_has(ObsErrors, JediVarName)) then
     call cxvarobs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
   else
@@ -602,23 +603,17 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
-    ! TODO: Flags, PGEFinal
+    if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
+    ! TODO: PGEFinal
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable(Hdr,           &
-                                                         OpsVarName,    &
-                                                         NumObs,        &
-                                                         El2,           &
-                                                         JediVarName,   &
-                                                         ObsSpace,      &
-                                                         Channels,      &
-                                                         ObsErrors,     &
-                                                         HdrIn,         &
-                                                         initial_value)
+subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+  Hdr, OpsVarName, NumObs, El2, JediVarName, ObsSpace, Channels, Flags, ObsErrors, &
+  HdrIn, initial_value)
 implicit none
 
 ! Subroutine arguments:
@@ -629,19 +624,22 @@ type(Element_type), pointer                     :: El2(:,:)
 character(len=*), intent(in)                    :: JediVarName
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
+type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 type(ElementHeader_Type), optional, intent(in)  :: HdrIn
 type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
+integer(kind=c_int)                             :: Flag(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 
 integer                                         :: iChannel, iObs
-character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable"
+character(len=*), parameter                     :: &
+  RoutineName = "cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
@@ -665,8 +663,19 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
                  initial_value = initial_value)
 
   do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI
+    ! Retrieve data from JEDI:
+    ! - observation value
     call obsspace_get_db(ObsSpace, "ObsValue", JediVarNamesWithChannels(iChannel), ObsValue)
+    ! - QC flag
+    if (cxvarobs_obsdatavector_int_has(Flags, JediVarNamesWithChannels(iChannel))) then
+      call cxvarobs_obsdatavector_int_get(Flags, JediVarNamesWithChannels(iChannel), Flag)
+    else
+      write (ErrorMessage, '(A,A,A)') &
+        "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
+      call gen_warn(RoutineName, ErrorMessage)
+      Flag = 0 ! assume all observations passed QC
+    end if
+    ! - observation error
     if (cxvarobs_obsdatavector_float_has(ObsErrors, JediVarNamesWithChannels(iChannel))) then
       call cxvarobs_obsdatavector_float_get(ObsErrors, JediVarNamesWithChannels(iChannel), ObsError)
     else
@@ -680,6 +689,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
     do iObs = 1, NumObs
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
+      if (Flag(iObs) /= 0)                 El2(iObs, iChannel) % Flags = ibset(0, FinalRejectFlag)
       ! TODO: Flags, PGEFinal
     end do
   end do
@@ -758,7 +768,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
-    ! TODO: Flags, PGEFinal
+    ! TODO(someone): Fill Flags and PGEFinal, if available.
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable
