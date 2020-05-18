@@ -29,6 +29,7 @@ use GenMod_ModelIO, only: LenFixHd, UM_header_type
 use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
 
+use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
     Ops_InitMPI
@@ -61,29 +62,201 @@ integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 type, public :: cxvarobs_varobswriter
 private
   character(len=max_string), public, allocatable :: geovars(:)
-  integer(kind=8) :: obsgroup
-  type(datetime)  :: validitytime  ! Corresponds to OPS validity time
+
+  integer(kind=8) :: ObsGroup
+  type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
+
+  integer(kind=8) :: FH_VertCoord
+  integer(kind=8) :: FH_HorizGrid
+  integer(kind=8) :: FH_GridStagger
+  integer(kind=8) :: FH_ModelVersion
+
+  integer(kind=8) :: IC_TorTheta
+  integer(kind=8) :: IC_ShipWind
+  integer(kind=8) :: IC_GroundGPSOperator
+  integer(kind=8) :: IC_GPSRO_Operator_pseudo
+  integer(kind=8) :: IC_GPSRO_Operator_press
+
+  integer(kind=8) :: IC_XLen
+  integer(kind=8) :: IC_YLen
+  integer(kind=8) :: IC_PLevels
+  integer(kind=8) :: IC_WetLevels
+
+  real(kind=8) RC_LongSpacing
+  real(kind=8) RC_LatSpacing
+  real(kind=8) RC_FirstLat
+  real(kind=8) RC_FirstLong
+  real(kind=8) RC_PoleLat
+  real(kind=8) RC_PoleLong
 end type cxvarobs_varobswriter
 
 ! ------------------------------------------------------------------------------
 contains
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_create(self, f_conf)
+! Set up a cxvarobs_varobswriter. Returns .true. on success and .false. on failure.
+function cxvarobs_varobswriter_create(self, f_conf)
 implicit none
-type(cxvarobs_varobswriter), intent(inout)      :: self
-type(fckit_configuration), intent(in) :: f_conf
+type(cxvarobs_varobswriter), intent(inout) :: self
+type(fckit_configuration), intent(in)      :: f_conf
+logical(c_bool)                            :: cxvarobs_varobswriter_create
+
+character(len=:), allocatable              :: string
+integer(kind=c_int)                        :: int
+logical                                    :: bool
+real(kind=c_double)                        :: double
+
+integer(kind=8), parameter                 :: zero = 0
+
+character(len=*), parameter :: RoutineName = "cxvarobs_varobswriter_create"
+character(len=200)          :: ErrorMessage
+
+cxvarobs_varobswriter_create = .true.
 
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
 
 GeneralMode = DebugMode
 
-self % obsgroup = cxvarobs_varobswriter_getobsgroup(self, f_conf)
-self % validitytime = cxvarobs_varobswriter_getvaliditytime(self, f_conf)
 ! TODO: set self%geovars (list of variables to use from GeoVaLs) if needed
 
-end subroutine cxvarobs_varobswriter_create
+call f_conf % get_or_die("obs_group", string)
+self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
+
+call f_conf % get_or_die("validity_time", string)
+call datetime_create(string, self % validitytime)
+
+call f_conf % get_or_die("FH_VertCoord", string)
+select case (ops_to_lower_case(string))
+case ("fh_vertcoord_hybrid")
+  self % FH_VertCoord = FH_VertCoord_Hybrid
+case ("fh_vertcoord_sigma")
+  self % FH_VertCoord = FH_VertCoord_Sigma
+case ("fh_vertcoord_depth")
+  self % FH_VertCoord = FH_VertCoord_Depth
+case ("fh_vertcoord_cp")
+  self % FH_VertCoord = FH_VertCoord_CP
+case ("fh_vertcoord_wave")
+  self % FH_VertCoord = FH_VertCoord_Wave
+case default
+  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end select
+
+call f_conf % get_or_die("FH_HorizGrid", string)
+select case (ops_to_lower_case(string))
+case ("fh_horizgrid_global")
+  self % FH_HorizGrid = FH_HorizGrid_Global
+case ("fh_horizgrid_nh")
+  self % FH_HorizGrid = FH_HorizGrid_NH
+case ("fh_horizgrid_sh")
+  self % FH_HorizGrid = FH_HorizGrid_SH
+case ("fh_horizgrid_lamnowrap")
+  self % FH_HorizGrid = FH_HorizGrid_LamNoWrap
+case ("fh_horizgrid_lamwrap")
+  self % FH_HorizGrid = FH_HorizGrid_LamWrap
+case ("fh_horizgrid_eq")
+  self % FH_HorizGrid = FH_HorizGrid_Eq
+case ("fh_horizgrid_lamnowrapeq")
+  self % FH_HorizGrid = FH_HorizGrid_LamNoWrapEq
+case ("fh_horizgrid_lamwrapeq")
+  self % FH_HorizGrid = FH_HorizGrid_LamWrapEq
+case default
+  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end select
+
+call f_conf % get_or_die("FH_GridStagger", string)
+select case (ops_to_lower_case(string))
+case ("fh_gridstagger_arakawab")
+  self % FH_GridStagger = FH_GridStagger_ArakawaB
+case ("fh_gridstagger_arakawac")
+  self % FH_GridStagger = FH_GridStagger_ArakawaC
+case ("fh_gridstagger_endgame")
+  self % FH_GridStagger = FH_GridStagger_EndGame
+case default
+  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end select
+
+call f_conf % get_or_die("FH_ModelVersion", int)
+self % FH_ModelVersion = int
+! TODO LOWERCASE
+
+call f_conf % get_or_die("IC_TorTheta", string)
+select case (ops_to_lower_case(string))
+case ("ic_tortheta_t")
+  self % IC_TorTheta = IC_TorTheta_T
+case ("ic_tortheta_theta")
+  self % IC_TorTheta = IC_TorTheta_Theta
+case default
+  write (ErrorMessage, '("IC_TorTheta code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end select
+
+call f_conf % get_or_die("IC_ShipWind", bool)
+self % IC_ShipWind = merge(IC_ShipWind_10m, zero, bool)
+
+call f_conf % get_or_die("IC_GroundGPSOperator", string)
+select case (ops_to_lower_case(string))
+case ("ic_groundgpsoperatorchoice")
+  self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
+case ("ic_groundgpsoperatorgeneric")
+  self % IC_GroundGPSOperator = IC_GroundGPSOperatorGeneric
+case default
+  write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end select
+
+call f_conf % get_or_die("IC_GPSRO_Operator_pseudo", bool)
+self % IC_GPSRO_Operator_pseudo = merge(IC_GPSRO_Operator_pseudo_choice, zero, bool)
+
+call f_conf % get_or_die("IC_GPSRO_Operator_press", bool)
+self % IC_GPSRO_Operator_press = merge(IC_GPSRO_Operator_press_choice, zero, bool)
+
+call f_conf % get_or_die("IC_XLen", int)
+self % IC_XLen = int
+
+call f_conf % get_or_die("IC_YLen", int)
+self % IC_YLen = int
+
+call f_conf % get_or_die("IC_PLevels", int)
+self % IC_PLevels = int
+
+call f_conf % get_or_die("IC_WetLevels", int)
+self % IC_WetLevels = int
+
+call f_conf % get_or_die("RC_LongSpacing", double)
+self % RC_LongSpacing = double
+
+call f_conf % get_or_die("RC_LatSpacing", double)
+self % RC_LatSpacing = double
+
+call f_conf % get_or_die("RC_FirstLat", double)
+self % RC_FirstLat = double
+
+call f_conf % get_or_die("RC_FirstLong", double)
+self % RC_FirstLong = double
+
+call f_conf % get_or_die("RC_PoleLat", double)
+self % RC_PoleLat = double
+
+call f_conf % get_or_die("RC_PoleLong", double)
+self % RC_PoleLong = double
+
+9999 if (allocated(string)) deallocate(string)
+
+end function cxvarobs_varobswriter_create
 
 ! ------------------------------------------------------------------------------
 
@@ -160,32 +333,6 @@ call obs % deallocate()
 ! DEALLOCATE(Obs % Header % ObsPerBatchPerPE)
 
 end subroutine cxvarobs_varobswriter_post
-
-! ------------------------------------------------------------------------------
-
-integer function cxvarobs_varobswriter_getobsgroup(self, f_conf)
-implicit none
-type(cxvarobs_varobswriter), intent(in) :: self
-type(fckit_configuration), intent(in) :: f_conf
-
-character(len=:),allocatable :: obsgroupname
-
-call f_conf % get_or_die("obs_group", obsgroupname)
-cxvarobs_varobswriter_getobsgroup = OpsFn_ObsGroupNameToNum(obsgroupname)
-end function cxvarobs_varobswriter_getobsgroup
-
-! ------------------------------------------------------------------------------
-
-type(datetime) function cxvarobs_varobswriter_getvaliditytime(self, f_conf)
-implicit none
-type(cxvarobs_varobswriter), intent(in) :: self
-type(fckit_configuration), intent(in) :: f_conf
-
-character(len=:),allocatable :: validitytimestr
-
-call f_conf % get_or_die("validity_time", validitytimestr)
-call datetime_create(validitytimestr, cxvarobs_varobswriter_getvaliditytime)
-end function cxvarobs_varobswriter_getvaliditytime
 
 ! ------------------------------------------------------------------------------
 

@@ -6,6 +6,7 @@
  */
 
 #include "cxvarobs/VarObsWriter.h"
+#include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 
@@ -27,6 +28,14 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
                            boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)) {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
+
+  // These parameters are not currently used because we're passing an eckit::Configuration object
+  // to Fortran anyway. But
+  // (a) their presence serves as documentation
+  // (b) they could be used to validate the parameters.
+  VarObsWriterParameters parameters;
+  parameters.deserialize(config);
+
   eckit::LocalConfiguration conf(config);
   // TODO(wsmigaj): is this the correct definition of the validity time?
   conf.set("validity_time", obsdb.windowEnd().toString());

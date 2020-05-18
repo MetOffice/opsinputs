@@ -30,13 +30,14 @@ contains
 #include "oops/util/linkedList_c.f"
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_create_c(c_self, c_conf, c_varlist) &
+function cxvarobs_varobswriter_create_c(c_self, c_conf, c_varlist) &
   bind(c,name='cxvarobs_varobswriter_create_f90')
 use string_f_c_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
 type(c_ptr), intent(in), value :: c_varlist ! list of geovals variables to be requested
+logical(c_bool)                :: cxvarobs_varobswriter_create_c
 
 type(cxvarobs_varobswriter), pointer :: self
 type(fckit_configuration) :: f_conf
@@ -44,7 +45,7 @@ type(fckit_configuration) :: f_conf
 call cxvarobs_varobswriter_registry%setup(c_self, self)
 
 f_conf = fckit_configuration(c_conf)
-call cxvarobs_varobswriter_create(self, f_conf)
+cxvarobs_varobswriter_create_c = cxvarobs_varobswriter_create(self, f_conf)
 
 !> Update C++ ObsFilter with geovals variables list
 if (allocated(self%geovars)) then
@@ -52,7 +53,7 @@ if (allocated(self%geovars)) then
 !  call f_c_push_string_varlist(c_varlist, self%geovars)
 endif
 
-end subroutine cxvarobs_varobswriter_create_c
+end function cxvarobs_varobswriter_create_c
 
 ! ------------------------------------------------------------------------------
 

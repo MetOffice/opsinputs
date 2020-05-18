@@ -49,7 +49,7 @@ class VarObsWriter : public util::Printable,
   void priorFilter(const ufo::GeoVaLs &) const;
   void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics & diags) const;
 
-  const oops::Variables & requiredGeoVaLs() const {return geovars_;}
+  const oops::Variables & requiredVars() const {return geovars_;}
   const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
 
  private:
