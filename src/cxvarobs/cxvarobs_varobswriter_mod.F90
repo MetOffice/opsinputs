@@ -404,11 +404,9 @@ if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
     ObsSpace, "MetaData", "station_id", int(LenCallSign, kind=4), Ob % Callsign)
 end if
 
-! TODO: Num levels
-select case (Ob % Header % ObsGroup)
-case (ObsGroupAircraft, ObsGroupSatwind)
-  call Ops_Alloc(Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA)
-end select
+call cxvarobs_varobswriter_fillcoord2d( &
+  Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA, &
+  "air_pressure", "MetaData", ObsSpace, Channels)
 
 do iVarField = 1, nVarFields
   Zcode = ZcodeUnused ! TODO: fill in correctly
@@ -1088,6 +1086,56 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillreal2d
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_fillcoord2d(Hdr, OpsVarName, NumObs, Coord2, &
+                                             JediVarName, JediVarGroup, ObsSpace, Channels, &
+                                             HdrIn, initial_value)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(kind=8), intent(in)                     :: NumObs
+type(coord_type), pointer                       :: Coord2(:,:)
+character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediVarGroup
+type(c_ptr), value, intent(in)                  :: ObsSpace
+integer(c_int), intent(in)                      :: Channels(:)
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
+type(coord_type), optional, intent(in)          :: initial_value
+
+! Local declarations:
+real(kind=c_double)                             :: VarValue(NumObs)
+real(kind=c_double)                             :: MissingDouble
+character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+integer                                         :: iChannel
+
+! Body:
+
+MissingDouble = missing_value(0.0_c_double)
+
+JediVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels(JediVarName, Channels)
+
+if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
+  ! Allocate OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Coord2, &
+                 HdrIn = HdrIn, &
+                 num_levels = int(size(JediVarNamesWithChannels), kind=8), &
+                 initial_value = initial_value)
+
+  do iChannel = 1, size(JediVarNamesWithChannels)
+    ! Retrieve data from JEDI
+    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+
+    ! Fill the OPS data structures
+    where (VarValue /= MissingDouble)
+      Coord2(:, iChannel) % Value = VarValue
+    end where
+  end do
+end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
+end subroutine cxvarobs_varobswriter_fillcoord2d
 
 ! ------------------------------------------------------------------------------
 
