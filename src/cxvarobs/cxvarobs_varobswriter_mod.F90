@@ -105,6 +105,7 @@ character(len=:), allocatable              :: string
 integer(kind=c_int)                        :: int
 logical                                    :: bool
 real(kind=c_double)                        :: double
+logical                                    :: found
 
 integer(kind=8), parameter                 :: zero = 0
 
@@ -126,7 +127,8 @@ self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 call f_conf % get_or_die("validity_time", string)
 call datetime_create(string, self % validitytime)
 
-call f_conf % get_or_die("FH_VertCoord", string)
+string = "fh_vertcoord_hybrid"  ! TODO(wsmigaj): is this a good default?
+found = f_conf % get("FH_VertCoord", string)
 select case (ops_to_lower_case(string))
 case ("fh_vertcoord_hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -145,7 +147,8 @@ case default
   goto 9999
 end select
 
-call f_conf % get_or_die("FH_HorizGrid", string)
+string = "fh_horizgrid_global"
+found = f_conf % get("FH_HorizGrid", string)
 select case (ops_to_lower_case(string))
 case ("fh_horizgrid_global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -170,7 +173,8 @@ case default
   goto 9999
 end select
 
-call f_conf % get_or_die("FH_GridStagger", string)
+string = "fh_gridstagger_endgame"
+found = f_conf % get("FH_GridStagger", string)
 select case (ops_to_lower_case(string))
 case ("fh_gridstagger_arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -185,11 +189,12 @@ case default
   goto 9999
 end select
 
-call f_conf % get_or_die("FH_ModelVersion", int)
+int = 0
+found = f_conf % get("FH_ModelVersion", int)
 self % FH_ModelVersion = int
-! TODO LOWERCASE
 
-call f_conf % get_or_die("IC_TorTheta", string)
+string = "ic_tortheta_t"
+found = f_conf % get("IC_TorTheta", string)
 select case (ops_to_lower_case(string))
 case ("ic_tortheta_t")
   self % IC_TorTheta = IC_TorTheta_T
@@ -202,10 +207,12 @@ case default
   goto 9999
 end select
 
-call f_conf % get_or_die("IC_ShipWind", bool)
+bool = .false.
+found = f_conf % get("IC_ShipWind", bool)
 self % IC_ShipWind = merge(IC_ShipWind_10m, zero, bool)
 
-call f_conf % get_or_die("IC_GroundGPSOperator", string)
+string = "ic_groundgpsoperatorchoice"
+found = f_conf % get("IC_GroundGPSOperator", string)
 select case (ops_to_lower_case(string))
 case ("ic_groundgpsoperatorchoice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
@@ -218,40 +225,52 @@ case default
   goto 9999
 end select
 
-call f_conf % get_or_die("IC_GPSRO_Operator_pseudo", bool)
+bool = .false.
+found = f_conf % get("IC_GPSRO_Operator_pseudo", bool)
 self % IC_GPSRO_Operator_pseudo = merge(IC_GPSRO_Operator_pseudo_choice, zero, bool)
 
-call f_conf % get_or_die("IC_GPSRO_Operator_press", bool)
+bool = .false.
+found = f_conf % get("IC_GPSRO_Operator_press", bool)
 self % IC_GPSRO_Operator_press = merge(IC_GPSRO_Operator_press_choice, zero, bool)
 
-call f_conf % get_or_die("IC_XLen", int)
+int = 0
+found = f_conf % get("IC_XLen", int)
 self % IC_XLen = int
 
-call f_conf % get_or_die("IC_YLen", int)
+int = 0
+found = f_conf % get("IC_YLen", int)
 self % IC_YLen = int
 
-call f_conf % get_or_die("IC_PLevels", int)
+int = 0
+found = f_conf % get("IC_PLevels", int)
 self % IC_PLevels = int
 
-call f_conf % get_or_die("IC_WetLevels", int)
+int = 0
+found = f_conf % get("IC_WetLevels", int)
 self % IC_WetLevels = int
 
-call f_conf % get_or_die("RC_LongSpacing", double)
+double = 0.0
+found = f_conf % get("RC_LongSpacing", double)
 self % RC_LongSpacing = double
 
-call f_conf % get_or_die("RC_LatSpacing", double)
+double = 0.0
+found = f_conf % get("RC_LatSpacing", double)
 self % RC_LatSpacing = double
 
-call f_conf % get_or_die("RC_FirstLat", double)
+double = 0.0
+found = f_conf % get("RC_FirstLat", double)
 self % RC_FirstLat = double
 
-call f_conf % get_or_die("RC_FirstLong", double)
+double = 0.0
+found = f_conf % get("RC_FirstLong", double)
 self % RC_FirstLong = double
 
-call f_conf % get_or_die("RC_PoleLat", double)
+double = 0.0
+found = f_conf % get("RC_PoleLat", double)
 self % RC_PoleLat = double
 
-call f_conf % get_or_die("RC_PoleLong", double)
+double = 0.0
+found = f_conf % get("RC_PoleLong", double)
 self % RC_PoleLong = double
 
 9999 if (allocated(string)) deallocate(string)
