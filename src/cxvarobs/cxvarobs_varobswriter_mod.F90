@@ -426,7 +426,11 @@ do iVarField = 1, nVarFields
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         "surface_pressure", ObsSpace, Flags, ObsErrors)
     case (VarField_theta)
-      call Ops_Alloc(Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta)
+      ! TODO(wsmigaj): check if air_potential_temperature is the correct variable name
+      ! (it isn't used in JEDI, but virtual_temperature is)
+      call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta, &
+        "air_potential_temperature", ObsSpace, Channels, Flags, ObsErrors)
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
