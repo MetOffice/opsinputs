@@ -121,10 +121,18 @@ GeneralMode = DebugMode
 
 ! TODO: set self%geovars (list of variables to use from GeoVaLs) if needed
 
-call f_conf % get_or_die("obs_group", string)
+if (.not. f_conf % get("obs_group", string)) then
+  call gen_warn(RoutineName, "Mandatory obs_group option not found")
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end if
 self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 
-call f_conf % get_or_die("validity_time", string)
+if (.not. f_conf % get("validity_time", string)) then
+  call gen_warn(RoutineName, "Mandatory validity_time option not found")
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end if
 call datetime_create(string, self % validitytime)
 
 string = "hybrid"  ! TODO(wsmigaj): is this a good default?
