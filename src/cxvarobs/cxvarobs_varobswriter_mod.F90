@@ -396,6 +396,13 @@ Ob % Time = TimeOffsetsInSeconds
 
 call cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags)
 
+! TODO(someone): This call to Ops_Alloc() will need to be replaced by
+! call cxvarobs_varobswriter_fillinteger( &
+!   Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
+!   "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+! with the placeholders replaced by an appropriate variable name and group.
+! We call Ops_Alloc() because the Ops_CreateVarobs terminates prematurely if the ObsType array
+! doesn't exist.
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
