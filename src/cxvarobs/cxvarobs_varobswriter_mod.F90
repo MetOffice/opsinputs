@@ -33,6 +33,7 @@ use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
     Ops_InitMPI
+use OpsMod_DateTime
 use OpsMod_MiscTypes
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
@@ -58,10 +59,9 @@ integer, parameter :: max_varname_length=MAXVARLEN
 integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 
 ! ------------------------------------------------------------------------------
-!> TODO: fill in this type
 type, public :: cxvarobs_varobswriter
 private
-  character(len=max_string), public, allocatable :: geovars(:)
+  character(len=max_string), public, allocatable :: geovars(:) ! TODO: may need to be filled
 
   integer(kind=8) :: ObsGroup
   type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
@@ -344,12 +344,7 @@ Obs % Header % ObsPerBatchPerPE(1,mype) = obs % Header % numobslocal
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields) ! TODO(wsmigaj): move to separate function?
 call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Channels, &
                                                 Flags, ObsErrors, obs)
-
-CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
-CxHeader % FixHd(FH_IntCSize) = 49
-CxHeader % FixHd(FH_RealCStart) = CxHeader % FixHd(FH_IntCStart) + CxHeader % FixHd(FH_IntCSize)
-CxHeader % FixHd(FH_RealCSize) = 34
-call CxHeader % alloc
+call cxvarobs_varobswriter_populatecxheader(self, CxHeader)
 
 call Ops_CreateVarobs (Obs,                 & ! in
                        CxHeader,            & ! in
@@ -1273,9 +1268,11 @@ end subroutine cxvarobs_varobswriter_fillcorbritemp
 !> 1D and hence the returned array contains just the single string VarName.
 function cxvarobs_varobswriter_varnames_with_channels(VarName, Channels) result(VarNames)
 implicit none
+! Subroutine arguments:
 character(len=*), intent(in)                   :: VarName
 integer(c_int), intent(in)                     :: Channels(:)
 
+! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: i
 
@@ -1287,5 +1284,76 @@ else
   end do
 end if
 end function cxvarobs_varobswriter_varnames_with_channels
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_populatecxheader(self, CxHeader)
+implicit none
+! Subroutine arguments:
+type(cxvarobs_varobswriter), intent(in) :: self
+type(UM_header_type), intent(inout)     :: CxHeader
+
+! Local declarations:
+integer(c_int)                          :: year, month, day, hour, minute, second
+TYPE (DateTime_type)                    :: now
+
+! Body:
+
+CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
+CxHeader % FixHd(FH_IntCSize) = 49
+CxHeader % FixHd(FH_RealCStart) = CxHeader % FixHd(FH_IntCStart) + CxHeader % FixHd(FH_IntCSize)
+CxHeader % FixHd(FH_RealCSize) = 34
+call CxHeader % alloc
+
+CxHeader % FixHd(FH_VertCoord) = self % FH_VertCoord
+CxHeader % FixHd(FH_HorizGrid) = self % FH_HorizGrid
+CxHeader % FixHd(FH_GridStagger) = self % FH_GridStagger
+CxHeader % FixHd(FH_ModelVersion) = self % FH_ModelVersion
+
+call datetime_to_YYYYMMDDhhmmss(self % ValidityTime, year, month, day, hour, minute, second)
+CxHeader % FixHd(FH_DTYear) = year
+CxHeader % FixHd(FH_DTMonth) = month
+CxHeader % FixHd(FH_DTDay) = day
+CxHeader % FixHd(FH_DTHour) = hour
+CxHeader % FixHd(FH_DTMinute) = minute
+CxHeader % FixHd(FH_DTSecond) = second
+CxHeader % FixHd(FH_DTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
+
+CxHeader % FixHd(FH_VTYear) = year
+CxHeader % FixHd(FH_VTMonth) = month
+CxHeader % FixHd(FH_VTDay) = day
+CxHeader % FixHd(FH_VTHour) = hour
+CxHeader % FixHd(FH_VTMinute) = minute
+CxHeader % FixHd(FH_VTSecond) = second
+CxHeader % FixHd(FH_VTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
+
+now = OpsFn_DateTime_now()
+CxHeader % FixHd(FH_CTYear) = now % year
+CxHeader % FixHd(FH_CTMonth) = now % month
+CxHeader % FixHd(FH_CTDay) = now % day
+CxHeader % FixHd(FH_CTHour) = now % hour
+CxHeader % FixHd(FH_CTMinute) = now % minute
+CxHeader % FixHd(FH_CTSecond) = now % second
+CxHeader % FixHd(FH_CTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
+
+CxHeader % IntC(IC_TorTheta) = self % IC_TorTheta
+CxHeader % IntC(IC_ShipWind) = self % IC_ShipWind
+CxHeader % IntC(IC_GroundGPSOperator) = self % IC_GroundGPSOperator
+CxHeader % IntC(IC_GPSRO_Operator_pseudo) = self % IC_GPSRO_Operator_pseudo
+CxHeader % IntC(IC_GPSRO_Operator_press) = self % IC_GPSRO_Operator_press
+
+CxHeader % IntC(IC_XLen) = self % IC_XLen
+CxHeader % IntC(IC_YLen) = self % IC_Ylen
+CxHeader % IntC(IC_PLevels) = self % IC_PLevels
+CxHeader % IntC(IC_WetLevels) = self % IC_WetLevels
+
+CxHeader % RealC(RC_LongSpacing) = self % RC_LongSpacing
+CxHeader % RealC(RC_LatSpacing) = self % RC_LatSpacing
+CxHeader % RealC(RC_FirstLat) = self % RC_FirstLat
+CxHeader % RealC(RC_FirstLong) = self % RC_FirstLong
+CxHeader % RealC(RC_PoleLat) = self % RC_PoleLat
+CxHeader % RealC(RC_PoleLong) = self % RC_PoleLong
+
+end subroutine cxvarobs_varobswriter_populatecxheader
 
 end module cxvarobs_varobswriter_mod
