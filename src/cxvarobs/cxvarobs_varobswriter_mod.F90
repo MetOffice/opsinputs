@@ -127,18 +127,18 @@ self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 call f_conf % get_or_die("validity_time", string)
 call datetime_create(string, self % validitytime)
 
-string = "fh_vertcoord_hybrid"  ! TODO(wsmigaj): is this a good default?
+string = "hybrid"  ! TODO(wsmigaj): is this a good default?
 found = f_conf % get("FH_VertCoord", string)
 select case (ops_to_lower_case(string))
-case ("fh_vertcoord_hybrid")
+case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
-case ("fh_vertcoord_sigma")
+case ("sigma")
   self % FH_VertCoord = FH_VertCoord_Sigma
-case ("fh_vertcoord_depth")
+case ("depth")
   self % FH_VertCoord = FH_VertCoord_Depth
-case ("fh_vertcoord_cp")
+case ("cp")
   self % FH_VertCoord = FH_VertCoord_CP
-case ("fh_vertcoord_wave")
+case ("wave")
   self % FH_VertCoord = FH_VertCoord_Wave
 case default
   write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
@@ -147,24 +147,24 @@ case default
   goto 9999
 end select
 
-string = "fh_horizgrid_global"
+string = "global"
 found = f_conf % get("FH_HorizGrid", string)
 select case (ops_to_lower_case(string))
-case ("fh_horizgrid_global")
+case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
-case ("fh_horizgrid_nh")
+case ("nh")
   self % FH_HorizGrid = FH_HorizGrid_NH
-case ("fh_horizgrid_sh")
+case ("sh")
   self % FH_HorizGrid = FH_HorizGrid_SH
-case ("fh_horizgrid_lamnowrap")
+case ("lamnowrap")
   self % FH_HorizGrid = FH_HorizGrid_LamNoWrap
-case ("fh_horizgrid_lamwrap")
+case ("lamwrap")
   self % FH_HorizGrid = FH_HorizGrid_LamWrap
-case ("fh_horizgrid_eq")
+case ("eq")
   self % FH_HorizGrid = FH_HorizGrid_Eq
-case ("fh_horizgrid_lamnowrapeq")
+case ("lamnowrapeq")
   self % FH_HorizGrid = FH_HorizGrid_LamNoWrapEq
-case ("fh_horizgrid_lamwrapeq")
+case ("lamwrapeq")
   self % FH_HorizGrid = FH_HorizGrid_LamWrapEq
 case default
   write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
@@ -173,14 +173,14 @@ case default
   goto 9999
 end select
 
-string = "fh_gridstagger_endgame"
+string = "endgame"
 found = f_conf % get("FH_GridStagger", string)
 select case (ops_to_lower_case(string))
-case ("fh_gridstagger_arakawab")
+case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
-case ("fh_gridstagger_arakawac")
+case ("arakawac")
   self % FH_GridStagger = FH_GridStagger_ArakawaC
-case ("fh_gridstagger_endgame")
+case ("endgame")
   self % FH_GridStagger = FH_GridStagger_EndGame
 case default
   write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
@@ -193,12 +193,12 @@ int = 0
 found = f_conf % get("FH_ModelVersion", int)
 self % FH_ModelVersion = int
 
-string = "ic_tortheta_t"
+string = "t"
 found = f_conf % get("IC_TorTheta", string)
 select case (ops_to_lower_case(string))
-case ("ic_tortheta_t")
+case ("t")
   self % IC_TorTheta = IC_TorTheta_T
-case ("ic_tortheta_theta")
+case ("theta")
   self % IC_TorTheta = IC_TorTheta_Theta
 case default
   write (ErrorMessage, '("IC_TorTheta code not recognised: ",A)') string
@@ -211,12 +211,12 @@ bool = .false.
 found = f_conf % get("IC_ShipWind", bool)
 self % IC_ShipWind = merge(IC_ShipWind_10m, zero, bool)
 
-string = "ic_groundgpsoperatorchoice"
+string = "choice"
 found = f_conf % get("IC_GroundGPSOperator", string)
 select case (ops_to_lower_case(string))
-case ("ic_groundgpsoperatorchoice")
+case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
-case ("ic_groundgpsoperatorgeneric")
+case ("generic")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorGeneric
 case default
   write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') string
