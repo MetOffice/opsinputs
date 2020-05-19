@@ -27,6 +27,7 @@ Observations:
     ObsFilters:
     - Filter: VarObsWriter
       obs_group: Surface
+      FH_HorizGrid: NH
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
