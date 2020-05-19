@@ -44,6 +44,7 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupScatwind
 use OpsMod_ObsInfo
 use OpsMod_GPSRO, only: GPSRO_TPD
+use OpsMod_Radar, only: RadFamily
 use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
 use OpsMod_Varfields
 use OpsMod_Varobs
@@ -65,7 +66,9 @@ private
 
   integer(kind=8) :: ObsGroup
   type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
+
   logical         :: AccountForGPSROTangentPointDrift
+  logical         :: UseRadarFamily
 
   integer(kind=8) :: FH_VertCoord
   integer(kind=8) :: FH_HorizGrid
@@ -139,6 +142,9 @@ call datetime_create(string, self % validitytime)
 self % AccountForGPSROTangentPointDrift = .false.
 found = f_conf % get("account_for_gpsro_tangent_point_drift", &
                      self % AccountForGPSROTangentPointDrift)
+
+self % UseRadarFamily = .false.
+found = f_conf % get("use_radar_family", self % UseRadarFamily)
 
 string = "hybrid"  ! TODO(wsmigaj): is this a good default?
 found = f_conf % get("FH_VertCoord", string)
@@ -423,6 +429,13 @@ call cxvarobs_varobswriter_fillcoord2d( &
 GPSRO_TPD = self % AccountForGPSROTangentPointDrift
 if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
   call cxvarobs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
+end if
+
+RadFamily = self % UseRadarFamily
+if (RadFamily) then
+  call cxvarobs_varobswriter_fillinteger( &
+    Ob % Header % Family, "Family", Ob % Header % NumObsLocal, Ob % Family, &
+    "radar_family", "MetaData", ObsSpace)
 end if
 
 do iVarField = 1, nVarFields
