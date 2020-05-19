@@ -38,6 +38,7 @@ use OpsMod_MiscTypes
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
+    ObsGroupGPSRO,             &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind
@@ -64,6 +65,7 @@ private
 
   integer(kind=8) :: ObsGroup
   type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
+  logical         :: AccountForGPSROTangentPointDrift
 
   integer(kind=8) :: FH_VertCoord
   integer(kind=8) :: FH_HorizGrid
@@ -133,6 +135,10 @@ if (.not. f_conf % get("validity_time", string)) then
   goto 9999
 end if
 call datetime_create(string, self % validitytime)
+
+self % AccountForGPSROTangentPointDrift = .false.
+found = f_conf % get("account_for_gpsro_tangent_point_drift", &
+                     self % AccountForGPSROTangentPointDrift)
 
 string = "hybrid"  ! TODO(wsmigaj): is this a good default?
 found = f_conf % get("FH_VertCoord", string)
@@ -414,6 +420,11 @@ call cxvarobs_varobswriter_fillcoord2d( &
   Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA, &
   "air_pressure", "MetaData", ObsSpace, Channels)
 
+GPSRO_TPD = self % AccountForGPSROTangentPointDrift
+if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
+  call cxvarobs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
+end if
+
 do iVarField = 1, nVarFields
   Zcode = ZcodeUnused ! TODO: fill in correctly
 
@@ -628,6 +639,8 @@ do iVarField = 1, nVarFields
       call Ops_Alloc(Ob % Header % z, "z", Ob % Header % NumObsLocal, Ob % z)
     case (VarField_BendingAngle)
       if (GPSRO_TPD) then
+        ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
+        ! once it is known.
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll, &
           "PLACEHOLDER_VARIABLE_NAME", ObsSpace, Channels, Flags, ObsErrors)
@@ -638,6 +651,8 @@ do iVarField = 1, nVarFields
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
+         ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
+         ! once it is known.
          call cxvarobs_varobswriter_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll, &
            ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
@@ -1421,6 +1436,33 @@ end if ! brightness_temperature@ObsValue not present? OPS will produce a warning
        ! -- we don't need to duplicate it.
 
 end subroutine cxvarobs_varobswriter_fillcorbritemp
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
+implicit none
+! Subroutine arguments:
+type(OB_type), intent(inout)             :: Ob
+type(c_ptr), value, intent(in)           :: ObsSpace
+
+! Body:
+
+! TODO(someone): Replace the placeholder in the call below with an appropriate variable name
+! and group, once they're known.
+call cxvarobs_varobswriter_fillinteger( &
+  Ob % Header % RO_quality, "RO_quality", Ob % Header % NumObsLocal, Ob % RO_quality, &
+  "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+! TODO(someone): Replace "latitude" and "longitude" variable names in the two calls below with
+! appropriate GPSRO-specific variable names, once they're known. The group name may need to be
+! adjusted as well.
+call cxvarobs_varobswriter_fillreal( &
+  Ob % Header % ro_occ_lat, "ro_occ_lat", Ob % Header % NumObsLocal, Ob % ro_occ_lat, &
+  "latitude", "MetaData", ObsSpace)
+call cxvarobs_varobswriter_fillreal( &
+  Ob % Header % ro_occ_lon, "ro_occ_lon", Ob % Header % NumObsLocal, Ob % ro_occ_lon, &
+  "longitude", "MetaData", ObsSpace)
+
+end subroutine cxvarobs_varobswriter_fillgpsrotpddependentfields
 
 ! ------------------------------------------------------------------------------
 

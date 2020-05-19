@@ -21,6 +21,8 @@ namespace cxvarobs {
 class VarObsWriterParameters : public oops::Parameters {
  public:
   oops::RequiredParameter<std::string> obs_group{"obs_group", this};
+  oops::Parameter<bool> account_for_gpsro_tangent_point_drift{
+    "account_for_gpsro_tangent_point_drift", false, this};
 
   oops::Parameter<std::string> FH_VertCoord{"FH_VertCoord", "FH_VertCoord_Hybrid", this};
   oops::Parameter<std::string> FH_HorizGrid{"FH_HorizGrid", "FH_HorizGrid_Global", this};
