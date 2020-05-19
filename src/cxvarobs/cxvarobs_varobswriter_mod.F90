@@ -42,11 +42,10 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSatwind,           &
     ObsGroupScatwind
 use OpsMod_ObsInfo
+use OpsMod_GPSRO, only: GPSRO_TPD
+use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
 use OpsMod_Varfields
 use OpsMod_Varobs
-
-use OpsMod_SatRad_RTmodel, only: &
-    nlevels_strat_varobs
 
 implicit none
 public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, &
@@ -628,21 +627,33 @@ do iVarField = 1, nVarFields
     case (VarField_z)
       call Ops_Alloc(Ob % Header % z, "z", Ob % Header % NumObsLocal, Ob % z)
     case (VarField_BendingAngle)
-      ! IF (GPSRO_TPD) THEN
-      !   CALL Ops_Alloc(Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll)
-      ! ELSE
-      !   CALL Ops_Alloc(Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle)
-      ! END IF
+      if (GPSRO_TPD) then
+        call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+          Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll, &
+          "PLACEHOLDER_VARIABLE_NAME", ObsSpace, Channels, Flags, ObsErrors)
+      else
+        call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+          Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle, &
+          "bending_angle", ObsSpace, Channels, Flags, ObsErrors)
+      end if
     case (VarField_ImpactParam)
-      ! IF (GPSRO_TPD) THEN
-      !   CALL Ops_Alloc(Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll)
-      ! ELSE
-      !   CALL Ops_Alloc(Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam)
-      ! END IF
+       if (GPSRO_TPD) then
+         call cxvarobs_varobswriter_fillelementtype2dfromnormalvariable( &
+           Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll, &
+           ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
+       else
+         call cxvarobs_varobswriter_fillelementtype2dfromnormalvariable( &
+           Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam, &
+           ObsSpace, Channels, "impact_parameter", "MetaData")
+       end if
     case (VarField_RO_Rad_Curv)
-      call Ops_Alloc(Ob % Header % RO_Rad_Curv, "RO_Rad_Curv", Ob % Header % NumObsLocal, Ob % RO_Rad_Curv)
+      call cxvarobs_varobswriter_fillelementtypefromnormalvariable( &
+        Ob % Header % RO_Rad_Curv, "RO_Rad_Curv", Ob % Header % NumObsLocal, Ob % RO_Rad_Curv, &
+        ObsSpace, "earth_radius_of_curvature", "MetaData")
     case (VarField_RO_geoid_und)
-      call Ops_Alloc(Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und)
+      call cxvarobs_varobswriter_fillelementtypefromnormalvariable( &
+        Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
+        ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData")
     case (VarField_AOD)
       call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
@@ -949,6 +960,98 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable
+
+! ------------------------------------------------------------------------------
+
+!> Fill a 1D field of type Element_Type with values taken from an arbitrary JEDI variable
+!> (i.e. not a simulated variable) and optionally errors taken from another such variable.
+
+subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable( &
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, HdrIn, initial_value)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(kind=8), intent(in)                     :: NumObs
+type(Element_type), pointer                     :: El2(:,:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
+integer(c_int), intent(in)                      :: Channels(:)
+character(len=*), intent(in)                    :: JediValueVarName
+character(len=*), intent(in)                    :: JediValueGroup
+character(len=*), optional, intent(in)          :: JediErrorVarName
+character(len=*), optional, intent(in)          :: JediErrorGroup
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
+type(Element_Type), optional, intent(in)        :: initial_value
+
+! Local declarations:
+real(kind=c_double)                             :: ObsValue(NumObs)
+real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: MissingDouble
+real(kind=c_float)                              :: MissingFloat
+character(len=max_varname_with_channel_length)  :: &
+  JediValueVarNamesWithChannels(max(size(Channels), 1)), &
+  JediErrorVarNamesWithChannels(max(size(Channels), 1))
+integer                                         :: iChannel, iObs
+character(len=*), parameter                     :: &
+  RoutineName = "cxvarobs_varobswriter_fillelementtype2dfromnormalvariable"
+character(len=256)                              :: ErrorMessage
+
+! Body:
+
+if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
+  write (ErrorMessage, '(A)') &
+    "JediErrorVarName and JediErrorGroup must be either both absent or both present"
+  call gen_warn(RoutineName, ErrorMessage)
+end if
+
+MissingDouble = missing_value(0.0_c_double)
+
+JediValueVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels( &
+  JediValueVarName, Channels)
+if (present(JediErrorVarName)) then
+  JediErrorVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels( &
+    JediErrorVarName, Channels)
+end if
+
+if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
+  ! Allocate OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
+                 HdrIn = HdrIn, &
+                 num_levels = int(size(JediValueVarNamesWithChannels), kind=8), &
+                 initial_value = initial_value)
+
+  do iChannel = 1, size(JediValueVarNamesWithChannels)
+    ! Retrieve data from JEDI:
+    ! - observation value
+    call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(iChannel), &
+                         ObsValue)
+    ! - observation error
+    if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
+      if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel))) then
+        call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
+                             ObsError)
+      else
+          write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
+            JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
+          call gen_warn(RoutineName, ErrorMessage)
+          ObsError = RMDI
+      end if
+    else
+      ObsError = RMDI
+    end if
+
+    ! Fill the OPS data structures
+    do iObs = 1, NumObs
+      if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
+      if (ObsError(iObs) /= MissingDouble) El2(iObs, iChannel) % OBErr = ObsError(iObs)
+      ! TODO: PGEFinal
+    end do
+  end do
+end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
+
+end subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable
 
 ! ------------------------------------------------------------------------------
 
