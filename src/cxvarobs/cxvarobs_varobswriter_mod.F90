@@ -542,9 +542,7 @@ do iVarField = 1, nVarFields
       ! NumLevs = nlevels_strat_varobs
       ! call Ops_Alloc(Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t)
     case (VarField_satid)
-      call cxvarobs_varobswriter_fillinteger( &
-        Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
-        "satellite_id", "MetaData", ObsSpace)
+      call cxvarobs_varobswriter_fillsatid(Ob, ObsSpace)
     case (VarField_satazimth)
       call Ops_Alloc(Ob % Header % SatAzimth, "SatAzimth", Ob % Header % NumObsLocal, Ob % SatAzimth)
     case (VarField_localazimuth)
@@ -1447,6 +1445,7 @@ type(c_ptr), value, intent(in)           :: ObsSpace
 
 ! Body:
 
+call cxvarobs_varobswriter_fillsatid(Ob, ObsSpace)
 ! TODO(someone): Replace the placeholder in the call below with an appropriate variable name
 ! and group, once they're known.
 call cxvarobs_varobswriter_fillinteger( &
@@ -1463,6 +1462,21 @@ call cxvarobs_varobswriter_fillreal( &
   "longitude", "MetaData", ObsSpace)
 
 end subroutine cxvarobs_varobswriter_fillgpsrotpddependentfields
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_fillsatid(Ob, ObsSpace)
+implicit none
+! Subroutine arguments:
+type(OB_type), intent(inout)             :: Ob
+type(c_ptr), value, intent(in)           :: ObsSpace
+
+! Body:
+call cxvarobs_varobswriter_fillinteger( &
+  Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
+  "satellite_id", "MetaData", ObsSpace)
+
+end subroutine cxvarobs_varobswriter_fillsatid
 
 ! ------------------------------------------------------------------------------
 

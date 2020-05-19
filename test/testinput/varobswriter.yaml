@@ -56,4 +56,16 @@ Observations:
     HofX: ObsValue # there's no GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
-
+  - ObsSpace:
+      name: GPSRO
+      ObsDataIn:
+        obsfile: Data/ioda/testinput_tier_1/gnssro_obs_2018041500_m.nc4
+      simulate:
+        variables: [bending_angle]
+    ObsFilters:
+    - Filter: VarObsWriter
+      obs_group: GPSRO
+      account_for_gpsro_tangent_point_drift: true
+    HofX: ObsValue # there's no GsiHofX
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0
