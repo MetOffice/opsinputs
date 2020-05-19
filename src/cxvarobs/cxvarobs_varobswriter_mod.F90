@@ -924,7 +924,6 @@ if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
 end if
 
 MissingDouble = missing_value(0.0_c_double)
-MissingFloat  = missing_value(0.0_c_float)
 
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   ! Retrieve data from JEDI
@@ -945,7 +944,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El1, HdrIn, initial_value)
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
-    if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
+    if (ObsError(i) /= MissingDouble)  El1(i) % OBErr = ObsError(i)
     ! TODO(someone): Fill Flags and PGEFinal, if available.
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
