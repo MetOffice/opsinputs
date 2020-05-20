@@ -6,6 +6,8 @@
  */
 
 #include "cxvarobs/VarObsWriter.h"
+
+#include "cxvarobs/ScopedSetEnv.h"
 #include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
@@ -26,19 +28,19 @@ namespace cxvarobs {
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                            boost::shared_ptr<ioda::ObsDataVector<int> > flags,
                            boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)) {
+  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
+{
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
 
-  // These parameters are not currently used because we're passing an eckit::Configuration object
-  // to Fortran anyway. But
-  // (a) their presence serves as documentation
-  // (b) they could be used to validate the parameters.
-  VarObsWriterParameters parameters;
-  parameters.deserialize(config);
+  parameters_.deserialize(config);
+
+  ScopedSetEnv scopedSetEnv;
+  setupEnvironment(scopedSetEnv);
 
   eckit::LocalConfiguration conf(config);
   // TODO(wsmigaj): is this the correct definition of the validity time?
   conf.set("validity_time", obsdb.windowEnd().toString());
+
   if (!cxvarobs_varobswriter_create_f90(key_, &conf, geovars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
@@ -49,6 +51,10 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
 
 VarObsWriter::~VarObsWriter() {
   oops::Log::trace() << "VarObsWriter destructor key = " << key_ << std::endl;
+
+  ScopedSetEnv scopedSetEnv;
+  setupEnvironment(scopedSetEnv);
+
   cxvarobs_varobswriter_delete_f90(key_);
 }
 
@@ -56,6 +62,10 @@ VarObsWriter::~VarObsWriter() {
 
 void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   oops::Log::trace() << "VarObsWriter priorFilter" << std::endl;
+
+  ScopedSetEnv scopedSetEnv;
+  setupEnvironment(scopedSetEnv);
+
   cxvarobs_varobswriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
@@ -64,6 +74,10 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
                               const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
+
+  ScopedSetEnv scopedSetEnv;
+  setupEnvironment(scopedSetEnv);
+
   // We need to pass the list of channels separately because the Fortran interface to
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
@@ -78,4 +92,14 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
 void VarObsWriter::print(std::ostream & os) const {
   os << "VarObsWriter::print not yet implemented " << key_;
 }
+
+// -----------------------------------------------------------------------------
+
+void VarObsWriter::setupEnvironment(ScopedSetEnv &scopedSetEnv) const {
+  if (parameters_.namelist_directory.value() != boost::none)
+    scopedSetEnv.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelist_directory.value());
+  if (parameters_.output_directory.value() != boost::none)
+    scopedSetEnv.set("OPS_VAROB_OUTPUT_DIR", *parameters_.output_directory.value());
+}
+
 }  // namespace cxvarobs

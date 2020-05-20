@@ -32,7 +32,7 @@ contains
 
 function cxvarobs_varobswriter_create_c(c_self, c_conf, c_varlist) &
   bind(c,name='cxvarobs_varobswriter_create_f90')
-use string_f_c_mod
+use oops_variables_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
@@ -41,17 +41,13 @@ logical(c_bool)                :: cxvarobs_varobswriter_create_c
 
 type(cxvarobs_varobswriter), pointer :: self
 type(fckit_configuration) :: f_conf
+type(oops_variables) :: f_varlist
 
 call cxvarobs_varobswriter_registry%setup(c_self, self)
 
 f_conf = fckit_configuration(c_conf)
-cxvarobs_varobswriter_create_c = cxvarobs_varobswriter_create(self, f_conf)
-
-!> Update C++ ObsFilter with geovals variables list
-if (allocated(self%geovars)) then
-! TODO(wsmigaj) this doesn't compile, why?
-!  call f_c_push_string_varlist(c_varlist, self%geovars)
-endif
+f_varlist = oops_variables(c_varlist)
+cxvarobs_varobswriter_create_c = cxvarobs_varobswriter_create(self, f_conf, f_varlist)
 
 end function cxvarobs_varobswriter_create_c
 

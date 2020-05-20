@@ -10,7 +10,9 @@ module cxvarobs_varobswriter_mod
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding
 use datetime_mod
+use kinds
 use missing_values_mod
+use oops_variables_mod
 use obsspace_mod
 use ufo_geovals_mod
 use ufo_vars_mod
@@ -62,8 +64,6 @@ integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 ! ------------------------------------------------------------------------------
 type, public :: cxvarobs_varobswriter
 private
-  character(len=max_string), public, allocatable :: geovars(:) ! TODO: may need to be filled
-
   integer(kind=8) :: ObsGroup
   type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
 
@@ -92,6 +92,8 @@ private
   real(kind=8) RC_FirstLong
   real(kind=8) RC_PoleLat
   real(kind=8) RC_PoleLong
+
+  type(ufo_geovals), pointer :: GeoVals
 end type cxvarobs_varobswriter
 
 ! ------------------------------------------------------------------------------
@@ -99,10 +101,11 @@ contains
 ! ------------------------------------------------------------------------------
 
 ! Set up a cxvarobs_varobswriter. Returns .true. on success and .false. on failure.
-function cxvarobs_varobswriter_create(self, f_conf)
+function cxvarobs_varobswriter_create(self, f_conf, geovars)
 implicit none
 type(cxvarobs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf
+type(oops_variables), intent(inout)        :: geovars
 logical(c_bool)                            :: cxvarobs_varobswriter_create
 
 character(len=:), allocatable              :: string
@@ -292,6 +295,8 @@ double = 0.0
 found = f_conf % get("RC_PoleLong", double)
 self % RC_PoleLong = double
 
+call cxvarobs_varobswriter_addrequiredgeovars(self, geovars)
+
 9999 if (allocated(string)) deallocate(string)
 
 end function cxvarobs_varobswriter_create
@@ -303,7 +308,6 @@ implicit none
 type(cxvarobs_varobswriter), intent(inout) :: self
 
 call datetime_delete(self % validitytime)
-if (allocated(self%geovars))   deallocate(self%geovars)
 
 end subroutine cxvarobs_varobswriter_delete
 
@@ -311,9 +315,11 @@ end subroutine cxvarobs_varobswriter_delete
 
 subroutine cxvarobs_varobswriter_prior(self, ObsSpace, GeoVals)
 implicit none
-type(cxvarobs_varobswriter),  intent(in) :: self
-type(c_ptr), value, intent(in) :: ObsSpace
-type(ufo_geovals),  intent(in) :: GeoVals
+type(cxvarobs_varobswriter), intent(inout) :: self
+type(c_ptr), value, intent(in)             :: ObsSpace
+type(ufo_geovals), intent(in), pointer     :: GeoVals
+
+self % GeoVals => GeoVals
 
 end subroutine cxvarobs_varobswriter_prior
 
@@ -366,6 +372,29 @@ call obs % deallocate()
 ! DEALLOCATE(Obs % Header % ObsPerBatchPerPE)
 
 end subroutine cxvarobs_varobswriter_post
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_addrequiredgeovars(self, geovars)
+implicit none
+type(cxvarobs_varobswriter), intent(in) :: self
+type(oops_variables), intent(inout)     :: geovars
+
+integer(kind=8)                         :: VarFields(ActualMaxVarfield)
+integer                                 :: i
+
+call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
+
+do i = 1, size(VarFields)
+  select case (VarFields(i))
+  case (VarField_modelsurface)
+    ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
+    ! here and in cxvarobs_varobswriter_populateobservations.
+    call geovars % push_back("land_type_index")
+  end select
+end do
+
+end subroutine cxvarobs_varobswriter_addrequiredgeovars
 
 ! ------------------------------------------------------------------------------
 
@@ -543,7 +572,11 @@ do iVarField = 1, nVarFields
     case (VarField_elevation)
       call Ops_Alloc(Ob % Header % elevation, "elevation", Ob % Header % NumObsLocal, Ob % elevation)
     case (VarField_modelsurface)
-      call Ops_Alloc(Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface)
+      ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
+      ! here and in cxvarobs_varobswriter_addrequiredgeovars.
+      call cxvarobs_varobswriter_fillrealfromgeoval( &
+        Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface, &
+        "land_type_index", self % GeoVals)
     case (VarField_modelorog)
       call Ops_Alloc(Ob % Header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
     case (VarField_stratt)
@@ -1059,10 +1092,10 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
         call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
                              ObsError)
       else
-          write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
-            JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
-          call gen_warn(RoutineName, ErrorMessage)
-          ObsError = RMDI
+        write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
+          JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
+        call gen_warn(RoutineName, ErrorMessage)
+        ObsError = RMDI
       end if
     else
       ObsError = RMDI
@@ -1081,15 +1114,8 @@ end subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillreal(Hdr,           &
-                                                 OpsVarName,    &
-                                                 NumObs,        &
-                                                 Real1,         &
-                                                 JediVarName,   &
-                                                 JediVarGroup,  &
-                                                 ObsSpace,      &
-                                                 HdrIn,         &
-                                                 initial_value)
+subroutine cxvarobs_varobswriter_fillreal( &
+  Hdr, OpsVarName, NumObs, Real1, JediVarName, JediVarGroup, ObsSpace, HdrIn, initial_value)
 implicit none
 
 ! Subroutine arguments:
@@ -1126,48 +1152,48 @@ end subroutine cxvarobs_varobswriter_fillreal
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillinteger(Hdr,           &
-                                             OpsVarName,    &
-                                             NumObs,        &
-                                             Int1,         &
-                                             JediVarName,   &
-                                             JediVarGroup,  &
-                                             ObsSpace,      &
-                                             HdrIn,         &
-                                             initial_value)
+subroutine cxvarobs_varobswriter_fillrealfromgeoval( &
+  Hdr, OpsVarName, NumObs, Real1, JediVarName, GeoVals, HdrIn, initial_value)
 implicit none
 
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
-integer(kind=8), pointer                        :: Int1(:)
+real(kind=8), pointer                           :: Real1(:)
 character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-type(c_ptr), value, intent(in)                  :: ObsSpace
+type(ufo_geovals), intent(in)                   :: GeoVals
 type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-integer(kind=8), optional, intent(in)           :: initial_value
+real(kind=8), optional, intent(in)              :: initial_value
 
 ! Local declarations:
-integer(kind=4)                                 :: VarValue(NumObs)
-integer(kind=4)                                 :: MissingInt
-integer                                         :: i
+type(ufo_geoval), pointer                       :: GeoVal
+real(kind_real)                                 :: MissingReal
+
+character(len=*), parameter                     :: &
+  RoutineName = "cxvarobs_varobswriter_fillrealfromgeoval"
+character(len=256)                              :: ErrorMessage
 
 ! Body:
 
-MissingInt = missing_value(0_c_int32_t)
+MissingReal = missing_value(0_kind_real)
 
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
-  ! Retrieve data from JEDI
-  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
+if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
+  ! Retrieve GeoVal
+  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+  if (GeoVal % nval /= 1) then
+    write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
+      &Only the first of these values will be written to the VarObs file")') JediVarName
+    call gen_warn(RoutineName, ErrorMessage)
+  end if
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Int1, HdrIn, initial_value)
-  where (VarValue /= MissingInt)
-    Int1 = VarValue
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1, HdrIn, initial_value)
+  where (GeoVal % vals(1,:) /= MissingReal)
+    Real1 = GeoVal % vals(1,:)
   end where
 end if
-end subroutine cxvarobs_varobswriter_fillinteger
+end subroutine cxvarobs_varobswriter_fillrealfromgeoval
 
 ! ------------------------------------------------------------------------------
 
@@ -1225,6 +1251,50 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillreal2d
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_fillinteger(Hdr,           &
+                                             OpsVarName,    &
+                                             NumObs,        &
+                                             Int1,          &
+                                             JediVarName,   &
+                                             JediVarGroup,  &
+                                             ObsSpace,      &
+                                             HdrIn,         &
+                                             initial_value)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(kind=8), intent(in)                     :: NumObs
+integer(kind=8), pointer                        :: Int1(:)
+character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediVarGroup
+type(c_ptr), value, intent(in)                  :: ObsSpace
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
+integer(kind=8), optional, intent(in)           :: initial_value
+
+! Local declarations:
+integer(kind=4)                                 :: VarValue(NumObs)
+integer(kind=4)                                 :: MissingInt
+
+! Body:
+
+MissingInt = missing_value(0_c_int32_t)
+
+if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
+  ! Retrieve data from JEDI
+  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Int1, HdrIn, initial_value)
+  where (VarValue /= MissingInt)
+    Int1 = VarValue
+  end where
+end if
+end subroutine cxvarobs_varobswriter_fillinteger
 
 ! ------------------------------------------------------------------------------
 

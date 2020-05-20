@@ -25,9 +25,12 @@ endfunction(CREATE_SYMLINK_FILENAME)
 # Create a directory for test input config and symlink all files
 list( APPEND cxvarobs_test_input
   testinput/varobswriter.yaml
+  testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput)
+# TODO(wsmigaj): find a more elegant solution to create the required subdirectories of testinput
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelistsAMSUB)
 CREATE_SYMLINK( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${cxvarobs_test_input} )
 
 # Add files to cmake resources

@@ -18,6 +18,7 @@
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
 #include "cxvarobs/VarObsWriter.interface.h"
+#include "cxvarobs/VarObsWriterParameters.h"
 
 namespace eckit {
   class Configuration;
@@ -35,14 +36,15 @@ namespace ufo {
 
 namespace cxvarobs {
 
-class VarObsWriter : public util::Printable,
-                private util::ObjectCounter<VarObsWriter> {
+class ScopedSetEnv;
+
+class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
  public:
   static const std::string classname() {return "ufo::VarObsWriter";}
 
   VarObsWriter(ioda::ObsSpace &, const eckit::Configuration &,
-            boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-            boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
+               boost::shared_ptr<ioda::ObsDataVector<int> > flags,
+               boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~VarObsWriter();
 
   void preProcess() const {}
@@ -54,6 +56,9 @@ class VarObsWriter : public util::Printable,
 
  private:
   void print(std::ostream &) const;
+
+  void setupEnvironment(ScopedSetEnv &scopedSetEnv) const;
+
   F90check key_;
 
   ioda::ObsSpace & obsdb_;
@@ -61,6 +66,8 @@ class VarObsWriter : public util::Printable,
   oops::Variables extradiagvars_;
   boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
   boost::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
+
+  VarObsWriterParameters parameters_;
 };
 
 }  // namespace cxvarobs

@@ -38,9 +38,13 @@ Observations:
       simulate:
         variables: [brightness_temperature]
         channels: 1-15
+    GeoVaLs:
+      filename: ../../ufo/test/Data/amsua_metop-b_geoval_2018041500_m.nc4
     ObsFilters:
     - Filter: VarObsWriter
       obs_group: AMSUB
+      namelist_directory: testinput/VarObsWriterNamelistsAMSUB
+      output_directory: testoutput/VarObsWriterOutputAMSUB
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
@@ -64,7 +68,7 @@ Observations:
       simulate:
         variables: [bending_angle]
     ObsFilters:
-    - Filter: VarObsWriter
+    - Filter: VarObsWriter      
       obs_group: GPSRO
       account_for_gpsro_tangent_point_drift: true
     HofX: ObsValue # there's no GsiHofX

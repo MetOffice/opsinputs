@@ -12,10 +12,13 @@ list( APPEND cxvarobs_src_files
     cxvarobs_obsdatavector_mod.F90
     cxvarobs_varobswriter_mod.F90
     instantiateObsFilterFactory.h
-    VarObsWriter.h
+    ScopedSetEnv.cc
+    ScopedSetEnv.h
     VarObsWriter.cc
+    VarObsWriter.h
     VarObsWriter.interface.F90
     VarObsWriter.interface.h
+    VarObsWriterParameters.h
 )
 
 # TEMPORARY
