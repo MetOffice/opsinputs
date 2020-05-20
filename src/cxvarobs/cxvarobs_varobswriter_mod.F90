@@ -732,11 +732,13 @@ do iVarField = 1, nVarFields
       !   CALL Ops_Alloc(Ob % Header % level_time, "level_time", Ob % Header % NumObsLocal, Ob % level_time)
       ! END IF
     case (VarField_LevelLat)
-      ! IF (PRESENT (RepObs)) THEN
-      !   ObHdrVrbl = RepObs % Header % model_level_lat
-      ! ELSE
-      !   CALL Ops_Alloc(Ob % Header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat)
-      ! END IF
+      ! TODO(someone): the OPS code had "if (present(RepObs))...else...end if" here. Is that needed
+      ! and what is RepObs?
+      ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
+      ! once it is known.
+      call cxvarobs_varobswriter_fillreal2dfromgeoval( &
+        Ob % Header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat, &
+        "PLACEHOLDER_VARIABLE_NAME", self % GeoVals)
     case (VarField_LevelLon)
       ! IF (PRESENT (RepObs)) THEN
       !   ObHdrVrbl = RepObs % Header % model_level_lon
@@ -1251,6 +1253,43 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillreal2d
+
+! ------------------------------------------------------------------------------
+
+subroutine cxvarobs_varobswriter_fillreal2dfromgeoval( &
+  Hdr, OpsVarName, NumObs, Real2, JediVarName, GeoVals, HdrIn, initial_value)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(kind=8), intent(in)                     :: NumObs
+real(kind=8), pointer                           :: Real2(:,:)
+character(len=*), intent(in)                    :: JediVarName
+type(ufo_geovals), intent(in)                   :: GeoVals
+type(ElementHeader_Type), optional, intent(in)  :: HdrIn
+real(kind=8), optional, intent(in)              :: initial_value
+
+! Local declarations:
+type(ufo_geoval), pointer                       :: GeoVal
+real(kind_real)                                 :: MissingReal
+
+! Body:
+
+MissingReal = missing_value(0_kind_real)
+
+if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
+  ! Retrieve GeoVal
+  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, HdrIn, initial_value = initial_value, &
+                 num_levels = int(GeoVal % nval, kind = 8))
+  where (transpose(GeoVal % vals) /= MissingReal)
+    Real2 = transpose(GeoVal % vals)
+  end where
+end if
+end subroutine cxvarobs_varobswriter_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
