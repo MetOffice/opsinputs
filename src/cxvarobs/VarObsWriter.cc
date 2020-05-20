@@ -7,7 +7,7 @@
 
 #include "cxvarobs/VarObsWriter.h"
 
-#include "cxvarobs/ScopedSetEnv.h"
+#include "cxvarobs/LocalEnvironment.h"
 #include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
@@ -34,8 +34,8 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
 
   parameters_.deserialize(config);
 
-  ScopedSetEnv scopedSetEnv;
-  setupEnvironment(scopedSetEnv);
+  LocalEnvironment localEnvironment;
+  setupEnvironment(localEnvironment);
 
   eckit::LocalConfiguration conf(config);
   // TODO(wsmigaj): is this the correct definition of the validity time?
@@ -52,8 +52,8 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
 VarObsWriter::~VarObsWriter() {
   oops::Log::trace() << "VarObsWriter destructor key = " << key_ << std::endl;
 
-  ScopedSetEnv scopedSetEnv;
-  setupEnvironment(scopedSetEnv);
+  LocalEnvironment localEnvironment;
+  setupEnvironment(localEnvironment);
 
   cxvarobs_varobswriter_delete_f90(key_);
 }
@@ -63,8 +63,8 @@ VarObsWriter::~VarObsWriter() {
 void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   oops::Log::trace() << "VarObsWriter priorFilter" << std::endl;
 
-  ScopedSetEnv scopedSetEnv;
-  setupEnvironment(scopedSetEnv);
+  LocalEnvironment localEnvironment;
+  setupEnvironment(localEnvironment);
 
   cxvarobs_varobswriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
@@ -75,8 +75,8 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
                               const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
 
-  ScopedSetEnv scopedSetEnv;
-  setupEnvironment(scopedSetEnv);
+  LocalEnvironment localEnvironment;
+  setupEnvironment(localEnvironment);
 
   // We need to pass the list of channels separately because the Fortran interface to
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
@@ -95,11 +95,11 @@ void VarObsWriter::print(std::ostream & os) const {
 
 // -----------------------------------------------------------------------------
 
-void VarObsWriter::setupEnvironment(ScopedSetEnv &scopedSetEnv) const {
+void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
   if (parameters_.namelist_directory.value() != boost::none)
-    scopedSetEnv.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelist_directory.value());
+    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelist_directory.value());
   if (parameters_.output_directory.value() != boost::none)
-    scopedSetEnv.set("OPS_VAROB_OUTPUT_DIR", *parameters_.output_directory.value());
+    localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.output_directory.value());
 }
 
 }  // namespace cxvarobs

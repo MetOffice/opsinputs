@@ -36,7 +36,7 @@ namespace ufo {
 
 namespace cxvarobs {
 
-class ScopedSetEnv;
+class LocalEnvironment;
 
 class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
  public:
@@ -57,7 +57,7 @@ class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsW
  private:
   void print(std::ostream &) const;
 
-  void setupEnvironment(ScopedSetEnv &scopedSetEnv) const;
+  void setupEnvironment(LocalEnvironment &localEnvironment) const;
 
   F90check key_;
 

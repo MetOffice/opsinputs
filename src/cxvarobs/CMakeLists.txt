@@ -12,8 +12,8 @@ list( APPEND cxvarobs_src_files
     cxvarobs_obsdatavector_mod.F90
     cxvarobs_varobswriter_mod.F90
     instantiateObsFilterFactory.h
-    ScopedSetEnv.cc
-    ScopedSetEnv.h
+    LocalEnvironment.cc
+    LocalEnvironment.h
     VarObsWriter.cc
     VarObsWriter.h
     VarObsWriter.interface.F90

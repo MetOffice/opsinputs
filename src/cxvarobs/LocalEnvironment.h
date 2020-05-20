@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_SCOPEDSETENV_H
-#define CXVAROBS_SCOPEDSETENV_H
+#ifndef CXVAROBS_LOCALENVIRONMENT_H
+#define CXVAROBS_LOCALENVIRONMENT_H
 
 #include <map>
 #include <set>
@@ -16,14 +16,14 @@ namespace cxvarobs {
 
 /// \brief Sets environment variables to values specified in the contructor, restoring the original
 /// values on destruction.
-class ScopedSetEnv {
+class LocalEnvironment {
  public:
-  ScopedSetEnv();
-  explicit ScopedSetEnv(const std::map<std::string, std::string> &variableNamesAndValues);
+  LocalEnvironment();
+  explicit LocalEnvironment(const std::map<std::string, std::string> &variableNamesAndValues);
 
-  ~ScopedSetEnv();
-  ScopedSetEnv(const ScopedSetEnv &) = delete;
-  ScopedSetEnv& operator=(const ScopedSetEnv &) = delete;
+  ~LocalEnvironment();
+  LocalEnvironment(const LocalEnvironment &) = delete;
+  LocalEnvironment& operator=(const LocalEnvironment &) = delete;
 
   void set(const std::string &variableName, const std::string &value);
 
@@ -34,4 +34,4 @@ class ScopedSetEnv {
 
 }  // namespace cxvarobs
 
-#endif // CXVAROBS_SCOPEDSETENV_H
+#endif // CXVAROBS_LOCALENVIRONMENT_H
