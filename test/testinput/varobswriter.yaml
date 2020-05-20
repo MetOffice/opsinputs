@@ -68,9 +68,24 @@ Observations:
       simulate:
         variables: [bending_angle]
     ObsFilters:
-    - Filter: VarObsWriter      
+    - Filter: VarObsWriter
       obs_group: GPSRO
       account_for_gpsro_tangent_point_drift: true
     HofX: ObsValue # there's no GsiHofX
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: Aircraft
+      ObsDataIn:
+        obsfile: ../../ufo/test/Data/met_office_buddy_check.nc4
+        obsgrouping:
+          group_variable: "station_id"
+      simulate:
+        variables: [air_temperature, eastward_wind, northward_wind]
+    ObsFilters:
+    - Filter: VarObsWriter
+      obs_group: Aircraft
+      output_directory: testoutput/VarObsWriterOutputBuddyCheck
+    HofX: HofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0

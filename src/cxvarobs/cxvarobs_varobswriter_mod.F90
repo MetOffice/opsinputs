@@ -32,6 +32,7 @@ use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
 
 use OpsMod_CharUtils, only: ops_to_lower_case
+use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
     Ops_InitMPI
@@ -366,7 +367,7 @@ call cxvarobs_varobswriter_populatecxheader(self, CxHeader)
 call Ops_CreateVarobs (Obs,                 & ! in
                        CxHeader,            & ! in
                        AssimDataFormat_VAR, &
-                       NumVarobsTotal)        ! TODO: PGEBd
+                       NumVarobsTotal)
 
 call obs % deallocate()
 ! DEALLOCATE(Obs % Header % ObsPerBatchPerPE)
@@ -810,6 +811,7 @@ type(Element_Type), optional, intent(in)        :: initial_value
 real(kind=c_double)                             :: ObsValue(NumObs)
 integer(kind=c_int)                             :: Flag(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 integer                                         :: i
@@ -845,7 +847,13 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   else
     write (ErrorMessage, '(A,A,A)') "Variable ", JediVarName, "@ObsError not found"
     call gen_warn(RoutineName, ErrorMessage)
-    ObsError = RMDI
+    ObsError = MissingFloat
+  end if
+  ! - gross error probability
+  if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarName)) then
+    call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarName, PGE)
+  else
+    PGE = MissingDouble
   end if
 
   ! Fill the OPS data structures
@@ -853,8 +861,8 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
+    if (PGE(i) /= MissingDouble)      El1(i) % PGEFinal = PGE(i) * PPF
     if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
-    ! TODO: PGEFinal
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
@@ -883,6 +891,7 @@ type(Element_Type), optional, intent(in)        :: initial_value
 real(kind=c_double)                             :: ObsValue(NumObs)
 integer(kind=c_int)                             :: Flag(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
@@ -932,15 +941,22 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
       write (ErrorMessage, '(A,A,A)') &
         "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
       call gen_warn(RoutineName, ErrorMessage)
-      ObsError = RMDI
+      ObsError = MissingFloat
+    end if
+    ! - gross error probability
+    if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarNamesWithChannels(iChannel))) then
+      call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarNamesWithChannels(iChannel), &
+                           PGE)
+    else
+      PGE = MissingDouble
     end if
 
     ! Fill the OPS data structures
     do iObs = 1, NumObs
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
+      if (PGE(iObs) /= MissingDouble)      El2(iObs, iChannel) % PGEFinal = PGE(iObs) * PPF
       if (Flag(iObs) /= 0)                 El2(iObs, iChannel) % Flags = ibset(0, FinalRejectFlag)
-      ! TODO: Flags, PGEFinal
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -1006,10 +1022,10 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     else
       write (ErrorMessage, '("Variable ",A,"@",A," not found")') JediErrorVarName, JediErrorGroup
       call gen_warn(RoutineName, ErrorMessage)
-      ObsError = RMDI
+      ObsError = MissingDouble
     end if
   else
-    ObsError = RMDI
+    ObsError = MissingDouble
   end if
 
   ! Fill the OPS data structures
@@ -1097,17 +1113,17 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
         write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
           JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
         call gen_warn(RoutineName, ErrorMessage)
-        ObsError = RMDI
+        ObsError = MissingDouble
       end if
     else
-      ObsError = RMDI
+      ObsError = MissingDouble
     end if
 
     ! Fill the OPS data structures
     do iObs = 1, NumObs
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingDouble) El2(iObs, iChannel) % OBErr = ObsError(iObs)
-      ! TODO: PGEFinal
+      ! TODO(someone): Fill Flags and PGEFinal, if needed
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
