@@ -40,7 +40,7 @@ class LocalEnvironment;
 
 class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
  public:
-  static const std::string classname() {return "ufo::VarObsWriter";}
+  static const std::string classname() {return "cxvarobs::VarObsWriter";}
 
   VarObsWriter(ioda::ObsSpace &, const eckit::Configuration &,
                boost::shared_ptr<ioda::ObsDataVector<int> > flags,
