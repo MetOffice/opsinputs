@@ -11,8 +11,12 @@ Observations:
         variables: [air_temperature, specific_humidity,
                     eastward_wind, northward_wind]
     ObsFilters:
-    - Filter: VarObsWriter
-      obs_group: Aircraft
+    - &varobswriterparameters
+        Filter: VarObsWriter
+        obs_group: Aircraft
+    - <<: *varobswriterparameters
+      Filter: VarObsChecker
+
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0

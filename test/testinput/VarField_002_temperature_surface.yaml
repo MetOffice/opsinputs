@@ -1,0 +1,47 @@
+window_begin: 2018-04-14T20:30:00Z
+window_end: 2018-04-15T03:30:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: Surface
+      Generate:
+        List:
+          lats: [ 21, 22, -23, 24 ]
+          lons: [ 31, 32,  33, 34 ]
+          datetimes: [ '2010-01-01T00:01:00Z', '2010-01-01T00:02:00Z',
+                       '2010-01-01T00:03:00Z', '2010-01-01T00:04:00Z' ]
+        obs_errors: [1.0]
+      simulate:
+        variables: [air_temperature]
+    # GeoVaLs: [when needed:]
+      # filename: Data/amsua_metop-b_geoval_2018041500_m.nc4
+    ObsFilters:
+    - Filter: ObsSpace Populator
+      FloatVariables:
+        air_temperature@ObsValue:              [ 301,    _,  303,  304] # _ -> missing
+        air_temperature@ObsError:              [   1,    _,    3,    4]
+        air_temperature@GrossErrorProbability: [0.01,    _, 0.03, 0.04]
+    - Filter: Bounds Check
+      where:
+      - variable:
+          name:  latitude@MetaData
+        maxvalue: 0.
+    - &varobswriterparameters
+        Filter: VarObsWriter
+        obs_group: Surface
+    - <<: *varobswriterparameters
+      Filter: VarObsChecker
+      ExpectedHeaderEntries:
+        Vertical coordinate type: 1
+      ExpectedTableEntries:
+        ob num:   [1, 4]
+        field:    [2, 2]
+        ob value: [301, 304]
+        ob error: [0.01, 0.04]
+        lat:      [21, 24]
+        lon:      [31, 34]
+        time:     [0, 0] # TODO
+    HofX: ObsValue
+    benchmarkFlag: 1000 # bogus
+    flaggedBenchmark: 0
