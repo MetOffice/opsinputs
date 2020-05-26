@@ -10,13 +10,11 @@
 
 #include "cxvarobs/VarObsWriter.h"
 #include "oops/interface/ObsFilter.h"
-#include "ufo/instantiateObsFilterFactory.h"
 
 namespace cxvarobs {
 
 template<typename MODEL> 
 void instantiateObsFilterFactory() {
-  ufo::instantiateObsFilterFactory<MODEL>();
   static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, VarObsWriter> >
     makerVarObsWriter_("VarObsWriter");
 }
