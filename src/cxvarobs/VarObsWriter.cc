@@ -18,9 +18,6 @@
 #include "oops/interface/ObsFilter.h"
 #include "oops/util/Logger.h"
 
-#include "ufo/UfoTrait.h"
-#include "ufo/filters/Variables.h"
-
 namespace cxvarobs {
 
 // -------------------------------------------------------------------------
