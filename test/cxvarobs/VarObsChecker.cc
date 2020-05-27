@@ -5,20 +5,20 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
+#include <cstdio>
 #include <fstream>
 #include <regex>
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <Eigen/Core>
+#include <boost/algorithm/string/trim.hpp>
 
-#include "../test/cxvarobs/VarObsChecker.h"
+#include "../cxvarobs/VarObsChecker.h"
 
 #include "cxvarobs/LocalEnvironment.h"
 #include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
-#include "eckit/filesystem/TempFile.h"
-#include "eckit/testing/Test.h"
 
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
@@ -29,24 +29,12 @@
 #include "ufo/filters/Variables.h"
 
 namespace cxvarobs {
+namespace test {
 
 namespace {
 
 // This could be made OS-dependent.
 const char PATH_SEPARATOR = '/';
-
-struct FloatVariable {
-  std::vector<int> channels;
-  Eigen::MatrixXf values;
-  Eigen::MatrixXi qcFlags;
-  boost::optional<Eigen::MatrixXf> errors;
-  boost::optional<Eigen::MatrixXf> grossErrorProbabilities;
-};
-
-struct IntVariable {
-  std::vector<int> channels;
-  Eigen::MatrixXi values;
-};
 
 std::string getEnvVariableOrDefault(const char *variableName, const char *defaultValue) {
   const char *value = std::getenv(variableName);
@@ -64,7 +52,88 @@ bool startsWith(const std::string &string, const char *prefix) {
   return string.rfind(prefix, 0 /*look only at the beginning of string*/);
 }
 
+class TempFile {
+public:
+  explicit TempFile(const eckit::PathName &fileName) : fileName_(fileName) {}
+  explicit TempFile(const char *fileName) : fileName_(fileName) {}
+
+  TempFile(const TempFile &) = delete;
+  TempFile(TempFile &&other) { std::swap(fileName_, other.fileName_); }
+
+  TempFile & operator=(const TempFile &) = delete;
+  TempFile & operator=(TempFile &&other) {
+    if (this != &other) {
+      deleteFileAndResetFileName();
+      std::swap(fileName_, other.fileName_);
+    }
+  }
+
+  ~TempFile() {
+    deleteFileAndResetFileName();
+  }
+
+  std::string name() const { return fileName_.asString(); }
+
+private:
+  void deleteFileAndResetFileName() {
+    if (fileName_.exists()) {
+      fileName_.unlink();
+    }
+    fileName_ = eckit::PathName();
+  }
+
+private:
+  eckit::PathName fileName_;
+};
+
 }  // namespace
+
+/// Encapsulates the main table of per-observation data printed by PrintVarobs.
+class VarObsChecker::MainTable {
+public:
+  MainTable(std::string headerLine, std::vector<std::string> dataLines);
+
+  /// \brief Return values from the column with the specified header (trimmed on both sides).
+  std::vector<std::string> operator[](const std::string &columnHeader) const;
+
+private:
+  std::string headerLine_;
+  std::vector<std::string> dataLines_;
+};
+
+VarObsChecker::MainTable::MainTable(std::string headerLine, std::vector<std::string> dataLines) :
+  headerLine_(std::move(headerLine)), dataLines_(std::move(dataLines))
+{}
+
+std::vector<std::string> VarObsChecker::MainTable::operator[](
+    const std::string &columnHeader) const {
+  auto position = headerLine_.find(columnHeader);
+  if (position == std::string::npos)
+    throw std::runtime_error("Column '" + columnHeader + "' not found in VarObs data table");
+  auto columnEnd = position + columnHeader.size();
+
+  // Find the left end of the column, i.e. the beginning of the sequence of spaces preceding
+  // the column header
+  auto columnBegin = position;
+  while (columnBegin != 0 && columnHeader[columnBegin - 1] == ' ')
+    --columnBegin;
+
+  std::vector<std::string> entries;
+  entries.reserve(dataLines_.size());
+  for (const std::string &line : dataLines_) {
+    std::string entry = line.substr(columnBegin, columnEnd - columnBegin);
+    boost::algorithm::trim(entry);
+    entries.push_back(std::move(entry));
+  }
+
+  return entries;
+}
+
+struct VarObsChecker::PrintVarObsOutput {
+  std::map<std::string, std::string> headerFields;
+  MainTable mainTable;
+};
+
 
 VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                              boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -86,7 +155,9 @@ void VarObsChecker::priorFilter(const ufo::GeoVaLs &) const {
 void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
 
-  LocalEnvironment localEnvironment;
+  // Print the contents of the varobs file to a temporary file...
+
+  cxvarobs::LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
   const eckit::PathName varObsFileName(getEnvVariableOrThrow("OPS_VAROB_OUTPUT_DIR") +
@@ -94,13 +165,44 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   if (!varObsFileName.exists())
     throw std::runtime_error("File '" + varObsFileName + "' not found");
 
-  eckit::TempFile tempFile;
-  std::string cmd = "PrintVarobs \"" + varObsFileName + "\" --all --outfile \"" + tempFile + "\"";
-  const int exitCode = std::system(cmd.c_str());
+  char tempFileName[L_tmpnam];
+  std::tmpnam(tempFileName);
 
+  TempFile tempFile(tempFileName);
+
+  const char exeName[] = "OpsProg_PrintVarobs.exe";
+  std::string exePath;
+  if (char *dir = getenv("CXVAROBS_OPS_BIN_DIR")) {
+    exePath = dir;
+    exePath += PATH_SEPARATOR;
+    exePath += exeName;
+  } else {
+    exePath = exeName;
+  }
+  const std::string cmd = exePath + " \"" + varObsFileName + "\" --all --outfile=\"" +
+      tempFile.name() + "\"";
+  oops::Log::info() << "Running " << cmd << "\n";
+  const int exitCode = std::system(cmd.c_str());
   if (exitCode != 0)
     throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
-  std::ifstream tempFileStream(tempFile.asString());
+
+  // ... parse them and check them
+
+  PrintVarObsOutput output = parsePrintVarObsOutput(tempFile.name());
+  checkHeader(output.headerFields);
+  checkMainTable(output.mainTable);
+}
+
+void VarObsChecker::setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const {
+  if (parameters_.namelistDirectory.value() != boost::none)
+    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
+  if (parameters_.outputDirectory.value() != boost::none)
+    localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
+}
+
+VarObsChecker::PrintVarObsOutput VarObsChecker::parsePrintVarObsOutput(
+    const std::string &fileName) const {
+  std::ifstream is(fileName);
   std::string line;
 
   enum FileSection {
@@ -112,24 +214,27 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
 
   FileSection section = BeforeColumnDependentConstants;
 
-  std::regex columnDepConstantsRegEx(R"((.*?) +\(([0-9]+)\) +([0-9]+)");
+//  std::regex columnDepConstantsRegEx(R"((.*?) +\(([0-9]+)\) +([0-9]+)");
 
   std::map<std::string, std::string> headerFields;
-  std::map<int, int> numLevelsByVarfield;
-  std::vector<std::string> mainTableHeaders;
-  std::vector<std::string> tokens;
-  std::vector<std::vector<std::string>> mainTableColumns;
-  while (std::getline(tempFileStream, line)) {
+//  std::map<int, int> numLevelsByVarfield;
+
+  std::string mainTableHeader;
+  std::vector<std::string> mainTableContents;
+  while (std::getline(is, line)) {
     switch (section) {
     case BeforeColumnDependentConstants:
       if (line == "Column Dependent Constants:") {
         section = BeforeLevelDependentConstants;
       } else {
-        const char* separator = " = ";
+        const char separator[] = " = ";
         auto separatorPos = line.find(separator);
         if (separatorPos != std::string::npos) {
-          headerFields[line.substr(0, separatorPos)] =
-              line.substr(separatorPos + sizeof(separator) - 1);
+          std::string name = line.substr(0, separatorPos);
+          std::string value = line.substr(separatorPos + sizeof(separator) - 1);
+          boost::algorithm::trim(name);
+          boost::algorithm::trim(value);
+          headerFields[name] = value;
         }
       }
       break;
@@ -137,116 +242,51 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
       if (line == "Level Dependent Constants:") {
         section = BeforeMainTable;
       } else {
-        std::smatch match;
-        if (std::regex_match(line, match, columnDepConstantsRegEx))
-          numLevelsByVarfield[std::stoi(match[1].str())] = std::stoi(match[2].str());
+//        // Probably unnecessary
+//        std::smatch match;
+//        if (std::regex_match(line, match, columnDepConstantsRegEx))
+//          numLevelsByVarfield[std::stoi(match[1].str())] = std::stoi(match[2].str());
       }
       break;
     case BeforeMainTable:
-      if (startsWith(line, "batch ")) {
+      if (boost::algorithm::starts_with(line, "  batch ")) {
+        mainTableHeader = line;
         section = InMainTable;
-        boost::algorithm::split(mainTableHeaders, line, [](char ch) { return ch == ' ';},
-                                boost::token_compress_on);
-        // Unfortunately some headers contain spaces; they start with "ob ", and we need to
-        // merge each "ob" prefix with the following word.
-        for (size_t i = 0; i + 1 < mainTableHeaders.size(); ++i) {
-          if (mainTableHeaders[i] == "ob") {
-            mainTableHeaders[i] += " " + mainTableHeaders[i + 1];
-            mainTableHeaders.erase(mainTableHeaders.begin() + i + 1);
-          }
-        }
-        mainTableColumns.resize(mainTableHeaders.size());
       }
       break;
     case InMainTable:
-      boost::algorithm::split(tokens, line, [](char ch) { return ch == ' ';},
-                              boost::token_compress_on);
-      if (tokens.size() != mainTableColumns.size())
-        throw std::runtime_error("Unexpected number of space-separated tokens in line '"
-                                 + line + "'");
-      for (size_t i = 0; i < tokens.size(); ++i)
-        mainTableColumns[i].push_back(tokens[i]);
+      mainTableContents.push_back(line);
       break;
     }
   }
 
-  checkUMHeader(headerFields);
-
-  for (const std::string &varfieldName : parameters_.expectedVarfields.value()) {
-    checkVarfield(varfieldName, numLevelsByVarfield, mainTableHeaders, mainTableColumns);
-  }
-
-
+  return PrintVarObsOutput{std::move(headerFields),
+                           MainTable(std::move(mainTableHeader), std::move(mainTableContents))};
 }
 
-void VarObsChecker::checkUMHeader(const std::map<std::string, std::string> &headerFields) const {
-  EXPECT_EQUAL(std::stoi(headerFields.at("Vertical coordinate type")),
-               FH_VertCoord_from_string(parameters_.FH_VertCoord.value()));
-  EXPECT_EQUAL(std::stoi(headerFields.at("Horizontal grid type")),
-               FH_HorizGrid_from_string(parameters_.FH_HorizGrid.value()));
-  EXPECT_EQUAL(std::stoi(headerFields.at("Grid staggering type")),
-               FH_GridStagger_from_string(parameters_.FH_GridStagger.value()));
-
-  EXPECT_EQUAL(std::stoi(headerFields.at("Number EW points")),
-               parameters_.IC_XLen.value());
-//  oops::Parameter<int> IC_XLen{"IC_XLen", 0, this};
-//  oops::Parameter<int> IC_YLen{"IC_YLen", 0, this};
-//  oops::Parameter<int> IC_PLevels{"IC_PLevels", 0, this};
-//  oops::Parameter<int> IC_WetLevels{"IC_WetLevels", 0, this};
-//  oops::Parameter<std::string> IC_TorTheta{"IC_TorTheta", "IC_TorTheta_T", this};
-//  oops::Parameter<bool> IC_ShipWind{"IC_ShipWind", false, this};
-//  oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "", this};
-//  oops::Parameter<bool> IC_GPSRO_Operator_pseudo{"IC_GPSRO_Operator_pseudo", false, this};
-//  oops::Parameter<bool> IC_GPSRO_Operator_press{"IC_GPSRO_Operator_press", false, this};
-
-  // Or just print the C++ number with 2 digits after the decimal point...
-  const realHeaderFieldsPrecision = 0.01;
-  EXPECT_EQUAL(oops::is_close_absolute(std::stod(headerFields.at("Longitude spacing")),
-               parameters_.RC_LongSpacing.value(), realHeaderFieldsPrecision));
-//  oops::Parameter<double> RC_LongSpacing{"RC_LongSpacing", 0.0, this};
-//  oops::Parameter<double> RC_LatSpacing{"RC_LatSpacing", 0.0, this};
-//  oops::Parameter<double> RC_FirstLat{"RC_FirstLat", 0.0, this};
-//  oops::Parameter<double> RC_FirstLong{"RC_FirstLong", 0.0, this};
-//  oops::Parameter<double> RC_PoleLat{"RC_PoleLat", 0.0, this};
-//  oops::Parameter<double> RC_PoleLong{"RC_PoleLong", 0.0, this};
-}
-
-void VarObsChecker::checkVarfield(
-    const std::string &varfieldName,
-    const std::map<int, int> &numLevelsByVarfield,
-    const std::vector<std::string> &mainTableHeaders,
-    const std::vector<std::vector<std::string>> &mainTableColumns) const {
-  if (parameters_.expectedObValues.value())
-    EXPECT_EQUAL(mainTable["ob value"], parameters_.expectedObValues.value());
-  if (parameters_.expectedObErrors.value())
-    EXPECT_EQUAL(mainTable["ob value"], parameters_.expectedObErrors.value());
-  if (parameters_.expectedPges.value())
-    EXPECT_EQUAL(mainTable["pge"], parameters_.expectedPges.value());
-  if (parameters_.expectedDate.value())
-    EXPECT_EQUAL(mainTable["pge"], parameters_.expectedPges.value());
-
-  int varfield;
-  switch (varfield) {
-    case VarfieldAirTemperature:
-    {
-      // Clearly we can't hardcode these values here...
-      EXPECT_EQUAL(mainTable["ob value"], parameters_.expectedObValues);
+void VarObsChecker::checkHeader(const std::map<std::string, std::string> &headerFields) const {
+  for (const std::pair<const std::string, std::string> &expectedNameAndValue :
+       parameters_.expectedHeaderFields.value()) {
+    const std::string &value = headerFields.at(expectedNameAndValue.first);
+    if (value != expectedNameAndValue.second) {
+      std::stringstream str;
+      str << "Header field '" << expectedNameAndValue.first << "':\n  received: " << value
+          << "\n  expected: " << expectedNameAndValue.second;
+      throw std::runtime_error(str.str());
     }
   }
 }
 
-FloatVariable VarObsChecker::getVariableFromObsSpace(const std::string &name,
-                                                     const std::string &group) const {
-  const int minChannel = 0, maxChannel = 10000;
-
-  FloatVariable var;
-
-  std::vector<float> values(obsdb_.nlocs());
-  if (obsdb_.has(group, name)) {
-    var.values.set_size(obsdb_.nlocs());
-    obsdb_.get_db(group, name, values);
-    obsErrors_->has(name);
-    obsdb_.
+void VarObsChecker::checkMainTable(const MainTable &mainTable) const {
+  for (const std::pair<const std::string, std::vector<std::string>> &expectedNameAndValues :
+       parameters_.expectedMainTableColumns.value()) {
+    const std::vector<std::string> &values = mainTable[expectedNameAndValues.first];
+    if (values != expectedNameAndValues.second) {
+      std::stringstream str;
+      str << "Column '" << expectedNameAndValues.first << "':\n  received: " << values
+          << "\n  expected: " << expectedNameAndValues.second;
+      throw std::runtime_error(str.str());
+    }
   }
 }
 
@@ -254,11 +294,5 @@ void VarObsChecker::print(std::ostream & os) const {
   os << "VarObsChecker::print not yet implemented";
 }
 
-void VarObsChecker::setupEnvironment(LocalEnvironment &localEnvironment) const {
-  if (parameters_.namelist_directory.value() != boost::none)
-    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelist_directory.value());
-  if (parameters_.output_directory.value() != boost::none)
-    localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.output_directory.value());
-}
-
+}  // namespace test
 }  // namespace cxvarobs

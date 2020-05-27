@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_VAROBSCHECKER_H_
-#define CXVAROBS_VAROBSCHECKER_H_
+#ifndef TEST_CXVAROBS_VAROBSCHECKER_H_
+#define TEST_CXVAROBS_VAROBSCHECKER_H_
 
 #include <ostream>
 #include <string>
@@ -17,7 +17,7 @@
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
-#include "cxvarobs/VarObsWriterParameters.h"
+#include "../cxvarobs/VarObsCheckerParameters.h"
 
 namespace eckit {
   class Configuration;
@@ -37,6 +37,8 @@ namespace cxvarobs {
 
 class LocalEnvironment;
 
+namespace test {
+
 class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObsChecker> {
  public:
   static const std::string classname() {return "ufo::VarObsChecker";}
@@ -54,9 +56,18 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
 
  private:
+  class PrintVarObsOutput;
+  class MainTable;
+
   void print(std::ostream &) const;
 
-  void setupEnvironment(LocalEnvironment &localEnvironment) const;
+  void setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const;
+
+  PrintVarObsOutput parsePrintVarObsOutput(const std::string &fileName) const;
+
+  void checkHeader(const std::map<std::string, std::string> &headerFields) const;
+
+  void checkMainTable(const MainTable &mainTable) const;
 
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
@@ -64,9 +75,10 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
   boost::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
 
-  VarObsWriterParameters parameters_;
+  VarObsCheckerParameters parameters_;
 };
 
+}  // namespace test
 }  // namespace cxvarobs
 
-#endif  // CXVAROBS_VAROBSCHECKER_H_
+#endif  // TEST_CXVAROBS_VAROBSCHECKER_H_

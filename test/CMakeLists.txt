@@ -25,6 +25,7 @@ endfunction(CREATE_SYMLINK_FILENAME)
 # Create a directory for test input config and symlink all files
 list( APPEND cxvarobs_test_input
   testinput/varobswriter.yaml
+  testinput/002_VarField_temperature_Surface.yaml
   testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
 )
 
@@ -38,6 +39,16 @@ ecbuild_add_resources( TARGET cxvarobs_test_scripts
                        SOURCES_PACK
                        ${cxvarobs_test_input}
                      )
+
+# Create Data directory for test data and symlink files
+list( APPEND cxvarobs_test_data
+  002_VarField_temperature_Surface.nc4
+)
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Data)
+CREATE_SYMLINK_FILENAME( ${CMAKE_CURRENT_SOURCE_DIR}/testinput
+                         ${CMAKE_CURRENT_BINARY_DIR}/Data ${cxvarobs_test_data} )
+
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
@@ -129,11 +140,23 @@ execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink
                  ${CMAKE_CURRENT_BINARY_DIR}/Data/ioda )
 
 ecbuild_add_executable( TARGET  test_CxVarObsFilters.x
-                        SOURCES mains/TestCxVarObsFilters.cc
+                        SOURCES cxvarobs/instantiateObsFilterFactory.h
+                                cxvarobs/ResetFlagsToPass.cc
+                                cxvarobs/ResetFlagsToPass.h
+                                cxvarobs/VarObsChecker.cc
+                                cxvarobs/VarObsChecker.h
+                                cxvarobs/VarObsCheckerParameters.h
+                                mains/TestCxVarObsFilters.cc
                         LIBS    cxvarobs )
 
 ecbuild_add_test( TARGET  test_cxvarobs_varobswriter
                   COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
                   ARGS    "testinput/varobswriter.yaml"
+                  ENVIRONMENT OOPS_TRAPFPE=1
+                  DEPENDS test_CxVarObsFilters.x )
+
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_Surface
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/002_VarField_temperature_Surface.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )

@@ -7,6 +7,7 @@
 
 #include "../test/ufo/ObsFilters.h"
 #include "cxvarobs/instantiateObsFilterFactory.h"
+#include "../cxvarobs/instantiateObsFilterFactory.h"
 #include "oops/runs/Run.h"
 #include "ufo/instantiateObsFilterFactory.h"
 #include "ufo/UfoTrait.h"
@@ -15,6 +16,7 @@ int main(int argc,  char ** argv) {
   oops::Run run(argc, argv);
   ufo::instantiateObsFilterFactory<ufo::UfoTrait>();
   cxvarobs::instantiateObsFilterFactory<ufo::UfoTrait>();
+  cxvarobs::test::instantiateObsFilterFactory<ufo::UfoTrait>();
   ufo::test::ObsFilters tests;
   return run.execute(tests);
 }

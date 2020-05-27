@@ -1,0 +1,46 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: Surface
+      ObsDataIn:
+        obsfile: Data/002_VarField_temperature_Surface.nc4
+      simulate:
+        variables: [air_temperature]
+    # GeoVaLs: [when needed:]
+      # filename: Data/amsua_metop-b_geoval_2018041500_m.nc4
+    ObsFilters:
+    # Double all observation errors: we want to check if error changes made by filters are
+    # propagated to VarObs files
+    - Filter: Bounds Check
+      action:
+        name: inflate error
+        inflation factor: 2.0
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - Filter: Reset Flags to Pass
+    - Filter: Bounds Check
+      where:
+      - variable:
+          name:  latitude@MetaData
+        maxvalue: 0.
+    - &varobswriterparameters
+        Filter: VarObs Writer
+        obs_group: Surface
+    - <<: *varobswriterparameters
+      Filter: VarObs Checker
+      expected_header_fields:
+        Vertical coordinate type: 1
+      expected_main_table_columns:
+        ob num:   [1, 2, 4]
+        field:    [2, 2, 2]
+        ob value: [1.10000, -1073741824.00000, 1.40000]
+        ob error: [0.2, -1073741824.00000, 0.8]
+        lat:      [21, 22, 24]
+        lon:      [31, 32, 34]
+        time:     [0, 0, 0] # TODO
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
