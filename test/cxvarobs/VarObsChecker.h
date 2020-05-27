@@ -41,7 +41,7 @@ namespace test {
 
 class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObsChecker> {
  public:
-  static const std::string classname() {return "ufo::VarObsChecker";}
+  static const std::string classname() {return "cxvarobs::test::VarObsChecker";}
 
   VarObsChecker(ioda::ObsSpace &, const eckit::Configuration &,
                 boost::shared_ptr<ioda::ObsDataVector<int> > flags,

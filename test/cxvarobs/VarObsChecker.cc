@@ -66,6 +66,7 @@ public:
       deleteFileAndResetFileName();
       std::swap(fileName_, other.fileName_);
     }
+    return *this;
   }
 
   ~TempFile() {
@@ -115,7 +116,7 @@ std::vector<std::string> VarObsChecker::MainTable::operator[](
   // Find the left end of the column, i.e. the beginning of the sequence of spaces preceding
   // the column header
   auto columnBegin = position;
-  while (columnBegin != 0 && columnHeader[columnBegin - 1] == ' ')
+  while (columnBegin != 0 && headerLine_[columnBegin - 1] == ' ')
     --columnBegin;
 
   std::vector<std::string> entries;

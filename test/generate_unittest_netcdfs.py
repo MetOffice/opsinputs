@@ -10,7 +10,7 @@ def output_1d_var_to_netcdf(var_name, file_name):
     f.createDimension('nlocs', nlocs)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
-    var[:] = [21, 22, 23, 24]
+    var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
     air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))

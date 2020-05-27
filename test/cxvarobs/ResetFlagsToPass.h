@@ -8,46 +8,62 @@
 #ifndef TEST_CXVAROBS_RESETFLAGSTOPASS_H_
 #define TEST_CXVAROBS_RESETFLAGSTOPASS_H_
 
-#include <memory>
 #include <ostream>
 #include <string>
-#include <vector>
 
-#include <boost/optional.hpp>
-#include <boost/shared_ptr.hpp>
+#include "boost/shared_ptr.hpp"
 
 #include "ioda/ObsDataVector.h"
+#include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
-#include "ufo/filters/FilterBase.h"
-#include "ufo/filters/QCflags.h"
+#include "oops/util/Printable.h"
+#include "../cxvarobs/ResetFlagsToPassParameters.h"
 
 namespace eckit {
   class Configuration;
 }
 
 namespace ioda {
-  template <typename DATATYPE> class ObsDataVector;
   class ObsSpace;
+  class ObsVector;
+}
+
+namespace ufo {
+  class GeoVaLs;
+  class ObsDiagnostics;
 }
 
 namespace cxvarobs {
+
+class LocalEnvironment;
+
 namespace test {
 
-/// \brief Resets the QC flag of all observations (even those failed by previous tests) to "pass".
-class ResetFlagsToPass : public ufo::FilterBase,
-                         private util::ObjectCounter<ResetFlagsToPass> {
+class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<ResetFlagsToPass> {
  public:
-  static const std::string classname() {return "cxvarobs::ResetFlagsToPass";}
+  static const std::string classname() {return "cxvarobs::test::ResetFlagsToPass";}
 
-  ResetFlagsToPass(ioda::ObsSpace &obsdb, const eckit::Configuration &config,
+  ResetFlagsToPass(ioda::ObsSpace &, const eckit::Configuration &,
                    boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                   boost::shared_ptr<ioda::ObsDataVector<float> > obserr);
+                   boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
+  ~ResetFlagsToPass();
+
+  void preProcess() const {}
+  void priorFilter(const ufo::GeoVaLs &) const {}
+  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const;
+
+  const oops::Variables & requiredVars() const {return geovars_;}
+  const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
 
  private:
-  void print(std::ostream &) const override;
-  void applyFilter(const std::vector<bool> &, const ufo::Variables &,
-                   std::vector<std::vector<bool>> &) const override;
-  int qcFlag() const override { return ufo::QCflags::pass; }
+  void print(std::ostream &) const;
+
+  ioda::ObsSpace & obsdb_;
+  oops::Variables geovars_;
+  oops::Variables extradiagvars_;
+  boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
+
+  std::set<int> flagsToReset_;
 };
 
 }  // namespace test
