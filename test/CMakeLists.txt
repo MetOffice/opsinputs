@@ -26,6 +26,7 @@ endfunction(CREATE_SYMLINK_FILENAME)
 list( APPEND cxvarobs_test_input
   testinput/varobswriter.yaml
   testinput/002_VarField_temperature_Surface.yaml
+  testinput/002_VarField_temperature_RadarZ.yaml
   testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
 )
 
@@ -43,6 +44,7 @@ ecbuild_add_resources( TARGET cxvarobs_test_scripts
 # Create Data directory for test data and symlink files
 list( APPEND cxvarobs_test_data
   002_VarField_temperature_Surface.nc4
+  002_VarField_temperature_RadarZ.nc4
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Data)
@@ -156,8 +158,16 @@ ecbuild_add_test( TARGET  test_cxvarobs_varobswriter
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )
 
+# Single level
 ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_Surface
                   COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
                   ARGS    "testinput/002_VarField_temperature_Surface.yaml"
+                  ENVIRONMENT OOPS_TRAPFPE=1
+                  DEPENDS test_CxVarObsFilters.x )
+
+# Multiple levels
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/002_VarField_temperature_RadarZ.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )
