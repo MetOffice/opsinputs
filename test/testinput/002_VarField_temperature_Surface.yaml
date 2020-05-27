@@ -28,11 +28,9 @@ Observations:
       - variable:
           name: latitude@MetaData
         minvalue: 0.
-    - &varobswriterparameters
-        Filter: VarObs Writer
-        obs_group: Surface
-    - <<: *varobswriterparameters
-      Filter: VarObs Checker
+    - Filter: VarObs Writer
+      obs_group: Surface
+    - Filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 1
       expected_main_table_columns:
