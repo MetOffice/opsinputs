@@ -24,6 +24,7 @@
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
+#include "oops/parallel/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
 #include "ufo/filters/Variables.h"
@@ -169,6 +170,7 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   char tempFileName[L_tmpnam];
   std::tmpnam(tempFileName);
 
+  // TODO(wsmigaj): need to share the same file name across all MPI processes.
   TempFile tempFile(tempFileName);
 
   const char exeName[] = "OpsProg_PrintVarobs.exe";
@@ -180,12 +182,15 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   } else {
     exePath = exeName;
   }
-  const std::string cmd = exePath + " \"" + varObsFileName + "\" --all --outfile=\"" +
-      tempFile.name() + "\"";
-  oops::Log::info() << "Running " << cmd << "\n";
-  const int exitCode = std::system(cmd.c_str());
-  if (exitCode != 0)
-    throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
+  // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
+  const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + varObsFileName +
+      "\" --all --outfile=\"" + tempFile.name() + "\"";
+  if (oops::mpi::comm().rank() == 0) {
+    oops::Log::info() << "Running " << cmd << "\n";
+    const int exitCode = std::system(cmd.c_str());
+    if (exitCode != 0)
+      throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
+  }
 
   // ... parse them and check them
 
