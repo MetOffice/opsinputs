@@ -12,7 +12,7 @@ Observations:
                     eastward_wind, northward_wind]
     ObsFilters:
     - &varobswriterparameters
-        Filter: VarObsWriter
+        Filter: VarObs Writer
         obs_group: Aircraft
     - <<: *varobswriterparameters
       Filter: VarObsChecker
@@ -29,7 +29,7 @@ Observations:
                     air_temperature, virtual_temperature,
                     eastward_wind, northward_wind]
     ObsFilters:
-    - Filter: VarObsWriter
+    - Filter: VarObs Writer
       obs_group: Surface
       FH_HorizGrid: NH
     HofX: GsiHofX
@@ -45,7 +45,7 @@ Observations:
     GeoVaLs:
       filename: ../../ufo/test/Data/amsua_metop-b_geoval_2018041500_m.nc4
     ObsFilters:
-    - Filter: VarObsWriter
+    - Filter: VarObs Writer
       obs_group: AMSUB
       namelist_directory: testinput/VarObsWriterNamelistsAMSUB
       output_directory: testoutput/VarObsWriterOutputAMSUB
@@ -60,7 +60,7 @@ Observations:
         variables: [aerosol_optical_depth]
         channels: 4
     ObsFilters:
-    - Filter: VarObsWriter
+    - Filter: VarObs Writer
       obs_group: AOD
     HofX: ObsValue # there's no GsiHofX
     benchmarkFlag: 1000 # bogus
@@ -72,7 +72,7 @@ Observations:
       simulate:
         variables: [bending_angle]
     ObsFilters:
-    - Filter: VarObsWriter
+    - Filter: VarObs Writer
       obs_group: GPSRO
       account_for_gpsro_tangent_point_drift: true
     HofX: ObsValue # there's no GsiHofX
@@ -87,7 +87,7 @@ Observations:
       simulate:
         variables: [air_temperature, eastward_wind, northward_wind]
     ObsFilters:
-    - Filter: VarObsWriter
+    - Filter: VarObs Writer
       obs_group: Aircraft
       output_directory: testoutput/VarObsWriterOutputBuddyCheck
     HofX: HofX

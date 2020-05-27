@@ -16,7 +16,7 @@ namespace cxvarobs {
 template<typename MODEL> 
 void instantiateObsFilterFactory() {
   static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, VarObsWriter> >
-    makerVarObsWriter_("VarObsWriter");
+    makerVarObsWriter_("VarObs Writer");
 }
 
 }  // namespace cxvarobs

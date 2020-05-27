@@ -12,11 +12,13 @@
 
 #include "eckit/config/Configuration.h"
 
+#include "ioda/ObsVector.h"
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
 #include "oops/util/Logger.h"
+#include "ufo/GeoVaLs.h"
 
 namespace cxvarobs {
 
@@ -93,10 +95,10 @@ void VarObsWriter::print(std::ostream & os) const {
 // -----------------------------------------------------------------------------
 
 void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
-  if (parameters_.namelist_directory.value() != boost::none)
-    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelist_directory.value());
-  if (parameters_.output_directory.value() != boost::none)
-    localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.output_directory.value());
+  if (parameters_.namelistDirectory.value() != boost::none)
+    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
+  if (parameters_.outputDirectory.value() != boost::none)
+    localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
 }
 
 }  // namespace cxvarobs

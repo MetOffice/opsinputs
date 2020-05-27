@@ -30,18 +30,18 @@ class VarObsWriterParameters : public oops::Parameters {
   /// OPS_VAROBSCONTROL_NL_DIR environment variable. If the namelist directory or the namelist file
   /// corresponding to a particular observation group is not found, the default list of varfields
   /// specified by OPS for that observation group is used.
-  oops::OptionalParameter<std::string> namelist_directory{"namelist_directory", this};
+  oops::OptionalParameter<std::string> namelistDirectory{"namelist_directory", this};
 
   /// Output directory for VarObs files.
   ///
   /// If this option is not set, the location of the output directory is controlled by the
   /// OPS_VAROB_OUTPUT_DIR environment variable.
-  oops::OptionalParameter<std::string> output_directory{"output_directory", this};
+  oops::OptionalParameter<std::string> outputDirectory{"output_directory", this};
 
-  oops::RequiredParameter<std::string> obs_group{"obs_group", this};
-  oops::Parameter<bool> account_for_gpsro_tangent_point_drift{
+  oops::RequiredParameter<std::string> obsGroup{"obs_group", this};
+  oops::Parameter<bool> accountForGPSROTangentPointDrift{
     "account_for_gpsro_tangent_point_drift", false, this};
-  oops::Parameter<bool> use_radar_family{"use_radar_family", false, this};
+  oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
 
   oops::Parameter<std::string> FH_VertCoord{"FH_VertCoord", "FH_VertCoord_Hybrid", this};
   oops::Parameter<std::string> FH_HorizGrid{"FH_HorizGrid", "FH_HorizGrid_Global", this};
