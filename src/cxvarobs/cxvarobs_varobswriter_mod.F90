@@ -46,6 +46,7 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSatwind,           &
     ObsGroupScatwind
 use OpsMod_ObsInfo
+use OpsMod_AODGeneral, only: NAODWaves
 use OpsMod_GPSRO, only: GPSRO_TPD
 use OpsMod_Radar, only: RadFamily
 use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
@@ -772,6 +773,8 @@ do iVarField = 1, nVarFields
       call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
         "aerosol_optical_depth", ObsSpace, Channels, Flags, ObsErrors)
+        ! NAODWaves is used by the Ops_VarobPGEs subroutine.
+        if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
