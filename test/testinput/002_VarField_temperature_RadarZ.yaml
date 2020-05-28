@@ -30,7 +30,7 @@ Observations:
           name: latitude@MetaData
         minvalue: 0.
     - Filter: VarObs Writer
-      obs_group: RadarZ
+      reject_obs_with_any_variable_failing_qc: true
     - Filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 1

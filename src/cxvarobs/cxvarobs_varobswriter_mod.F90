@@ -68,6 +68,9 @@ private
   integer(kind=8) :: ObsGroup
   type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
 
+  logical         :: RejectObsWithAnyVariableFailingQC
+  logical         :: RejectObsWithAllVariablesFailingQC
+
   logical         :: AccountForGPSROTangentPointDrift
   logical         :: UseRadarFamily
 
@@ -142,6 +145,14 @@ if (.not. f_conf % get("validity_time", string)) then
   goto 9999
 end if
 call datetime_create(string, self % validitytime)
+
+self % RejectObsWithAnyVariableFailingQC = .false.
+found = f_conf % get("reject_obs_with_any_variable_failing_qc", &
+                     self % RejectObsWithAnyVariableFailingQC)
+
+self % RejectObsWithAllVariablesFailingQC = .false.
+found = f_conf % get("reject_obs_with_all_variables_failing_qc", &
+                     self % RejectObsWithAllVariablesFailingQC)
 
 self % AccountForGPSROTangentPointDrift = .false.
 found = f_conf % get("account_for_gpsro_tangent_point_drift", &
@@ -435,7 +446,8 @@ call cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
   ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
 Ob % Time = TimeOffsetsInSeconds
 
-call cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags)
+call cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
+  self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
 ! TODO(someone): This call to Ops_Alloc() will need to be replaced by
 ! call cxvarobs_varobswriter_fillinteger( &
@@ -1317,7 +1329,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
                  HdrIn = HdrIn, &
                  num_levels = int(size(JediVarNamesWithChannels), kind=8), &
                  initial_value = initial_value)
-
+  print *, "size(Real2): ", size(Real2,1), " ", size(Real2,2)
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
@@ -1463,13 +1475,17 @@ end subroutine cxvarobs_varobswriter_fillcoord2d
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags)
+subroutine cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
+                                                 RejectObsWithAnyVariableFailingQC, &
+                                                 RejectObsWithAllVariablesFailingQC)
 use oops_variables_mod
 implicit none
 
 ! Subroutine arguments:
 type(OB_type), intent(inout)             :: Ob
 type(c_ptr), value, intent(in)           :: ObsSpace, Flags
+logical, intent(in)                      :: RejectObsWithAnyVariableFailingQC
+logical, intent(in)                      :: RejectObsWithAllVariablesFailingQC
 
 ! Local declarations:
 type(oops_variables)                     :: ObsVariables
@@ -1482,20 +1498,35 @@ call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
                Ob % Header % NumObsLocal, Ob % ReportFlags)
 Ob % ReportFlags = 0
 
-! Toggle on the FinalRejectReport bit in ReportFlags for observations with a non-zero flag
-! in at least one variable.
 ! TODO(wsmigaj): Is this the right thing to do?
 ObsVariables = cxvarobs_obsdatavector_int_varnames(Flags)
 NumObsVariables = ObsVariables % nvars()
-do iVar = 1, NumObsVariables
-  VarName = ObsVariables % variable(iVar)
-  call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
-  ! TODO(wsmigaj): during development, we leave ReportFlags = 0 for observations with missing data
-  ! (as otherwise all observations in some of the IODA test files would be rejected).
-  where (VarFlags > 1)
-    Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
-  end where
-end do
+
+if (RejectObsWithAnyVariableFailingQC) then
+  Ob % ReportFlags = 0
+
+  ! Set the FinalRejectReport bit in ReportFlags for observations with a non-zero QC flag
+  ! in at least one variable.
+  do iVar = 1, NumObsVariables
+    VarName = ObsVariables % variable(iVar)
+    call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
+    where (VarFlags > 0)
+      Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
+    end where
+  end do
+else if (RejectObsWithAllVariablesFailingQC) then
+  Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
+
+  ! Clear the FinalRejectReport bit in ReportFlags for observations with a zero QC flag
+  ! in at least one variable.
+  do iVar = 1, NumObsVariables
+    VarName = ObsVariables % variable(iVar)
+    call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
+    where (VarFlags == 0)
+      Ob % ReportFlags = ibclr(Ob % ReportFlags, FinalRejectReport)
+    end where
+  end do
+end if
 
 end subroutine cxvarobs_varobswriter_fillreportflags
 
@@ -1576,10 +1607,15 @@ NumMultichannelVariables = NumVariables / NumChannels
 if (NumMultichannelVariables * NumChannels /= NumVariables) then
   call gen_fail(RoutineName, "Unexpected number of variables")
 end if
-
-do iMultichannelVariable = 1, NumMultichannelVariables
+! Having single NumChans and ChanNum varfields makes sense only if only one (multi-channel)
+! variable is assimilated or if all assimilated variables share the same quality flags.
+if (NumMultichannelVariables > 1) then
+  call gen_warn(RoutineName, "More than one multichannel simulated variable found. &
+                             &Assuming all these variables have the same quality flags")
+end if
+if (NumMultichannelVariables > 0) then
   do iChannel = 1, NumChannels
-    iVariable = (iMultichannelVariable - 1) * NumChannels + iChannel
+    iVariable = iChannel
     VariableName = Variables % variable(iVariable)
     call cxvarobs_obsdatavector_int_get(Flags, VariableName, VarFlags)
     do iObs = 1, NumObs
@@ -1589,7 +1625,7 @@ do iMultichannelVariable = 1, NumMultichannelVariables
       end if
     end do
   end do
-end do
+end if
 
 end subroutine cxvarobs_varobswriter_findchannelspassingqc
 
@@ -1609,6 +1645,8 @@ character(len=*), parameter              :: RoutineName = "cxvarobs_varobswriter
 character(len=256)                       :: ErrorMessage
 
 ! Body:
+
+CorBriTempBias => null()
 
 ! Retrieve the uncorrected brightness temperature...
 call cxvarobs_varobswriter_fillreal2d( &

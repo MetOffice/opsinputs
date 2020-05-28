@@ -39,6 +39,7 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
   eckit::LocalConfiguration conf(config);
   // TODO(wsmigaj): is this the correct definition of the validity time?
   conf.set("validity_time", obsdb.windowEnd().toString());
+  conf.set("obs_group", obsdb.obsname());
 
   if (!cxvarobs_varobswriter_create_f90(key_, &conf, geovars_))
     throw std::runtime_error("VarObsWriter construction failed. "

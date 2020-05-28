@@ -38,7 +38,13 @@ class VarObsWriterParameters : public oops::Parameters {
   /// OPS_VAROB_OUTPUT_DIR environment variable.
   oops::OptionalParameter<std::string> outputDirectory{"output_directory", this};
 
-  oops::RequiredParameter<std::string> obsGroup{"obs_group", this};
+  /// Output only observations that passed the quality check in all variables.
+  oops::Parameter<bool> rejectObsWithAnyVariableFailingQC{
+    "reject_obs_with_any_variable_failing_qc", false, this};
+  /// Output only observations that passed the quality check in at least one variable.
+  oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
+    "reject_obs_with_all_variables_failing_qc", false, this};
+
   oops::Parameter<bool> accountForGPSROTangentPointDrift{
     "account_for_gpsro_tangent_point_drift", false, this};
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};

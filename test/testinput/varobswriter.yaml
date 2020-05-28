@@ -11,12 +11,7 @@ Observations:
         variables: [air_temperature, specific_humidity,
                     eastward_wind, northward_wind]
     ObsFilters:
-    - &varobswriterparameters
-        Filter: VarObs Writer
-        obs_group: Aircraft
-    - <<: *varobswriterparameters
-      Filter: VarObsChecker
-
+    - Filter: VarObs Writer
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
@@ -30,7 +25,6 @@ Observations:
                     eastward_wind, northward_wind]
     ObsFilters:
     - Filter: VarObs Writer
-      obs_group: Surface
       FH_HorizGrid: NH
     HofX: GsiHofX
     benchmarkFlag: 1000 # bogus
@@ -46,7 +40,6 @@ Observations:
       filename: ../../ufo/test/Data/amsua_metop-b_geoval_2018041500_m.nc4
     ObsFilters:
     - Filter: VarObs Writer
-      obs_group: AMSUB
       namelist_directory: testinput/VarObsWriterNamelistsAMSUB
       output_directory: testoutput/VarObsWriterOutputAMSUB
     HofX: GsiHofX
@@ -61,7 +54,6 @@ Observations:
         channels: 4
     ObsFilters:
     - Filter: VarObs Writer
-      obs_group: AOD
     HofX: ObsValue # there's no GsiHofX
     benchmarkFlag: 1000 # bogus
     flaggedBenchmark: 0
@@ -73,7 +65,6 @@ Observations:
         variables: [bending_angle]
     ObsFilters:
     - Filter: VarObs Writer
-      obs_group: GPSRO
       account_for_gpsro_tangent_point_drift: true
     HofX: ObsValue # there's no GsiHofX
     benchmarkFlag: 1000 # bogus
@@ -88,7 +79,6 @@ Observations:
         variables: [air_temperature, eastward_wind, northward_wind]
     ObsFilters:
     - Filter: VarObs Writer
-      obs_group: Aircraft
       output_directory: testoutput/VarObsWriterOutputBuddyCheck
     HofX: HofX
     benchmarkFlag: 1000 # bogus
