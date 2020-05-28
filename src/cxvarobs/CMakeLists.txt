@@ -21,10 +21,6 @@ list( APPEND cxvarobs_src_files
     VarObsWriterParameters.h
 )
 
-# TEMPORARY
-
-set(OPS_ROOT "/net/data/users/wsmigaj/cylc-run/r12482_2330_buddy_check_near_lon_180/share/fcm_make_ops_x86_64_gfortran_debug/build" CACHE STRING "OPS root")
-
 set(OPS_INCLUDE_DIR "${OPS_ROOT}/include")
 set(OPS_OBJECT_DIR "${OPS_ROOT}/o")
 set(SHUM_LIB_DIR "${OPS_ROOT}/installs/shumlib/lib")

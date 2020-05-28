@@ -1,0 +1,44 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: Surface
+      ObsDataIn:
+        obsfile: Data/005_VarField_v_Surface.nc4
+      simulate:
+        variables: [northward_wind]
+    ObsFilters:
+    # Double all observation errors: we want to check if error changes made by filters are
+    # propagated to VarObs files
+    - Filter: BlackList
+      variables: northward_wind
+      action:
+        name: inflate error
+        inflation factor: 2.0
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - Filter: Reset Flags to Pass
+      flags_to_reset: [1, 6]  # missing, Hfailed
+    - Filter: Domain Check
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.
+    - Filter: VarObs Writer
+      reject_obs_with_any_variable_failing_qc: true
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Vertical coordinate type: 1
+      expected_main_table_columns:
+        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
+        field:    ["5", "5", "5"]
+        ob value: ["1.10000", "-1073741824.00000", "1.40000"]
+        ob error: ["0.20000", "-1073741824.00000", "0.80000"]
+        lat:      ["21.00000", "22.00000", "24.00000"]
+        lon:      ["31.00000", "32.00000", "34.00000"]
+        time:     ["-3540.00000", "-3480.00000", "-3360.00000"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

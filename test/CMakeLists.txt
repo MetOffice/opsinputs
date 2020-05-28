@@ -22,16 +22,47 @@ function(CREATE_SYMLINK_FILENAME src dst)
         endforeach(FILENAME)
 endfunction(CREATE_SYMLINK_FILENAME)
 
+# macro to define a VarObsWriter test
+function(ADD_VAROBSWRITER_TEST name)
+  ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${name}
+                    COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                    ARGS    "testinput/${name}.yaml"
+                    ENVIRONMENT
+                      OOPS_TRAPFPE=1
+                      LD_LIBRARY_PATH=${OPS_ROOT}/installs/odb/lib:${OPS_ROOT}/installs/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+                    DEPENDS test_CxVarObsFilters.x )
+endfunction(ADD_VAROBSWRITER_TEST)
+
 # Create a directory for test input config and symlink all files
 list( APPEND cxvarobs_test_input
   testinput/varobswriter.yaml
-  testinput/002_VarField_temperature_Surface.yaml
-  testinput/002_VarField_temperature_RadarZ.yaml
   testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
+  testinput/001_VarField_pstar.yaml
+  testinput/002_VarField_temperature_RadarZ.yaml
+  testinput/002_VarField_temperature_Surface.yaml
+  testinput/003_VarField_rh_Sonde.yaml
+  testinput/003_VarField_rh_Surface.yaml
+  testinput/004_VarField_u_Sonde.yaml
+  testinput/004_VarField_u_Surface.yaml
+  testinput/005_VarField_v_Sonde.yaml
+  testinput/005_VarField_v_Surface.yaml
   testinput/010_VarField_britemp.yaml
+  testinput/019_VarField_satzenith.yaml
+  testinput/023_VarField_modelsurface_geoval.yaml
+  testinput/028_VarField_satid.yaml
+  testinput/031_VarField_solzenith.yaml
   testinput/054_VarField_numchans.yaml
   testinput/055_VarField_channum.yaml
+  testinput/071_VarField_bendingangle.yaml
+  testinput/072_VarField_impactparam.yaml
+  testinput/073_VarField_ro_rad_curv.yaml
+  testinput/074_VarField_ro_geoid_und.yaml
+  testinput/077_VarField_aod.yaml
+  testinput/078_VarField_theta.yaml
   testinput/VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
+  testinput/VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
+  testinput/VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
+  testinput/VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
   testinput/VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
   testinput/VarObsWriterNamelists_055_VarField_channum/AMSUB.nl
 )
@@ -40,6 +71,9 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput)
 # TODO(wsmigaj): find a more elegant solution to create the required subdirectories of testinput
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelistsAMSUB)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_010_VarField_britemp)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_019_VarField_satzenith)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_023_VarField_modelsurface)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_031_VarField_solzenith)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_054_VarField_numchans)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_055_VarField_channum)
 CREATE_SYMLINK( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${cxvarobs_test_input} )
@@ -52,9 +86,26 @@ ecbuild_add_resources( TARGET cxvarobs_test_scripts
 
 # Create Data directory for test data and symlink files
 list( APPEND cxvarobs_test_data
-  002_VarField_temperature_Surface.nc4
+  001_VarField_pstar.nc4
   002_VarField_temperature_RadarZ.nc4
+  002_VarField_temperature_Surface.nc4
+  003_VarField_rh_Sonde.nc4
+  003_VarField_rh_Surface.nc4
+  004_VarField_u_Sonde.nc4
+  004_VarField_u_Surface.nc4
+  005_VarField_v_Sonde.nc4
+  005_VarField_v_Surface.nc4
   010_VarField_britemp.nc4
+  019_VarField_satzenith.nc4
+  023_VarField_modelsurface_geoval.nc4
+  028_VarField_satid.nc4
+  031_VarField_solzenith.nc4
+  071_VarField_bendingangle.nc4
+  072_VarField_impactparam.nc4
+  073_VarField_ro_rad_curv.nc4
+  074_VarField_ro_geoid_und.nc4
+  077_VarField_aod.nc4
+  078_VarField_theta.nc4
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Data)
@@ -168,34 +219,25 @@ ecbuild_add_test( TARGET  test_cxvarobs_varobswriter
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )
 
-# Single level
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_Surface
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/002_VarField_temperature_Surface.yaml"
-                  ENVIRONMENT OOPS_TRAPFPE=1
-                  DEPENDS test_CxVarObsFilters.x )
-
-# Multiple levels
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/002_VarField_temperature_RadarZ.yaml"
-                  ENVIRONMENT OOPS_TRAPFPE=1
-                  DEPENDS test_CxVarObsFilters.x )
-
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_010_VarField_britemp
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/010_VarField_britemp.yaml"
-                  ENVIRONMENT OOPS_TRAPFPE=1
-                  DEPENDS test_CxVarObsFilters.x )
-
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_054_VarField_numchans
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/054_VarField_numchans.yaml"
-                  ENVIRONMENT OOPS_TRAPFPE=1
-                  DEPENDS test_CxVarObsFilters.x )
-
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_055_VarField_channum
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/055_VarField_channum.yaml"
-                  ENVIRONMENT OOPS_TRAPFPE=1
-                  DEPENDS test_CxVarObsFilters.x )
+ADD_VAROBSWRITER_TEST(001_VarField_pstar)
+ADD_VAROBSWRITER_TEST(002_VarField_temperature_Surface)
+ADD_VAROBSWRITER_TEST(002_VarField_temperature_RadarZ)
+ADD_VAROBSWRITER_TEST(003_VarField_rh_Surface)
+ADD_VAROBSWRITER_TEST(003_VarField_rh_Sonde)
+ADD_VAROBSWRITER_TEST(004_VarField_u_Surface)
+ADD_VAROBSWRITER_TEST(004_VarField_u_Sonde)
+ADD_VAROBSWRITER_TEST(005_VarField_v_Surface)
+ADD_VAROBSWRITER_TEST(005_VarField_v_Sonde)
+ADD_VAROBSWRITER_TEST(010_VarField_britemp)
+ADD_VAROBSWRITER_TEST(019_VarField_satzenith)
+ADD_VAROBSWRITER_TEST(023_VarField_modelsurface_geoval)
+ADD_VAROBSWRITER_TEST(028_VarField_satid)
+ADD_VAROBSWRITER_TEST(031_VarField_solzenith)
+ADD_VAROBSWRITER_TEST(054_VarField_numchans)
+ADD_VAROBSWRITER_TEST(055_VarField_channum)
+ADD_VAROBSWRITER_TEST(071_VarField_bendingangle)
+ADD_VAROBSWRITER_TEST(072_VarField_impactparam)
+ADD_VAROBSWRITER_TEST(073_VarField_ro_rad_curv)
+ADD_VAROBSWRITER_TEST(074_VarField_ro_geoid_und)
+ADD_VAROBSWRITER_TEST(077_VarField_aod)
+ADD_VAROBSWRITER_TEST(078_VarField_theta)
