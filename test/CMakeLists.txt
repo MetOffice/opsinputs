@@ -28,11 +28,14 @@ list( APPEND cxvarobs_test_input
   testinput/002_VarField_temperature_Surface.yaml
   testinput/002_VarField_temperature_RadarZ.yaml
   testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
+  testinput/010_VarField_britemp.yaml
+  testinput/VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput)
 # TODO(wsmigaj): find a more elegant solution to create the required subdirectories of testinput
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelistsAMSUB)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_010_VarField_britemp)
 CREATE_SYMLINK( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${cxvarobs_test_input} )
 
 # Add files to cmake resources
@@ -45,6 +48,7 @@ ecbuild_add_resources( TARGET cxvarobs_test_scripts
 list( APPEND cxvarobs_test_data
   002_VarField_temperature_Surface.nc4
   002_VarField_temperature_RadarZ.nc4
+  010_VarField_britemp.nc4
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Data)
@@ -169,5 +173,11 @@ ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_Su
 ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ
                   COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
                   ARGS    "testinput/002_VarField_temperature_RadarZ.yaml"
+                  ENVIRONMENT OOPS_TRAPFPE=1
+                  DEPENDS test_CxVarObsFilters.x )
+
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_010_VarField_britemp
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/010_VarField_britemp.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )
