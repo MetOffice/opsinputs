@@ -1269,7 +1269,7 @@ character(len=256)                              :: ErrorMessage
 
 ! Body:
 
-MissingReal = missing_value(0_kind_real)
+MissingReal = missing_value(0.0_c_float)
 
 if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   ! Retrieve GeoVal
@@ -1367,7 +1367,7 @@ real(kind_real)                                 :: MissingReal
 
 ! Body:
 
-MissingReal = missing_value(0_kind_real)
+MissingReal = missing_value(0.0_c_float)
 
 if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   ! Retrieve GeoVal
