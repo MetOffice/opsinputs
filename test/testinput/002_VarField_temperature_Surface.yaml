@@ -9,8 +9,6 @@ Observations:
         obsfile: Data/002_VarField_temperature_Surface.nc4
       simulate:
         variables: [air_temperature]
-    # GeoVaLs: [when needed:]
-      # filename: Data/amsua_metop-b_geoval_2018041500_m.nc4
     ObsFilters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
