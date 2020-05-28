@@ -25,7 +25,7 @@ Observations:
       expected_main_table_columns:
         # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
         field:    ["73", "73", "73"]
-        ob value: ["1.10000", "-1073741824.00000", "1.40000"]
+        ob value: ["5.10000", "-1073741824.00000", "5.40000"]
         ob error: ["-1073741824.00000", "-1073741824.00000", "-1073741824.00000"]
         lat:      ["21.00000", "22.00000", "24.00000"]
         lon:      ["31.00000", "32.00000", "34.00000"]
