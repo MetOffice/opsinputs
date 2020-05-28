@@ -26,38 +26,38 @@ Observations:
     # values are encoded correctly in the VarObsFile.
     - Filter: Reset Flags to Pass
       flags_to_reset: [1, 6]  # missing, Hfailed
-    # Reject the third observation
-    - Filter: Domain Check
-      where:
-      - variable:
-          name: latitude@MetaData
-        minvalue: 0.
     - Filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
     - Filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
-        field:    ["10",
+        # Note: information about which channels have passed QC tests is stored in the ChanNum
+        # and NumChans varfield (covered by a separate test)
+        field:    ["10", "10",
                    "10", "10",
-                   "10"]
-        level:    ["1",
+                   "10", "10",
+                   "10", "10"]
+        level:    ["1", "2",
                    "1", "2",
-                   "1"]
-        ob value: ["3.10000",
-                   "-1073741824.00000", "3.20000",
-                   "1.40000"]
-        ob error: ["4.20000",
-                   "-1073741824.00000", "4.40000",
-                   "0.80000"]
-        lat:      ["21.00000",
+                   "1", "2",
+                   "1", "2"]
+        # Note: these are bias-corrected brightness temperatures
+        ob value: ["1.20000", "3.11000",
+                   "-1073741824.00000", "3.22000",
+                   "1.60000", "3.33000",
+                   "1.80000", "3.44000"]
+        lat:      ["21.00000", "21.00000",
                    "22.00000", "22.00000",
-                   "24.00000"]
-        lon:      ["31.00000",
+                   "-23.00000", "-23.00000",
+                   "24.00000", "24.00000"]
+        lon:      ["31.00000", "31.00000",
                    "32.00000", "32.00000",
-                   "34.00000"]
-        time:     ["-3540.00000",
+                   "33.00000", "33.00000",
+                   "34.00000", "34.00000"]
+        time:     ["-3540.00000", "-3540.00000",
                    "-3480.00000", "-3480.00000",
-                   "-3360.00000"]
+                   "-3420.00000", "-3420.00000",
+                   "-3360.00000", "-3360.00000"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
