@@ -1595,7 +1595,7 @@ character(len=*), parameter    :: RoutineName = "cxvarobs_varobswriter_findchann
 NumChannels = size(Channels)
 if (NumChannels == 0) return
 
-ChannelIndices = IMDI
+ChannelIndices = 0
 ChannelCounts = 0
 
 ! We rely on an implementation detail of oops::Variables, namely that if any channels are defined,
@@ -1620,7 +1620,7 @@ if (NumMultichannelVariables > 0) then
     call cxvarobs_obsdatavector_int_get(Flags, VariableName, VarFlags)
     do iObs = 1, NumObs
       if (VarFlags(iObs) == 0) then ! This channel has passed quality control
-        ChannelIndices(iObs, 1 + ChannelCounts(iObs)) = Channels(iChannel)
+        ChannelIndices(iObs, 1 + ChannelCounts(iObs)) = iChannel
         ChannelCounts(iObs) = ChannelCounts(iObs) + 1
       end if
     end do
