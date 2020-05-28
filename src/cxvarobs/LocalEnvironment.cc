@@ -7,7 +7,7 @@
 
 #include "cxvarobs/LocalEnvironment.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace cxvarobs {
 
