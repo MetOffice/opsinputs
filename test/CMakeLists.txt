@@ -29,13 +29,19 @@ list( APPEND cxvarobs_test_input
   testinput/002_VarField_temperature_RadarZ.yaml
   testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
   testinput/010_VarField_britemp.yaml
+  testinput/054_VarField_numchans.yaml
+  testinput/055_VarField_channum.yaml
   testinput/VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
+  testinput/VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
+  testinput/VarObsWriterNamelists_055_VarField_channum/AMSUB.nl
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput)
 # TODO(wsmigaj): find a more elegant solution to create the required subdirectories of testinput
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelistsAMSUB)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_010_VarField_britemp)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_054_VarField_numchans)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_055_VarField_channum)
 CREATE_SYMLINK( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${cxvarobs_test_input} )
 
 # Add files to cmake resources
@@ -179,5 +185,17 @@ ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_Ra
 ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_010_VarField_britemp
                   COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
                   ARGS    "testinput/010_VarField_britemp.yaml"
+                  ENVIRONMENT OOPS_TRAPFPE=1
+                  DEPENDS test_CxVarObsFilters.x )
+
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_054_VarField_numchans
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/054_VarField_numchans.yaml"
+                  ENVIRONMENT OOPS_TRAPFPE=1
+                  DEPENDS test_CxVarObsFilters.x )
+
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_055_VarField_channum
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/055_VarField_channum.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )
