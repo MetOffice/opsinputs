@@ -169,6 +169,8 @@ case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
 case ("sigma")
   self % FH_VertCoord = FH_VertCoord_Sigma
+case ("pressure")
+  self % FH_VertCoord = FH_VertCoord_Pressure
 case ("depth")
   self % FH_VertCoord = FH_VertCoord_Depth
 case ("cp")
