@@ -1,0 +1,37 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: Surface
+      ObsDataIn:
+        obsfile: Data/reject_obs_with_all_variables_failing_qc.nc4
+      simulate:
+        variables: [eastward_wind, northward_wind]
+    ObsFilters:
+    # BlackList all eastward_wind observations...
+    - Filter: BlackList
+      filter variables:
+      - name: eastward_wind
+    # But only one northward_wind observation.
+    - Filter: Domain Check
+      filter variables:
+      - name: northward_wind
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.
+    # Set the flag of observations with missing values to "pass".
+    - Filter: Reset Flags to Pass
+      flags_to_reset: [1, 6]  # missing, Hfailed
+    - Filter: VarObs Writer
+      reject_obs_with_all_variables_failing_qc: true
+    - Filter: VarObs Checker
+      expected_main_table_columns:
+        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
+        field:    ["4", "5", "4", "5", "4", "5"]
+        lat:      ["21.00000", "21.00000", "22.00000", "22.00000", "24.00000", "24.00000"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

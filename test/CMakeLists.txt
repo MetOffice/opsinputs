@@ -61,9 +61,11 @@ list( APPEND cxvarobs_test_input
   testinput/078_VarField_theta.yaml
   testinput/FixedHeader_GridStagger.yaml
   testinput/FixedHeader_HorizGrid.yaml
+  testinput/FixedHeader_Times.yaml
   testinput/FixedHeader_VertCoord.yaml
   testinput/IntegerConstants_LensAndLevels.yaml
   testinput/RealConstants.yaml
+  testinput/reject_obs_with_all_variables_failing_qc.yaml
   testinput/VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
   testinput/VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
   testinput/VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
@@ -111,6 +113,7 @@ list( APPEND cxvarobs_test_data
   074_VarField_ro_geoid_und.nc4
   077_VarField_aod.nc4
   078_VarField_theta.nc4
+  reject_obs_with_all_variables_failing_qc.nc4
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Data)
@@ -248,9 +251,13 @@ ADD_VAROBSWRITER_TEST(074_VarField_ro_geoid_und)
 ADD_VAROBSWRITER_TEST(077_VarField_aod)
 ADD_VAROBSWRITER_TEST(078_VarField_theta)
 
-# Parameter tests
+# Header field tests
 ADD_VAROBSWRITER_TEST(FixedHeader_VertCoord)
 ADD_VAROBSWRITER_TEST(FixedHeader_HorizGrid)
 ADD_VAROBSWRITER_TEST(FixedHeader_GridStagger)
+ADD_VAROBSWRITER_TEST(FixedHeader_Times)
 ADD_VAROBSWRITER_TEST(IntegerConstants_LensAndLevels)
 ADD_VAROBSWRITER_TEST(RealConstants)
+
+# Other tests
+ADD_VAROBSWRITER_TEST(reject_obs_with_all_variables_failing_qc)

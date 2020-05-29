@@ -33,6 +33,44 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
 
     f.close()
 
+def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
+    f = netcdf.netcdf_file(file_name, 'w')
+
+    nlocs = 4
+    f.createDimension('nlocs', nlocs)
+
+    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var[:] = [21, 22, -23, 24]
+    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var[:] = [31, 32, 33, 34]
+    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    minute = 1/60.
+    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+
+    var = f.createVariable(var_name_1 + '@ObsValue', 'f', ('nlocs',))
+    var[:] = [1.1, missing_float, 1.3, 1.4]
+    var = f.createVariable(var_name_1 + '@ObsError', 'f', ('nlocs',))
+    var[:] = [0.1, missing_float, 0.3, 0.4]
+    var = f.createVariable(var_name_1 + '@GrossErrorProbability', 'f', ('nlocs',))
+    var[:] = [0.01, missing_float, 0.03, 0.04]
+    var = f.createVariable(var_name_1 + '@PreQC', 'i', ('nlocs',))
+    var[:] = [1, 1, 1, 1]
+
+    var = f.createVariable(var_name_2 + '@ObsValue', 'f', ('nlocs',))
+    var[:] = [2.1, missing_float, 2.3, 2.4]
+    var = f.createVariable(var_name_2 + '@ObsError', 'f', ('nlocs',))
+    var[:] = [1.1, missing_float, 1.3, 1.4]
+    var = f.createVariable(var_name_2 + '@GrossErrorProbability', 'f', ('nlocs',))
+    var[:] = [0.11, missing_float, 0.13, 0.14]
+    var = f.createVariable(var_name_2 + '@PreQC', 'i', ('nlocs',))
+    var[:] = [1, 1, 1, 1]
+
+    f.date_time = 2018010100
+
+    f.close()
+
 def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
     f = netcdf.netcdf_file(file_name, 'w')
 
@@ -247,3 +285,6 @@ output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testin
 output_1d_normal_var_to_netcdf('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
 output_2d_simulated_var_to_netcdf('aerosol_optical_depth', 'testinput/077_VarField_aod.nc4')
 output_2d_simulated_var_to_netcdf('air_potential_temperature',  'testinput/078_VarField_theta.nc4') # Sonde
+
+output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind', 
+                                   'testinput/reject_obs_with_all_variables_failing_qc.nc4')
