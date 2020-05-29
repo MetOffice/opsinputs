@@ -5,22 +5,22 @@
 
 # macro to create a symlink from src to dst
 function(CREATE_SYMLINK src dst)
-    foreach (FILENAME ${ARGN})
-        execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink
-            ${src}/${FILENAME}
-            ${dst}/${FILENAME} )
-        endforeach(FILENAME)
-endfunction(CREATE_SYMLINK)
+  foreach (FILENAME ${ARGN})
+    execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink
+                     ${src}/${FILENAME}
+                     ${dst}/${FILENAME} )
+  endforeach(FILENAME)
+endfunction()
 
 # macro to create a symlink from src to dst with just filename
 function(CREATE_SYMLINK_FILENAME src dst)
-    foreach (FILENAME ${ARGN})
-        get_filename_component(filename ${FILENAME} NAME )
-        execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink
-            ${src}/${FILENAME}
-            ${dst}/${filename} )
-        endforeach(FILENAME)
-endfunction(CREATE_SYMLINK_FILENAME)
+  foreach (FILENAME ${ARGN})
+    get_filename_component(filename ${FILENAME} NAME )
+    execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink
+                     ${src}/${FILENAME}
+                     ${dst}/${filename} )
+  endforeach(FILENAME)
+endfunction()
 
 # macro to define a VarObsWriter test
 function(ADD_VAROBSWRITER_TEST name)
@@ -30,13 +30,15 @@ function(ADD_VAROBSWRITER_TEST name)
                     ENVIRONMENT
                       OOPS_TRAPFPE=1
                       LD_LIBRARY_PATH=${OPS_ROOT}/installs/odb/lib:${OPS_ROOT}/installs/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+                      OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${name}
                     DEPENDS test_CxVarObsFilters.x )
-endfunction(ADD_VAROBSWRITER_TEST)
+  set_tests_properties( test_cxvarobs_varobswriter_${name} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+endfunction()
+
+set( CXVAROBS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 
 # Create a directory for test input config and symlink all files
 list( APPEND cxvarobs_test_input
-  testinput/varobswriter.yaml
-  testinput/VarObsWriterNamelistsAMSUB/AMSUB.nl
   testinput/001_VarField_pstar.yaml
   testinput/002_VarField_temperature_RadarZ.yaml
   testinput/002_VarField_temperature_Surface.yaml
@@ -77,7 +79,6 @@ list( APPEND cxvarobs_test_input
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput)
 # TODO(wsmigaj): find a more elegant solution to create the required subdirectories of testinput
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelistsAMSUB)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_010_VarField_britemp)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_019_VarField_satzenith)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testinput/VarObsWriterNamelists_023_VarField_modelsurface)
@@ -223,11 +224,11 @@ ecbuild_add_executable( TARGET  test_CxVarObsFilters.x
                                 mains/TestCxVarObsFilters.cc
                         LIBS    cxvarobs )
 
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/varobswriter.yaml"
-                  ENVIRONMENT OOPS_TRAPFPE=1
-                  DEPENDS test_CxVarObsFilters.x )
+# Cleans up the output directory
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_setup
+                  COMMAND ${CMAKE_COMMAND}
+                  ARGS    "-E" "remove_directory" ${CXVAROBS_OUTPUT_DIR})
+set_tests_properties(test_cxvarobs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
 
 # Tests of individual varfields
 ADD_VAROBSWRITER_TEST(001_VarField_pstar)
