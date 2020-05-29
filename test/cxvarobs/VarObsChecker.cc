@@ -19,6 +19,7 @@
 #include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
+#include "eckit/exception/Exceptions.h"
 
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
@@ -144,6 +145,9 @@ VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const eckit::Configuration 
 {
   oops::Log::trace() << "VarObsChecker constructor starting" << std::endl;
   parameters_.deserialize(config);
+  ASSERT_MSG(!parameters_.expectedHeaderFields.value().empty() ||
+             !parameters_.expectedMainTableColumns.value().empty(),
+             "No VarObs file components to check have been specified");
 }
 
 VarObsChecker::~VarObsChecker() {
