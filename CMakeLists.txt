@@ -66,9 +66,8 @@ include_directories( ${IODA_INCLUDE_DIRS} )
 ecbuild_use_package( PROJECT oops VERSION 0.2.1 REQUIRED )
 include_directories( ${OOPS_INCLUDE_DIRS} )
 
-# TEMPORARY
-
-set(OPS_ROOT "/net/data/users/wsmigaj/cylc-run/r12482_2330_buddy_check_near_lon_180/share/fcm_make_ops_x86_64_gfortran_debug/build" CACHE STRING "OPS root")
+# OPS
+find_package(OPS REQUIRED)
 
 ################################################################################
 # Export package info

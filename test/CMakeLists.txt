@@ -29,7 +29,7 @@ function(ADD_VAROBSWRITER_TEST name)
                     ARGS    "testinput/${name}.yaml"
                     ENVIRONMENT
                       OOPS_TRAPFPE=1
-                      LD_LIBRARY_PATH=${OPS_ROOT}/installs/odb/lib:${OPS_ROOT}/installs/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+                      LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
                       OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${name}
                     DEPENDS test_CxVarObsFilters.x )
   set_tests_properties( test_cxvarobs_varobswriter_${name} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )

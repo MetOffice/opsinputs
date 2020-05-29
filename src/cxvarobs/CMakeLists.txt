@@ -21,17 +21,15 @@ list( APPEND cxvarobs_src_files
     VarObsWriterParameters.h
 )
 
-set(OPS_INCLUDE_DIR "${OPS_ROOT}/include")
-set(OPS_OBJECT_DIR "${OPS_ROOT}/o")
-set(SHUM_LIB_DIR "${OPS_ROOT}/installs/shumlib/lib")
+set(SHUM_LIB_DIR "${OPS_INSTALLS_DIR}/shumlib/lib")
 set(SHUM_LIBS 
     "${SHUM_LIB_DIR}/libshum_byteswap.so"
     "${SHUM_LIB_DIR}/libshum_string_conv.so"
     "${SHUM_LIB_DIR}/libshum_wgdos_packing.so")
-file(GLOB OPS_OBJ_FILES LIST_DIRECTORIES false "${OPS_OBJECT_DIR}/*.o")
+file(GLOB OPS_O_FILES LIST_DIRECTORIES false "${OPS_O_DIR}/*.o")
 
 ecbuild_add_library( TARGET   ops
-                     SOURCES  ${OPS_OBJ_FILES}
+                     SOURCES  ${OPS_O_FILES}
                      LINKER_LANGUAGE Fortran
                      TYPE STATIC
                      LIBS ${SHUM_LIBS}
