@@ -49,16 +49,16 @@ class VarObsWriterParameters : public oops::Parameters {
     "account_for_gpsro_tangent_point_drift", false, this};
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
 
-  oops::Parameter<std::string> FH_VertCoord{"FH_VertCoord", "FH_VertCoord_Hybrid", this};
-  oops::Parameter<std::string> FH_HorizGrid{"FH_HorizGrid", "FH_HorizGrid_Global", this};
-  oops::Parameter<std::string> FH_GridStagger{"FH_GridStagger", "FH_GridStagger_EndGame", this};
+  oops::Parameter<std::string> FH_VertCoord{"FH_VertCoord", "Hybrid", this};
+  oops::Parameter<std::string> FH_HorizGrid{"FH_HorizGrid", "Global", this};
+  oops::Parameter<std::string> FH_GridStagger{"FH_GridStagger", "EndGame", this};
   oops::Parameter<int> FH_ModelVersion{"FH_ModelVersion", 0, this};
 
   oops::Parameter<int> IC_XLen{"IC_XLen", 0, this};
   oops::Parameter<int> IC_YLen{"IC_YLen", 0, this};
   oops::Parameter<int> IC_PLevels{"IC_PLevels", 0, this};
   oops::Parameter<int> IC_WetLevels{"IC_WetLevels", 0, this};
-  oops::Parameter<std::string> IC_TorTheta{"IC_TorTheta", "IC_TorTheta_T", this};
+  oops::Parameter<std::string> IC_TorTheta{"IC_TorTheta", "T", this};
   oops::Parameter<bool> IC_ShipWind{"IC_ShipWind", false, this};
   oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "", this};
   oops::Parameter<bool> IC_GPSRO_Operator_pseudo{"IC_GPSRO_Operator_pseudo", false, this};
