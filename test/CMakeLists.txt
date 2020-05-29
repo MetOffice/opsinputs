@@ -59,6 +59,12 @@ list( APPEND cxvarobs_test_input
   testinput/074_VarField_ro_geoid_und.yaml
   testinput/077_VarField_aod.yaml
   testinput/078_VarField_theta.yaml
+  testinput/FixedHeader_GridStagger.yaml
+  testinput/FixedHeader_HorizGrid.yaml
+  testinput/FixedHeader_VertCoord.yaml
+  testinput/IntegerConstants_LensAndLevels.yaml
+  testinput/IntegerConstants_TorTheta.yaml
+  testinput/RealConstants.yaml
   testinput/VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
   testinput/VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
   testinput/VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
@@ -219,6 +225,7 @@ ecbuild_add_test( TARGET  test_cxvarobs_varobswriter
                   ENVIRONMENT OOPS_TRAPFPE=1
                   DEPENDS test_CxVarObsFilters.x )
 
+# Tests of individual varfields
 ADD_VAROBSWRITER_TEST(001_VarField_pstar)
 ADD_VAROBSWRITER_TEST(002_VarField_temperature_Surface)
 ADD_VAROBSWRITER_TEST(002_VarField_temperature_RadarZ)
@@ -241,3 +248,11 @@ ADD_VAROBSWRITER_TEST(073_VarField_ro_rad_curv)
 ADD_VAROBSWRITER_TEST(074_VarField_ro_geoid_und)
 ADD_VAROBSWRITER_TEST(077_VarField_aod)
 ADD_VAROBSWRITER_TEST(078_VarField_theta)
+
+# Parameter tests
+ADD_VAROBSWRITER_TEST(FixedHeader_VertCoord)
+ADD_VAROBSWRITER_TEST(FixedHeader_HorizGrid)
+ADD_VAROBSWRITER_TEST(FixedHeader_GridStagger)
+ADD_VAROBSWRITER_TEST(IntegerConstants_LensAndLevels)
+ADD_VAROBSWRITER_TEST(IntegerConstants_TorTheta)
+ADD_VAROBSWRITER_TEST(RealConstants)

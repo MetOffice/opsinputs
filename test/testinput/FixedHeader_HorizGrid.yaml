@@ -1,0 +1,139 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 0
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: Global
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 0
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: NH
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 1
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: SH
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 2
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: LamNoWrap
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 3
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: LamWrap
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 4
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: Eq
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 100
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: LamNoWrapEq
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 103
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      FH_HorizGrid: LamWrapEq
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Horizontal grid type: 104
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
