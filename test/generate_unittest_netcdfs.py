@@ -1,6 +1,14 @@
+#!/usr/bin/env python
+"""Generate NetCDF files required by VarObsWriter tests.
+
+This script must currently be run manually whenever these files need to be regenerated. 
+In principle we could define these files as outputs of a custom CMake target; 
+this script would then be run automatically as part of the build process whenever it changed."""
+
 import numpy as np
 from scipy.io import netcdf
 
+# Defined as in oops/util/missingValues.cc 
 missing_float = np.finfo(np.float32).min * 0.99
 missing_int = np.iinfo(np.int32).min + 5
 
