@@ -29,8 +29,6 @@ Observations:
     - Filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
     - Filter: VarObs Checker
-      expected_header_fields:
-        Vertical coordinate type: 1
       expected_main_table_columns:
         # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
         field:    ["2", "2", "2"]

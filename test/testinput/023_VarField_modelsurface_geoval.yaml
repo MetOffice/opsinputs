@@ -32,8 +32,6 @@ Observations:
       reject_obs_with_any_variable_failing_qc: true
       namelist_directory: testinput/VarObsWriterNamelists_023_VarField_modelsurface
     - Filter: VarObs Checker
-      expected_header_fields:
-        Vertical coordinate type: 1
       expected_main_table_columns:
         # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
         field:    ["23", "23", "23"]
