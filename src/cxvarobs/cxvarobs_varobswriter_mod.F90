@@ -80,7 +80,6 @@ private
   integer(kind=8) :: FH_GridStagger
   integer(kind=8) :: FH_ModelVersion
 
-  integer(kind=8) :: IC_TorTheta
   integer(kind=8) :: IC_ShipWind
   integer(kind=8) :: IC_GroundGPSOperator
   integer(kind=8) :: IC_GPSRO_Operator_pseudo
@@ -229,20 +228,6 @@ end select
 int = 0
 found = f_conf % get("FH_ModelVersion", int)
 self % FH_ModelVersion = int
-
-string = "t"
-found = f_conf % get("IC_TorTheta", string)
-select case (ops_to_lower_case(string))
-case ("t")
-  self % IC_TorTheta = IC_TorTheta_T
-case ("theta")
-  self % IC_TorTheta = IC_TorTheta_Theta
-case default
-  write (ErrorMessage, '("IC_TorTheta code not recognised: ",A)') string
-  call gen_warn(RoutineName, ErrorMessage)
-  cxvarobs_varobswriter_create = .false.
-  goto 9999
-end select
 
 bool = .false.
 found = f_conf % get("IC_ShipWind", bool)
@@ -1794,7 +1779,6 @@ CxHeader % FixHd(FH_CTMinute) = now % minute
 CxHeader % FixHd(FH_CTSecond) = now % second
 CxHeader % FixHd(FH_CTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
 
-CxHeader % IntC(IC_TorTheta) = self % IC_TorTheta
 CxHeader % IntC(IC_ShipWind) = self % IC_ShipWind
 CxHeader % IntC(IC_GroundGPSOperator) = self % IC_GroundGPSOperator
 CxHeader % IntC(IC_GPSRO_Operator_pseudo) = self % IC_GPSRO_Operator_pseudo

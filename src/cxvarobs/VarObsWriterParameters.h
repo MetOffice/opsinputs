@@ -58,7 +58,6 @@ class VarObsWriterParameters : public oops::Parameters {
   oops::Parameter<int> IC_YLen{"IC_YLen", 0, this};
   oops::Parameter<int> IC_PLevels{"IC_PLevels", 0, this};
   oops::Parameter<int> IC_WetLevels{"IC_WetLevels", 0, this};
-  oops::Parameter<std::string> IC_TorTheta{"IC_TorTheta", "T", this};
   oops::Parameter<bool> IC_ShipWind{"IC_ShipWind", false, this};
   oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "", this};
   oops::Parameter<bool> IC_GPSRO_Operator_pseudo{"IC_GPSRO_Operator_pseudo", false, this};

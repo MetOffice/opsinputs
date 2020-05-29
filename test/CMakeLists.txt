@@ -63,7 +63,6 @@ list( APPEND cxvarobs_test_input
   testinput/FixedHeader_HorizGrid.yaml
   testinput/FixedHeader_VertCoord.yaml
   testinput/IntegerConstants_LensAndLevels.yaml
-  testinput/IntegerConstants_TorTheta.yaml
   testinput/RealConstants.yaml
   testinput/VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
   testinput/VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
@@ -254,5 +253,4 @@ ADD_VAROBSWRITER_TEST(FixedHeader_VertCoord)
 ADD_VAROBSWRITER_TEST(FixedHeader_HorizGrid)
 ADD_VAROBSWRITER_TEST(FixedHeader_GridStagger)
 ADD_VAROBSWRITER_TEST(IntegerConstants_LensAndLevels)
-ADD_VAROBSWRITER_TEST(IntegerConstants_TorTheta)
 ADD_VAROBSWRITER_TEST(RealConstants)
