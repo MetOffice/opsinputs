@@ -35,6 +35,7 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
+  createOutputDirectory();
 
   eckit::LocalConfiguration conf(config);
   // TODO(wsmigaj): is this the correct definition of the validity time?
@@ -100,6 +101,19 @@ void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
     localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
+}
+
+// -----------------------------------------------------------------------------
+
+void VarObsWriter::createOutputDirectory() {
+  char *outputDirectory = getenv("OPS_VAROB_OUTPUT_DIR");
+  ASSERT_MSG(outputDirectory != nullptr, "The output directory has not been set");
+  eckit::PathName outputPath(outputDirectory);
+  ASSERT_MSG(!outputPath.exists() || outputPath.isDir(),
+             "The output path '" + std::string(outputDirectory) + "'is not a directory");
+  if (!outputPath.exists()) {
+    outputPath.mkdir();
+  }
 }
 
 }  // namespace cxvarobs

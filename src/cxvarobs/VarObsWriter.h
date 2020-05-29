@@ -59,6 +59,8 @@ class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsW
 
   void setupEnvironment(LocalEnvironment &localEnvironment) const;
 
+  void createOutputDirectory();
+
   F90check key_;
 
   ioda::ObsSpace & obsdb_;
