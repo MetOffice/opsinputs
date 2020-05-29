@@ -150,7 +150,7 @@ def output_1d_geoval_to_netcdf(var_name, file_name):
 
     f.close()
 
-def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
+def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with_radar_family=False):
     f = netcdf.netcdf_file(file_name, 'w')
 
     nlocs = 4
@@ -165,6 +165,9 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    if with_radar_family:
+        var = f.createVariable('radar_family@MetaData', 'i', ('nlocs',))
+        var[:] = [11, 12, 13, 14]
 
     var = f.createVariable(var_name + '_1@ObsValue', 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
@@ -206,7 +209,7 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
 
     f.close()
 
-def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_bias=False):
+def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_family=False):
     f = netcdf.netcdf_file(file_name, 'w')
 
     nlocs = 4
@@ -221,6 +224,9 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_bias=Fal
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    if with_radar_family:
+        var = f.createVariable('radar_family@MetaData', 'i', ('nlocs',))
+        var[:] = [11, 12, 13, 14]
 
     # There must be at least one simulated variable
 
@@ -279,6 +285,7 @@ output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_V
 output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
 output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
 # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
+output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
 output_2d_simulated_var_to_netcdf('bending_angle',              'testinput/071_VarField_bendingangle.nc4')
 output_2d_normal_var_to_netcdf('impact_parameter', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
 output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')

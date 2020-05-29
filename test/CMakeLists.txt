@@ -53,6 +53,7 @@ list( APPEND cxvarobs_test_input
   testinput/031_VarField_solzenith.yaml
   testinput/054_VarField_numchans.yaml
   testinput/055_VarField_channum.yaml
+  testinput/066_VarField_radarobazim.yaml
   testinput/071_VarField_bendingangle.yaml
   testinput/072_VarField_impactparam.yaml
   testinput/073_VarField_ro_rad_curv.yaml
@@ -107,6 +108,7 @@ list( APPEND cxvarobs_test_data
   023_VarField_modelsurface_geoval.nc4
   028_VarField_satid.nc4
   031_VarField_solzenith.nc4
+  066_VarField_radarobazim.nc4
   071_VarField_bendingangle.nc4
   072_VarField_impactparam.nc4
   073_VarField_ro_rad_curv.nc4
@@ -244,6 +246,7 @@ ADD_VAROBSWRITER_TEST(028_VarField_satid)
 ADD_VAROBSWRITER_TEST(031_VarField_solzenith)
 ADD_VAROBSWRITER_TEST(054_VarField_numchans)
 ADD_VAROBSWRITER_TEST(055_VarField_channum)
+ADD_VAROBSWRITER_TEST(066_VarField_radarobazim)
 ADD_VAROBSWRITER_TEST(071_VarField_bendingangle)
 ADD_VAROBSWRITER_TEST(072_VarField_impactparam)
 ADD_VAROBSWRITER_TEST(073_VarField_ro_rad_curv)

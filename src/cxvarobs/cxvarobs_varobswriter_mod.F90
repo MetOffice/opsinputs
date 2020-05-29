@@ -701,8 +701,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
     case (VarField_RadarObAzim)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim)
+      call cxvarobs_varobswriter_fillreal2d( &
+        Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim, &
+        "radar_azimuth", "MetaData", ObsSpace, Channels)
     case (VarField_RadIdent)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
