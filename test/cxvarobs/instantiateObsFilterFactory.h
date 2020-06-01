@@ -8,14 +8,14 @@
 #ifndef TEST_CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
 #define TEST_CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
 
-#include "oops/interface/ObsFilter.h"
-#include "../cxvarobs/VarObsChecker.h"
 #include "../cxvarobs/ResetFlagsToPass.h"
+#include "../cxvarobs/VarObsChecker.h"
+#include "oops/interface/ObsFilter.h"
 
 namespace cxvarobs {
 namespace test {
 
-template<typename MODEL> 
+template<typename MODEL>
 void instantiateObsFilterFactory() {
   static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, VarObsChecker> >
     varObsCheckerMaker("VarObs Checker");

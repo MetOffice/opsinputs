@@ -11,14 +11,14 @@
 #include <ostream>
 #include <string>
 
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 
+#include "cxvarobs/VarObsWriter.interface.h"
+#include "cxvarobs/VarObsWriterParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
-#include "cxvarobs/VarObsWriter.interface.h"
-#include "cxvarobs/VarObsWriterParameters.h"
 
 namespace eckit {
   class Configuration;

@@ -5,6 +5,9 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
+#include <utility>
+#include <vector>
+
 #include "cxvarobs/VarObsWriter.h"
 
 #include "cxvarobs/LocalEnvironment.h"
@@ -12,9 +15,9 @@
 
 #include "eckit/config/Configuration.h"
 
-#include "ioda/ObsVector.h"
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
+#include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
 #include "oops/util/Logger.h"

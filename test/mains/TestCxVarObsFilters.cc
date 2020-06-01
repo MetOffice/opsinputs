@@ -5,9 +5,9 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
+#include "../cxvarobs/instantiateObsFilterFactory.h"
 #include "../test/ufo/ObsFilters.h"
 #include "cxvarobs/instantiateObsFilterFactory.h"
-#include "../cxvarobs/instantiateObsFilterFactory.h"
 #include "oops/runs/Run.h"
 #include "ufo/instantiateObsFilterFactory.h"
 #include "ufo/UfoTrait.h"

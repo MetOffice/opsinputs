@@ -14,7 +14,8 @@ namespace cxvarobs {
 LocalEnvironment::LocalEnvironment()
 {}
 
-LocalEnvironment::LocalEnvironment(const std::map<std::string, std::string> &variableNamesAndValues) {
+LocalEnvironment::LocalEnvironment(
+    const std::map<std::string, std::string> &variableNamesAndValues) {
   for (const auto &nameAndValue : variableNamesAndValues) {
     set(nameAndValue.first, nameAndValue.second);
   }

@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_VAROBSWRITERPARAMETERS_H
-#define CXVAROBS_VAROBSWRITERPARAMETERS_H
+#ifndef CXVAROBS_VAROBSWRITERPARAMETERS_H_
+#define CXVAROBS_VAROBSWRITERPARAMETERS_H_
 
 #include <string>
 
@@ -73,4 +73,4 @@ class VarObsWriterParameters : public oops::Parameters {
 
 }  // namespace cxvarobs
 
-#endif // CXVAROBS_VAROBSWRITERPARAMETERS_H
+#endif  // CXVAROBS_VAROBSWRITERPARAMETERS_H_

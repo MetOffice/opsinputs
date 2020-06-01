@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H
-#define CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H
+#ifndef TEST_CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H_
+#define TEST_CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H_
 
 #include <vector>
 
@@ -24,4 +24,4 @@ class ResetFlagsToPassParameters : public oops::Parameters {
 
 }  // namespace cxvarobs
 
-#endif // CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H
+#endif  // TEST_CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H_

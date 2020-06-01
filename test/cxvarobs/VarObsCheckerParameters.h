@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_VAROBSCHECKERPARAMETERS_H
-#define CXVAROBS_VAROBSCHECKERPARAMETERS_H
+#ifndef TEST_CXVAROBS_VAROBSCHECKERPARAMETERS_H_
+#define TEST_CXVAROBS_VAROBSCHECKERPARAMETERS_H_
 
 #include <map>
 #include <string>
@@ -49,4 +49,4 @@ class VarObsCheckerParameters : public oops::Parameters {
 
 }  // namespace cxvarobs
 
-#endif // CXVAROBS_VAROBSCHECKERPARAMETERS_H
+#endif  // TEST_CXVAROBS_VAROBSCHECKERPARAMETERS_H_

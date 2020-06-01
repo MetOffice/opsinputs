@@ -5,7 +5,7 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#include "../cxvarobs/ResetFlagsToPass.h"
+#include "../../test/cxvarobs/ResetFlagsToPass.h"
 
 #include "eckit/config/Configuration.h"
 
@@ -13,9 +13,9 @@
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
+#include "oops/util/IntSetParser.h"  // for contains()
 #include "oops/util/Logger.h"
 #include "ufo/filters/QCflags.h"
-#include "oops/util/IntSetParser.h"  // for contains()
 
 namespace cxvarobs {
 namespace test {

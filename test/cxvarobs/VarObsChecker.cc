@@ -7,13 +7,12 @@
 
 #include <cstdio>
 #include <fstream>
-#include <regex>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include "../cxvarobs/VarObsChecker.h"
+#include "../../test/cxvarobs/VarObsChecker.h"
 
 #include "cxvarobs/LocalEnvironment.h"
 #include "cxvarobs/VarObsWriterParameters.h"
@@ -55,7 +54,7 @@ bool startsWith(const std::string &string, const char *prefix) {
 }
 
 class TempFile {
-public:
+ public:
   explicit TempFile(const eckit::PathName &fileName) : fileName_(fileName) {}
   explicit TempFile(const char *fileName) : fileName_(fileName) {}
 
@@ -77,7 +76,7 @@ public:
 
   std::string name() const { return fileName_.asString(); }
 
-private:
+ private:
   void deleteFileAndResetFileName() {
     if (fileName_.exists()) {
       fileName_.unlink();
@@ -85,7 +84,7 @@ private:
     fileName_ = eckit::PathName();
   }
 
-private:
+ private:
   eckit::PathName fileName_;
 };
 
@@ -93,13 +92,13 @@ private:
 
 /// Encapsulates the main table of per-observation data printed by PrintVarobs.
 class VarObsChecker::MainTable {
-public:
+ public:
   MainTable(std::string headerLine, std::vector<std::string> dataLines);
 
   /// \brief Return values from the column with the specified header (trimmed on both sides).
   std::vector<std::string> operator[](const std::string &columnHeader) const;
 
-private:
+ private:
   std::string headerLine_;
   std::vector<std::string> dataLines_;
 };
@@ -224,10 +223,7 @@ VarObsChecker::PrintVarObsOutput VarObsChecker::parsePrintVarObsOutput(
 
   FileSection section = BeforeColumnDependentConstants;
 
-//  std::regex columnDepConstantsRegEx(R"((.*?) +\(([0-9]+)\) +([0-9]+)");
-
   std::map<std::string, std::string> headerFields;
-//  std::map<int, int> numLevelsByVarfield;
 
   std::string mainTableHeader;
   std::vector<std::string> mainTableContents;
@@ -251,11 +247,6 @@ VarObsChecker::PrintVarObsOutput VarObsChecker::parsePrintVarObsOutput(
     case BeforeLevelDependentConstants:
       if (line == "Level Dependent Constants:") {
         section = BeforeMainTable;
-      } else {
-//        // Probably unnecessary
-//        std::smatch match;
-//        if (std::regex_match(line, match, columnDepConstantsRegEx))
-//          numLevelsByVarfield[std::stoi(match[1].str())] = std::stoi(match[2].str());
       }
       break;
     case BeforeMainTable:

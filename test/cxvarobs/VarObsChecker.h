@@ -8,16 +8,17 @@
 #ifndef TEST_CXVAROBS_VAROBSCHECKER_H_
 #define TEST_CXVAROBS_VAROBSCHECKER_H_
 
+#include <map>
 #include <ostream>
 #include <string>
 
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 
+#include "../cxvarobs/VarObsCheckerParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
-#include "../cxvarobs/VarObsCheckerParameters.h"
 
 namespace eckit {
   class Configuration;

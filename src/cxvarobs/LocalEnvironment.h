@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_LOCALENVIRONMENT_H
-#define CXVAROBS_LOCALENVIRONMENT_H
+#ifndef CXVAROBS_LOCALENVIRONMENT_H_
+#define CXVAROBS_LOCALENVIRONMENT_H_
 
 #include <map>
 #include <set>
@@ -34,4 +34,4 @@ class LocalEnvironment {
 
 }  // namespace cxvarobs
 
-#endif // CXVAROBS_LOCALENVIRONMENT_H
+#endif  // CXVAROBS_LOCALENVIRONMENT_H_

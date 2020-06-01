@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_OBSSPACE_F_H_
-#define CXVAROBS_OBSSPACE_F_H_
+#ifndef CXVAROBS_CXVAROBS_OBSSPACE_F_H_
+#define CXVAROBS_CXVAROBS_OBSSPACE_F_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -37,4 +37,4 @@ extern "C" {
 
 }  // namespace cxvarobs
 
-#endif  // CXVAROBS_OBSSPACE_F_H_
+#endif  // CXVAROBS_CXVAROBS_OBSSPACE_F_H_

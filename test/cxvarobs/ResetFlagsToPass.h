@@ -9,15 +9,16 @@
 #define TEST_CXVAROBS_RESETFLAGSTOPASS_H_
 
 #include <ostream>
+#include <set>
 #include <string>
 
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 
+#include "../cxvarobs/ResetFlagsToPassParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
-#include "../cxvarobs/ResetFlagsToPassParameters.h"
 
 namespace eckit {
   class Configuration;
