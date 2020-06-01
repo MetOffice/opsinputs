@@ -325,8 +325,8 @@ end subroutine cxvarobs_varobswriter_prior
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_post(self, ObsSpace, nchannels, Channels, &
-                                      Flags, ObsErrors, nvars, nlocs, hofx)
+subroutine cxvarobs_varobswriter_post( &
+  self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
 implicit none
 type(cxvarobs_varobswriter), intent(in) :: self
 type(c_ptr), value, intent(in) :: ObsSpace
@@ -398,8 +398,8 @@ end subroutine cxvarobs_varobswriter_addrequiredgeovars
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Channels, &
-                                                      Flags, ObsErrors, Ob)
+subroutine cxvarobs_varobswriter_populateobservations( &
+  self, VarFields, ObsSpace, Channels, Flags, ObsErrors, Ob)
 implicit none
 type(cxvarobs_varobswriter),  intent(in) :: self
 integer(kind=8), intent(in)              :: VarFields(:)
@@ -855,7 +855,7 @@ end subroutine cxvarobs_varobswriter_populateobservations
 ! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El1, JediVarName, ObsSpace, Flags, ObsErrors, HdrIn, initial_value)
+  Hdr, OpsVarName, NumObs, El1, JediVarName, ObsSpace, Flags, ObsErrors)
 implicit none
 
 ! Subroutine arguments:
@@ -867,8 +867,6 @@ character(len=*), intent(in)                    :: JediVarName
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -920,7 +918,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   end if
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1, HdrIn, initial_value)
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1)
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
@@ -933,8 +931,7 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 ! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El2, JediVarName, ObsSpace, Channels, Flags, ObsErrors, &
-  HdrIn, initial_value)
+  Hdr, OpsVarName, NumObs, El2, JediVarName, ObsSpace, Channels, Flags, ObsErrors)
 implicit none
 
 ! Subroutine arguments:
@@ -947,8 +944,6 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -980,9 +975,7 @@ JediVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels(JediVarN
 if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 HdrIn = HdrIn, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8), &
-                 initial_value = initial_value)
+                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
 
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI:
@@ -1030,17 +1023,9 @@ end subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable
 !> Fill a 1D field of type Element_Type with values taken from an arbitrary JEDI variable
 !> (i.e. not a simulated variable) and optionally errors taken from another such variable.
 
-subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable(Hdr,                   &
-                                                                   OpsVarName,            &
-                                                                   NumObs,                &
-                                                                   El1,                   &
-                                                                   ObsSpace,              &
-                                                                   JediValueVarName,      &
-                                                                   JediValueGroup,        &
-                                                                   JediErrorVarName,      &
-                                                                   JediErrorGroup,        &
-                                                                   HdrIn,                 &
-                                                                   initial_value)
+subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable( &
+  Hdr, OpsVarName, NumObs, El1, ObsSpace, &
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1053,8 +1038,6 @@ character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -1092,7 +1075,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   end if
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1, HdrIn, initial_value)
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1)
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingDouble)  El1(i) % OBErr = ObsError(i)
@@ -1108,7 +1091,7 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable
 
 subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, HdrIn, initial_value)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1122,8 +1105,6 @@ character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-type(Element_Type), optional, intent(in)        :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -1158,9 +1139,7 @@ end if
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 HdrIn = HdrIn, &
-                 num_levels = int(size(JediValueVarNamesWithChannels), kind=8), &
-                 initial_value = initial_value)
+                 num_levels = int(size(JediValueVarNamesWithChannels), kind=8))
 
   do iChannel = 1, size(JediValueVarNamesWithChannels)
     ! Retrieve data from JEDI:
@@ -1196,7 +1175,7 @@ end subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable
 ! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_fillreal( &
-  Hdr, OpsVarName, NumObs, Real1, JediVarName, JediVarGroup, ObsSpace, HdrIn, initial_value)
+  Hdr, OpsVarName, NumObs, Real1, JediVarName, JediVarGroup, ObsSpace)
 implicit none
 
 ! Subroutine arguments:
@@ -1207,8 +1186,6 @@ real(kind=8), pointer                           :: Real1(:)
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
 type(c_ptr), value, intent(in)                  :: ObsSpace
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-real(kind=8), optional, intent(in)              :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1224,7 +1201,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1, HdrIn, initial_value)
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
   do i = 1, NumObs
     if (VarValue(i) /= MissingDouble) Real1(i) = VarValue(i)
   end do
@@ -1234,7 +1211,7 @@ end subroutine cxvarobs_varobswriter_fillreal
 ! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_fillrealfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real1, JediVarName, GeoVals, HdrIn, initial_value)
+  Hdr, OpsVarName, NumObs, Real1, JediVarName, GeoVals)
 implicit none
 
 ! Subroutine arguments:
@@ -1244,8 +1221,6 @@ integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real1(:)
 character(len=*), intent(in)                    :: JediVarName
 type(ufo_geovals), intent(in)                   :: GeoVals
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-real(kind=8), optional, intent(in)              :: initial_value
 
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
@@ -1269,7 +1244,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   end if
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1, HdrIn, initial_value)
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
   where (GeoVal % vals(1,:) /= MissingReal)
     Real1 = GeoVal % vals(1,:)
   end where
@@ -1278,16 +1253,8 @@ end subroutine cxvarobs_varobswriter_fillrealfromgeoval
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillreal2d(Hdr,           &
-                                                 OpsVarName,    &
-                                                 NumObs,        &
-                                                 Real2,         &
-                                                 JediVarName,   &
-                                                 JediVarGroup,  &
-                                                 ObsSpace,      &
-                                                 Channels,      &
-                                                 HdrIn,         &
-                                                 initial_value)
+subroutine cxvarobs_varobswriter_fillreal2d( &
+  Hdr, OpsVarName, NumObs, Real2, JediVarName, JediVarGroup, ObsSpace, Channels)
 implicit none
 
 ! Subroutine arguments:
@@ -1299,8 +1266,6 @@ character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-real(kind=8), optional, intent(in)              :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1317,9 +1282,7 @@ JediVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels(JediVarN
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                 HdrIn = HdrIn, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8), &
-                 initial_value = initial_value)
+                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
   print *, "size(Real2): ", size(Real2,1), " ", size(Real2,2)
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
@@ -1336,7 +1299,7 @@ end subroutine cxvarobs_varobswriter_fillreal2d
 ! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_fillreal2dfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real2, JediVarName, GeoVals, HdrIn, initial_value)
+  Hdr, OpsVarName, NumObs, Real2, JediVarName, GeoVals)
 implicit none
 
 ! Subroutine arguments:
@@ -1346,8 +1309,6 @@ integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real2(:,:)
 character(len=*), intent(in)                    :: JediVarName
 type(ufo_geovals), intent(in)                   :: GeoVals
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-real(kind=8), optional, intent(in)              :: initial_value
 
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
@@ -1362,8 +1323,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, HdrIn, initial_value = initial_value, &
-                 num_levels = int(GeoVal % nval, kind = 8))
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(GeoVal % nval, kind = 8))
   where (transpose(GeoVal % vals) /= MissingReal)
     Real2 = transpose(GeoVal % vals)
   end where
@@ -1372,15 +1332,8 @@ end subroutine cxvarobs_varobswriter_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillinteger(Hdr,           &
-                                             OpsVarName,    &
-                                             NumObs,        &
-                                             Int1,          &
-                                             JediVarName,   &
-                                             JediVarGroup,  &
-                                             ObsSpace,      &
-                                             HdrIn,         &
-                                             initial_value)
+subroutine cxvarobs_varobswriter_fillinteger( &
+  Hdr, OpsVarName, NumObs, Int1, JediVarName, JediVarGroup, ObsSpace)
 implicit none
 
 ! Subroutine arguments:
@@ -1391,8 +1344,6 @@ integer(kind=8), pointer                        :: Int1(:)
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
 type(c_ptr), value, intent(in)                  :: ObsSpace
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-integer(kind=8), optional, intent(in)           :: initial_value
 
 ! Local declarations:
 integer(kind=4)                                 :: VarValue(NumObs)
@@ -1407,7 +1358,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Int1, HdrIn, initial_value)
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, Int1)
   where (VarValue /= MissingInt)
     Int1 = VarValue
   end where
@@ -1416,9 +1367,8 @@ end subroutine cxvarobs_varobswriter_fillinteger
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillcoord2d(Hdr, OpsVarName, NumObs, Coord2, &
-                                             JediVarName, JediVarGroup, ObsSpace, Channels, &
-                                             HdrIn, initial_value)
+subroutine cxvarobs_varobswriter_fillcoord2d( &
+  Hdr, OpsVarName, NumObs, Coord2, JediVarName, JediVarGroup, ObsSpace, Channels)
 implicit none
 
 ! Subroutine arguments:
@@ -1430,8 +1380,6 @@ character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
-type(ElementHeader_Type), optional, intent(in)  :: HdrIn
-type(coord_type), optional, intent(in)          :: initial_value
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1448,9 +1396,7 @@ JediVarNamesWithChannels = cxvarobs_varobswriter_varnames_with_channels(JediVarN
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Coord2, &
-                 HdrIn = HdrIn, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8), &
-                 initial_value = initial_value)
+                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
 
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
@@ -1466,9 +1412,8 @@ end subroutine cxvarobs_varobswriter_fillcoord2d
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
-                                                 RejectObsWithAnyVariableFailingQC, &
-                                                 RejectObsWithAllVariablesFailingQC)
+subroutine cxvarobs_varobswriter_fillreportflags( &
+  Ob, ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
 use oops_variables_mod
 implicit none
 
@@ -1523,8 +1468,8 @@ end subroutine cxvarobs_varobswriter_fillreportflags
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_fillchannumandnumchans(Ob, ObsSpace, Channels, Flags, &
-                                                        FillChanNum, FillNumChans)
+subroutine cxvarobs_varobswriter_fillchannumandnumchans( &
+  Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1560,8 +1505,8 @@ end subroutine cxvarobs_varobswriter_fillchannumandnumchans
 
 ! ------------------------------------------------------------------------------
 
-subroutine cxvarobs_varobswriter_findchannelspassingqc(NumObs, ObsSpace, Channels, Flags, &
-                                                       ChannelIndices, ChannelCounts)
+subroutine cxvarobs_varobswriter_findchannelspassingqc( &
+  NumObs, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
 use oops_variables_mod
 implicit none
 
