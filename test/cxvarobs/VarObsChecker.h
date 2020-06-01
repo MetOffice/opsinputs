@@ -40,6 +40,14 @@ class LocalEnvironment;
 
 namespace test {
 
+/// \brief Compares contents of VarObs files against reference values specified in the
+/// configuration.
+///
+/// The OpsProg_PrintVarobs.exe OPS utility is used to print the contents of VarObs files in textual
+/// form. Reference values of individual fields/arrays are then compared against values extracted
+/// from that output.
+///
+/// See VarObsCheckerParameters for a list of available options.
 class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObsChecker> {
  public:
   static const std::string classname() {return "cxvarobs::test::VarObsChecker";}
@@ -50,7 +58,7 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   ~VarObsChecker();
 
   void preProcess() const {}
-  void priorFilter(const ufo::GeoVaLs &) const;
+  void priorFilter(const ufo::GeoVaLs &) const {}
   void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const;
 
   const oops::Variables & requiredVars() const {return geovars_;}

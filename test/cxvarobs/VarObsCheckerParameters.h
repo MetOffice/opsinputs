@@ -40,9 +40,11 @@ class VarObsCheckerParameters : public oops::Parameters {
   /// OPS_VAROB_OUTPUT_DIR environment variable.
   oops::OptionalParameter<std::string> outputDirectory{"output_directory", this};
 
+  /// Expected values of header fields.
   oops::Parameter<std::map<std::string, std::string>> expectedHeaderFields{
     "expected_header_fields", {}, this};
 
+  /// Expected contents of columns of the main table with per-observation data.
   oops::Parameter<std::map<std::string, std::vector<std::string>>> expectedMainTableColumns{
     "expected_main_table_columns", {}, this};
 };

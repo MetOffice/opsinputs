@@ -25,8 +25,6 @@
 
 namespace cxvarobs {
 
-// -------------------------------------------------------------------------
-
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                            boost::shared_ptr<ioda::ObsDataVector<int> > flags,
                            boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
@@ -51,8 +49,6 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
   oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;
 }
 
-// -----------------------------------------------------------------------------
-
 VarObsWriter::~VarObsWriter() {
   oops::Log::trace() << "VarObsWriter destructor key = " << key_ << std::endl;
 
@@ -61,8 +57,6 @@ VarObsWriter::~VarObsWriter() {
 
   cxvarobs_varobswriter_delete_f90(key_);
 }
-
-// -----------------------------------------------------------------------------
 
 void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   oops::Log::trace() << "VarObsWriter priorFilter" << std::endl;
@@ -73,8 +67,6 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   cxvarobs_varobswriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
-// -----------------------------------------------------------------------------
-
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
                               const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
@@ -82,7 +74,7 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  // We need to pass the list of channels separately because the Fortran interface to
+  // We need to pass the list of channels in a separate parameter because the Fortran interface to
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
   const std::vector<int> &channels = obsdb_.obsvariables().channels();
@@ -91,13 +83,9 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
                                  hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
 }
 
-// -----------------------------------------------------------------------------
-
 void VarObsWriter::print(std::ostream & os) const {
   os << "VarObsWriter::print not yet implemented " << key_;
 }
-
-// -----------------------------------------------------------------------------
 
 void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
   if (parameters_.namelistDirectory.value() != boost::none)
@@ -105,8 +93,6 @@ void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
 }
-
-// -----------------------------------------------------------------------------
 
 void VarObsWriter::createOutputDirectory() {
   char *outputDirectory = getenv("OPS_VAROB_OUTPUT_DIR");

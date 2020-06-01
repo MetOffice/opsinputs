@@ -38,6 +38,11 @@ namespace cxvarobs {
 
 class LocalEnvironment;
 
+/// \brief Outputs observations to VarObs files.
+///
+/// Most of the implementation is in Fortran (cxvarobs_varobswriter_mod.F90).
+///
+/// \see VarObsWriterParameters for the list of accepted configuration parameters.
 class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
  public:
   static const std::string classname() {return "cxvarobs::VarObsWriter";}

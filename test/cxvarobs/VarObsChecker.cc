@@ -37,11 +37,6 @@ namespace {
 // This could be made OS-dependent.
 const char PATH_SEPARATOR = '/';
 
-std::string getEnvVariableOrDefault(const char *variableName, const char *defaultValue) {
-  const char *value = std::getenv(variableName);
-  return value ? value : defaultValue;
-}
-
 std::string getEnvVariableOrThrow(const char *variableName) {
   const char *value = std::getenv(variableName);
   if (!value)
@@ -53,6 +48,7 @@ bool startsWith(const std::string &string, const char *prefix) {
   return string.rfind(prefix, 0 /*look only at the beginning of string*/);
 }
 
+/// Manages a temporary file (deleted when this object is destroyed).
 class TempFile {
  public:
   explicit TempFile(const eckit::PathName &fileName) : fileName_(fileName) {}
@@ -153,10 +149,6 @@ VarObsChecker::~VarObsChecker() {
   oops::Log::trace() << "VarObsChecker destructor starting" << std::endl;
 }
 
-void VarObsChecker::priorFilter(const ufo::GeoVaLs &) const {
-  oops::Log::trace() << "VarObsChecker priorFilter" << std::endl;
-}
-
 void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
 
@@ -185,6 +177,7 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   } else {
     exePath = exeName;
   }
+
   // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
   const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + varObsFileName +
       "\" --all --outfile=\"" + tempFile.name() + "\"";

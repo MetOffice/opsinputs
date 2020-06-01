@@ -45,29 +45,61 @@ class VarObsWriterParameters : public oops::Parameters {
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
 
+  /// Account for the GPSRO tangent point drift.
   oops::Parameter<bool> accountForGPSROTangentPointDrift{
     "account_for_gpsro_tangent_point_drift", false, this};
+  /// Output the Family field (taken from the radar_family variable). Used for radar observations.
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
 
+  // Values of UM header elements. Ultimately some of them might be set using data retrieved
+  // from the model.
+
+  /// Vertical coordinate type.
+  ///
+  /// Valid values (case-insensitive): Hybrid, Sigma, Pressure, Depth, CP, Wave.
   oops::Parameter<std::string> FH_VertCoord{"FH_VertCoord", "Hybrid", this};
+  /// Horizontal grid type.
+  ///
+  /// Valid values (case-insensitive): Global, NH, SH, LamNoWrap, LamWrap, Eq, LamNoWrapEq,
+  /// LamWrapEq.
   oops::Parameter<std::string> FH_HorizGrid{"FH_HorizGrid", "Global", this};
+  /// Grid staggering indicator.
+  ///
+  /// Valid values (case-insensitive): ArakawaB, ArakawaC, EndGame.
   oops::Parameter<std::string> FH_GridStagger{"FH_GridStagger", "EndGame", this};
+  /// Model version number x 100 + release number.
   oops::Parameter<int> FH_ModelVersion{"FH_ModelVersion", 0, this};
 
+  /// Number of points E-W.
   oops::Parameter<int> IC_XLen{"IC_XLen", 0, this};
+  /// Number of points N-S.
   oops::Parameter<int> IC_YLen{"IC_YLen", 0, this};
+  /// Number of levels (PLEVELS).
   oops::Parameter<int> IC_PLevels{"IC_PLevels", 0, this};
+  /// Number of wet levels (QLEVELS).
   oops::Parameter<int> IC_WetLevels{"IC_WetLevels", 0, this};
+  /// True if ship winds have been adjusted to 10m.
   oops::Parameter<bool> IC_ShipWind{"IC_ShipWind", false, this};
-  oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "", this};
+  /// Version of the ground GPS operator.
+  ///
+  /// Valid values (case-insensitive): Choice, Generic.
+  oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "choice", this};
+  /// TODO(Neill): Describe this parameter.
   oops::Parameter<bool> IC_GPSRO_Operator_pseudo{"IC_GPSRO_Operator_pseudo", false, this};
+  /// TODO(Neill): Describe this parameter.
   oops::Parameter<bool> IC_GPSRO_Operator_press{"IC_GPSRO_Operator_press", false, this};
 
+  /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_LongSpacing{"RC_LongSpacing", 0.0, this};
+  /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_LatSpacing{"RC_LatSpacing", 0.0, this};
+  /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_FirstLat{"RC_FirstLat", 0.0, this};
+  /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_FirstLong{"RC_FirstLong", 0.0, this};
+  /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_PoleLat{"RC_PoleLat", 0.0, this};
+  /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_PoleLong{"RC_PoleLong", 0.0, this};
 };
 

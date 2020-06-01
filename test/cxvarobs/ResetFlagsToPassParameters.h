@@ -18,7 +18,7 @@ namespace cxvarobs {
 /// \brief ResetFlagsToPass filter's options.
 class ResetFlagsToPassParameters : public oops::Parameters {
  public:
-  /// \brief QC flags to replace with "pass".
+  /// \brief List of QC flags (elements of ufo::QCflags) to be replaced with "pass".
   oops::Parameter<std::vector<int>> flagsToReset{"flags_to_reset", {}, this};
 };
 

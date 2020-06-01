@@ -36,10 +36,11 @@ namespace ufo {
 
 namespace cxvarobs {
 
-class LocalEnvironment;
-
 namespace test {
 
+/// \brief Resets observation QC flags to 'pass'.
+///
+/// See ResetFlagsToPassParameters for the available options.
 class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<ResetFlagsToPass> {
  public:
   static const std::string classname() {return "cxvarobs::test::ResetFlagsToPass";}

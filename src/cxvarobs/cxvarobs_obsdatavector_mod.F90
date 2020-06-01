@@ -24,7 +24,7 @@ public cxvarobs_obsdatavector_float_get
 
 contains
 
-!> Return the number of observational locations in this ObsDataVector<int> object.
+!> Return the number of observation locations in this ObsDataVector<int> object.
 
 integer function cxvarobs_obsdatavector_int_nlocs(c_vec)
   use, intrinsic :: iso_c_binding
@@ -82,7 +82,7 @@ subroutine cxvarobs_obsdatavector_int_get(c_vec, variable, vect)
 end subroutine cxvarobs_obsdatavector_int_get
 
 
-!> Return the number of observational locations in this ObsDataVector<float> object.
+!> Return the number of observation locations in this ObsDataVector<float> object.
 
 integer function cxvarobs_obsdatavector_float_nlocs(c_vec)
   use, intrinsic :: iso_c_binding
