@@ -3,7 +3,8 @@
 ! This software is licensed under the terms of the Apache Licence Version 2.0
 ! which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
-!> Fortran module to implement varobswriter
+!> Fortran part of VarObsWriter. It collects data from JEDI and uses the functions from the OPS
+!> OpsMod_Varobs module to output them to a VarObs file.
 
 module cxvarobs_varobswriter_mod
 
@@ -57,7 +58,6 @@ implicit none
 public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, &
           cxvarobs_varobswriter_prior, cxvarobs_varobswriter_post
 private
-integer, parameter :: max_string=800
 ! Maximum length of a variable name
 integer, parameter :: max_varname_length=MAXVARLEN
 ! Maximum length of a variable name with channel suffix
@@ -90,12 +90,12 @@ private
   integer(kind=8) :: IC_PLevels
   integer(kind=8) :: IC_WetLevels
 
-  real(kind=8) RC_LongSpacing
-  real(kind=8) RC_LatSpacing
-  real(kind=8) RC_FirstLat
-  real(kind=8) RC_FirstLong
-  real(kind=8) RC_PoleLat
-  real(kind=8) RC_PoleLong
+  real(kind=8)    :: RC_LongSpacing
+  real(kind=8)    :: RC_LatSpacing
+  real(kind=8)    :: RC_FirstLat
+  real(kind=8)    :: RC_FirstLong
+  real(kind=8)    :: RC_PoleLat
+  real(kind=8)    :: RC_PoleLong
 
   type(ufo_geovals), pointer :: GeoVals
 end type cxvarobs_varobswriter
@@ -104,12 +104,12 @@ end type cxvarobs_varobswriter
 contains
 ! ------------------------------------------------------------------------------
 
-! Set up a cxvarobs_varobswriter. Returns .true. on success and .false. on failure.
+!> Set up an instance of cxvarobs_varobswriter. Returns .true. on success and .false. on failure.
 function cxvarobs_varobswriter_create(self, f_conf, geovars)
 implicit none
 type(cxvarobs_varobswriter), intent(inout) :: self
-type(fckit_configuration), intent(in)      :: f_conf
-type(oops_variables), intent(inout)        :: geovars
+type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
+type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
 logical(c_bool)                            :: cxvarobs_varobswriter_create
 
 character(len=:), allocatable              :: string
@@ -125,12 +125,15 @@ character(len=200)          :: ErrorMessage
 
 cxvarobs_varobswriter_create = .true.
 
+! Setup OPS
+
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
 
 GeneralMode = DebugMode
 
-! TODO: set self%geovars (list of variables to use from GeoVaLs) if needed
+! Retrieve parameter values from the input configuration object
+! and store them in member variables
 
 if (.not. f_conf % get("obs_group", string)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
@@ -295,6 +298,8 @@ double = 0.0
 found = f_conf % get("RC_PoleLong", double)
 self % RC_PoleLong = double
 
+! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
+
 call cxvarobs_varobswriter_addrequiredgeovars(self, geovars)
 
 9999 if (allocated(string)) deallocate(string)
@@ -303,6 +308,7 @@ end function cxvarobs_varobswriter_create
 
 ! ------------------------------------------------------------------------------
 
+!> Destroy an instance of cxvarobs_varobswriter.
 subroutine cxvarobs_varobswriter_delete(self)
 implicit none
 type(cxvarobs_varobswriter), intent(inout) :: self
@@ -313,6 +319,9 @@ end subroutine cxvarobs_varobswriter_delete
 
 ! ------------------------------------------------------------------------------
 
+!> Called by the priorFilter() method of the C++ VarObsWriter object.
+!>
+!> Sets the GeoVals pointer.
 subroutine cxvarobs_varobswriter_prior(self, ObsSpace, GeoVals)
 implicit none
 type(cxvarobs_varobswriter), intent(inout) :: self
@@ -325,6 +334,9 @@ end subroutine cxvarobs_varobswriter_prior
 
 ! ------------------------------------------------------------------------------
 
+!> Called by the postFilter() method of the C++ VarObsWriter object.
+!>
+!> Writes out a VarObs file containing varfields derived from JEDI variables.
 subroutine cxvarobs_varobswriter_post( &
   self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
 implicit none
@@ -343,22 +355,16 @@ integer(kind=8)                :: NumVarObsTotal
 
 obs % Header % obsgroup = self % obsgroup
 
-print *, 'Calling Ops_SetupObType in post'
 call Ops_SetupObType(obs)
-print *, 'Called Ops_SetupObType'
 
 obs % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
 obs % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
-
-print *, 'obsspace_get_gnlocs: ', obs % Header % numobstotal
-print *, 'obsspace_get_gnlocs: ', obsspace_get_gnlocs(ObsSpace)
-print *, 'obsspace_get_nlocs: ', obs % Header % numobslocal
 
 Obs % Header % NumCXBatches = 1
 allocate(Obs % Header % ObsPerBatchPerPE(Obs % Header % NumCXBatches, 0:nproc - 1))
 Obs % Header % ObsPerBatchPerPE(1,mype) = obs % Header % numobslocal
 
-call Ops_ReadVarobsControlNL(self % obsgroup, VarFields) ! TODO(wsmigaj): move to separate function?
+call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Channels, &
                                                 Flags, ObsErrors, obs)
 call cxvarobs_varobswriter_populatecxheader(self, CxHeader)
@@ -369,7 +375,6 @@ call Ops_CreateVarobs (Obs,                 & ! in
                        NumVarobsTotal)
 
 call obs % deallocate()
-! DEALLOCATE(Obs % Header % ObsPerBatchPerPE)
 
 end subroutine cxvarobs_varobswriter_post
 
@@ -401,25 +406,23 @@ end subroutine cxvarobs_varobswriter_addrequiredgeovars
 subroutine cxvarobs_varobswriter_populateobservations( &
   self, VarFields, ObsSpace, Channels, Flags, ObsErrors, Ob)
 implicit none
-type(cxvarobs_varobswriter),  intent(in) :: self
-integer(kind=8), intent(in)              :: VarFields(:)
-type(c_ptr), value, intent(in)           :: ObsSpace
-integer(c_int), intent(in)               :: Channels(:)
-type(c_ptr), value, intent(in)           :: Flags, ObsErrors
-type(OB_type), intent(inout)             :: Ob
+type(cxvarobs_varobswriter), intent(in) :: self
+integer(kind=8), intent(in)             :: VarFields(:)
+type(c_ptr), value, intent(in)          :: ObsSpace
+integer(c_int), intent(in)              :: Channels(:)
+type(c_ptr), value, intent(in)          :: Flags, ObsErrors
+type(OB_type), intent(inout)            :: Ob
 
-character(len=*), parameter              :: RoutineName = "cxvarobs_varobswriter_populateobservations"
-character(len=80)                        :: ErrorMessage
+character(len=*), parameter             :: RoutineName = "cxvarobs_varobswriter_populateobservations"
+character(len=80)                       :: ErrorMessage
 
-integer                                  :: nVarFields
-integer                                  :: iVarField
+integer                                 :: nVarFields
+integer                                 :: iVarField
 
-integer(c_int64_t)                       :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
+integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
 
-integer                                  :: Zcode
-
-logical                                  :: FillChanNum = .false.
-logical                                  :: FillNumChans = .false.
+logical                                 :: FillChanNum = .false.
+logical                                 :: FillNumChans = .false.
 
 nVarFields = size(VarFields)
 
@@ -469,8 +472,6 @@ if (RadFamily) then
 end if
 
 do iVarField = 1, nVarFields
-  Zcode = ZcodeUnused ! TODO: fill in correctly
-
   select case (VarFields(iVarField))
     case (imdi)
       cycle
@@ -1079,7 +1080,9 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingDouble)  El1(i) % OBErr = ObsError(i)
-    ! TODO(someone): Fill Flags and PGEFinal, if available.
+    ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
+    ! variables. At present, however, we don't even have a use case where there is a separate
+    ! variable storing the observation error.
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable
@@ -1165,7 +1168,9 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
     do iObs = 1, NumObs
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingDouble) El2(iObs, iChannel) % OBErr = ObsError(iObs)
-      ! TODO(someone): Fill Flags and PGEFinal, if needed
+      ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
+      ! variables. At present, however, we don't even have a use case where there is a separate
+      ! variable storing the observation error.
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -1434,7 +1439,6 @@ call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
                Ob % Header % NumObsLocal, Ob % ReportFlags)
 Ob % ReportFlags = 0
 
-! TODO(wsmigaj): Is this the right thing to do?
 ObsVariables = cxvarobs_obsdatavector_int_varnames(Flags)
 NumObsVariables = ObsVariables % nvars()
 
