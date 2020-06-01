@@ -348,38 +348,25 @@ type(c_ptr), value, intent(in) :: Flags, ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
 
-type(OB_type)                  :: obs
+type(OB_type)                  :: Ob
 type(UM_header_type)           :: CxHeader
-integer(kind=8)                :: VarFields(ActualMaxVarfield)
 integer(kind=8)                :: NumVarObsTotal
 
-obs % Header % obsgroup = self % obsgroup
-
-call Ops_SetupObType(obs)
-
-obs % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
-obs % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
-
-Obs % Header % NumCXBatches = 1
-allocate(Obs % Header % ObsPerBatchPerPE(Obs % Header % NumCXBatches, 0:nproc - 1))
-Obs % Header % ObsPerBatchPerPE(1,mype) = obs % Header % numobslocal
-
-call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
-call cxvarobs_varobswriter_populateobservations(self, VarFields, ObsSpace, Channels, &
-                                                Flags, ObsErrors, obs)
+call cxvarobs_varobswriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, Ob)
 call cxvarobs_varobswriter_populatecxheader(self, CxHeader)
 
-call Ops_CreateVarobs (Obs,                 & ! in
+call Ops_CreateVarobs (Ob,                  & ! in
                        CxHeader,            & ! in
                        AssimDataFormat_VAR, &
                        NumVarobsTotal)
 
-call obs % deallocate()
+call Ob % deallocate()
 
 end subroutine cxvarobs_varobswriter_post
 
 ! ------------------------------------------------------------------------------
 
+!> Populates the list of GeoVaLs needed to fill in any requested varfields.
 subroutine cxvarobs_varobswriter_addrequiredgeovars(self, geovars)
 implicit none
 type(cxvarobs_varobswriter), intent(in) :: self
@@ -404,10 +391,9 @@ end subroutine cxvarobs_varobswriter_addrequiredgeovars
 ! ------------------------------------------------------------------------------
 
 subroutine cxvarobs_varobswriter_populateobservations( &
-  self, VarFields, ObsSpace, Channels, Flags, ObsErrors, Ob)
+  self, ObsSpace, Channels, Flags, ObsErrors, Ob)
 implicit none
 type(cxvarobs_varobswriter), intent(in) :: self
-integer(kind=8), intent(in)             :: VarFields(:)
 type(c_ptr), value, intent(in)          :: ObsSpace
 integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
@@ -416,6 +402,7 @@ type(OB_type), intent(inout)            :: Ob
 character(len=*), parameter             :: RoutineName = "cxvarobs_varobswriter_populateobservations"
 character(len=80)                       :: ErrorMessage
 
+integer(kind=8)                         :: VarFields(ActualMaxVarfield)
 integer                                 :: nVarFields
 integer                                 :: iVarField
 
@@ -424,7 +411,23 @@ integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % Nu
 logical                                 :: FillChanNum = .false.
 logical                                 :: FillNumChans = .false.
 
+! Get the list of varfields to populate
+
+call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 nVarFields = size(VarFields)
+
+! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
+
+Ob % Header % obsgroup = self % obsgroup
+
+call Ops_SetupObType(Ob)
+
+Ob % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
+Ob % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
+
+Ob % Header % NumCXBatches = 1
+allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
+Ob % Header % ObsPerBatchPerPE(1,mype) = Ob % Header % numobslocal
 
 call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
 call obsspace_get_db(ObsSpace, "MetaData", "latitude", Ob % Latitude)
@@ -464,12 +467,15 @@ if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
   call cxvarobs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
 end if
 
+! TODO(wsmigaj): it may be possible to derive RadFamily directly from the observation group.
 RadFamily = self % UseRadarFamily
 if (RadFamily) then
   call cxvarobs_varobswriter_fillinteger( &
     Ob % Header % Family, "Family", Ob % Header % NumObsLocal, Ob % Family, &
     "radar_family", "MetaData", ObsSpace)
 end if
+
+! Populate Ob members dependent on the list of varfields
 
 do iVarField = 1, nVarFields
   select case (VarFields(iVarField))
@@ -855,6 +861,30 @@ end subroutine cxvarobs_varobswriter_populateobservations
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 1D array of Element_type objects and its header from a set of variables whose name
+!> is included in the list passed to the 'simulate' option of the JEDI ObsSpace.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p El1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] El1
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
+!>   used to populate \p El1 and \p Hdr.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
+!> \param[in] Flags
+!>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
+!> \param[in] ObsErrors
+!>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
   Hdr, OpsVarName, NumObs, El1, JediVarName, ObsSpace, Flags, ObsErrors)
 implicit none
@@ -877,7 +907,8 @@ real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 integer                                         :: i
-character(len=*), parameter                     :: RoutineName = "cxvarobs_varobswriter_fillelementtypefromsimulatedvariable"
+character(len=*), parameter                     :: &
+  RoutineName = "cxvarobs_varobswriter_fillelementtypefromsimulatedvariable"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
@@ -931,6 +962,33 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 2D array of Element_type objects and its header from a set of variables whose name
+!> is included in the list passed to the 'simulate' option of the JEDI ObsSpace.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p El2 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] El2
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
+!>   used to populate El1 and Hdr. The variables can either have no channel suffix (in which case
+!>   \p El2 will have only a single row) or have suffixes representing the indices specified in
+!>   \p Channels.
+!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
+!> \param[in] Flags
+!>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
+!> \param[in] ObsErrors
+!>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
   Hdr, OpsVarName, NumObs, El2, JediVarName, ObsSpace, Channels, Flags, ObsErrors)
 implicit none
@@ -1021,9 +1079,32 @@ end subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable
 
 ! ------------------------------------------------------------------------------
 
-!> Fill a 1D field of type Element_Type with values taken from an arbitrary JEDI variable
-!> (i.e. not a simulated variable) and optionally errors taken from another such variable.
-
+!> Populate a 1D array of Element_type objects and its header from an arbitrary JEDI variable
+!> (not included in the list passed to the 'simulate' option of the JEDI ObsSpace) containing
+!> obsevation values and optionally another variable containing observation errors.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p El1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] El1
+!>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables.
+!> \param[in] JediValueVarName
+!>   Name of the JEDI variable containing observation values.
+!> \param[in] JediValueGroup
+!>   Group of the JEDI variable containing observation values.
+!> \param[in] JediErrorVarName
+!>   (Optional) Name of the JEDI variable containing observation errors.
+!> \param[in] JediErrorGroup
+!>   (Optional) Group of the JEDI variable containing observation errors.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable( &
   Hdr, OpsVarName, NumObs, El1, ObsSpace, &
   JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
@@ -1089,9 +1170,35 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromnormalvariable
 
 ! ------------------------------------------------------------------------------
 
-!> Fill a 1D field of type Element_Type with values taken from an arbitrary JEDI variable
-!> (i.e. not a simulated variable) and optionally errors taken from another such variable.
-
+!> Populate a 2D array of Element_type objects and its header from an arbitrary JEDI variable
+!> (not included in the list passed to the 'simulate' option of the JEDI ObsSpace) containing
+!> obsevation values and optionally another variable containing observation errors.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which El1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] El2
+!>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can
+!>   have either no channel suffix (in which case \p El2 will have only a single row) or suffixes
+!>   representing the indices specified in \p Channels.
+!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
+!> \param[in] JediValueVarName
+!>   Name of the JEDI variable containing observation values.
+!> \param[in] JediValueGroup
+!>   Group of the JEDI variable containing observation values.
+!> \param[in] JediErrorVarName
+!>   (Optional) Name of the JEDI variable containing observation errors.
+!> \param[in] JediErrorGroup
+!>   (Optional) Group of the JEDI variable containing observation errors.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
   JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
@@ -1179,6 +1286,26 @@ end subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 1D array of real numbers and its header from a JEDI variable.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real1
+!>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
+!> \param[in] JediVarName
+!>   Name of the JEDI variable used to populate \p Real1.
+!> \param[in] JediGroup
+!>   Group of the JEDI variable used to populate \p Real1.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillreal( &
   Hdr, OpsVarName, NumObs, Real1, JediVarName, JediVarGroup, ObsSpace)
 implicit none
@@ -1215,6 +1342,28 @@ end subroutine cxvarobs_varobswriter_fillreal
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 1D array of real numbers and its header from a GeoVaL.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real1
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the GeoVaL used to populate \p Real1.
+!> \param[in] GeoVals
+!>   A container holding the specified GeoVaL.
+!>
+!> \note If you're calling this function from cxvarobs_varobswriter_populateobservations, be sure
+!> to update cxvarobs_varobswriter_addrequiredgeovars by adding \p JediVarName to the list of
+!> GeoVaLs required by the VarObsWriter.
+!>
+!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillrealfromgeoval( &
   Hdr, OpsVarName, NumObs, Real1, JediVarName, GeoVals)
 implicit none
@@ -1258,6 +1407,31 @@ end subroutine cxvarobs_varobswriter_fillrealfromgeoval
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 2D array of real numbers and its header from a JEDI variable.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real2
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the JEDI variable used to populate \p Real2. This can represent either a single
+!>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
+!>   of variables with suffixes corresponding to the indices specified in \p Channels.
+!> \param[in] JediGroup
+!>   Group of the JEDI variable used to populate \p Real2.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
+!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
+!>   representing the indices specified in \p Channels.
+!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillreal2d( &
   Hdr, OpsVarName, NumObs, Real2, JediVarName, JediVarGroup, ObsSpace, Channels)
 implicit none
@@ -1303,6 +1477,24 @@ end subroutine cxvarobs_varobswriter_fillreal2d
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 2D array of real numbers and its header from a GeoVaL.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real2
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the GeoVal used to populate \p Real2.
+!> \param[in] GeoVals
+!>   A container holding the specified GeoVaL.
+!>
+!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillreal2dfromgeoval( &
   Hdr, OpsVarName, NumObs, Real2, JediVarName, GeoVals)
 implicit none
@@ -1337,6 +1529,26 @@ end subroutine cxvarobs_varobswriter_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 1D array of integers and its header from a JEDI variable.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Int1 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Int1
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the JEDI variable used to populate \p Int1.
+!> \param[in] JediGroup
+!>   Group of the JEDI variable used to populate \p Int1.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillinteger( &
   Hdr, OpsVarName, NumObs, Int1, JediVarName, JediVarGroup, ObsSpace)
 implicit none
@@ -1372,6 +1584,31 @@ end subroutine cxvarobs_varobswriter_fillinteger
 
 ! ------------------------------------------------------------------------------
 
+!> Populate a 2D array of Coord_type objects and its header from a JEDI variable.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Coord2 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Coord2
+!>   Pointer to the array to be populated.
+!> \param[in] JediVarName
+!>   Name of the JEDI variable used to populate \p Coord2. This can represent either a single
+!>   variable with no channel suffix (in which case \p Coord2 will have only a single row) or a set
+!>   of variables with suffixes corresponding to the indices specified in \p Channels.
+!> \param[in] JediGroup
+!>   Group of the JEDI variable used to populate \p Coord2.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
+!>   have either no channel suffix (in which case \p Coord2 will have only a single row) or suffixes
+!>   representing the indices specified in \p Channels.
+!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
 subroutine cxvarobs_varobswriter_fillcoord2d( &
   Hdr, OpsVarName, NumObs, Coord2, JediVarName, JediVarGroup, ObsSpace, Channels)
 implicit none
@@ -1417,6 +1654,10 @@ end subroutine cxvarobs_varobswriter_fillcoord2d
 
 ! ------------------------------------------------------------------------------
 
+!> Populate the Ob % ReportFlags field.
+!>
+!> Observations are marked as rejected if the JEDI QC flags of any or all (depending on the
+!> specified options) simulated variables are set to anything different from "pass".
 subroutine cxvarobs_varobswriter_fillreportflags( &
   Ob, ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
 use oops_variables_mod
@@ -1472,6 +1713,10 @@ end subroutine cxvarobs_varobswriter_fillreportflags
 
 ! ------------------------------------------------------------------------------
 
+!> Populate the Ob % NumChans and/or Ob % ChanNum field.
+!>
+!> Ob % ChanNum is filled with the indices of channels that passed QC; the number of these channels
+!> is stored in Ob % NumChans.
 subroutine cxvarobs_varobswriter_fillchannumandnumchans( &
   Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans)
 implicit none
@@ -1509,6 +1754,8 @@ end subroutine cxvarobs_varobswriter_fillchannumandnumchans
 
 ! ------------------------------------------------------------------------------
 
+!> Find the indices of indices of channels that passed QC for the first (and normally only)
+!> simulated variable.
 subroutine cxvarobs_varobswriter_findchannelspassingqc( &
   NumObs, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
 use oops_variables_mod
@@ -1571,6 +1818,7 @@ end subroutine cxvarobs_varobswriter_findchannelspassingqc
 
 ! ------------------------------------------------------------------------------
 
+!> Populate the Ob % CorBriTemp field.
 subroutine cxvarobs_varobswriter_fillcorbritemp(Ob, ObsSpace, Channels)
 implicit none
 ! Subroutine arguments:
@@ -1613,6 +1861,7 @@ end subroutine cxvarobs_varobswriter_fillcorbritemp
 
 ! ------------------------------------------------------------------------------
 
+!> Fill the members of OB_type required to take the GPSRO point drift into account.
 subroutine cxvarobs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
 implicit none
 ! Subroutine arguments:
@@ -1641,6 +1890,9 @@ end subroutine cxvarobs_varobswriter_fillgpsrotpddependentfields
 
 ! ------------------------------------------------------------------------------
 
+!> Fill the Ob % SatId field.
+!>
+!> This is done in a separate routine because this field is filled from two places in the code.
 subroutine cxvarobs_varobswriter_fillsatid(Ob, ObsSpace)
 implicit none
 ! Subroutine arguments:
@@ -1657,8 +1909,8 @@ end subroutine cxvarobs_varobswriter_fillsatid
 ! ------------------------------------------------------------------------------
 
 !> Return an array containing the names of JEDI variables storing individual channels of the
-!> variable VarName. If the list of channels is empty, this means the variable in question is
-!> 1D and hence the returned array contains just the single string VarName.
+!> variable \p VarName. If the list of channels is empty, this means the variable in question is
+!> 1D and hence the returned array contains just the single string \p VarName.
 function cxvarobs_varobswriter_varnames_with_channels(VarName, Channels) result(VarNames)
 implicit none
 ! Subroutine arguments:
@@ -1680,6 +1932,7 @@ end function cxvarobs_varobswriter_varnames_with_channels
 
 ! ------------------------------------------------------------------------------
 
+!> Prepare a CxHeader object to be given to the OPS function writing a VarObs file.
 subroutine cxvarobs_varobswriter_populatecxheader(self, CxHeader)
 implicit none
 ! Subroutine arguments:
