@@ -486,7 +486,7 @@ call cxvarobs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
 ! TODO(someone): This call to Ops_Alloc() will need to be replaced by
 ! call cxvarobs_varobswriter_fillinteger( &
 !   Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
-!   "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+!   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
 ! with the placeholders replaced by an appropriate variable name and group.
 ! We call Ops_Alloc() because the Ops_CreateVarobs terminates prematurely if the ObsType array
 ! doesn't exist.
@@ -500,7 +500,7 @@ end if
 
 call cxvarobs_varobswriter_fillcoord2d( &
   Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA, &
-  "air_pressure", "MetaData", ObsSpace, Channels)
+   ObsSpace, Channels, "air_pressure", "MetaData")
 
 GPSRO_TPD = self % AccountForGPSROTangentPointDrift
 if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
@@ -512,7 +512,7 @@ RadFamily = self % UseRadarFamily
 if (RadFamily) then
   call cxvarobs_varobswriter_fillinteger( &
     Ob % Header % Family, "Family", Ob % Header % NumObsLocal, Ob % Family, &
-    "radar_family", "MetaData", ObsSpace)
+    ObsSpace, "radar_family", "MetaData")
 end if
 
 ! Populate Ob members dependent on the list of varfields
@@ -524,54 +524,54 @@ do iVarField = 1, nVarFields
     case (VarField_pstar)
       call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
-        "surface_pressure", ObsSpace, Flags, ObsErrors)
+        ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
       ! TODO(wsmigaj): check if air_potential_temperature is the correct variable name
       ! (it isn't used in JEDI, but virtual_temperature is)
       call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta, &
-        "air_potential_temperature", ObsSpace, Channels, Flags, ObsErrors)
+        ObsSpace, Channels, Flags, ObsErrors, "air_potential_temperature")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
-          "air_temperature", ObsSpace, Flags, ObsErrors)
+          ObsSpace, Flags, ObsErrors, "air_temperature")
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
-          "air_temperature", ObsSpace, Channels, Flags, ObsErrors)
+          ObsSpace, Channels, Flags, ObsErrors, "air_temperature")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
-          "relative_humidity", ObsSpace, Flags, ObsErrors)
+          ObsSpace, Flags, ObsErrors, "relative_humidity")
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
-          "relative_humidity", ObsSpace, Channels, Flags, ObsErrors)
+          ObsSpace, Channels, Flags, ObsErrors, "relative_humidity")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
-          "eastward_wind", ObsSpace, Flags, ObsErrors)
+          ObsSpace, Flags, ObsErrors, "eastward_wind")
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
-          "eastward_wind", ObsSpace, Channels, Flags, ObsErrors)
+          ObsSpace, Channels, Flags, ObsErrors, "eastward_wind")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
-          "northward_wind", ObsSpace, Flags, ObsErrors)
+          ObsSpace, Flags, ObsErrors, "northward_wind")
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
-          "northward_wind", ObsSpace, Channels, Flags, ObsErrors)
+          ObsSpace, Channels, Flags, ObsErrors, "northward_wind")
       end if
     case (VarField_logvis)
       ! TODO(someone): handle this varfield
@@ -604,17 +604,17 @@ do iVarField = 1, nVarFields
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call cxvarobs_varobswriter_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss, &
-        "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace, Channels)
+        ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_TCozone)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
       call cxvarobs_varobswriter_fillreal( &
         Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone, &
-        "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+        ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_satzenith)
       call cxvarobs_varobswriter_fillreal( &
         Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle, &
-        "sensor_zenith_angle", "MetaData", ObsSpace)
+        ObsSpace, "sensor_zenith_angle", "MetaData")
     case (VarField_scanpos)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ScanPosition, "ScanPosition", Ob % Header % NumObsLocal, Ob % ScanPosition)
@@ -623,7 +623,7 @@ do iVarField = 1, nVarFields
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
       call cxvarobs_varobswriter_fillinteger( &
         Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
-        "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+        ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_elevation)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % elevation, "elevation", Ob % Header % NumObsLocal, Ob % elevation)
@@ -632,7 +632,7 @@ do iVarField = 1, nVarFields
       ! here and in cxvarobs_varobswriter_addrequiredgeovars.
       call cxvarobs_varobswriter_fillrealfromgeoval( &
         Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface, &
-        "land_type_index", self % GeoVals)
+        self % GeoVals, "land_type_index")
     case (VarField_modelorog)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
@@ -655,7 +655,7 @@ do iVarField = 1, nVarFields
     case (VarField_solzenith)
       call cxvarobs_varobswriter_fillreal( &
         Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith, &
-        "solar_zenith_angle", "MetaData", ObsSpace)
+        ObsSpace, "solar_zenith_angle", "MetaData")
     case (VarField_solazimth)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % SolarAzimth, "SolarAzimth", Ob % Header % NumObsLocal, Ob % SolarAzimth)
@@ -664,7 +664,7 @@ do iVarField = 1, nVarFields
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call cxvarobs_varobswriter_fillreal( &
         Ob % Header % IREmiss, "IREmiss", Ob % Header % NumObsLocal, Ob % IREmiss, &
-        "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+        ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_cloudtopp)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudTopP, "CloudTopP", Ob % Header % NumObsLocal, Ob % CloudTopP)
@@ -719,13 +719,13 @@ do iVarField = 1, nVarFields
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call cxvarobs_varobswriter_fillreal2d( &
         Ob % Header % Emissivity, "Emissivity", Ob % Header % NumObsLocal, Ob % Emissivity, &
-        "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace, Channels)
+        ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_QCinfo)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call cxvarobs_varobswriter_fillinteger( &
         Ob % Header % QCinfo, "QCinfo", Ob % Header % NumObsLocal, Ob % QCinfo, &
-        "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+        ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_SBUVozone)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % SBUVozone, "SBUVozone", Ob % Header % NumObsLocal, Ob % SBUVozone)
@@ -750,7 +750,7 @@ do iVarField = 1, nVarFields
     case (VarField_RadarObAzim)
       call cxvarobs_varobswriter_fillreal2d( &
         Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim, &
-        "radar_azimuth", "MetaData", ObsSpace, Channels)
+        ObsSpace, Channels, "radar_azimuth", "MetaData")
     case (VarField_RadIdent)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
@@ -778,11 +778,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll, &
-          "PLACEHOLDER_VARIABLE_NAME", ObsSpace, Channels, Flags, ObsErrors)
+          ObsSpace, Channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
       else
         call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle, &
-          "bending_angle", ObsSpace, Channels, Flags, ObsErrors)
+          ObsSpace, Channels, Flags, ObsErrors, "bending_angle")
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -807,7 +807,7 @@ do iVarField = 1, nVarFields
     case (VarField_AOD)
       call cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
-        "aerosol_optical_depth", ObsSpace, Channels, Flags, ObsErrors)
+        ObsSpace, Channels, Flags, ObsErrors, "aerosol_optical_depth")
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
@@ -835,7 +835,7 @@ do iVarField = 1, nVarFields
       ! once it is known.
       call cxvarobs_varobswriter_fillreal2dfromgeoval( &
         Ob % Header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat, &
-        "PLACEHOLDER_VARIABLE_NAME", self % GeoVals)
+        self % GeoVals, "PLACEHOLDER_VARIABLE_NAME")
     case (VarField_LevelLon)
       ! IF (PRESENT (RepObs)) THEN
       !   ObHdrVrbl = RepObs % Header % model_level_lon
@@ -912,21 +912,21 @@ end subroutine cxvarobs_varobswriter_populateobservations
 !>   Number of observations held by this process.
 !> \param[inout] El1
 !>   Pointer to the array to be populated.
-!> \param[in] JediVarName
-!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate \p El1 and \p Hdr.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
 !> \param[in] Flags
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
+!> \param[in] JediVarName
+!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
+!>   used to populate \p El1 and \p Hdr.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El1, JediVarName, ObsSpace, Flags, ObsErrors)
+  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName)
 implicit none
 
 ! Subroutine arguments:
@@ -934,10 +934,10 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 type(Element_type), pointer                     :: El1(:)
-character(len=*), intent(in)                    :: JediVarName
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
+character(len=*), intent(in)                    :: JediVarName
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -1013,11 +1013,6 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 !>   Number of observations held by this process.
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
-!> \param[in] JediVarName
-!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate El1 and Hdr. The variables can either have no channel suffix (in which case
-!>   \p El2 will have only a single row) or have suffixes representing the indices specified in
-!>   \p Channels.
 !> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
@@ -1025,12 +1020,17 @@ end subroutine cxvarobs_varobswriter_fillelementtypefromsimulatedvariable
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
+!> \param[in] JediVarName
+!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
+!>   used to populate El1 and Hdr. The variables can either have no channel suffix (in which case
+!>   \p El2 will have only a single row) or have suffixes representing the indices specified in
+!>   \p Channels.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillelementtype2dfromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El2, JediVarName, ObsSpace, Channels, Flags, ObsErrors)
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName)
 implicit none
 
 ! Subroutine arguments:
@@ -1038,11 +1038,11 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 type(Element_type), pointer                     :: El2(:,:)
-character(len=*), intent(in)                    :: JediVarName
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
+character(len=*), intent(in)                    :: JediVarName
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -1347,7 +1347,7 @@ end subroutine cxvarobs_varobswriter_fillelementtype2dfromnormalvariable
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillreal( &
-  Hdr, OpsVarName, NumObs, Real1, JediVarName, JediVarGroup, ObsSpace)
+  Hdr, OpsVarName, NumObs, Real1, ObsSpace, JediVarName, JediVarGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1355,9 +1355,9 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real1(:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
-type(c_ptr), value, intent(in)                  :: ObsSpace
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1392,10 +1392,10 @@ end subroutine cxvarobs_varobswriter_fillreal
 !>   Number of observations held by this process.
 !> \param[inout] Real1
 !>   Pointer to the array to be populated.
-!> \param[in] JediVarName
-!>   Name of the GeoVaL used to populate \p Real1.
 !> \param[in] GeoVals
 !>   A container holding the specified GeoVaL.
+!> \param[in] JediVarName
+!>   Name of the GeoVaL used to populate \p Real1.
 !>
 !> \note If you're calling this function from cxvarobs_varobswriter_populateobservations, be sure
 !> to update cxvarobs_varobswriter_addrequiredgeovars by adding \p JediVarName to the list of
@@ -1405,7 +1405,7 @@ end subroutine cxvarobs_varobswriter_fillreal
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillrealfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real1, JediVarName, GeoVals)
+  Hdr, OpsVarName, NumObs, Real1, GeoVals, JediVarName)
 implicit none
 
 ! Subroutine arguments:
@@ -1413,8 +1413,8 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real1(:)
-character(len=*), intent(in)                    :: JediVarName
 type(ufo_geovals), intent(in)                   :: GeoVals
+character(len=*), intent(in)                    :: JediVarName
 
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
@@ -1457,23 +1457,23 @@ end subroutine cxvarobs_varobswriter_fillrealfromgeoval
 !>   Number of observations held by this process.
 !> \param[inout] Real2
 !>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
+!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
+!>   representing the indices specified in \p Channels.
+!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. This can represent either a single
 !>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
 !>   of variables with suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
 !>   Group of the JEDI variable used to populate \p Real2.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
-!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillreal2d( &
-  Hdr, OpsVarName, NumObs, Real2, JediVarName, JediVarGroup, ObsSpace, Channels)
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1481,10 +1481,10 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real2(:,:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
+character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediVarGroup
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1527,16 +1527,16 @@ end subroutine cxvarobs_varobswriter_fillreal2d
 !>   Number of observations held by this process.
 !> \param[inout] Real2
 !>   Pointer to the array to be populated.
-!> \param[in] JediVarName
-!>   Name of the GeoVal used to populate \p Real2.
 !> \param[in] GeoVals
 !>   A container holding the specified GeoVaL.
+!> \param[in] JediVarName
+!>   Name of the GeoVal used to populate \p Real2.
 !>
 !> \note This function returns early (without a warning) if the specified GeoVaL is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillreal2dfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real2, JediVarName, GeoVals)
+  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName)
 implicit none
 
 ! Subroutine arguments:
@@ -1579,18 +1579,18 @@ end subroutine cxvarobs_varobswriter_fillreal2dfromgeoval
 !>   Number of observations held by this process.
 !> \param[inout] Int1
 !>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Int1.
 !> \param[in] JediGroup
 !>   Group of the JEDI variable used to populate \p Int1.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillinteger( &
-  Hdr, OpsVarName, NumObs, Int1, JediVarName, JediVarGroup, ObsSpace)
+  Hdr, OpsVarName, NumObs, Int1, ObsSpace, JediVarName, JediVarGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1598,9 +1598,9 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 integer(kind=8), pointer                        :: Int1(:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
-type(c_ptr), value, intent(in)                  :: ObsSpace
 
 ! Local declarations:
 integer(kind=4)                                 :: VarValue(NumObs)
@@ -1634,23 +1634,23 @@ end subroutine cxvarobs_varobswriter_fillinteger
 !>   Number of observations held by this process.
 !> \param[inout] Coord2
 !>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
+!>   have either no channel suffix (in which case \p Coord2 will have only a single row) or suffixes
+!>   representing the indices specified in \p Channels.
+!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Coord2. This can represent either a single
 !>   variable with no channel suffix (in which case \p Coord2 will have only a single row) or a set
 !>   of variables with suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
 !>   Group of the JEDI variable used to populate \p Coord2.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Coord2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
-!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_varobswriter_fillcoord2d( &
-  Hdr, OpsVarName, NumObs, Coord2, JediVarName, JediVarGroup, ObsSpace, Channels)
+  Hdr, OpsVarName, NumObs, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1658,10 +1658,10 @@ type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(kind=8), intent(in)                     :: NumObs
 type(coord_type), pointer                       :: Coord2(:,:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
+character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediVarGroup
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1879,13 +1879,13 @@ CorBriTempBias => null()
 ! Retrieve the uncorrected brightness temperature...
 call cxvarobs_varobswriter_fillreal2d( &
   Ob % Header % CorBriTemp, "CorBriTemp", Ob % Header % NumObsLocal, Ob % CorBriTemp, &
-  "brightness_temperature", "ObsValue", ObsSpace, Channels)
+  ObsSpace, Channels, "brightness_temperature", "ObsValue")
 
 ! ... and correct it by subtracting the bias.
 if (Ob % Header % CorBriTemp % Present) then
   call cxvarobs_varobswriter_fillreal2d( &
     CorBriTempBiasHeader, "CorBriTemp", Ob % Header % NumObsLocal, CorBriTempBias, &
-    "brightness_temperature", "ObsBias", ObsSpace, Channels)
+    ObsSpace, Channels, "brightness_temperature", "ObsBias")
   if (CorBriTempBiasHeader % Present) then
     where (Ob % CorBriTemp /= RMDI .and. CorBriTempBias /= RMDI)
       Ob % CorBriTemp = Ob % CorBriTemp - CorBriTempBias
@@ -1915,16 +1915,16 @@ call cxvarobs_varobswriter_fillsatid(Ob, ObsSpace)
 ! and group, once they're known.
 call cxvarobs_varobswriter_fillinteger( &
   Ob % Header % RO_quality, "RO_quality", Ob % Header % NumObsLocal, Ob % RO_quality, &
-  "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", ObsSpace)
+  ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
 ! TODO(someone): Replace "latitude" and "longitude" variable names in the two calls below with
 ! appropriate GPSRO-specific variable names, once they're known. The group name may need to be
 ! adjusted as well.
 call cxvarobs_varobswriter_fillreal( &
   Ob % Header % ro_occ_lat, "ro_occ_lat", Ob % Header % NumObsLocal, Ob % ro_occ_lat, &
-  "latitude", "MetaData", ObsSpace)
+  ObsSpace, "latitude", "MetaData")
 call cxvarobs_varobswriter_fillreal( &
   Ob % Header % ro_occ_lon, "ro_occ_lon", Ob % Header % NumObsLocal, Ob % ro_occ_lon, &
-  "longitude", "MetaData", ObsSpace)
+  ObsSpace, "longitude", "MetaData")
 
 end subroutine cxvarobs_varobswriter_fillgpsrotpddependentfields
 
@@ -1942,7 +1942,7 @@ type(c_ptr), value, intent(in)           :: ObsSpace
 ! Body:
 call cxvarobs_varobswriter_fillinteger( &
   Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
-  "satellite_id", "MetaData", ObsSpace)
+  ObsSpace, "satellite_id", "MetaData")
 
 end subroutine cxvarobs_varobswriter_fillsatid
 
