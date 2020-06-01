@@ -107,11 +107,14 @@ contains
 !> Set up an instance of cxvarobs_varobswriter. Returns .true. on success and .false. on failure.
 function cxvarobs_varobswriter_create(self, f_conf, geovars)
 implicit none
+
+! Subroutine arguments:
 type(cxvarobs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
 logical(c_bool)                            :: cxvarobs_varobswriter_create
 
+! Local declarations:
 character(len=:), allocatable              :: string
 integer(kind=c_int)                        :: int
 logical                                    :: bool
@@ -122,6 +125,8 @@ integer(kind=8), parameter                 :: zero = 0
 
 character(len=*), parameter :: RoutineName = "cxvarobs_varobswriter_create"
 character(len=200)          :: ErrorMessage
+
+! Body:
 
 cxvarobs_varobswriter_create = .true.
 
@@ -311,8 +316,11 @@ end function cxvarobs_varobswriter_create
 !> Destroy an instance of cxvarobs_varobswriter.
 subroutine cxvarobs_varobswriter_delete(self)
 implicit none
+
+! Subroutine arguments:
 type(cxvarobs_varobswriter), intent(inout) :: self
 
+! Body:
 call datetime_delete(self % validitytime)
 
 end subroutine cxvarobs_varobswriter_delete
@@ -321,13 +329,16 @@ end subroutine cxvarobs_varobswriter_delete
 
 !> Called by the priorFilter() method of the C++ VarObsWriter object.
 !>
-!> Sets the GeoVals pointer.
+!> Set the GeoVals pointer.
 subroutine cxvarobs_varobswriter_prior(self, ObsSpace, GeoVals)
 implicit none
+
+! Subroutine arguments:
 type(cxvarobs_varobswriter), intent(inout) :: self
 type(c_ptr), value, intent(in)             :: ObsSpace
 type(ufo_geovals), intent(in), pointer     :: GeoVals
 
+! Body:
 self % GeoVals => GeoVals
 
 end subroutine cxvarobs_varobswriter_prior
@@ -336,10 +347,12 @@ end subroutine cxvarobs_varobswriter_prior
 
 !> Called by the postFilter() method of the C++ VarObsWriter object.
 !>
-!> Writes out a VarObs file containing varfields derived from JEDI variables.
+!> Write out a VarObs file containing varfields derived from JEDI variables.
 subroutine cxvarobs_varobswriter_post( &
   self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
 implicit none
+
+! Subroutine arguments:
 type(cxvarobs_varobswriter), intent(in) :: self
 type(c_ptr), value, intent(in) :: ObsSpace
 integer,            intent(in) :: nchannels
@@ -348,10 +361,13 @@ type(c_ptr), value, intent(in) :: Flags, ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
 
+! Local declarations:
 type(OB_type)                  :: Ob
 type(UM_header_type)           :: CxHeader
 integer(kind=8)                :: NumVarObsTotal
 
+! Body:
+call cxvarobs_varobswriter_allocateobservations(self, ObsSpace, Ob)
 call cxvarobs_varobswriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, Ob)
 call cxvarobs_varobswriter_populatecxheader(self, CxHeader)
 
@@ -366,15 +382,19 @@ end subroutine cxvarobs_varobswriter_post
 
 ! ------------------------------------------------------------------------------
 
-!> Populates the list of GeoVaLs needed to fill in any requested varfields.
+!> Populate the list of GeoVaLs needed to fill in any requested varfields.
 subroutine cxvarobs_varobswriter_addrequiredgeovars(self, geovars)
 implicit none
+
+! Subroutine arguments:
 type(cxvarobs_varobswriter), intent(in) :: self
 type(oops_variables), intent(inout)     :: geovars
 
+! Local declarations:
 integer(kind=8)                         :: VarFields(ActualMaxVarfield)
 integer                                 :: i
 
+! Body:
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 
 do i = 1, size(VarFields)
@@ -390,15 +410,44 @@ end subroutine cxvarobs_varobswriter_addrequiredgeovars
 
 ! ------------------------------------------------------------------------------
 
+!> Prepare Ob to hold the required number of observations.
+subroutine cxvarobs_varobswriter_allocateobservations(self, ObsSpace, Ob)
+implicit none
+
+! Subroutine arguments:
+type(cxvarobs_varobswriter), intent(in) :: self
+type(c_ptr), value, intent(in)          :: ObsSpace
+type(OB_type), intent(inout)            :: Ob
+
+! Body:
+Ob % Header % obsgroup = self % obsgroup
+
+call Ops_SetupObType(Ob)
+
+Ob % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
+Ob % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
+
+Ob % Header % NumCXBatches = 1
+allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
+Ob % Header % ObsPerBatchPerPE(1,mype) = Ob % Header % numobslocal
+
+end subroutine cxvarobs_varobswriter_allocateobservations
+
+! ------------------------------------------------------------------------------
+
+!> Populate Ob fields needed to output the requested varfields.
 subroutine cxvarobs_varobswriter_populateobservations( &
   self, ObsSpace, Channels, Flags, ObsErrors, Ob)
 implicit none
+
+! Subroutine arguments:
 type(cxvarobs_varobswriter), intent(in) :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
 type(OB_type), intent(inout)            :: Ob
 
+! Local declarations:
 character(len=*), parameter             :: RoutineName = "cxvarobs_varobswriter_populateobservations"
 character(len=80)                       :: ErrorMessage
 
@@ -411,23 +460,14 @@ integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % Nu
 logical                                 :: FillChanNum = .false.
 logical                                 :: FillNumChans = .false.
 
+! Body:
+
 ! Get the list of varfields to populate
 
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 nVarFields = size(VarFields)
 
 ! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
-
-Ob % Header % obsgroup = self % obsgroup
-
-call Ops_SetupObType(Ob)
-
-Ob % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
-Ob % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
-
-Ob % Header % NumCXBatches = 1
-allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
-Ob % Header % ObsPerBatchPerPE(1,mype) = Ob % Header % numobslocal
 
 call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
 call obsspace_get_db(ObsSpace, "MetaData", "latitude", Ob % Latitude)
