@@ -15,6 +15,7 @@
 #include "../../test/cxvarobs/VarObsChecker.h"
 
 #include "cxvarobs/LocalEnvironment.h"
+#include "cxvarobs/MPIExceptionSynchronizer.h"
 #include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
@@ -152,45 +153,58 @@ VarObsChecker::~VarObsChecker() {
 void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
 
+  MPIExceptionSynchronizer exceptionSynchronizer;
+
+  const size_t rootProcessRank = 0;
+
   // Print the contents of the varobs file to a temporary file...
 
-  cxvarobs::LocalEnvironment localEnvironment;
-  setupEnvironment(localEnvironment);
-
-  const eckit::PathName varObsFileName(getEnvVariableOrThrow("OPS_VAROB_OUTPUT_DIR") +
-            PATH_SEPARATOR + obsdb_.obsname() + ".varobs");
-  if (!varObsFileName.exists())
-    throw std::runtime_error("File '" + varObsFileName + "' not found");
-
   char tempFileName[L_tmpnam];
-  std::tmpnam(tempFileName);
-
-  // TODO(wsmigaj): need to share the same file name across all MPI processes.
-  TempFile tempFile(tempFileName);
-
-  const char exeName[] = "OpsProg_PrintVarobs.exe";
-  std::string exePath;
-  if (char *dir = getenv("CXVAROBS_OPS_BIN_DIR")) {
-    exePath = dir;
-    exePath += PATH_SEPARATOR;
-    exePath += exeName;
-  } else {
-    exePath = exeName;
+  std::unique_ptr<TempFile> tempFile;
+  if (oops::mpi::comm().rank() == rootProcessRank) {
+    std::tmpnam(tempFileName);
+    tempFile.reset(new TempFile(tempFileName));
   }
+  exceptionSynchronizer.throwIfAnyProcessHasThrown();
+  oops::mpi::comm().broadcast(tempFileName, L_tmpnam, rootProcessRank);
 
-  // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
-  const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + varObsFileName +
-      "\" --all --outfile=\"" + tempFile.name() + "\"";
-  if (oops::mpi::comm().rank() == 0) {
-    oops::Log::info() << "Running " << cmd << "\n";
-    const int exitCode = std::system(cmd.c_str());
-    if (exitCode != 0)
-      throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
+  if (oops::mpi::comm().rank() == rootProcessRank) {
+    cxvarobs::LocalEnvironment localEnvironment;
+    setupEnvironment(localEnvironment);
+
+    const eckit::PathName varObsFileName(getEnvVariableOrThrow("OPS_VAROB_OUTPUT_DIR") +
+              PATH_SEPARATOR + obsdb_.obsname() + ".varobs");
+    if (!varObsFileName.exists())
+      throw std::runtime_error("File '" + varObsFileName + "' not found");
+
+    const char exeName[] = "OpsProg_PrintVarobs.exe";
+    std::string exePath;
+    if (char *dir = getenv("CXVAROBS_OPS_BIN_DIR")) {
+      exePath = dir;
+      exePath += PATH_SEPARATOR;
+      exePath += exeName;
+    } else {
+      exePath = exeName;
+    }
+
+    // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
+    const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + varObsFileName +
+        "\" --all --outfile=\"" + tempFile->name() + "\"";
+    if (oops::mpi::comm().rank() == 0) {
+      oops::Log::info() << "Running " << cmd << "\n";
+      const int exitCode = std::system(cmd.c_str());
+      if (exitCode != 0)
+        throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
+    }
   }
 
   // ... parse them and check them
+  PrintVarObsOutput output = parsePrintVarObsOutput(tempFile->name());
 
-  PrintVarObsOutput output = parsePrintVarObsOutput(tempFile.name());
+  exceptionSynchronizer.throwIfAnyProcessHasThrown();
+  // Ensure all processes have read the file before rank 0 deletes in as TempFile goes out of scope
+  oops::mpi::comm().barrier();
+
   checkHeader(output.headerFields);
   checkMainTable(output.mainTable);
 }

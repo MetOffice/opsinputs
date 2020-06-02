@@ -41,6 +41,7 @@ set( CXVAROBS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 list( APPEND cxvarobs_test_input
   testinput/001_VarField_pstar.yaml
   testinput/002_VarField_temperature_RadarZ.yaml
+  testinput/002_VarField_temperature_RadarZ_MPI_4.yaml
   testinput/002_VarField_temperature_Surface.yaml
   testinput/003_VarField_rh_Sonde.yaml
   testinput/003_VarField_rh_Surface.yaml
@@ -266,6 +267,28 @@ ADD_VAROBSWRITER_TEST(RealConstants)
 
 # Other tests
 ADD_VAROBSWRITER_TEST(reject_obs_with_all_variables_failing_qc)
+
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_1
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/002_VarField_temperature_RadarZ.yaml"
+                  MPI     1
+                  ENVIRONMENT
+                    OOPS_TRAPFPE=1
+                    LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+                    OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_1
+                  DEPENDS test_CxVarObsFilters.x )
+set_tests_properties( test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_1 PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+
+ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_4
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                  ARGS    "testinput/002_VarField_temperature_RadarZ_MPI_4.yaml"
+                  MPI     4
+                  ENVIRONMENT
+                    OOPS_TRAPFPE=4
+                    LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+                    OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_4
+                  DEPENDS test_CxVarObsFilters.x )
+set_tests_properties( test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_4 PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 
 ecbuild_add_test( TARGET  test_cxvarobs_mpiexceptionsynchronizer
                   SOURCES mains/TestMPIExceptionSynchronizer.cc
