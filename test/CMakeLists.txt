@@ -62,6 +62,7 @@ list( APPEND cxvarobs_test_input
   testinput/074_VarField_ro_geoid_und.yaml
   testinput/077_VarField_aod.yaml
   testinput/078_VarField_theta.yaml
+  testinput/empty.yaml
   testinput/FixedHeader_GridStagger.yaml
   testinput/FixedHeader_HorizGrid.yaml
   testinput/FixedHeader_Times.yaml
@@ -265,3 +266,10 @@ ADD_VAROBSWRITER_TEST(RealConstants)
 
 # Other tests
 ADD_VAROBSWRITER_TEST(reject_obs_with_all_variables_failing_qc)
+
+ecbuild_add_test( TARGET  test_cxvarobs_mpiexceptionsynchronizer
+                  SOURCES mains/TestMPIExceptionSynchronizer.cc
+                  ARGS    "testinput/empty.yaml"
+                  ENVIRONMENT OOPS_TRAPFPE=1
+                  MPI     4
+                  LIBS    cxvarobs)
