@@ -23,16 +23,36 @@ function(CREATE_SYMLINK_FILENAME src dst)
 endfunction()
 
 # macro to define a VarObsWriter test
-function(ADD_VAROBSWRITER_TEST name)
-  ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${name}
-                    COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                    ARGS    "testinput/${name}.yaml"
-                    ENVIRONMENT
-                      OOPS_TRAPFPE=1
-                      LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-                      OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${name}
-                    DEPENDS test_CxVarObsFilters.x )
-  set_tests_properties( test_cxvarobs_varobswriter_${name} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+function( ADD_VAROBSWRITER_TEST )
+  set( options )
+  set( single_value_args NAME MPI )
+  set( multi_value_args )
+  cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
+                         ${_FIRST_ARG} ${ARGN} )
+  if(_PAR_UNPARSED_ARGUMENTS)
+    ecbuild_critical("Unknown keywords given to ADD_VAROBSWRITER_TEST(): \"${_PAR_UNPARSED_ARGUMENTS}\"")
+  endif()
+
+  set( environment
+         OOPS_TRAPFPE=1
+         LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+         OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${_PAR_NAME} )
+
+  if (_PAR_MPI)
+    ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${_PAR_NAME}
+                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                      ARGS    "testinput/${_PAR_NAME}.yaml"
+                      ENVIRONMENT "${environment}"
+                      MPI     ${_PAR_MPI}
+                      DEPENDS test_CxVarObsFilters.x )
+  else()
+    ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${_PAR_NAME}
+                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+                      ARGS    "testinput/${_PAR_NAME}.yaml"
+                      ENVIRONMENT "${environment}"
+                      DEPENDS test_CxVarObsFilters.x )
+  endif()
+  set_tests_properties( test_cxvarobs_varobswriter_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
 set( CXVAROBS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
@@ -41,6 +61,7 @@ set( CXVAROBS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 list( APPEND cxvarobs_test_input
   testinput/001_VarField_pstar.yaml
   testinput/002_VarField_temperature_RadarZ.yaml
+  testinput/002_VarField_temperature_RadarZ_MPI_1.yaml
   testinput/002_VarField_temperature_RadarZ_MPI_4.yaml
   testinput/002_VarField_temperature_Surface.yaml
   testinput/003_VarField_rh_Sonde.yaml
@@ -233,62 +254,43 @@ ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_setup
 set_tests_properties(test_cxvarobs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
 
 # Tests of individual varfields
-ADD_VAROBSWRITER_TEST(001_VarField_pstar)
-ADD_VAROBSWRITER_TEST(002_VarField_temperature_Surface)
-ADD_VAROBSWRITER_TEST(002_VarField_temperature_RadarZ)
-ADD_VAROBSWRITER_TEST(003_VarField_rh_Surface)
-ADD_VAROBSWRITER_TEST(003_VarField_rh_Sonde)
-ADD_VAROBSWRITER_TEST(004_VarField_u_Surface)
-ADD_VAROBSWRITER_TEST(004_VarField_u_Sonde)
-ADD_VAROBSWRITER_TEST(005_VarField_v_Surface)
-ADD_VAROBSWRITER_TEST(005_VarField_v_Sonde)
-ADD_VAROBSWRITER_TEST(010_VarField_britemp)
-ADD_VAROBSWRITER_TEST(019_VarField_satzenith)
-ADD_VAROBSWRITER_TEST(023_VarField_modelsurface_geoval)
-ADD_VAROBSWRITER_TEST(028_VarField_satid)
-ADD_VAROBSWRITER_TEST(031_VarField_solzenith)
-ADD_VAROBSWRITER_TEST(054_VarField_numchans)
-ADD_VAROBSWRITER_TEST(055_VarField_channum)
-ADD_VAROBSWRITER_TEST(066_VarField_radarobazim)
-ADD_VAROBSWRITER_TEST(071_VarField_bendingangle)
-ADD_VAROBSWRITER_TEST(072_VarField_impactparam)
-ADD_VAROBSWRITER_TEST(073_VarField_ro_rad_curv)
-ADD_VAROBSWRITER_TEST(074_VarField_ro_geoid_und)
-ADD_VAROBSWRITER_TEST(077_VarField_aod)
-ADD_VAROBSWRITER_TEST(078_VarField_theta)
+ADD_VAROBSWRITER_TEST(NAME 001_VarField_pstar)
+ADD_VAROBSWRITER_TEST(NAME 002_VarField_temperature_Surface)
+ADD_VAROBSWRITER_TEST(NAME 002_VarField_temperature_RadarZ)
+ADD_VAROBSWRITER_TEST(NAME 003_VarField_rh_Surface)
+ADD_VAROBSWRITER_TEST(NAME 003_VarField_rh_Sonde)
+ADD_VAROBSWRITER_TEST(NAME 004_VarField_u_Surface)
+ADD_VAROBSWRITER_TEST(NAME 004_VarField_u_Sonde)
+ADD_VAROBSWRITER_TEST(NAME 005_VarField_v_Surface)
+ADD_VAROBSWRITER_TEST(NAME 005_VarField_v_Sonde)
+ADD_VAROBSWRITER_TEST(NAME 010_VarField_britemp)
+ADD_VAROBSWRITER_TEST(NAME 019_VarField_satzenith)
+ADD_VAROBSWRITER_TEST(NAME 023_VarField_modelsurface_geoval)
+ADD_VAROBSWRITER_TEST(NAME 028_VarField_satid)
+ADD_VAROBSWRITER_TEST(NAME 031_VarField_solzenith)
+ADD_VAROBSWRITER_TEST(NAME 054_VarField_numchans)
+ADD_VAROBSWRITER_TEST(NAME 055_VarField_channum)
+ADD_VAROBSWRITER_TEST(NAME 066_VarField_radarobazim)
+ADD_VAROBSWRITER_TEST(NAME 071_VarField_bendingangle)
+ADD_VAROBSWRITER_TEST(NAME 072_VarField_impactparam)
+ADD_VAROBSWRITER_TEST(NAME 073_VarField_ro_rad_curv)
+ADD_VAROBSWRITER_TEST(NAME 074_VarField_ro_geoid_und)
+ADD_VAROBSWRITER_TEST(NAME 077_VarField_aod)
+ADD_VAROBSWRITER_TEST(NAME 078_VarField_theta)
+
+ADD_VAROBSWRITER_TEST(NAME 002_VarField_temperature_RadarZ_MPI_1 MPI 1)
+ADD_VAROBSWRITER_TEST(NAME 002_VarField_temperature_RadarZ_MPI_4 MPI 4)
 
 # Header field tests
-ADD_VAROBSWRITER_TEST(FixedHeader_VertCoord)
-ADD_VAROBSWRITER_TEST(FixedHeader_HorizGrid)
-ADD_VAROBSWRITER_TEST(FixedHeader_GridStagger)
-ADD_VAROBSWRITER_TEST(FixedHeader_Times)
-ADD_VAROBSWRITER_TEST(IntegerConstants_LensAndLevels)
-ADD_VAROBSWRITER_TEST(RealConstants)
+ADD_VAROBSWRITER_TEST(NAME FixedHeader_VertCoord)
+ADD_VAROBSWRITER_TEST(NAME FixedHeader_HorizGrid)
+ADD_VAROBSWRITER_TEST(NAME FixedHeader_GridStagger)
+ADD_VAROBSWRITER_TEST(NAME FixedHeader_Times)
+ADD_VAROBSWRITER_TEST(NAME IntegerConstants_LensAndLevels)
+ADD_VAROBSWRITER_TEST(NAME RealConstants)
 
 # Other tests
-ADD_VAROBSWRITER_TEST(reject_obs_with_all_variables_failing_qc)
-
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_1
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/002_VarField_temperature_RadarZ.yaml"
-                  MPI     1
-                  ENVIRONMENT
-                    OOPS_TRAPFPE=1
-                    LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-                    OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_1
-                  DEPENDS test_CxVarObsFilters.x )
-set_tests_properties( test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_1 PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
-
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_4
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
-                  ARGS    "testinput/002_VarField_temperature_RadarZ_MPI_4.yaml"
-                  MPI     4
-                  ENVIRONMENT
-                    OOPS_TRAPFPE=4
-                    LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-                    OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_4
-                  DEPENDS test_CxVarObsFilters.x )
-set_tests_properties( test_cxvarobs_varobswriter_002_VarField_temperature_RadarZ_MPI_4 PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+ADD_VAROBSWRITER_TEST(NAME reject_obs_with_all_variables_failing_qc)
 
 ecbuild_add_test( TARGET  test_cxvarobs_mpiexceptionsynchronizer
                   SOURCES mains/TestMPIExceptionSynchronizer.cc
