@@ -72,7 +72,7 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
 
   void setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const;
 
-  PrintVarObsOutput parsePrintVarObsOutput(const std::string &fileName) const;
+  PrintVarObsOutput parsePrintVarObsOutput(const char *fileName) const;
 
   void checkHeader(const std::map<std::string, std::string> &headerFields) const;
 

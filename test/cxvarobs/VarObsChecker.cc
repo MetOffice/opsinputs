@@ -198,11 +198,16 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
     }
   }
 
+  exceptionSynchronizer.throwIfAnyProcessHasThrown();
+  // Ensure rootProcessRank has written the file
+  oops::mpi::comm().barrier();
+
   // ... parse them and check them
-  PrintVarObsOutput output = parsePrintVarObsOutput(tempFile->name());
+  PrintVarObsOutput output = parsePrintVarObsOutput(tempFileName);
 
   exceptionSynchronizer.throwIfAnyProcessHasThrown();
-  // Ensure all processes have read the file before rank 0 deletes in as TempFile goes out of scope
+  // Ensure all processes have read the file before rootProcessRank deletes it
+  // as TempFile goes out of scope
   oops::mpi::comm().barrier();
 
   checkHeader(output.headerFields);
@@ -217,7 +222,7 @@ void VarObsChecker::setupEnvironment(cxvarobs::LocalEnvironment &localEnvironmen
 }
 
 VarObsChecker::PrintVarObsOutput VarObsChecker::parsePrintVarObsOutput(
-    const std::string &fileName) const {
+    const char *fileName) const {
   std::ifstream is(fileName);
   std::string line;
 
