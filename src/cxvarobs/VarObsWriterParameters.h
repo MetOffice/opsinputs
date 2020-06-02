@@ -21,6 +21,12 @@ namespace cxvarobs {
 /// \brief VarObsWriter options.
 class VarObsWriterParameters : public oops::Parameters {
  public:
+  /// Determines OPS verbosity.
+  ///
+  /// Valid values (case-insensitive): Operational, Quiet, Production, Normal, Diagnostic, Debug,
+  /// Verbose.
+  oops::Parameter<std::string> generalMode{"general_mode", "normal", this};
+
   /// Directory containing namelist files specifying the varfields to output.
   ///
   /// The list of varfields to output for an observation group ObsGroup is controlled by the file

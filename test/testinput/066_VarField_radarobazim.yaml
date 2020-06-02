@@ -30,6 +30,7 @@ Observations:
     - Filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
       use_radar_family: true
+      general_mode: debug
     - Filter: VarObs Checker
       expected_main_table_columns:
         # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check.

@@ -21,7 +21,13 @@ use cxvarobs_obsdatavector_mod
 use cxvarobs_obsspace_mod
 
 use GenMod_Control, only:   &
+    OperationalMode,        &
+    QuietMode,              &
+    ProductionMode,         &
+    NormalMode,             &
+    DiagnosticMode,         &
     DebugMode,              &
+    VerboseMode,            &
     GeneralMode,            &
     mype,                   &
     nproc
@@ -132,10 +138,32 @@ cxvarobs_varobswriter_create = .true.
 
 ! Setup OPS
 
+string = "normal"
+found = f_conf % get("general_mode", string)
+select case (ops_to_lower_case(string))
+case ("operational")
+  GeneralMode = OperationalMode
+case ("quiet")
+  GeneralMode = QuietMode
+case ("production")
+  GeneralMode = ProductionMode
+case ("normal")
+  GeneralMode = NormalMode
+case ("diagnostic")
+  GeneralMode = DiagnosticMode
+case ("debug")
+  GeneralMode = DebugMode
+case ("verbose")
+  GeneralMode = VerboseMode
+case default
+  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_varobswriter_create = .false.
+  goto 9999
+end select
+
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
-
-GeneralMode = DebugMode
 
 ! Retrieve parameter values from the input configuration object
 ! and store them in member variables

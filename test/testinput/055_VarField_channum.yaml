@@ -28,6 +28,7 @@ Observations:
       flags_to_reset: [1, 6]  # missing, Hfailed
     - Filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_055_VarField_channum
+      general_mode: debug
     - Filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
