@@ -28,48 +28,66 @@ void noException() {
   oops::mpi::comm().allReduce(term, sum, eckit::mpi::Operation::SUM);
 
   EXPECT_EQUAL(sum, oops::mpi::comm().size());
+
+  synchronizer.throwIfAnyProcessHasThrown();
+  int product;
+  oops::mpi::comm().allReduce(term, product, eckit::mpi::Operation::PROD);
+
+  EXPECT_EQUAL(product, 1);
 }
 
-void exceptionBeforeMPICall() {
+void exceptionBeforeFirstMPICall() {
   cxvarobs::MPIExceptionSynchronizer synchronizer;
 
   int term = 1;
-  int sum;
 
   if (oops::mpi::comm().rank() == 0)
     throw std::runtime_error("An exception in one process only");
 
   synchronizer.throwIfAnyProcessHasThrown();
+  int sum;
   oops::mpi::comm().allReduce(term, sum, eckit::mpi::Operation::SUM);
 
   EXPECT_EQUAL(sum, oops::mpi::comm().size());
+
+  synchronizer.throwIfAnyProcessHasThrown();
+  int product;
+  oops::mpi::comm().allReduce(term, product, eckit::mpi::Operation::PROD);
+
+  EXPECT_EQUAL(product, 1);
 }
 
-void exceptionAfterMPICall() {
+void exceptionBeforeSecondMPICall() {
   cxvarobs::MPIExceptionSynchronizer synchronizer;
 
   int term = 1;
-  int sum;
 
   synchronizer.throwIfAnyProcessHasThrown();
+  int sum;
   oops::mpi::comm().allReduce(term, sum, eckit::mpi::Operation::SUM);
 
   EXPECT_EQUAL(sum, oops::mpi::comm().size());
 
   if (oops::mpi::comm().rank() == 0)
     throw std::runtime_error("An exception in one process only");
+
+  synchronizer.throwIfAnyProcessHasThrown();
+  int product;
+  oops::mpi::comm().allReduce(term, product, eckit::mpi::Operation::PROD);
+
+  EXPECT_EQUAL(product, 1);
 }
 
 CASE("cxvarobs/MPIExceptionSynchronizer/No exception") {
   EXPECT_NO_THROW(noException());
 }
 
-CASE("cxvarobs/MPIExceptionSynchronizer/Exception before MPI call") {
-  EXPECT_THROWS_AS(exceptionBeforeMPICall(), std::runtime_error);
+CASE("cxvarobs/MPIExceptionSynchronizer/Exception before first MPI call") {
+  EXPECT_THROWS_AS(exceptionBeforeFirstMPICall(), std::runtime_error);
 }
 
-CASE("cxvarobs/MPIExceptionSynchronizer/Exception after MPI call") {
-  EXPECT_THROWS_AS(exceptionAfterMPICall(), std::runtime_error);
+CASE("cxvarobs/MPIExceptionSynchronizer/Exception before second MPI call") {
+  EXPECT_THROWS_AS(exceptionBeforeSecondMPICall(), std::runtime_error);
 }
 
 class MPIExceptionSynchronizer : public oops::Test {

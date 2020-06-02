@@ -8,27 +8,30 @@
 
 namespace cxvarobs {
 
-class MPIExceptionSynchronizer
-{
+class MPIExceptionSynchronizer {
 public:
   void throwIfAnyProcessHasThrown() {
-    int maxNumExceptions = 0;
-    oops::Log::debug() << "throwIfAnyProcessHasThrown before reduce (" << oops::mpi::comm().rank() << "/" << oops::mpi::comm().size() << "): " << maxNumExceptions << std::endl;
-    oops::mpi::comm().allReduceInPlace(maxNumExceptions, eckit::mpi::Operation::MAX);
-    oops::Log::debug() << "throwIfAnyProcessHasThrown after reduce (" << oops::mpi::comm().rank() << "/" << oops::mpi::comm().size() << "): " << maxNumExceptions << std::endl;
-    if (maxNumExceptions > 0)
-      throw std::runtime_error("An exception has been thrown by another process");
+    if (unhealthy_)
+      throw std::logic_error("You shouldn't call throwIfAnyProcessHasThrown() "
+                             "if a previous call to this function has thrown an exception");
+    int anyUnhealthy;
+    oops::mpi::comm().allReduce(unhealthy_, anyUnhealthy, eckit::mpi::Operation::MAX);
+    if (anyUnhealthy) {
+      unhealthy_ = 1;
+      throw std::runtime_error("An exception has been thrown by another MPI process");
+    }
   }
 
-  ~MPIExceptionSynchronizer() noexcept(false) {
-    const int numExceptionsOnThisProcess = std::uncaught_exception();
-    int maxNumExceptions;
-    oops::Log::debug() << "~MPIExceptionSynchronizer before reduce (" << oops::mpi::comm().rank() << "/" << oops::mpi::comm().size() << "): " << numExceptionsOnThisProcess << std::endl;
-    oops::mpi::comm().allReduce(numExceptionsOnThisProcess, maxNumExceptions, eckit::mpi::Operation::MAX);
-    oops::Log::debug() << "~MPIExceptionSynchronizer after reduce (" << oops::mpi::comm().rank() << "/" << oops::mpi::comm().size() << "): " << maxNumExceptions << std::endl;
-    if (maxNumExceptions > 0 && numExceptionsOnThisProcess == 0)
-      throw std::runtime_error("An exception has been thrown by another process");
+  ~MPIExceptionSynchronizer() {
+    if (!unhealthy_ && std::uncaught_exception()) {
+      unhealthy_ = 1;
+      int anyUnhealthy;
+      oops::mpi::comm().allReduce(unhealthy_, anyUnhealthy, eckit::mpi::Operation::MAX);
+    }
   }
+
+ private:
+  int unhealthy_ = 0;
 };
 
 }  // namespace cxvarobs
