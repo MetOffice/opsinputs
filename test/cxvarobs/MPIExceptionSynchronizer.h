@@ -8,6 +8,8 @@
 #ifndef TEST_CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
 #define TEST_CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
 
+#include <string>
+
 #include "cxvarobs/MPIExceptionSynchronizer.h"
 #include "eckit/testing/Test.h"
 #include "oops/../test/TestEnvironment.h"

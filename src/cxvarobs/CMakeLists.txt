@@ -14,6 +14,8 @@ list( APPEND cxvarobs_src_files
     instantiateObsFilterFactory.h
     LocalEnvironment.cc
     LocalEnvironment.h
+    MPIExceptionSynchronizer.cc
+    MPIExceptionSynchronizer.h
     VarObsWriter.cc
     VarObsWriter.h
     VarObsWriter.interface.F90
