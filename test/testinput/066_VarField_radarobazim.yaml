@@ -60,6 +60,9 @@ Observations:
         family:   ["11", "11",
                    "12", "12",
                    "14", "14"]
+        Callsign: ["station_1", "station_1",
+                   "station_2", "station_2",
+                   "station_4", "station_4"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

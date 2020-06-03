@@ -17,17 +17,21 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nstring = 9
+    f.createDimension('nstring', nstring)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
-    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-
+    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
+    var[:] = ["station_1", "station_2", "station_3", "station_4"]
+    
     var = f.createVariable(var_name + '@ObsValue', 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
     var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
@@ -46,16 +50,20 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nstring = 9
+    f.createDimension('nstring', nstring)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
-    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
+    var[:] = ["station_1", "station_2", "station_3", "station_4"]
 
     var = f.createVariable(var_name_1 + '@ObsValue', 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
@@ -84,16 +92,20 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nstring = 9
+    f.createDimension('nstring', nstring)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
-    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
+    var[:] = ["station_1", "station_2", "station_3", "station_4"]
 
     # There must be at least one simulated variable
     var = f.createVariable('dummy@ObsValue', 'f', ('nlocs',))
@@ -117,16 +129,20 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nstring = 9
+    f.createDimension('nstring', nstring)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
-    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
+    var[:] = ["station_1", "station_2", "station_3", "station_4"]
 
     # There must be at least one simulated variable
     var = f.createVariable('dummy@ObsValue', 'f', ('nlocs',))
@@ -163,16 +179,20 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nstring = 9
+    f.createDimension('nstring', nstring)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
-    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
+    var[:] = ["station_1", "station_2", "station_3", "station_4"]
     if with_radar_family:
         var = f.createVariable('radar_family@MetaData', 'i', ('nlocs',))
         var[:] = [11, 12, 13, 14]
@@ -222,16 +242,20 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_fa
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nstring = 9
+    f.createDimension('nstring', nstring)
 
     var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    air = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
-    air[:] = [100100, 100200, 100300, 100400]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('time@MetaData', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
+    var[:] = ["station_1", "station_2", "station_3", "station_4"]
     if with_radar_family:
         var = f.createVariable('radar_family@MetaData', 'i', ('nlocs',))
         var[:] = [11, 12, 13, 14]
