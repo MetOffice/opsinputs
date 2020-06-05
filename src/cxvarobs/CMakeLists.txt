@@ -4,6 +4,7 @@
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 list( APPEND cxvarobs_src_files
+    cxvarobs_cxwriter_mod.F90
     cxvarobs_obsspace_f.cc
     cxvarobs_obsspace_f.h
     cxvarobs_obsspace_mod.F90
@@ -11,6 +12,11 @@ list( APPEND cxvarobs_src_files
     cxvarobs_obsdatavector_f.h
     cxvarobs_obsdatavector_mod.F90
     cxvarobs_varobswriter_mod.F90
+    CxWriter.cc
+    CxWriter.h
+    CxWriter.interface.F90
+    CxWriter.interface.h
+    CxWriterParameters.h
     instantiateObsFilterFactory.h
     LocalEnvironment.cc
     LocalEnvironment.h

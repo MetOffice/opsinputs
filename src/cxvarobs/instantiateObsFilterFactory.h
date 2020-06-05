@@ -8,6 +8,7 @@
 #ifndef CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
 #define CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
 
+#include "cxvarobs/CxWriter.h"
 #include "cxvarobs/VarObsWriter.h"
 #include "oops/interface/ObsFilter.h"
 
@@ -17,6 +18,8 @@ template<typename MODEL>
 void instantiateObsFilterFactory() {
   static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, VarObsWriter> >
     makerVarObsWriter_("VarObs Writer");
+  static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, CxWriter> >
+    makerCxWriter_("Cx Writer");
 }
 
 }  // namespace cxvarobs
