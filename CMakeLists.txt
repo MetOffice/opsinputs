@@ -9,7 +9,7 @@
 
 cmake_minimum_required( VERSION 3.12 FATAL_ERROR )
 
-project( cxvarobs C CXX Fortran )
+project( cxvarobs VERSION 0.1 LANGUAGES C CXX Fortran )
 
 set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH})
 
