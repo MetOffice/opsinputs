@@ -88,13 +88,17 @@ void CxWriter::print(std::ostream & os) const {
 }
 
 void CxWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
-  if (parameters_.namelistDirectory.value() != boost::none)
-    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
+  if (parameters_.namelistDirectory.value() != boost::none) {
+    localEnvironment.set("OPS_CX_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
+    localEnvironment.set("OPS_CXBGERR_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
+  }
   if (parameters_.outputDirectory.value() != boost::none)
+    // TODO(wsmigaj): check variable name
     localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
 }
 
 void CxWriter::createOutputDirectory() {
+  // TODO(wsmigaj): check variable name
   char *outputDirectory = getenv("OPS_VAROB_OUTPUT_DIR");
   ASSERT_MSG(outputDirectory != nullptr, "The output directory has not been set");
   eckit::PathName outputPath(outputDirectory);
