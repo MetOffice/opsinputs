@@ -11,6 +11,7 @@ list( APPEND cxvarobs_src_files
     cxvarobs_obsdatavector_f.cc
     cxvarobs_obsdatavector_f.h
     cxvarobs_obsdatavector_mod.F90
+    cxvarobs_utils_mod.F90
     cxvarobs_varobswriter_mod.F90
     CxWriter.cc
     CxWriter.h

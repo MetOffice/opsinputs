@@ -19,6 +19,7 @@ use ufo_geovals_mod
 use ufo_vars_mod
 use cxvarobs_obsdatavector_mod
 use cxvarobs_obsspace_mod
+use cxvarobs_utils_mod
 
 use GenMod_Control, only:   &
     OperationalMode,        &
@@ -64,10 +65,6 @@ implicit none
 public :: cxvarobs_varobswriter_create, cxvarobs_varobswriter_delete, &
           cxvarobs_varobswriter_prior, cxvarobs_varobswriter_post
 private
-! Maximum length of a variable name
-integer, parameter :: max_varname_length=MAXVARLEN
-! Maximum length of a variable name with channel suffix
-integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 
 ! ------------------------------------------------------------------------------
 type, public :: cxvarobs_varobswriter
@@ -1737,45 +1734,13 @@ type(c_ptr), value, intent(in)           :: ObsSpace, Flags
 logical, intent(in)                      :: RejectObsWithAnyVariableFailingQC
 logical, intent(in)                      :: RejectObsWithAllVariablesFailingQC
 
-! Local declarations:
-type(oops_variables)                     :: ObsVariables
-character(max_varname_length)            :: VarName
-integer                                  :: NumObsVariables, iVar
-integer(c_int)                           :: VarFlags(Ob % Header % NumObsLocal)
-
 ! Body:
 call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
                Ob % Header % NumObsLocal, Ob % ReportFlags)
-Ob % ReportFlags = 0
-
-ObsVariables = cxvarobs_obsdatavector_int_varnames(Flags)
-NumObsVariables = ObsVariables % nvars()
-
-if (RejectObsWithAnyVariableFailingQC) then
-  Ob % ReportFlags = 0
-
-  ! Set the FinalRejectReport bit in ReportFlags for observations with a non-zero QC flag
-  ! in at least one variable.
-  do iVar = 1, NumObsVariables
-    VarName = ObsVariables % variable(iVar)
-    call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
-    where (VarFlags > 0)
-      Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
-    end where
-  end do
-else if (RejectObsWithAllVariablesFailingQC) then
-  Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
-
-  ! Clear the FinalRejectReport bit in ReportFlags for observations with a zero QC flag
-  ! in at least one variable.
-  do iVar = 1, NumObsVariables
-    VarName = ObsVariables % variable(iVar)
-    call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
-    where (VarFlags == 0)
-      Ob % ReportFlags = ibclr(Ob % ReportFlags, FinalRejectReport)
-    end where
-  end do
-end if
+call cxvarobs_utils_fillreportflags(ObsSpace, Flags, &
+                                   RejectObsWithAnyVariableFailingQC, &
+                                   RejectObsWithAllVariablesFailingQC, &
+                                   Ob % ReportFlags)
 
 end subroutine cxvarobs_varobswriter_fillreportflags
 
