@@ -38,7 +38,23 @@ use GenMod_Core, only: &
 use GenMod_ModelIO, only: LenFixHd, UM_header_type
 use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
-
+use GenMod_CLookAdd, only: &
+    LBYR,                  &
+    LBMON,                 &
+    LBDAT,                 &
+    LBHR,                  &
+    LBMIN,                 &
+    LBDAY,                 &
+    LBSEC,                 &
+    LBYRD,                 &
+    LBMOND,                &
+    LBDATD,                &
+    LBHRD,                 &
+    LBMIND,                &
+    LBDAYD,                &
+    LBSECD,                &
+    LBTIM,                 &
+    LBFT
 use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
@@ -109,6 +125,9 @@ private
   real(kind=8)    :: RC_PoleLat
   real(kind=8)    :: RC_PoleLong
 
+  real(kind=8), allocatable :: EtaTheta(:)
+  real(kind=8), allocatable :: EtaRho(:)
+
   type(ufo_geovals), pointer :: GeoVals
 end type cxvarobs_cxwriter
 
@@ -134,6 +153,8 @@ real(kind=c_double)                        :: double
 logical                                    :: found
 
 integer(kind=8), parameter                 :: zero = 0
+
+integer                                    :: NumLevels
 
 character(len=*), parameter :: RoutineName = "cxvarobs_cxwriter_create"
 character(len=200)          :: ErrorMessage
@@ -311,6 +332,13 @@ double = 0.0
 found = f_conf % get("RC_PoleLong", double)
 self % RC_PoleLong = double
 
+! TODO(wsmigaj): Retrieve these vectors from the configuration
+NumLevels = self % IC_PLevels
+allocate(self % EtaTheta(NumLevels + 1))
+self % EtaTheta = 3.14
+allocate(self % EtaRho(NumLevels))
+self % EtaRho = 1.41
+
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 
 call cxvarobs_cxwriter_addrequiredgeovars(self, geovars)
@@ -330,6 +358,9 @@ type(cxvarobs_cxwriter), intent(inout) :: self
 
 ! Body:
 call datetime_delete(self % validitytime)
+
+if (allocated(self % EtaRho)) deallocate(self % EtaRho)
+if (allocated(self % EtaTheta)) deallocate(self % EtaTheta)
 
 end subroutine cxvarobs_cxwriter_delete
 
@@ -387,7 +418,8 @@ call cxvarobs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, 
 call cxvarobs_cxwriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, &
                                             NumObsLocal, RetainedObsIndices, Ob(1))
 call cxvarobs_cxwriter_allocatecx(self, Ob(1), Cx(1))
-call cxvarobs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, Cx(1))
+call cxvarobs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, RetainedObsIndices, &
+                                  Cx(1))
 call cxvarobs_cxwriter_populateumheader(self, UMHeader)
 
 call Ops_WriteOutVarCx1pe (Ob, Cx, [UMheader % IntC(IC_Plevels)], UMheader)
@@ -470,14 +502,14 @@ type(c_ptr), value, intent(in)          :: ObsSpace
 integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
 ! Number of observations held in ObsSpace by this process (including rejected ones)
-integer                                 :: NumObsLocal
+integer, intent(in)                     :: NumObsLocal
 ! Indices of retained observations (held by this process)
-integer                                 :: RetainedObsIndices(:)
+integer, intent(in)                     :: RetainedObsIndices(:)
 type(OB_type), intent(inout)            :: Ob
 
 ! Local declarations:
 real(c_double)                          :: Reals(NumObsLocal)
-integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
+integer(c_int64_t)                      :: TimeOffsetsInSeconds(NumObsLocal)
 
 ! Body:
 
@@ -517,6 +549,9 @@ type(CX_type), intent(inout)            :: Cx
 call CX % init
 
 ! TODO(wsmigaj): calculate the number of non-rejected observations
+
+! From Ops_CXSetup
+
 Cx % Header % NumLocal = Ob % Header % NumObsLocal
 Cx % Header % NumTotal = Ob % Header % NumObsTotal
 Cx % Header % ModelVersion = self % FH_ModelVersion
@@ -538,7 +573,7 @@ end subroutine cxvarobs_cxwriter_allocatecx
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
 subroutine cxvarobs_cxwriter_populatecx( &
-  self, ObsSpace, Channels, Flags, ObsErrors, Cx)
+  self, ObsSpace, Channels, Flags, ObsErrors, RetainedObsIndices, Cx)
 implicit none
 
 ! Subroutine arguments:
@@ -546,18 +581,31 @@ type(cxvarobs_cxwriter), intent(in)     :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
+! Indices of retained observations (held by this process)
+integer, intent(in)                     :: RetainedObsIndices(:)
 type(CX_type), intent(inout)            :: Cx
 
 ! Local declarations:
 character(len=*), parameter             :: RoutineName = "cxvarobs_cxwriter_populatecx"
 character(len=80)                       :: ErrorMessage
 
-integer(kind=8)                         :: CxFields(100) ! (MaxModelCodes)
+integer(kind=8)                         :: CxFields(MaxModelCodes)
 integer                                 :: nCxFields
 integer                                 :: iCxField
 
 ! Body:
+call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
 
+do iCxField = 1, size(CxFields)
+  select case (CxFields(iCxField))
+  case (StashItem_modelsurface)
+    ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
+    ! here and in cxvarobs_cxwriter_addrequiredgeovars.
+    call cxvarobs_cxwriter_fillrealfromgeoval( &
+      Cx % Header % ModelSurface, "ModelSurface", Cx % ModelSurface, &
+      self % GeoVals, RetainedObsIndices, "land_type_index")
+  end select
+end do
 end subroutine cxvarobs_cxwriter_populatecx
 
 ! ------------------------------------------------------------------------------
@@ -570,16 +618,29 @@ type(cxvarobs_cxwriter), intent(in) :: self
 type(UM_header_type), intent(inout) :: UmHeader
 
 ! Local declarations:
+integer                             :: NumLevels
 integer(c_int)                      :: year, month, day, hour, minute, second
 TYPE (DateTime_type)                :: now
 
 ! Body:
+
+NumLevels = size(self % EtaRho)
 
 UmHeader % FixHd = IMDI
 UmHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 UmHeader % FixHd(FH_IntCSize) = 49
 UmHeader % FixHd(FH_RealCStart) = UmHeader % FixHd(FH_IntCStart) + UmHeader % FixHd(FH_IntCSize)
 UmHeader % FixHd(FH_RealCSize) = 34
+UmHeader % FixHd(FH_LevDepCStart) = UmHeader % FixHd(FH_RealCStart) + UmHeader % FixHd(FH_RealCSize)
+UmHeader % FixHd(FH_LevDepCSize1) = NumLevels + 1  ! EtaTheta has an extra ground level
+UmHeader % FixHd(FH_LevDepCSize2) = 2              ! Two variables: EtaTheta and EtaRho
+!UmHeader % FixHd(FH_ColDepCStart) = UmHeader % FixHd(FH_LevDepCStart) + &
+!                                    UmHeader % FixHd(FH_LevDepCSize1) * UmHeader % FixHd(FH_LevDepCSize2)
+UmHeader % FixHd(FH_LookupStart) = UmHeader % FixHd(FH_LevDepCStart) + &
+                                   UmHeader % FixHd(FH_LevDepCSize1) * UmHeader % FixHd(FH_LevDepCSize2)
+UmHeader % FixHd(FH_LookupSize1) = LBFT
+UmHeader % FixHd(FH_LookupSize2) = 1
+
 call UmHeader % alloc
 
 UmHeader % FixHd(FH_VertCoord) = self % FH_VertCoord
@@ -626,6 +687,23 @@ UmHeader % RealC(RC_FirstLat) = self % RC_FirstLat
 UmHeader % RealC(RC_FirstLong) = self % RC_FirstLong
 UmHeader % RealC(RC_PoleLat) = self % RC_PoleLat
 UmHeader % RealC(RC_PoleLong) = self % RC_PoleLong
+
+UmHeader % LevDepC = RMDI
+UmHeader % LevDepC(1 : NumLevels+1) = self % EtaTheta
+UmHeader % LevDepC(NumLevels+2 : 2*NumLevels+1) = self % EtaRho
+
+UmHeader % Lookup = IMDI
+! Validity time
+UmHeader % Lookup(LBYR:LBMIN,1) = UmHeader % FixHd(FH_VTYear:FH_VTMinute)
+UmHeader % Lookup(LBDAY,1) = UmHeader % FixHd(FH_VTDayNo)
+UmHeader % Lookup(LBSEC,1) = UmHeader % FixHd(FH_VTSecond)
+
+! Data time
+UmHeader % Lookup(LBYRD:LBMIND,1) = UmHeader % FixHd(FH_DTYear:FH_DTMinute)
+UmHeader % Lookup(LBDAYD,1) = UmHeader % FixHd(FH_DTDayNo)
+UmHeader % Lookup(LBSECD,1) = UmHeader % FixHd(FH_DTSecond)
+
+! TODO(wsmigaj): fill the LBTIM and LBFT fields
 
 end subroutine cxvarobs_cxwriter_populateumheader
 
@@ -693,12 +771,12 @@ end subroutine cxvarobs_cxwriter_fillreal
 !>   Header to be populated.
 !> \param[in] OpsVarName
 !>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
 !> \param[inout] Real1
 !>   Pointer to the array to be populated.
 !> \param[in] GeoVals
 !>   A container holding the specified GeoVaL.
+!> \param[in] RetainedObsIndices
+!>   Indices of retained observations held by this process.
 !> \param[in] JediVarName
 !>   Name of the GeoVaL used to populate \p Real1.
 !>
@@ -710,20 +788,22 @@ end subroutine cxvarobs_cxwriter_fillreal
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_cxwriter_fillrealfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real1, GeoVals, JediVarName)
+  Hdr, OpsVarName, Real1, GeoVals, RetainedObsIndices, JediVarName)
 implicit none
 
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real1(:)
 type(ufo_geovals), intent(in)                   :: GeoVals
+integer, intent(in)                             :: RetainedObsIndices(:)
 character(len=*), intent(in)                    :: JediVarName
 
 ! Local declarations:
-type(ufo_geoval), pointer                       :: GeoVal
+integer(kind=8)                                 :: NumRetainedObs
 real(kind_real)                                 :: MissingReal
+type(ufo_geoval), pointer                       :: GeoVal
+integer                                         :: i, iIn, iOut
 
 character(len=*), parameter                     :: &
   RoutineName = "cxvarobs_cxwriter_fillrealfromgeoval"
@@ -731,6 +811,7 @@ character(len=256)                              :: ErrorMessage
 
 ! Body:
 
+NumRetainedObs = size(RetainedObsIndices)
 MissingReal = missing_value(0.0_c_float)
 
 if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
@@ -743,10 +824,15 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   end if
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
-  where (GeoVal % vals(1,:) /= MissingReal)
-    Real1 = GeoVal % vals(1,:)
-  end where
+  call Ops_Alloc(Hdr, OpsVarName, NumRetainedObs, Real1)
+  iOut = 1
+  do i = 1, NumRetainedObs
+    iIn = RetainedObsIndices(i)
+    if (GeoVal % vals(1,iIn) /= MissingReal) then
+      Real1(iOut) = GeoVal % vals(1,iIn)
+      iOut = iOut + 1
+    end if
+  end do
 end if
 end subroutine cxvarobs_cxwriter_fillrealfromgeoval
 
