@@ -4,6 +4,7 @@
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 list( APPEND cxvarobs_src_files
+    cxvarobs_cxgenerate_mod.F90
     cxvarobs_cxwriter_mod.F90
     cxvarobs_obsspace_f.cc
     cxvarobs_obsspace_f.h
@@ -29,6 +30,10 @@ list( APPEND cxvarobs_src_files
     VarObsWriter.interface.h
     VarObsWriterParameters.h
 )
+
+# TODO(wsmigaj): support Intel's compiler option
+set_source_files_properties(cxvarobs_cxgenerate_mod.F90 PROPERTIES
+                            COMPILE_FLAGS "-fdefault-real-8 -fdefault-integer-8")
 
 set(SHUM_LIB_DIR "${OPS_INSTALLS_DIR}/shumlib/lib")
 set(SHUM_LIBS 

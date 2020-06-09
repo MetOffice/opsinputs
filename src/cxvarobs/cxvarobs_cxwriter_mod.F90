@@ -51,10 +51,9 @@ use OpsMod_Control, only:   &
 use OpsMod_CXInfo, only: &
     CXheader_type, &
     CX_type
-use OpsMod_CXGenerate, only: MaxModelCodes, Ops_ReadCXControlNL
-!use OpsMod_CXGenerate, only: &
-!    MaxModelCodes,           &
-!    Ops_ReadCXControlNL
+use cxvarobs_cxgenerate_mod, only: &
+    MaxModelCodes,                 &
+    Ops_ReadCXControlNL
 use OpsMod_DateTime
 use OpsMod_MiscTypes
 use OpsMod_ModelColumnIO, only: &
