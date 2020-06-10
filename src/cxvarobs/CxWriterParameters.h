@@ -107,6 +107,14 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<int> timeIndicator{"time_indicator", 0, this};
   /// The LBFT element of the UM header look-up table.
   oops::Parameter<int> forecastPeriod{"forecast_period", 0, this};
+
+  // TODO(wsmigaj): I hope these comments are correct -- please let me know if not.
+  // Can these parameters be given more widely understandable names (without Greek letters)?.
+  /// New dynamics vertical coordinate theta. Should have length IC_PLEVELS + 1 (with the
+  /// first element denoting the value at the surface).
+  oops::Parameter<std::vector<double>> etaTheta{"eta_theta", {}, this};
+  /// New dynamics vertical coordinate rho. Should have length IC_PLEVELS.
+  oops::Parameter<std::vector<double>> etaRho{"eta_rho", {}, this};
 };
 
 }  // namespace cxvarobs

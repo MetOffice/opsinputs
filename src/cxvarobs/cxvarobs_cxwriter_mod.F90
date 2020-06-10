@@ -151,7 +151,6 @@ logical                                    :: found
 
 integer(kind=8), parameter                 :: zero = 0
 
-integer                                    :: NumLevels
 integer                                    :: i
 
 character(len=*), parameter :: RoutineName = "cxvarobs_cxwriter_create"
@@ -348,12 +347,29 @@ double = 0.0
 found = f_conf % get("RC_PoleLong", double)
 self % RC_PoleLong = double
 
-! TODO(wsmigaj): Retrieve these vectors from the configuration
-NumLevels = self % IC_PLevels
-allocate(self % EtaTheta(NumLevels + 1))
-self % EtaTheta = (/(i, i = 0, NumLevels)/)
-allocate(self % EtaRho(NumLevels))
-self % EtaRho = (/(i, i = 100 + 1, 100 + NumLevels)/)
+found = f_conf % get("eta_theta", self % EtaTheta)
+if (found) then
+  if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
+    call gen_warn(RoutineName, "eta_theta should be a vector of length (IC_PLevels + 1)")
+    cxvarobs_cxwriter_create = .false.
+    goto 9999
+  end if
+else
+  allocate(self % EtaTheta(self % IC_PLevels + 1))
+  self % EtaTheta = RMDI
+end if
+
+found = f_conf % get("eta_rho", self % EtaRho)
+if (found) then
+  if (size(self % EtaRho) /= self % IC_PLevels) then
+    call gen_warn(RoutineName, "eta_theta should be a vector of length (IC_PLevels + 1)")
+    cxvarobs_cxwriter_create = .false.
+    goto 9999
+  end if
+else
+  allocate(self % EtaRho(self % IC_PLevels))
+  self % EtaRho = RMDI
+end if
 
 int = 0
 found = f_conf % get("time_indicator", int)
@@ -693,7 +709,7 @@ UmHeader % FixHd(FH_DTDay) = day
 UmHeader % FixHd(FH_DTHour) = hour
 UmHeader % FixHd(FH_DTMinute) = minute
 UmHeader % FixHd(FH_DTSecond) = second
-UmHeader % FixHd(FH_DTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
+UmHeader % FixHd(FH_DTDayNo) = IMDI
 
 UmHeader % FixHd(FH_VTYear) = year
 UmHeader % FixHd(FH_VTMonth) = month
@@ -701,7 +717,7 @@ UmHeader % FixHd(FH_VTDay) = day
 UmHeader % FixHd(FH_VTHour) = hour
 UmHeader % FixHd(FH_VTMinute) = minute
 UmHeader % FixHd(FH_VTSecond) = second
-UmHeader % FixHd(FH_VTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
+UmHeader % FixHd(FH_VTDayNo) = IMDI
 
 now = OpsFn_DateTime_now()
 UmHeader % FixHd(FH_CTYear) = now % year
@@ -710,7 +726,7 @@ UmHeader % FixHd(FH_CTDay) = now % day
 UmHeader % FixHd(FH_CTHour) = now % hour
 UmHeader % FixHd(FH_CTMinute) = now % minute
 UmHeader % FixHd(FH_CTSecond) = now % second
-UmHeader % FixHd(FH_CTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
+UmHeader % FixHd(FH_CTDayNo) = IMDI
 
 UmHeader % IntC = IMDI
 UmHeader % IntC(IC_XLen) = self % IC_XLen

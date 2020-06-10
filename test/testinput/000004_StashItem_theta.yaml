@@ -24,6 +24,8 @@ Observations:
     - Filter: Cx Writer
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
+      eta_theta: [0,1,2,3,4,5]
+      eta_rho: [11,12,13,14,15]
       IC_PLevels: 5
 #    - Filter: VarObs Checker
 #      expected_main_table_columns:
