@@ -828,10 +828,8 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   iOut = 1
   do i = 1, NumRetainedObs
     iIn = RetainedObsIndices(i)
-    if (GeoVal % vals(1,iIn) /= MissingReal) then
-      Real1(iOut) = GeoVal % vals(1,iIn)
-      iOut = iOut + 1
-    end if
+    if (GeoVal % vals(1,iIn) /= MissingReal) Real1(iOut) = GeoVal % vals(1,iIn)
+    iOut = iOut + 1
   end do
 end if
 end subroutine cxvarobs_cxwriter_fillrealfromgeoval
@@ -970,12 +968,12 @@ integer                             :: iObs, iRetainedObs
 call cxvarobs_utils_fillreportflags(ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, &
                                     RejectObsWithAllVariablesFailingQC, ReportFlags)
 
-NumRetainedObs = count(btest(ReportFlags, FinalRejectFlag))
+NumRetainedObs = NumObsLocal - count(btest(ReportFlags, FinalRejectFlag))
 allocate(cxvarobs_cxwriter_retainedobsindices(NumRetainedObs))
 
 iRetainedObs = 1
 do iObs = 1, NumObsLocal
-  if (btest(ReportFlags(iObs), FinalRejectFlag)) then
+  if (.not. btest(ReportFlags(iObs), FinalRejectFlag)) then
     cxvarobs_cxwriter_retainedobsindices(iRetainedObs) = iObs
     iRetainedObs = iRetainedObs + 1
   end if
