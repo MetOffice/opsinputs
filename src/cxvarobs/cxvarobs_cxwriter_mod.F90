@@ -111,6 +111,7 @@ private
   integer(kind=8) :: FH_VertCoord
   integer(kind=8) :: FH_HorizGrid
   integer(kind=8) :: FH_GridStagger
+  integer(kind=8) :: FH_ObsFileType
   integer(kind=8) :: FH_ModelVersion
 
   integer(kind=8) :: IC_XLen
@@ -155,6 +156,7 @@ logical                                    :: found
 integer(kind=8), parameter                 :: zero = 0
 
 integer                                    :: NumLevels
+integer                                    :: i
 
 character(len=*), parameter :: RoutineName = "cxvarobs_cxwriter_create"
 character(len=200)          :: ErrorMessage
@@ -288,6 +290,24 @@ case default
   goto 9999
 end select
 
+string = "atmos"
+found = f_conf % get("FH_ObsFileType", string)
+select case (ops_to_lower_case(string))
+case ("atmos")
+  self % FH_ObsFileType = FH_ObsFileType_Atmos
+case ("ocean")
+  self % FH_ObsFileType = FH_ObsFileType_Ocean
+case ("sst")
+  self % FH_ObsFileType = FH_ObsFileType_SST
+case ("wave")
+  self % FH_ObsFileType = FH_ObsFileType_Wave
+case default
+  write (ErrorMessage, '("FH_ObsFileType code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  cxvarobs_cxwriter_create = .false.
+  goto 9999
+end select
+
 int = 0
 found = f_conf % get("FH_ModelVersion", int)
 self % FH_ModelVersion = int
@@ -335,9 +355,9 @@ self % RC_PoleLong = double
 ! TODO(wsmigaj): Retrieve these vectors from the configuration
 NumLevels = self % IC_PLevels
 allocate(self % EtaTheta(NumLevels + 1))
-self % EtaTheta = 3.14
+self % EtaTheta = (/(i, i = 0, NumLevels)/)
 allocate(self % EtaRho(NumLevels))
-self % EtaRho = 1.41
+self % EtaRho = (/(i, i = 100 + 1, 100 + NumLevels)/)
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 
@@ -508,14 +528,20 @@ integer, intent(in)                     :: RetainedObsIndices(:)
 type(OB_type), intent(inout)            :: Ob
 
 ! Local declarations:
+integer(c_int)                          :: year, month, day, hour, minute, second
 real(c_double)                          :: Reals(NumObsLocal)
 integer(c_int64_t)                      :: TimeOffsetsInSeconds(NumObsLocal)
 
 ! Body:
 
-! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
-
-! TODO: retained obs only
+call datetime_to_YYYYMMDDhhmmss(self % ValidityTime, year, month, day, hour, minute, second)
+Ob % Header % ValidityTime % year = year
+Ob % Header % ValidityTime % month = month
+Ob % Header % ValidityTime % day = day
+Ob % Header % ValidityTime % hour = hour
+Ob % Header % ValidityTime % minute = minute
+Ob % Header % ValidityTime % second = second
+Ob % Header % ValidityTime % diff_from_utc = 0 ! TODO(wsmigaj): Is it OK to assume this?
 
 call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
 call obsspace_get_db(ObsSpace, "MetaData", "latitude", Reals)
@@ -643,12 +669,16 @@ UmHeader % FixHd(FH_LookupSize2) = 1
 
 call UmHeader % alloc
 
+UmHeader % FixHd(FH_SubModel) = FH_SubModel_Atmos
 UmHeader % FixHd(FH_VertCoord) = self % FH_VertCoord
 UmHeader % FixHd(FH_HorizGrid) = self % FH_HorizGrid
 UmHeader % FixHd(FH_GridStagger) = self % FH_GridStagger
+UmHeader % FixHd(FH_Dataset) = FH_Dataset_InstDump
 UmHeader % FixHd(FH_ModelVersion) = self % FH_ModelVersion
+UmHeader % FixHd(FH_ObsFileType) = self % FH_ObsFileType
 
 call datetime_to_YYYYMMDDhhmmss(self % ValidityTime, year, month, day, hour, minute, second)
+
 UmHeader % FixHd(FH_DTYear) = year
 UmHeader % FixHd(FH_DTMonth) = month
 UmHeader % FixHd(FH_DTDay) = day

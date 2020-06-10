@@ -74,6 +74,10 @@ class CxWriterParameters : public oops::Parameters {
   ///
   /// Valid values (case-insensitive): ArakawaB, ArakawaC, EndGame.
   oops::Parameter<std::string> FH_GridStagger{"FH_GridStagger", "EndGame", this};
+  /// Type of observation file
+  ///
+  /// Valid values (case-insensitive): Atmos, Ocean, SST, Wave
+  oops::Parameter<std::string> FH_ObsFileType{"FH_ObsFileType", "Atmos", this};
   /// Model version number x 100 + release number.
   oops::Parameter<int> FH_ModelVersion{"FH_ModelVersion", 0, this};
 
