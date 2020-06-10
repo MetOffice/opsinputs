@@ -473,6 +473,8 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 
 do i = 1, size(CxFields)
   select case (CxFields(i))
+  case (StashItem_theta)
+    call geovars % push_back("air_potential_temperature")
   case (StashItem_modelsurface)
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
     ! here and in cxvarobs_cxwriter_populatecx.
@@ -628,6 +630,10 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 
 do iCxField = 1, size(CxFields)
   select case (CxFields(iCxField))
+  case (StashItem_theta)
+    call cxvarobs_cxwriter_fillreal2dfromgeoval( &
+      Cx % Header % theta, "theta", Cx % theta, &
+      self % GeoVals, RetainedObsIndices, "air_potential_temperature")
   case (StashItem_modelsurface)
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
     ! here and in cxvarobs_cxwriter_addrequiredgeovars.
@@ -875,12 +881,12 @@ end subroutine cxvarobs_cxwriter_fillrealfromgeoval
 !>   Header to be populated.
 !> \param[in] OpsVarName
 !>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
 !> \param[inout] Real2
 !>   Pointer to the array to be populated.
 !> \param[in] GeoVals
 !>   A container holding the specified GeoVaL.
+!> \param[in] RetainedObsIndices
+!>   Indices of retained observations held by this process.
 !> \param[in] JediVarName
 !>   Name of the GeoVal used to populate \p Real2.
 !>
@@ -888,23 +894,26 @@ end subroutine cxvarobs_cxwriter_fillrealfromgeoval
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine cxvarobs_cxwriter_fillreal2dfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName)
+  Hdr, OpsVarName, Real2, GeoVals, RetainedObsIndices, JediVarName)
 implicit none
 
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
 real(kind=8), pointer                           :: Real2(:,:)
-character(len=*), intent(in)                    :: JediVarName
 type(ufo_geovals), intent(in)                   :: GeoVals
+integer, intent(in)                             :: RetainedObsIndices(:)
+character(len=*), intent(in)                    :: JediVarName
 
 ! Local declarations:
+integer(kind=8)                                 :: NumRetainedObs
 type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
+integer                                         :: i, iIn, iOut
 
 ! Body:
 
+NumRetainedObs = size(RetainedObsIndices)
 MissingReal = missing_value(0.0_c_float)
 
 if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
@@ -912,10 +921,16 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
 
   ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(GeoVal % nval, kind = 8))
-  where (transpose(GeoVal % vals) /= MissingReal)
-    Real2 = transpose(GeoVal % vals)
-  end where
+  call Ops_Alloc(Hdr, OpsVarName, NumRetainedObs, Real2, num_levels = int(GeoVal % nval, kind = 8))
+
+  iOut = 1
+  do i = 1, NumRetainedObs
+    iIn = RetainedObsIndices(i)
+    where (GeoVal % vals(:,iIn) /= MissingReal)
+      Real2(iOut,:) = GeoVal % vals(:,iIn)
+    end where
+    iOut = iOut + 1
+  end do
 end if
 end subroutine cxvarobs_cxwriter_fillreal2dfromgeoval
 

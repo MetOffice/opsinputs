@@ -59,6 +59,7 @@ set( CXVAROBS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 
 # Create a directory for test input config and symlink all files
 list( APPEND cxvarobs_test_input
+  testinput/000004_StashItem_theta.yaml
   testinput/000030_StashItem_modelsurface.yaml
   testinput/001_VarField_pstar.yaml
   testinput/002_VarField_temperature_RadarZ.yaml
@@ -118,6 +119,8 @@ ecbuild_add_resources( TARGET cxvarobs_test_scripts
 
 # Create Data directory for test data and symlink files
 list( APPEND cxvarobs_test_data
+  000004_StashItem_theta.nc4
+  000030_StashItem_modelsurface.nc4
   001_VarField_pstar.nc4
   002_VarField_temperature_RadarZ.nc4
   002_VarField_temperature_Surface.nc4
@@ -205,6 +208,7 @@ ADD_WRITER_TEST(WRITER varobswriter NAME RealConstants)
 ADD_WRITER_TEST(WRITER varobswriter NAME reject_obs_with_all_variables_failing_qc)
 
 ### CxWriter tests
+ADD_WRITER_TEST(WRITER cxwriter NAME 000004_StashItem_theta)
 ADD_WRITER_TEST(WRITER cxwriter NAME 000030_StashItem_modelsurface)
 
 ### Tests of other classes

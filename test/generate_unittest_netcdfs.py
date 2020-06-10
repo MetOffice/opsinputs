@@ -302,6 +302,23 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_fa
 
     f.close()
 
+def output_2d_geoval_to_netcdf(var_name, file_name):
+    f = netcdf.netcdf_file(file_name, 'w')
+
+    nlocs = 4
+    nlevs = 3
+    f.createDimension('nlocs', nlocs)
+    f.createDimension('nlevs', nlevs)
+
+    var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+    var[:] = [[1.1, 1.2, 1.3], [2.1, missing_float, 2.3], [3.1, 3.2, 3.3], [4.1, 4.2, 4.3]]
+
+    f.date_time = 2018010100
+
+    f.close()
+
+
+# VarObs
 output_1d_simulated_var_to_netcdf('surface_pressure',           'testinput/001_VarField_pstar.nc4') # Surface
 output_1d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_Surface.nc4')
 output_2d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_RadarZ.nc4')
@@ -327,3 +344,7 @@ output_2d_simulated_var_to_netcdf('air_potential_temperature',  'testinput/078_V
 
 output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind', 
                                    'testinput/reject_obs_with_all_variables_failing_qc.nc4')
+
+# Cx
+output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/000004_StashItem_theta.nc4')
+output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/000030_StashItem_modelsurface.nc4')
