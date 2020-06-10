@@ -888,61 +888,6 @@ end subroutine cxvarobs_cxwriter_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
-!> Populate a 1D array of integers and its header from a JEDI variable.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Int1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Int1
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
-!> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Int1.
-!> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Int1.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine cxvarobs_cxwriter_fillinteger( &
-  Hdr, OpsVarName, NumObs, Int1, ObsSpace, JediVarName, JediVarGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-integer(kind=8), pointer                        :: Int1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-
-! Local declarations:
-integer(kind=4)                                 :: VarValue(NumObs)
-integer(kind=4)                                 :: MissingInt
-
-! Body:
-
-MissingInt = missing_value(0_c_int32_t)
-
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
-  ! Retrieve data from JEDI
-  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Int1)
-  where (VarValue /= MissingInt)
-    Int1 = VarValue
-  end where
-end if
-end subroutine cxvarobs_cxwriter_fillinteger
-
-! ------------------------------------------------------------------------------
-
 function cxvarobs_cxwriter_retainedobsindices( &
   NumObsLocal, ObsSpace, Flags, &
   RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
