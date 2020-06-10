@@ -102,6 +102,11 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<double> RC_PoleLat{"RC_PoleLat", 0.0, this};
   /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_PoleLong{"RC_PoleLong", 0.0, this};
+
+  /// The LBTIM element of the UM header look-up table.
+  oops::Parameter<int> timeIndicator{"time_indicator", 0, this};
+  /// The LBFT element of the UM header look-up table.
+  oops::Parameter<int> forecastPeriod{"forecast_period", 0, this};
 };
 
 }  // namespace cxvarobs

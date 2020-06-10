@@ -84,13 +84,6 @@ use OpsMod_ObsGroupInfo, only: &
 use OpsMod_ObsInfo
 use OpsMod_Stash
 
-!use OpsMod_AODGeneral, only: NAODWaves
-!use OpsMod_GPSRO, only: GPSRO_TPD
-!use OpsMod_Radar, only: RadFamily
-!use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
-!use OpsMod_Varfields
-!use OpsMod_Varobs
-
 implicit none
 public :: cxvarobs_cxwriter_create, cxvarobs_cxwriter_delete, &
           cxvarobs_cxwriter_prior, cxvarobs_cxwriter_post
@@ -125,6 +118,9 @@ private
   real(kind=8)    :: RC_FirstLong
   real(kind=8)    :: RC_PoleLat
   real(kind=8)    :: RC_PoleLong
+
+  integer(kind=8) :: TimeIndicator
+  integer(kind=8) :: ForecastPeriod
 
   real(kind=8), allocatable :: EtaTheta(:)
   real(kind=8), allocatable :: EtaRho(:)
@@ -359,8 +355,15 @@ self % EtaTheta = (/(i, i = 0, NumLevels)/)
 allocate(self % EtaRho(NumLevels))
 self % EtaRho = (/(i, i = 100 + 1, 100 + NumLevels)/)
 
-! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
+int = 0
+found = f_conf % get("time_indicator", int)
+self % TimeIndicator = int
 
+int = 0
+found = f_conf % get("forecast_period", int)
+self % ForecastPeriod = int
+
+! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 call cxvarobs_cxwriter_addrequiredgeovars(self, geovars)
 
 9999 if (allocated(string)) deallocate(string)
@@ -582,6 +585,7 @@ Cx % Header % NumLocal = Ob % Header % NumObsLocal
 Cx % Header % NumTotal = Ob % Header % NumObsTotal
 Cx % Header % ModelVersion = self % FH_ModelVersion
 Cx % Header % SubModel = FH_SubModel_Atmos
+! TODO(wsmigaj): to use this criterion, ModelType would need to be set appropriately.
 Cx % Header % NewDynamics = self % FH_ModelVersion >= 500 .and. ModelType /= ModelType_Ocean
 
 ! TODO(wsmigaj)
@@ -660,8 +664,6 @@ UmHeader % FixHd(FH_RealCSize) = 34
 UmHeader % FixHd(FH_LevDepCStart) = UmHeader % FixHd(FH_RealCStart) + UmHeader % FixHd(FH_RealCSize)
 UmHeader % FixHd(FH_LevDepCSize1) = NumLevels + 1  ! EtaTheta has an extra ground level
 UmHeader % FixHd(FH_LevDepCSize2) = 2              ! Two variables: EtaTheta and EtaRho
-!UmHeader % FixHd(FH_ColDepCStart) = UmHeader % FixHd(FH_LevDepCStart) + &
-!                                    UmHeader % FixHd(FH_LevDepCSize1) * UmHeader % FixHd(FH_LevDepCSize2)
 UmHeader % FixHd(FH_LookupStart) = UmHeader % FixHd(FH_LevDepCStart) + &
                                    UmHeader % FixHd(FH_LevDepCSize1) * UmHeader % FixHd(FH_LevDepCSize2)
 UmHeader % FixHd(FH_LookupSize1) = LBFT
@@ -733,7 +735,8 @@ UmHeader % Lookup(LBYRD:LBMIND,1) = UmHeader % FixHd(FH_DTYear:FH_DTMinute)
 UmHeader % Lookup(LBDAYD,1) = UmHeader % FixHd(FH_DTDayNo)
 UmHeader % Lookup(LBSECD,1) = UmHeader % FixHd(FH_DTSecond)
 
-! TODO(wsmigaj): fill the LBTIM and LBFT fields
+UmHeader % Lookup(LBTIM,1) = self % TimeIndicator
+UmHeader % Lookup(LBFT,1) = self % ForecastPeriod
 
 end subroutine cxvarobs_cxwriter_populateumheader
 
