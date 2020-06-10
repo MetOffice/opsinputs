@@ -151,9 +151,13 @@ CREATE_SYMLINK_FILENAME( ${CMAKE_CURRENT_SOURCE_DIR}/testinput
 
 ecbuild_add_executable( TARGET  test_CxVarObsFilters.x
                         SOURCES cxvarobs/instantiateObsFilterFactory.h
+                                cxvarobs/CheckerUtils.cc
+                                cxvarobs/CheckerUtils.h
                                 cxvarobs/ResetFlagsToPass.cc
                                 cxvarobs/ResetFlagsToPass.h
                                 cxvarobs/ResetFlagsToPassParameters.h
+                                cxvarobs/TempFile.cc
+                                cxvarobs/TempFile.h
                                 cxvarobs/VarObsChecker.cc
                                 cxvarobs/VarObsChecker.h
                                 cxvarobs/VarObsCheckerParameters.h
