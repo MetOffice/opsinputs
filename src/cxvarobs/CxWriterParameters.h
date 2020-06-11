@@ -51,13 +51,6 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
 
-// TODO(wsmigaj): needed?
-//  /// Account for the GPSRO tangent point drift.
-//  oops::Parameter<bool> accountForGPSROTangentPointDrift{
-//    "account_for_gpsro_tangent_point_drift", false, this};
-  /// Output the Family field (taken from the radar_family variable). Used for radar observations.
-  oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
-
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.
 

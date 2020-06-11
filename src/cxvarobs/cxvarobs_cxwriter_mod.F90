@@ -98,9 +98,6 @@ private
   logical         :: RejectObsWithAnyVariableFailingQC
   logical         :: RejectObsWithAllVariablesFailingQC
 
-  logical         :: AccountForGPSROTangentPointDrift
-  logical         :: UseRadarFamily
-
   integer(kind=8) :: FH_VertCoord
   integer(kind=8) :: FH_HorizGrid
   integer(kind=8) :: FH_GridStagger
@@ -213,13 +210,6 @@ found = f_conf % get("reject_obs_with_any_variable_failing_qc", &
 self % RejectObsWithAllVariablesFailingQC = .false.
 found = f_conf % get("reject_obs_with_all_variables_failing_qc", &
                      self % RejectObsWithAllVariablesFailingQC)
-
-self % AccountForGPSROTangentPointDrift = .false.
-found = f_conf % get("account_for_gpsro_tangent_point_drift", &
-                     self % AccountForGPSROTangentPointDrift)
-
-self % UseRadarFamily = .false.
-found = f_conf % get("use_radar_family", self % UseRadarFamily)
 
 string = "hybrid"  ! TODO(wsmigaj): is this a good default?
 found = f_conf % get("FH_VertCoord", string)
