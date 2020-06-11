@@ -9,6 +9,10 @@
 #include <fstream>
 #include <sstream>
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
+
 #include "../../test/cxvarobs/CheckerUtils.h"
 #include "../../test/cxvarobs/TempFile.h"
 
@@ -39,7 +43,29 @@ std::string getEnvVariableOrThrow(const char *variableName) {
 }
 
 bool startsWith(const std::string &string, const char *prefix) {
-  return string.rfind(prefix, 0 /*look only at the beginning of string*/);
+  return boost::algorithm::starts_with(string, prefix);
+}
+
+boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
+    const std::string &line) {
+  const char separator[] = " = ";
+  auto separatorPos = line.find(separator);
+  if (separatorPos != std::string::npos) {
+    std::string name = line.substr(0, separatorPos);
+    std::string value = line.substr(separatorPos + sizeof(separator) - 1);
+    boost::algorithm::trim(name);
+    boost::algorithm::trim(value);
+    return std::make_pair(std::move(name), std::move(value));
+  }
+  return boost::none;
+}
+
+std::vector<std::string> splitIntoFixedLengthChunks(const std::string &line, size_t chunkSize) {
+  const size_t numChunks = line.size() / chunkSize;
+  std::vector<std::string> chunks(numChunks);
+  for (size_t i = 0; i < numChunks; ++i)
+    chunks[i] = line.substr(i * chunkSize, chunkSize);
+  return chunks;
 }
 
 std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputFilePath) {

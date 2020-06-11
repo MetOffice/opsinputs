@@ -153,6 +153,9 @@ ecbuild_add_executable( TARGET  test_CxVarObsFilters.x
                         SOURCES cxvarobs/instantiateObsFilterFactory.h
                                 cxvarobs/CheckerUtils.cc
                                 cxvarobs/CheckerUtils.h
+                                cxvarobs/CxChecker.cc
+                                cxvarobs/CxChecker.h
+                                cxvarobs/CxCheckerParameters.h
                                 cxvarobs/ResetFlagsToPass.cc
                                 cxvarobs/ResetFlagsToPass.h
                                 cxvarobs/ResetFlagsToPassParameters.h

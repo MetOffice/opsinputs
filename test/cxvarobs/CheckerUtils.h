@@ -9,16 +9,31 @@
 #define TEST_CXVAROBS_CHECKERUTILS_H_
 
 #include <string>
+#include <utility>
+#include <vector>
+
+#include <boost/optional.hpp>
 
 namespace cxvarobs {
 namespace test {
 
-// This could be made OS-dependent.
-constexpr char PATH_SEPARATOR = '/';
+/// \brief Directory separator.
+constexpr char PATH_SEPARATOR = '/'; // This could be made OS-dependent.
 
 std::string getEnvVariableOrThrow(const char *variableName);
 
+/// \brief Return true if \p string starts with \p prefix, false otherwise.
 bool startsWith(const std::string &string, const char *prefix);
+
+/// \brief If \p line contains the substring " = ", return the trimmed left- and right-hand side of
+/// the equality. Otherwise return boost::none.
+boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
+    const std::string &line);
+
+/// \brief Split \p line into chunks of exactly \p chunkSize characters and return them.
+///
+/// Any leftover characters at the end of \p line are ignored.
+std::vector<std::string> splitIntoFixedLengthChunks(const std::string &line, size_t chunkSize);
 
 /// \brief Return the contents of \p inputFilePath printed in a textual form using the OPS utility
 /// \p printUtilName.
