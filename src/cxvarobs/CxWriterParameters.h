@@ -29,25 +29,27 @@ class CxWriterParameters : public oops::Parameters {
 
   /// Directory containing namelist files specifying the cxfields to output.
   ///
-  /// The list of varfields to output for an observation group ObsGroup is controlled by the file
+  /// The list of cxfields to output for an observation group ObsGroup is controlled by the file
   /// ObsGroup.nl located in the namelist directory.
   ///
   /// If this option is not set, the location of the namelist directory is controlled by the
-  /// OPS_VAROBSCONTROL_NL_DIR environment variable. If the namelist directory or the namelist file
-  /// corresponding to a particular observation group is not found, the default list of varfields
+  /// OPS_CX_CONTROL_NL_DIR environment variable. If the namelist directory or the namelist file
+  /// corresponding to a particular observation group is not found, the default list of cxfields
   /// specified by OPS for that observation group is used.
   oops::OptionalParameter<std::string> namelistDirectory{"namelist_directory", this};
 
-  /// Output directory for VarObs files.
+  /// Output directory for Cx files.
   ///
   /// If this option is not set, the location of the output directory is controlled by the
-  /// OPS_VAROB_OUTPUT_DIR environment variable.
+  /// OPS_CX_DIR_LIST environment variable.
   oops::OptionalParameter<std::string> outputDirectory{"output_directory", this};
 
-  /// Output only observations that passed the quality check in all variables.
+  /// Output only model columns corresponding to observations that passed the quality check in all
+  /// variables.
   oops::Parameter<bool> rejectObsWithAnyVariableFailingQC{
     "reject_obs_with_any_variable_failing_qc", false, this};
-  /// Output only observations that passed the quality check in at least one variable.
+  /// Output only model columns corresponding to observations that passed the quality check in
+  /// at least one variable.
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
 
@@ -102,7 +104,7 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<int> forecastPeriod{"forecast_period", 0, this};
 
   // TODO(wsmigaj): I hope these comments are correct -- please let me know if not.
-  // Can these parameters be given more widely understandable names (without Greek letters)?.
+  // Can these parameters be given more widely understandable names (without Greek letters)?
   /// New dynamics vertical coordinate theta. Should have length IC_PLEVELS + 1 (with the
   /// first element denoting the value at the surface).
   oops::Parameter<std::vector<double>> etaTheta{"eta_theta", {}, this};
