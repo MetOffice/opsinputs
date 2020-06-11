@@ -73,6 +73,7 @@ use cxvarobs_cxgenerate_mod, only: &
 use OpsMod_DateTime
 use OpsMod_MiscTypes
 use OpsMod_ModelColumnIO, only: &
+    Ops_WriteOutVarCx,      &
     Ops_WriteOutVarCx1pe
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
@@ -413,11 +414,45 @@ end subroutine cxvarobs_cxwriter_prior
 
 ! ------------------------------------------------------------------------------
 
+subroutine ops_mpl_allgather_integer(sendbuf, sendcount,  sendtype,          &
+                                     recvbuf, recvcount,  recvtype,          &
+                                     comm,    error)
+use mpl, only: &
+  gc_int_kind
+
+! Subroutine arguments:
+integer(kind=gc_int_kind) :: sendbuf(:)
+integer(kind=gc_int_kind) :: sendcount
+integer(kind=gc_int_kind) :: sendtype
+integer(kind=gc_int_kind) :: recvbuf(:)
+integer(kind=gc_int_kind) :: recvcount
+integer(kind=gc_int_kind) :: recvtype
+integer(kind=gc_int_kind) :: comm
+integer(kind=gc_int_kind) :: error
+
+! Local declarations:
+external mpl_allgather
+
+call mpl_allgather (sendbuf,  &
+                 sendcount,  &
+                 sendtype, &
+                 recvbuf,  &
+                 recvcount, &
+                 recvtype, &
+                 comm,     &
+                 error)
+
+end subroutine ops_mpl_allgather_integer
+
+! ------------------------------------------------------------------------------
+
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
 subroutine cxvarobs_cxwriter_post( &
   self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
+USE mpl, ONLY: &
+          gc_int_kind, mpl_integer
 implicit none
 
 ! Subroutine arguments:
@@ -435,6 +470,18 @@ integer, allocatable           :: RetainedObsIndices(:)
 type(OB_type)                  :: Ob(1)
 type(CX_type)                  :: Cx(1)
 type(UM_header_type)           :: UMHeader
+integer(kind=8)                :: NumRetainedObsOnEachRank(0:nproc-1)
+integer :: i
+logical(kind=8), allocatable :: mask(:)
+
+integer(kind=gc_int_kind) :: sendbuf(1)
+integer(kind=gc_int_kind) :: sendcount
+integer(kind=gc_int_kind) :: sendtype
+integer(kind=gc_int_kind) :: recvbuf(nproc)
+integer(kind=gc_int_kind) :: recvcount
+integer(kind=gc_int_kind) :: recvtype
+integer(kind=gc_int_kind) :: comm
+integer(kind=gc_int_kind) :: istat
 
 ! Body:
 
@@ -451,7 +498,24 @@ call cxvarobs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, Re
                                   Cx(1))
 call cxvarobs_cxwriter_populateumheader(self, UMHeader)
 
-call Ops_WriteOutVarCx1pe (Ob, Cx, [UMheader % IntC(IC_Plevels)], UMheader)
+! call Ops_WriteOutVarCx1pe (Ob, Cx, [UMheader % IntC(IC_Plevels)], UMheader)
+
+!call Ops_WriteOutVarCx(Ob, Cx, [UMheader % IntC(IC_Plevels)], UMheader)
+!sendbuf = Ob(1) % Header % NumObsLocal
+call ops_mpl_allgather_integer([Cx(1) % Header % NumLocal], 1_gc_int_kind, mpl_integer, &
+                               recvbuf, 1_gc_int_kind, mpl_integer, &
+                               mpi_group, istat)
+
+do i = 1, nproc
+  print *, "recvbuf  ",  mype, " ", i, " ", recvbuf(i)
+end do
+
+allocate(mask(Cx(1) % Header % NumLocal))
+mask = .true.
+
+call Ops_WriteOutVarCx(Ob(1), Cx(1), recvbuf, UMheader % IntC(IC_Plevels), UMheader, mask)
+
+deallocate(mask)
 
 call UMheader % dealloc()
 call Cx(1) % deallocate()
@@ -479,6 +543,10 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 
 do i = 1, size(CxFields)
   select case (CxFields(i))
+  case (StashItem_u)
+    call geovars % push_back("eastward_wind")
+  case (StashItem_v)
+    call geovars % push_back("northward_wind")
   case (StashItem_theta)
     call geovars % push_back("air_potential_temperature")
   case (StashItem_modelsurface)
@@ -636,6 +704,14 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 
 do iCxField = 1, size(CxFields)
   select case (CxFields(iCxField))
+  case (StashItem_u)
+    call cxvarobs_cxwriter_fillreal2dfromgeoval( &
+      Cx % Header % u, "u", Cx % u, &
+      self % GeoVals, RetainedObsIndices, "eastward_wind")
+  case (StashItem_v)
+    call cxvarobs_cxwriter_fillreal2dfromgeoval( &
+      Cx % Header % v, "v", Cx % v, &
+      self % GeoVals, RetainedObsIndices, "northward_wind")
   case (StashItem_theta)
     call cxvarobs_cxwriter_fillreal2dfromgeoval( &
       Cx % Header % theta, "theta", Cx % theta, &
@@ -928,6 +1004,8 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
 
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumRetainedObs, Real2, num_levels = int(GeoVal % nval, kind = 8))
+
+  print *, "Process ", mype, ": size of Real2: ", size(Real2,1), ", ", size(Real2,2)
 
   iOut = 1
   do i = 1, NumRetainedObs
