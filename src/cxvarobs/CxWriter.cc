@@ -88,10 +88,8 @@ void CxWriter::print(std::ostream & os) const {
 }
 
 void CxWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
-  if (parameters_.namelistDirectory.value() != boost::none) {
+  if (parameters_.namelistDirectory.value() != boost::none)
     localEnvironment.set("OPS_CX_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
-    localEnvironment.set("OPS_CXBGERR_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
-  }
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_CX_DIR_LIST", *parameters_.outputDirectory.value());
 }
