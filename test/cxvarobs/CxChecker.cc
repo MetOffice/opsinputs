@@ -17,7 +17,6 @@
 
 #include "cxvarobs/LocalEnvironment.h"
 #include "cxvarobs/MPIExceptionSynchronizer.h"
-#include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 #include "eckit/exception/Exceptions.h"
@@ -75,9 +74,9 @@ void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &)
   cxvarobs::LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  const char exeName[] = "OpsProg_PrintCxFile.exe";
+  const char exeName[] = "OpsProg_PrintCXFile.exe";
   const std::string varObsFileName(getEnvVariableOrThrow("OPS_CX_DIR_LIST") +
-            PATH_SEPARATOR + obsdb_.obsname() + ".varobs");
+            PATH_SEPARATOR + obsdb_.obsname() + ".cx");
   std::string printCxFileOutput = runOpsPrintUtil(exeName, varObsFileName);
 
   PrintCxFileOutput output = parsePrintCxFileOutput(printCxFileOutput);
@@ -96,8 +95,8 @@ void CxChecker::setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) c
 }
 
 CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
-    const std::string &printVarObsOutput) const {
-  std::istringstream is(printVarObsOutput);
+    const std::string &printCxFileOutput) const {
+  std::istringstream is(printCxFileOutput);
   std::string line;
 
   enum FileSection {
@@ -119,7 +118,7 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
     switch (section) {
     case BeforeLevelDependentConstants:
       if (line == "Level Dependent Constants:") {
-        section = BeforeLevelDependentConstants;
+        section = InLevelDependentConstants;
       } else if (auto nameAndValue = splitAtEqualsSignAndTrim(line)) {
         output.headerFields[nameAndValue->first] = nameAndValue->second;
       }
@@ -133,11 +132,11 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
         section = InColumnDependentConstants;
       break;
     case InEtaThetaLevels:
-      output.etaThetaLevels = splitIntoFixedLengthChunks(line, 6);
+      output.etaThetaLevels = splitIntoFixedLengthChunksAndTrim(line, 6);
       section = InLevelDependentConstants;
       break;
     case InEtaRhoLevels:
-      output.etaRhoLevels = splitIntoFixedLengthChunks(line, 6);
+      output.etaRhoLevels = splitIntoFixedLengthChunksAndTrim(line, 6);
       section = InLevelDependentConstants;
       break;
     case InColumnDependentConstants:
@@ -155,17 +154,18 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
       } else if (auto nameAndValue = splitAtEqualsSignAndTrim(line)) {
         output.lookupFields[batchIndex][nameAndValue->first] = nameAndValue->second;
       }
+      break;
     case InMainTable:
       if (startsWith(line, "Batch number ")) {
         batchIndex = std::stoi(line.substr(13)) - 1;
         output.mainTable.resize(batchIndex + 1);
       } else if (startsWith(line, "Column number ")){
-        columnIndex = std::stoi(line.substr(17)) - 1;
+        columnIndex = std::stoi(line.substr(14)) - 1;
         output.mainTable[batchIndex].resize(columnIndex + 1);
-      } else if (line == "doesn't exist") {
+      } else if (line.empty() || line == "doesn't exist") {
         // nothing to do
       } else {
-        output.mainTable[batchIndex][columnIndex] = splitIntoFixedLengthChunks(line, 10);
+        output.mainTable[batchIndex][columnIndex] = splitIntoFixedLengthChunksAndTrim(line, 10);
       }
       break;
     }
@@ -234,7 +234,7 @@ void CxChecker::checkMainTable(
   const std::vector<std::vector<std::vector<std::string>>> &expectedValues =
       *parameters_.expectedMainTableColumns.value();
 
-  if (mainTable.size() <= expectedValues.size()) {
+  if (mainTable.size() < expectedValues.size()) {
     std::stringstream str;
     str << "Expected " << expectedValues.size()
         << " batches, but only " << mainTable.size() << " found ";
@@ -242,7 +242,7 @@ void CxChecker::checkMainTable(
   }
 
   for (size_t batch = 0; batch < expectedValues.size(); ++batch) {
-    if (mainTable[batch].size() <= expectedValues[batch].size() ) {
+    if (mainTable[batch].size() < expectedValues[batch].size() ) {
       std::stringstream str;
       str << "Batch " << batch << ": expected " << expectedValues[batch].size()
           << " columns, but only " << mainTable[batch].size() << " found ";

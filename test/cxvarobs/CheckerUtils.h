@@ -30,10 +30,11 @@ bool startsWith(const std::string &string, const char *prefix);
 boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
     const std::string &line);
 
-/// \brief Split \p line into chunks of exactly \p chunkSize characters and return them.
+/// \brief Split \p line into chunks of exactly \p chunkSize characters, trim them and collect
+/// into a vector.
 ///
 /// Any leftover characters at the end of \p line are ignored.
-std::vector<std::string> splitIntoFixedLengthChunks(const std::string &line, size_t chunkSize);
+std::vector<std::string> splitIntoFixedLengthChunksAndTrim(const std::string &line, size_t chunkSize);
 
 /// \brief Return the contents of \p inputFilePath printed in a textual form using the OPS utility
 /// \p printUtilName.

@@ -60,11 +60,14 @@ boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
   return boost::none;
 }
 
-std::vector<std::string> splitIntoFixedLengthChunks(const std::string &line, size_t chunkSize) {
+std::vector<std::string> splitIntoFixedLengthChunksAndTrim(const std::string &line,
+                                                           size_t chunkSize) {
   const size_t numChunks = line.size() / chunkSize;
   std::vector<std::string> chunks(numChunks);
-  for (size_t i = 0; i < numChunks; ++i)
+  for (size_t i = 0; i < numChunks; ++i) {
     chunks[i] = line.substr(i * chunkSize, chunkSize);
+    boost::algorithm::trim(chunks[i]);
+  }
   return chunks;
 }
 
@@ -101,13 +104,14 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
     }
 
     // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
-    const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + inputFilePathName +
+    const std::string cmd = /*"mpiexec -n 1 " +*/ exePath + " \"" + inputFilePathName +
         "\" --all --outfile=\"" + tempFile->name() + "\"";
     if (oops::mpi::comm().rank() == 0) {
       oops::Log::info() << "Running " << cmd << "\n";
       const int exitCode = std::system(cmd.c_str());
       if (exitCode != 0)
-        throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
+        throw std::runtime_error(std::string(printUtilName) + " failed with exit code " +
+                                 std::to_string(exitCode));
     }
   }
 
