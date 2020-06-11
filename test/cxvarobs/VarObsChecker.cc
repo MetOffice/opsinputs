@@ -9,15 +9,12 @@
 #include <fstream>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 #include "../../test/cxvarobs/CheckerUtils.h"
 #include "../../test/cxvarobs/VarObsChecker.h"
 
 #include "cxvarobs/LocalEnvironment.h"
-#include "cxvarobs/MPIExceptionSynchronizer.h"
-#include "cxvarobs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 #include "eckit/exception/Exceptions.h"
