@@ -6,6 +6,7 @@
 list( APPEND cxvarobs_src_files
     cxvarobs_cxgenerate_mod.F90
     cxvarobs_cxwriter_mod.F90
+    cxvarobs_mpl_mod.F90
     cxvarobs_obsspace_f.cc
     cxvarobs_obsspace_f.h
     cxvarobs_obsspace_mod.F90

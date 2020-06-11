@@ -17,6 +17,7 @@ use oops_variables_mod
 use obsspace_mod
 use ufo_geovals_mod
 use ufo_vars_mod
+use cxvarobs_mpl_mod, only: cxvarobs_mpl_allgather_integer
 use cxvarobs_obsdatavector_mod
 use cxvarobs_obsspace_mod
 use cxvarobs_utils_mod
@@ -414,38 +415,6 @@ end subroutine cxvarobs_cxwriter_prior
 
 ! ------------------------------------------------------------------------------
 
-subroutine ops_mpl_allgather_integer(sendbuf, sendcount,  sendtype,          &
-                                     recvbuf, recvcount,  recvtype,          &
-                                     comm,    error)
-use mpl, only: &
-  gc_int_kind
-
-! Subroutine arguments:
-integer(kind=gc_int_kind) :: sendbuf(:)
-integer(kind=gc_int_kind) :: sendcount
-integer(kind=gc_int_kind) :: sendtype
-integer(kind=gc_int_kind) :: recvbuf(:)
-integer(kind=gc_int_kind) :: recvcount
-integer(kind=gc_int_kind) :: recvtype
-integer(kind=gc_int_kind) :: comm
-integer(kind=gc_int_kind) :: error
-
-! Local declarations:
-external mpl_allgather
-
-call mpl_allgather (sendbuf,  &
-                 sendcount,  &
-                 sendtype, &
-                 recvbuf,  &
-                 recvcount, &
-                 recvtype, &
-                 comm,     &
-                 error)
-
-end subroutine ops_mpl_allgather_integer
-
-! ------------------------------------------------------------------------------
-
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
@@ -467,21 +436,12 @@ real(c_double),     intent(in) :: hofx(nvars, nlocs)
 ! Local declarations:
 integer                        :: NumObsLocal
 integer, allocatable           :: RetainedObsIndices(:)
-type(OB_type)                  :: Ob(1)
-type(CX_type)                  :: Cx(1)
+type(OB_type)                  :: Ob
+type(CX_type)                  :: Cx
 type(UM_header_type)           :: UMHeader
-integer(kind=8)                :: NumRetainedObsOnEachRank(0:nproc-1)
-integer :: i
-logical(kind=8), allocatable :: mask(:)
-
-integer(kind=gc_int_kind) :: sendbuf(1)
-integer(kind=gc_int_kind) :: sendcount
-integer(kind=gc_int_kind) :: sendtype
-integer(kind=gc_int_kind) :: recvbuf(nproc)
-integer(kind=gc_int_kind) :: recvcount
-integer(kind=gc_int_kind) :: recvtype
-integer(kind=gc_int_kind) :: comm
-integer(kind=gc_int_kind) :: istat
+integer(kind=8)                :: NumRetainedObsOnEachRank(nproc)
+logical(kind=8), allocatable   :: mask(:)
+integer(kind=gc_int_kind)      :: istat
 
 ! Body:
 
@@ -490,36 +450,31 @@ RetainedObsIndices = cxvarobs_cxwriter_retainedobsindices( &
   NumObsLocal, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
-call cxvarobs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob(1))
+call cxvarobs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob)
 call cxvarobs_cxwriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, &
-                                            NumObsLocal, RetainedObsIndices, Ob(1))
-call cxvarobs_cxwriter_allocatecx(self, Ob(1), Cx(1))
+                                            NumObsLocal, RetainedObsIndices, Ob)
+call cxvarobs_cxwriter_allocatecx(self, Ob, Cx)
 call cxvarobs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, RetainedObsIndices, &
-                                  Cx(1))
+                                  Cx)
 call cxvarobs_cxwriter_populateumheader(self, UMHeader)
 
-! call Ops_WriteOutVarCx1pe (Ob, Cx, [UMheader % IntC(IC_Plevels)], UMheader)
-
-!call Ops_WriteOutVarCx(Ob, Cx, [UMheader % IntC(IC_Plevels)], UMheader)
-!sendbuf = Ob(1) % Header % NumObsLocal
-call ops_mpl_allgather_integer([Cx(1) % Header % NumLocal], 1_gc_int_kind, mpl_integer, &
-                               recvbuf, 1_gc_int_kind, mpl_integer, &
-                               mpi_group, istat)
-
-do i = 1, nproc
-  print *, "recvbuf  ",  mype, " ", i, " ", recvbuf(i)
-end do
-
-allocate(mask(Cx(1) % Header % NumLocal))
+call cxvarobs_mpl_allgather_integer([Cx % Header % NumLocal], 1_gc_int_kind, mpl_integer, &
+                                    NumRetainedObsOnEachRank, 1_gc_int_kind, mpl_integer, &
+                                    mpi_group, istat)
+allocate(mask(Cx % Header % NumLocal))
+! TODO(wsmigaj): It turns out that we could avoid "filtering" geovals by removing those rejected
+! by QC, and instead clear the elements of 'mask' corresponding to these elements. That would result
+! in simpler code and more scope for its reuse between CxWriter and VarObsWriter.
 mask = .true.
 
-call Ops_WriteOutVarCx(Ob(1), Cx(1), recvbuf, UMheader % IntC(IC_Plevels), UMheader, mask)
+call Ops_WriteOutVarCx(Ob, Cx, NumRetainedObsOnEachRank, &
+                       UMheader % IntC(IC_Plevels), UMheader, mask)
 
 deallocate(mask)
 
 call UMheader % dealloc()
-call Cx(1) % deallocate()
-call Ob(1) % deallocate()
+call Cx % deallocate()
+call Ob % deallocate()
 deallocate(RetainedObsIndices)
 
 end subroutine cxvarobs_cxwriter_post
