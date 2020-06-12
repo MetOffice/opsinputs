@@ -1,7 +1,7 @@
 pipeline { 
     agent { 
         docker {
-            image 'alpine:3'
+            image 'maven:3-alpine'
             label 'exxbuildprd1' 
         }
     }
