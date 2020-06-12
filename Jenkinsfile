@@ -6,12 +6,16 @@ pipeline {
     stages {
         stage('Build') { 
             steps { 
-				cmakeBuild buildType: 'Debug', cleanBuild: true, sourceDir: '.', buildDir: '../build', installation: '../install'
+				sh 'cd ..'
+				sh 'mkdir build'
+				sh 'cd build'
+                sh 'cmake ../cxvarobs -DCMAKE_BUILD_TYPE=Debug' 
+				sh 'make'
             }
         }
         stage('Test'){
             steps {
-				ctest installation: '../install'
+				sh 'ctest'
             }
         }
     }
