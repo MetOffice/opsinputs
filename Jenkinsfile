@@ -1,5 +1,10 @@
 pipeline { 
-    agent { label 'exxbuildprd1' }
+    agent { 
+        docker {
+            image 'alpine:3'
+            label 'exxbuildprd1' 
+        }
+    }
     options {
         skipStagesAfterUnstable()
     }
