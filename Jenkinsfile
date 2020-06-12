@@ -6,12 +6,12 @@ pipeline {
     stages {
         stage('Build') { 
             steps { 
-				cmakeBuild buildType: 'Debug', cleanBuild: true
+				cmakeBuild buildType: 'Debug', cleanBuild: true, sourceDir: '.', buildDir: '../build', installation: '../install'
             }
         }
         stage('Test'){
             steps {
-				ctest
+				ctest installation: '../install'
             }
         }
     }
