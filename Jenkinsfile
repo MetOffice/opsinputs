@@ -5,9 +5,6 @@ pipeline {
             label 'exxbuildprd1' 
         }
     }
-    options {
-        skipStagesAfterUnstable()
-    }
     stages {
         stage('Build') { 
             steps { 
