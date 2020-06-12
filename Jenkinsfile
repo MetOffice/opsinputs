@@ -11,16 +11,16 @@ pipeline {
     stages {
         stage('Build') { 
             steps { 
-				sh 'cd ..'
-				sh 'mkdir build'
-				sh 'cd build'
-                sh 'cmake ../cxvarobs -DCMAKE_BUILD_TYPE=Debug' 
-				sh 'make'
+				bat 'cd ..'
+				bat 'mkdir build'
+				bat 'cd build'
+                bat 'cmake ../cxvarobs -DCMAKE_BUILD_TYPE=Debug' 
+				bat 'make'
             }
         }
         stage('Test'){
             steps {
-				sh 'ctest'
+				bat 'ctest'
             }
         }
     }
