@@ -2,7 +2,7 @@ pipeline {
     agent { 
         docker {
             image 'maven:3-alpine'
-            label 'exxbuildprd1' 
+            label 'exxmidebldprd04' 
         }
     }
     stages {
