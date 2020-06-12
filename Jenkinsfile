@@ -1,5 +1,5 @@
 pipeline { 
-    agent any 
+    agent { label 'exxbuildprd1' }
     options {
         skipStagesAfterUnstable()
     }
