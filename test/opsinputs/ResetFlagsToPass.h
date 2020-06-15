@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_RESETFLAGSTOPASS_H_
-#define TEST_CXVAROBS_RESETFLAGSTOPASS_H_
+#ifndef TEST_OPSINPUTS_RESETFLAGSTOPASS_H_
+#define TEST_OPSINPUTS_RESETFLAGSTOPASS_H_
 
 #include <ostream>
 #include <set>
@@ -14,7 +14,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "../cxvarobs/ResetFlagsToPassParameters.h"
+#include "../opsinputs/ResetFlagsToPassParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
@@ -34,7 +34,7 @@ namespace ufo {
   class ObsDiagnostics;
 }
 
-namespace cxvarobs {
+namespace opsinputs {
 
 namespace test {
 
@@ -43,7 +43,7 @@ namespace test {
 /// See ResetFlagsToPassParameters for the available options.
 class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<ResetFlagsToPass> {
  public:
-  static const std::string classname() {return "cxvarobs::test::ResetFlagsToPass";}
+  static const std::string classname() {return "opsinputs::test::ResetFlagsToPass";}
 
   ResetFlagsToPass(ioda::ObsSpace &, const eckit::Configuration &,
                    boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -69,6 +69,6 @@ class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<Res
 };
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_RESETFLAGSTOPASS_H_
+#endif  // TEST_OPSINPUTS_RESETFLAGSTOPASS_H_

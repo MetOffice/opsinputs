@@ -9,11 +9,11 @@
 
 cmake_minimum_required( VERSION 3.12 FATAL_ERROR )
 
-project( cxvarobs VERSION 0.1 LANGUAGES C CXX Fortran )
+project( opsinputs VERSION 0.1 LANGUAGES C CXX Fortran )
 
 set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH})
 
-set( CMAKE_DIRECTORY_LABELS "cxvarobs" )
+set( CMAKE_DIRECTORY_LABELS "opsinputs" )
 
 set( ECBUILD_DEFAULT_BUILD_TYPE Release )
 set( ENABLE_OS_TESTS           OFF CACHE BOOL "Disable OS tests" FORCE )
@@ -32,7 +32,7 @@ ecbuild_declare_project()
 ecbuild_enable_fortran( REQUIRED )
 ecbuild_add_cxx11_flags()
 
-set( CXVAROBS_LINKER_LANGUAGE CXX )
+set( OPSINPUTS_LINKER_LANGUAGE CXX )
 
 ################################################################################
 # Dependencies
@@ -73,27 +73,27 @@ find_package(OPS REQUIRED)
 # Export package info
 ################################################################################
 
-list( APPEND CXVAROBS_TPLS ufo ioda oops )
+list( APPEND OPSINPUTS_TPLS ufo ioda oops )
 
-set( CXVAROBS_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/src
+set( OPSINPUTS_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/src
                       ${CMAKE_Fortran_MODULE_DIRECTORY} )
-set( CXVAROBS_LIBRARIES cxvarobs )
+set( OPSINPUTS_LIBRARIES opsinputs )
 
-get_directory_property( CXVAROBS_DEFINITIONS COMPILE_DEFINITIONS )
+get_directory_property( OPSINPUTS_DEFINITIONS COMPILE_DEFINITIONS )
 
-foreach( _tpl ${CXVAROBS_TPLS} )
+foreach( _tpl ${OPSINPUTS_TPLS} )
   string( TOUPPER ${_tpl} TPL )
-  list( APPEND CXVAROBS_EXTRA_DEFINITIONS   ${${TPL}_DEFINITIONS}  ${${TPL}_TPL_DEFINITIONS}  )
-  list( APPEND CXVAROBS_EXTRA_INCLUDE_DIRS  ${${TPL}_INCLUDE_DIRS} ${${TPL}_TPL_INCLUDE_DIRS} )
-  list( APPEND CXVAROBS_EXTRA_LIBRARIES     ${${TPL}_LIBRARIES}    ${${TPL}_TPL_LIBRARIES}    )
+  list( APPEND OPSINPUTS_EXTRA_DEFINITIONS   ${${TPL}_DEFINITIONS}  ${${TPL}_TPL_DEFINITIONS}  )
+  list( APPEND OPSINPUTS_EXTRA_INCLUDE_DIRS  ${${TPL}_INCLUDE_DIRS} ${${TPL}_TPL_INCLUDE_DIRS} )
+  list( APPEND OPSINPUTS_EXTRA_LIBRARIES     ${${TPL}_LIBRARIES}    ${${TPL}_TPL_LIBRARIES}    )
 endforeach()
 
 ################################################################################
 # Sources
 ################################################################################
 
-include( cxvarobs_compiler_flags )
-include_directories( ${CXVAROBS_INCLUDE_DIRS} ${CXVAROBS_EXTRA_INCLUDE_DIRS} )
+include( opsinputs_compiler_flags )
+include_directories( ${OPSINPUTS_INCLUDE_DIRS} ${OPSINPUTS_EXTRA_INCLUDE_DIRS} )
 
 add_subdirectory( src )
 add_subdirectory( test )
@@ -107,12 +107,12 @@ endif()
 ################################################################################
 
 # prepares a tar.gz of the sources and/or binaries
-ecbuild_install_project( NAME cxvarobs )
+ecbuild_install_project( NAME opsinputs )
 
 # print the summary of the configuration
 ecbuild_print_summary()
 
-ecbuild_add_test( TARGET cxvarobs_coding_norms
+ecbuild_add_test( TARGET opsinputs_coding_norms
                   TYPE SCRIPT
                   COMMAND ${CMAKE_BINARY_DIR}/bin/cpplint.py
                   ARGS --quiet --recursive ${CMAKE_CURRENT_SOURCE_DIR}

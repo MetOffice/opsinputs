@@ -5,15 +5,15 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
-#define CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
+#ifndef OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
+#define OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
 
 #include <exception>
 
 #include "oops/parallel/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief Prevents deadlocks in MPI code throwing exceptions.
 ///
@@ -45,6 +45,6 @@ class MPIExceptionSynchronizer {
   int unhealthy_ = 0;
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
+#endif  // OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_

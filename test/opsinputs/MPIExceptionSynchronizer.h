@@ -5,23 +5,23 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
-#define TEST_CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
+#ifndef TEST_OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
+#define TEST_OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
 
 #include <string>
 
-#include "cxvarobs/MPIExceptionSynchronizer.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
 #include "eckit/testing/Test.h"
 #include "oops/../test/TestEnvironment.h"
 #include "oops/parallel/mpi/mpi.h"
 #include "oops/runs/Test.h"
 #include "oops/util/Expect.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 void noException() {
-  cxvarobs::MPIExceptionSynchronizer synchronizer;
+  opsinputs::MPIExceptionSynchronizer synchronizer;
 
   int term = 1;
   int sum;
@@ -39,7 +39,7 @@ void noException() {
 }
 
 void exceptionBeforeFirstMPICall() {
-  cxvarobs::MPIExceptionSynchronizer synchronizer;
+  opsinputs::MPIExceptionSynchronizer synchronizer;
 
   int term = 1;
 
@@ -60,7 +60,7 @@ void exceptionBeforeFirstMPICall() {
 }
 
 void exceptionBeforeSecondMPICall() {
-  cxvarobs::MPIExceptionSynchronizer synchronizer;
+  opsinputs::MPIExceptionSynchronizer synchronizer;
 
   int term = 1;
 
@@ -80,26 +80,26 @@ void exceptionBeforeSecondMPICall() {
   EXPECT_EQUAL(product, 1);
 }
 
-CASE("cxvarobs/MPIExceptionSynchronizer/No exception") {
+CASE("opsinputs/MPIExceptionSynchronizer/No exception") {
   EXPECT_NO_THROW(noException());
 }
 
-CASE("cxvarobs/MPIExceptionSynchronizer/Exception before first MPI call") {
+CASE("opsinputs/MPIExceptionSynchronizer/Exception before first MPI call") {
   EXPECT_THROWS_AS(exceptionBeforeFirstMPICall(), std::runtime_error);
 }
 
-CASE("cxvarobs/MPIExceptionSynchronizer/Exception before second MPI call") {
+CASE("opsinputs/MPIExceptionSynchronizer/Exception before second MPI call") {
   EXPECT_THROWS_AS(exceptionBeforeSecondMPICall(), std::runtime_error);
 }
 
 class MPIExceptionSynchronizer : public oops::Test {
  private:
-  std::string testid() const override {return "cxvarobs::test::MPIExceptionSynchronizer";}
+  std::string testid() const override {return "opsinputs::test::MPIExceptionSynchronizer";}
 
   void register_tests() const override {}
 };
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_MPIEXCEPTIONSYNCHRONIZER_H_
+#endif  // TEST_OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_

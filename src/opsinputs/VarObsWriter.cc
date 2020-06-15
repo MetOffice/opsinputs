@@ -8,10 +8,10 @@
 #include <utility>
 #include <vector>
 
-#include "cxvarobs/VarObsWriter.h"
+#include "opsinputs/VarObsWriter.h"
 
-#include "cxvarobs/LocalEnvironment.h"
-#include "cxvarobs/VarObsWriterParameters.h"
+#include "opsinputs/LocalEnvironment.h"
+#include "opsinputs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 
@@ -23,7 +23,7 @@
 #include "oops/util/Logger.h"
 #include "ufo/GeoVaLs.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                            boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -43,7 +43,7 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
   conf.set("validity_time", obsdb.windowEnd().toString());
   conf.set("obs_group", obsdb.obsname());
 
-  if (!cxvarobs_varobswriter_create_f90(key_, &conf, geovars_))
+  if (!opsinputs_varobswriter_create_f90(key_, &conf, geovars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
   oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;
@@ -55,7 +55,7 @@ VarObsWriter::~VarObsWriter() {
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  cxvarobs_varobswriter_delete_f90(key_);
+  opsinputs_varobswriter_delete_f90(key_);
 }
 
 void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
@@ -64,7 +64,7 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  cxvarobs_varobswriter_prior_f90(key_, obsdb_, gv.toFortran());
+  opsinputs_varobswriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
@@ -78,7 +78,7 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
   const std::vector<int> &channels = obsdb_.obsvariables().channels();
-  cxvarobs_varobswriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
+  opsinputs_varobswriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
                                  *flags_, *obsErrors_,
                                  hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
 }
@@ -105,4 +105,4 @@ void VarObsWriter::createOutputDirectory() {
   }
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs

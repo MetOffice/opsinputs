@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_CXVAROBS_OBSDATAVECTOR_F_H_
-#define CXVAROBS_CXVAROBS_OBSDATAVECTOR_F_H_
+#ifndef OPSINPUTS_OPSINPUTS_OBSDATAVECTOR_F_H_
+#define OPSINPUTS_OPSINPUTS_OBSDATAVECTOR_F_H_
 
 #include <cstddef>
 
@@ -20,28 +20,28 @@ namespace oops {
   class Variables;
 }  // namespace oops
 
-namespace cxvarobs {
+namespace opsinputs {
 
 extern "C" {
-  int cxvarobs_obsdatavector_int_nlocs_f(const ioda::ObsDataVector<int> &vec);
-  const oops::Variables * cxvarobs_obsdatavector_int_varnames_f(
+  int opsinputs_obsdatavector_int_nlocs_f(const ioda::ObsDataVector<int> &vec);
+  const oops::Variables * opsinputs_obsdatavector_int_varnames_f(
       const ioda::ObsDataVector<int> &vec);
-  bool cxvarobs_obsdatavector_int_has_f(const ioda::ObsDataVector<int> &vec,
+  bool opsinputs_obsdatavector_int_has_f(const ioda::ObsDataVector<int> &vec,
                                         const char *variable);
-  void cxvarobs_obsdatavector_int_get_f(const ioda::ObsDataVector<int> &vec,
+  void opsinputs_obsdatavector_int_get_f(const ioda::ObsDataVector<int> &vec,
                                         const char *variable,
                                         const size_t &length, int* data);
 
-  int cxvarobs_obsdatavector_float_nlocs_f(const ioda::ObsDataVector<float> &vec);
-  const oops::Variables * cxvarobs_obsdatavector_float_varnames_f(
+  int opsinputs_obsdatavector_float_nlocs_f(const ioda::ObsDataVector<float> &vec);
+  const oops::Variables * opsinputs_obsdatavector_float_varnames_f(
       const ioda::ObsDataVector<float> &vec);
-  bool cxvarobs_obsdatavector_float_has_f(const ioda::ObsDataVector<float> &vec,
+  bool opsinputs_obsdatavector_float_has_f(const ioda::ObsDataVector<float> &vec,
                                           const char *variable);
-  void cxvarobs_obsdatavector_float_get_f(const ioda::ObsDataVector<float> &vec,
+  void opsinputs_obsdatavector_float_get_f(const ioda::ObsDataVector<float> &vec,
                                           const char *variable,
                                           const size_t &length, float* data);
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_CXVAROBS_OBSDATAVECTOR_F_H_
+#endif  // OPSINPUTS_OPSINPUTS_OBSDATAVECTOR_F_H_

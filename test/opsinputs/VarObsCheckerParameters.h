@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_VAROBSCHECKERPARAMETERS_H_
-#define TEST_CXVAROBS_VAROBSCHECKERPARAMETERS_H_
+#ifndef TEST_OPSINPUTS_VAROBSCHECKERPARAMETERS_H_
+#define TEST_OPSINPUTS_VAROBSCHECKERPARAMETERS_H_
 
 #include <map>
 #include <string>
@@ -18,7 +18,7 @@
 #include "oops/util/parameters/Parameters.h"
 #include "oops/util/parameters/RequiredParameter.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief VarObsChecker options.
 class VarObsCheckerParameters : public oops::Parameters {
@@ -49,6 +49,6 @@ class VarObsCheckerParameters : public oops::Parameters {
     "expected_main_table_columns", {}, this};
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_VAROBSCHECKERPARAMETERS_H_
+#endif  // TEST_OPSINPUTS_VAROBSCHECKERPARAMETERS_H_

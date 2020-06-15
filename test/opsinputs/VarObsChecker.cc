@@ -12,11 +12,11 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include "../../test/cxvarobs/VarObsChecker.h"
+#include "../../test/opsinputs/VarObsChecker.h"
 
-#include "cxvarobs/LocalEnvironment.h"
-#include "cxvarobs/MPIExceptionSynchronizer.h"
-#include "cxvarobs/VarObsWriterParameters.h"
+#include "opsinputs/LocalEnvironment.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
+#include "opsinputs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 #include "eckit/exception/Exceptions.h"
@@ -30,7 +30,7 @@
 
 #include "ufo/filters/Variables.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 namespace {
@@ -169,7 +169,7 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   oops::mpi::comm().broadcast(tempFileName, L_tmpnam, rootProcessRank);
 
   if (oops::mpi::comm().rank() == rootProcessRank) {
-    cxvarobs::LocalEnvironment localEnvironment;
+    opsinputs::LocalEnvironment localEnvironment;
     setupEnvironment(localEnvironment);
 
     const eckit::PathName varObsFileName(getEnvVariableOrThrow("OPS_VAROB_OUTPUT_DIR") +
@@ -179,7 +179,7 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
 
     const char exeName[] = "OpsProg_PrintVarobs.exe";
     std::string exePath;
-    if (char *dir = getenv("CXVAROBS_OPS_BIN_DIR")) {
+    if (char *dir = getenv("OPSINPUTS_OPS_BIN_DIR")) {
       exePath = dir;
       exePath += PATH_SEPARATOR;
       exePath += exeName;
@@ -214,7 +214,7 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   checkMainTable(output.mainTable);
 }
 
-void VarObsChecker::setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const {
+void VarObsChecker::setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const {
   if (parameters_.namelistDirectory.value() != boost::none)
     localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
@@ -308,4 +308,4 @@ void VarObsChecker::print(std::ostream & os) const {
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs

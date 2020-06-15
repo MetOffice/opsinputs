@@ -5,7 +5,7 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#include "../../test/cxvarobs/ResetFlagsToPass.h"
+#include "../../test/opsinputs/ResetFlagsToPass.h"
 
 #include "eckit/config/Configuration.h"
 
@@ -17,7 +17,7 @@
 #include "oops/util/Logger.h"
 #include "ufo/filters/QCflags.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 ResetFlagsToPass::ResetFlagsToPass(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
@@ -52,5 +52,5 @@ void ResetFlagsToPass::print(std::ostream & os) const {
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 

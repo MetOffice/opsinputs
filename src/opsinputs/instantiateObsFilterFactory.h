@@ -5,13 +5,13 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
-#define CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
+#ifndef OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
+#define OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 
-#include "cxvarobs/VarObsWriter.h"
+#include "opsinputs/VarObsWriter.h"
 #include "oops/interface/ObsFilter.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 template<typename MODEL>
 void instantiateObsFilterFactory() {
@@ -19,6 +19,6 @@ void instantiateObsFilterFactory() {
     makerVarObsWriter_("VarObs Writer");
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
+#endif  // OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_

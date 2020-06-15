@@ -30,7 +30,7 @@ The instructions below assume that the software will be built with version 7.2.0
 
 4. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
 
-       ecbuild_bundle( PROJECT cxvarobs GIT "https://github.com/MetOffice/cxvarobs.git" BRANCH develop UPDATE)
+       ecbuild_bundle( PROJECT opsinputs GIT "https://github.com/MetOffice/opsinputs.git" BRANCH develop UPDATE)
 
    (Git repository path to be confirmed.)
 
@@ -48,14 +48,14 @@ The instructions below assume that the software will be built with version 7.2.0
 
       make -j4
 
-8. Optionally, run tests to verify that components of the CxVarObs package work correctly:
+8. Optionally, run tests to verify that components of the Opsinputs package work correctly:
 
-      ctest -R cxvarobs
+      ctest -R opsinputs
 
 Usage
 =====
 
-VarObs files are written by the `VarObsWriter` observation filter. See the documentation of this filter for more information. YAML files illustrating its use can be found in the `test/cxvarobs/testinput` folder.
+VarObs files are written by the `VarObsWriter` observation filter. See the documentation of this filter for more information. YAML files illustrating its use can be found in the `test/opsinputs/testinput` folder.
 
 Development
 ===========
@@ -64,17 +64,17 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
 1. Determine where the input data will come from (a variable stored in the `ObsSpace` object? a GeoVaL?).
 
-2. Edit the `case` corresponding to the varfield in question in the `select` statement in the `cxvarobs_varobswriter_populateobservations` subroutine in the `src/cxvarobs/cxvarobs_varobswriter_mod.F90` file. In the vast majority of cases, you will simply need to replace a commented-out call to `Ops_Alloc` with a call to an appropriate `cxvarobs_varobswriter_fill...` subroutine. For example, suppose that the `VarField_logvis` varfield should be filled with the data (observed values, observation errors, gross error probabilities and QC flags) stored in the `logarithmic_visibility` observation variable in the `ObsSpace`. The comment
+2. Edit the `case` corresponding to the varfield in question in the `select` statement in the `opsinputs_varobswriter_populateobservations` subroutine in the `src/opsinputs/opsinputs_varobswriter_mod.F90` file. In the vast majority of cases, you will simply need to replace a commented-out call to `Ops_Alloc` with a call to an appropriate `opsinputs_varobswriter_fill...` subroutine. For example, suppose that the `VarField_logvis` varfield should be filled with the data (observed values, observation errors, gross error probabilities and QC flags) stored in the `logarithmic_visibility` observation variable in the `ObsSpace`. The comment
 
         ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
 
 should then be replaced by 
 
-        call cxvarobs_varobswriter_fillelementtypefromsimulatedvariable( &
+        call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
           ObsSpace, Flags, ObsErrors, "logarithmic_visibility")
 
-If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant `cxvarobs_varobswriter_fill...` subroutines.
+If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant `opsinputs_varobswriter_fill...` subroutines.
 
 3. Add a unit test for the new varfield:
 

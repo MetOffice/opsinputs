@@ -48,52 +48,52 @@ function( ADD_VAROBSWRITER_TEST )
     ecbuild_critical("Unknown keywords given to ADD_VAROBSWRITER_TEST(): \"${_PAR_UNPARSED_ARGUMENTS}\"")
   endif()
 
-  list( APPEND cxvarobs_test_input ${_PAR_INPUTS} )
-  set ( cxvarobs_test_input ${cxvarobs_test_input} PARENT_SCOPE )
-  list( APPEND cxvarobs_test_data ${_PAR_DATA})
-  set ( cxvarobs_test_data ${cxvarobs_test_data} PARENT_SCOPE )
+  list( APPEND opsinputs_test_input ${_PAR_INPUTS} )
+  set ( opsinputs_test_input ${opsinputs_test_input} PARENT_SCOPE )
+  list( APPEND opsinputs_test_data ${_PAR_DATA})
+  set ( opsinputs_test_data ${opsinputs_test_data} PARENT_SCOPE )
 
   set( environment
          OOPS_TRAPFPE=1
          LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-         OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${_PAR_NAME}
-         CXVAROBS_OPS_BIN_DIR=${OPS_BIN_DIR})
+         OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_varobswriter_${_PAR_NAME}
+         OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR})
 
   if (_PAR_MPI)
-    ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${_PAR_NAME}
-                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+    ecbuild_add_test( TARGET  test_opsinputs_varobswriter_${_PAR_NAME}
+                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
                       ARGS    "testinput/${_PAR_NAME}.yaml"
                       ENVIRONMENT "${environment}"
                       MPI     ${_PAR_MPI}
-                      DEPENDS test_CxVarObsFilters.x )
+                      DEPENDS test_OpsInputsFilters.x )
   else()
-    ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${_PAR_NAME}
-                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_CxVarObsFilters.x
+    ecbuild_add_test( TARGET  test_opsinputs_varobswriter_${_PAR_NAME}
+                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
                       ARGS    "testinput/${_PAR_NAME}.yaml"
                       ENVIRONMENT "${environment}"
-                      DEPENDS test_CxVarObsFilters.x )
+                      DEPENDS test_OpsInputsFilters.x )
   endif()
-  set_tests_properties( test_cxvarobs_varobswriter_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+  set_tests_properties( test_opsinputs_varobswriter_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
-set( CXVAROBS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
+set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 
-ecbuild_add_executable( TARGET  test_CxVarObsFilters.x
-                        SOURCES cxvarobs/instantiateObsFilterFactory.h
-                                cxvarobs/ResetFlagsToPass.cc
-                                cxvarobs/ResetFlagsToPass.h
-                                cxvarobs/ResetFlagsToPassParameters.h
-                                cxvarobs/VarObsChecker.cc
-                                cxvarobs/VarObsChecker.h
-                                cxvarobs/VarObsCheckerParameters.h
-                                mains/TestCxVarObsFilters.cc
-                        LIBS    cxvarobs )
+ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
+                        SOURCES opsinputs/instantiateObsFilterFactory.h
+                                opsinputs/ResetFlagsToPass.cc
+                                opsinputs/ResetFlagsToPass.h
+                                opsinputs/ResetFlagsToPassParameters.h
+                                opsinputs/VarObsChecker.cc
+                                opsinputs/VarObsChecker.h
+                                opsinputs/VarObsCheckerParameters.h
+                                mains/TestOpsInputsFilters.cc
+                        LIBS    opsinputs )
 
 # Cleans up the output directory
-ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_setup
+ecbuild_add_test( TARGET  test_opsinputs_varobswriter_setup
                   COMMAND ${CMAKE_COMMAND}
-                  ARGS    "-E" "remove_directory" ${CXVAROBS_OUTPUT_DIR})
-set_tests_properties(test_cxvarobs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
+                  ARGS    "-E" "remove_directory" ${OPSINPUTS_OUTPUT_DIR})
+set_tests_properties(test_opsinputs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
 
 # Tests of individual varfields
 ADD_VAROBSWRITER_TEST(NAME   001_VarField_pstar
@@ -202,21 +202,21 @@ ADD_VAROBSWRITER_TEST(NAME   reject_obs_with_all_variables_failing_qc
                       DATA   reject_obs_with_all_variables_failing_qc.nc4)
 
 # Tests of auxiliary classes
-list( APPEND cxvarobs_test_input empty.yaml )
-ecbuild_add_test( TARGET  test_cxvarobs_mpiexceptionsynchronizer
+list( APPEND opsinputs_test_input empty.yaml )
+ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
                   SOURCES mains/TestMPIExceptionSynchronizer.cc
                   ARGS    "testinput/empty.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   MPI     4
-                  LIBS    cxvarobs)
+                  LIBS    opsinputs)
 
 # Create symlinks to test inputs and data files
-CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/testinput ${cxvarobs_test_input} )
-CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/Data      ${cxvarobs_test_data}  )
+CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/testinput ${opsinputs_test_input} )
+CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/Data      ${opsinputs_test_data}  )
 
 # Add files to cmake resources
-list( TRANSFORM cxvarobs_test_input PREPEND testinput/ )
-ecbuild_add_resources( TARGET cxvarobs_test_scripts
+list( TRANSFORM opsinputs_test_input PREPEND testinput/ )
+ecbuild_add_resources( TARGET opsinputs_test_scripts
                        SOURCES_PACK
-                       ${cxvarobs_test_input} )
+                       ${opsinputs_test_input} )
 

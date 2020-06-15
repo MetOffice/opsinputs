@@ -8,9 +8,9 @@
 
 interface
 
-subroutine c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
+subroutine c_opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
     obss, group, variable, reference, length, offsets) &
-    bind(C,name='cxvarobs_obsspace_get_db_datetime_offset_in_seconds_f')
+    bind(C,name='opsinputs_obsspace_get_db_datetime_offset_in_seconds_f')
   use, intrinsic :: iso_c_binding, only: c_ptr, c_char, c_size_t, c_int64_t
   implicit none
   type(c_ptr), value :: obss
@@ -19,11 +19,11 @@ subroutine c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
   type(c_ptr), value :: reference
   integer(c_size_t), intent(in) :: length
   integer(c_int64_t), intent(inout) :: offsets(length)
-end subroutine c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds
+end subroutine c_opsinputs_obsspace_get_db_datetime_offset_in_seconds
 
-subroutine c_cxvarobs_obsspace_get_db_string( &
+subroutine c_opsinputs_obsspace_get_db_string( &
     obss, group, variable, string_length, num_strings, characters) &
-    bind(C,name='cxvarobs_obsspace_get_db_string_f')
+    bind(C,name='opsinputs_obsspace_get_db_string_f')
   use, intrinsic :: iso_c_binding, only: c_ptr, c_char, c_size_t
   implicit none
   type(c_ptr), value :: obss
@@ -32,6 +32,6 @@ subroutine c_cxvarobs_obsspace_get_db_string( &
   integer(c_size_t), intent(in) :: string_length
   integer(c_size_t), intent(in) :: num_strings
   character(kind=c_char, len=1), intent(inout) :: characters(string_length * num_strings)
-end subroutine c_cxvarobs_obsspace_get_db_string
+end subroutine c_opsinputs_obsspace_get_db_string
 
 end interface

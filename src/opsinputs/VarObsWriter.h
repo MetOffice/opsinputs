@@ -5,16 +5,16 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
-#ifndef CXVAROBS_VAROBSWRITER_H_
-#define CXVAROBS_VAROBSWRITER_H_
+#ifndef OPSINPUTS_VAROBSWRITER_H_
+#define OPSINPUTS_VAROBSWRITER_H_
 
 #include <ostream>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
 
-#include "cxvarobs/VarObsWriter.interface.h"
-#include "cxvarobs/VarObsWriterParameters.h"
+#include "opsinputs/VarObsWriter.interface.h"
+#include "opsinputs/VarObsWriterParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
@@ -34,18 +34,18 @@ namespace ufo {
   class ObsDiagnostics;
 }
 
-namespace cxvarobs {
+namespace opsinputs {
 
 class LocalEnvironment;
 
 /// \brief Outputs observations to VarObs files.
 ///
-/// Most of the implementation is in Fortran (cxvarobs_varobswriter_mod.F90).
+/// Most of the implementation is in Fortran (opsinputs_varobswriter_mod.F90).
 ///
 /// \see VarObsWriterParameters for the list of accepted configuration parameters.
 class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
  public:
-  static const std::string classname() {return "cxvarobs::VarObsWriter";}
+  static const std::string classname() {return "opsinputs::VarObsWriter";}
 
   VarObsWriter(ioda::ObsSpace &, const eckit::Configuration &,
                boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -77,6 +77,6 @@ class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsW
   VarObsWriterParameters parameters_;
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_VAROBSWRITER_H_
+#endif  // OPSINPUTS_VAROBSWRITER_H_

@@ -11,7 +11,7 @@ Finds an OPS build. Note: the build directory must contain not only the ``bin`` 
 ``install`` subdirectories, but also the ``o`` and ``include`` subdirectories. The standard OPS
 build task only extracts the former two directories, leaving ``o`` and ``include`` in the
 ``build.tgz`` file located next to the ``build`` directory. This file must be extracted manually
-into the ``build`` directory before configuring ``cxvarobs``.
+into the ``build`` directory before configuring ``opsinputs``.
 
 Result Variables
 ^^^^^^^^^^^^^^^^

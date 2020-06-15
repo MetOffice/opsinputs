@@ -5,23 +5,23 @@
 ! which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 !> Extensions to the Fortran interface to ioda::ObsSpace.
-module cxvarobs_obsspace_mod
+module opsinputs_obsspace_mod
 
 use datetime_mod
 use string_f_c_mod
 
 implicit none
 
-public cxvarobs_obsspace_get_db_datetime_offset_in_seconds, &
-       cxvarobs_obsspace_get_db_string
+public opsinputs_obsspace_get_db_datetime_offset_in_seconds, &
+       opsinputs_obsspace_get_db_string
 
-#include "cxvarobs_obsspace_interface.f90"
+#include "opsinputs_obsspace_interface.f90"
 
 contains
 
 !> Get a datetime variable from ObsSpace, representing it as an array of offsets (in seconds)
 !> with respect to a reference datetime.
-subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vname, reference, offsets)
+subroutine opsinputs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vname, reference, offsets)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), value, intent(in) :: obss
@@ -40,14 +40,14 @@ subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vnam
   call f_c_datetime(reference, c_reference)
   length = size(offsets)
 
-  call c_cxvarobs_obsspace_get_db_datetime_offset_in_seconds(obss, c_group, c_vname, c_reference, &
+  call c_opsinputs_obsspace_get_db_datetime_offset_in_seconds(obss, c_group, c_vname, c_reference, &
                                                              length, offsets)
 
   deallocate(c_group, c_vname)
-end subroutine cxvarobs_obsspace_get_db_datetime_offset_in_seconds
+end subroutine opsinputs_obsspace_get_db_datetime_offset_in_seconds
 
 !> Get a string variable from ObsSpace.
-subroutine cxvarobs_obsspace_get_db_string(obss, group, vname, string_length, strings)
+subroutine opsinputs_obsspace_get_db_string(obss, group, vname, string_length, strings)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), value, intent(in) :: obss
@@ -64,10 +64,10 @@ subroutine cxvarobs_obsspace_get_db_string(obss, group, vname, string_length, st
   call f_c_string(vname, c_vname)
   num_strings = size(strings)
 
-  call c_cxvarobs_obsspace_get_db_string(obss, c_group, c_vname, &
+  call c_opsinputs_obsspace_get_db_string(obss, c_group, c_vname, &
                                          int(string_length, kind=8), num_strings, strings)
 
   deallocate(c_group, c_vname)
-end subroutine cxvarobs_obsspace_get_db_string
+end subroutine opsinputs_obsspace_get_db_string
 
-end module cxvarobs_obsspace_mod
+end module opsinputs_obsspace_mod

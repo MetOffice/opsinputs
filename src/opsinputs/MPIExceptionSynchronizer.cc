@@ -7,11 +7,11 @@
 
 #include <exception>
 
-#include "cxvarobs/MPIExceptionSynchronizer.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
 #include "oops/parallel/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 MPIExceptionSynchronizer::~MPIExceptionSynchronizer() {
   if (!unhealthy_ && std::uncaught_exception()) {
@@ -33,4 +33,4 @@ void MPIExceptionSynchronizer::throwIfAnyProcessHasThrown() {
   }
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
