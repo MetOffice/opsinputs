@@ -7,8 +7,8 @@
 
 #include "../opsinputs/instantiateObsFilterFactory.h"
 #include "../test/ufo/ObsFilters.h"
-#include "opsinputs/instantiateObsFilterFactory.h"
 #include "oops/runs/Run.h"
+#include "opsinputs/instantiateObsFilterFactory.h"
 #include "ufo/instantiateObsFilterFactory.h"
 #include "ufo/UfoTrait.h"
 

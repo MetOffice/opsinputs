@@ -7,9 +7,9 @@
 
 #include <exception>
 
-#include "opsinputs/MPIExceptionSynchronizer.h"
 #include "oops/parallel/mpi/mpi.h"
 #include "oops/util/Logger.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
 
 namespace opsinputs {
 

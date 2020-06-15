@@ -10,12 +10,12 @@
 
 #include <string>
 
-#include "opsinputs/MPIExceptionSynchronizer.h"
 #include "eckit/testing/Test.h"
 #include "oops/../test/TestEnvironment.h"
 #include "oops/parallel/mpi/mpi.h"
 #include "oops/runs/Test.h"
 #include "oops/util/Expect.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
 
 namespace opsinputs {
 namespace test {
