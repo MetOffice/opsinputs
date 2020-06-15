@@ -20,9 +20,7 @@ Note that both of the above need to be built with the same compiler and use the 
 Building
 ========
 
-The instructions below assume that the software will be built with version 7.2.0 of the GNU compiler suite.
-
-1. Build OPS as described at https://code.metoffice.gov.uk/trac/ops/wiki/WorkingPractices. Use the `ops_x86_64_gfortran_debug` configuration.
+1. Build OPS as described at https://code.metoffice.gov.uk/trac/ops/wiki/WorkingPractices. Select the `ifort` or `gfortran` compiler. Alternatively, you can use an existing build from the `~opsrc` folder.
 
 2. Find the OPS build folder. It should have a sibling called `build.tgz` containing `include` and `o` directories with Fortran module files and object files. Unzip that archive into the `build` folder. The latter should now contain `include` and `o` subdirectories at the same level as `bin` and `installs`.
 
@@ -38,7 +36,14 @@ The instructions below assume that the software will be built with version 7.2.0
 
       module use /data/users/wsmigaj/Projects/JediModules/modulefiles
       module unload R/3.6.1
+
+   and, depending on whether you are using a `gfortran` or an `ifort` build of OPS, either
+
       module load jedi/ufo-bundle-dev-stack/gnu/7.2.0
+
+   or 
+
+      module load jedi/ufo-bundle-dev-stack/intel/17.0.64
 
 6. Create a build directory next to the `ufo-bundle` directory, enter it and run ecbuild to configure a build, passing the path to the OPS build folder to the OPS_ROOT variable:
 
