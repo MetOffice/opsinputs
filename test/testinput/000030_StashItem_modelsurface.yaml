@@ -10,7 +10,7 @@ Observations:
       simulate:
         variables: [air_temperature]
     GeoVaLs:
-      filename: Data/023_VarField_modelsurface_geoval.nc4
+      filename: Data/000030_StashItem_modelsurface.nc4
     ObsFilters:
     # Set the flag of observations with missing values to "pass" (as in VarObs tests)
     - Filter: Reset Flags to Pass
