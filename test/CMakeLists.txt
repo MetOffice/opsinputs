@@ -56,7 +56,8 @@ function( ADD_VAROBSWRITER_TEST )
   set( environment
          OOPS_TRAPFPE=1
          LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-         OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${_PAR_NAME} )
+         OPS_VAROB_OUTPUT_DIR=${CXVAROBS_OUTPUT_DIR}/test_cxvarobs_varobswriter_${_PAR_NAME}
+         CXVAROBS_OPS_BIN_DIR=${OPS_BIN_DIR})
 
   if (_PAR_MPI)
     ecbuild_add_test( TARGET  test_cxvarobs_varobswriter_${_PAR_NAME}
