@@ -26,10 +26,11 @@ The instructions below assume that the software will be built with version 7.2.0
 
 2. Find the OPS build folder. It should have a sibling called `build.tgz` containing `include` and `o` directories with Fortran module files and object files. Unzip that archive into the `build` folder. The latter should now contain `include` and `o` subdirectories at the same level as `bin` and `installs`.
 
-3. Clone the `ufo-bundle` into a folder of your choice. 
+3. Clone the `ufo-bundle` into a folder of your choice.
+
 4. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
 
-       ecbuild_bundle( PROJECT cxvarobs GIT "https://github.com/JCSDA/cxvarobs.git" BRANCH develop UPDATE)
+       ecbuild_bundle( PROJECT cxvarobs GIT "https://github.com/MetOffice/cxvarobs.git" BRANCH develop UPDATE)
 
    (Git repository path to be confirmed.)
 
@@ -37,7 +38,7 @@ The instructions below assume that the software will be built with version 7.2.0
 
       module use /data/users/wsmigaj/Projects/JediModules/modulefiles
       module unload R/3.6.1
-      module load jedi/gnu/7.2.0/ufo-bundle-dev-stack
+      module load jedi/ufo-bundle-dev-stack/gnu/7.2.0
 
 6. Create a build directory next to the `ufo-bundle` directory, enter it and run ecbuild to configure a build, passing the path to the OPS build folder to the OPS_ROOT variable:
 
@@ -62,7 +63,8 @@ Development
 Only a subset of varfields recognised by OPS and VAR can currently be output. To add support for a new varfield:
 
 1. Determine where the input data will come from (a variable stored in the `ObsSpace` object? a GeoVaL?).
-2. Edit the `case` corresponding to the varfield in question in the `select` statement in the `cxvarobs_varobswriter_populateobservations` subroutine in the `src/cxvarobs/cxvarobs_varobswriter_mod.F90` file. In the vast majority of cases, you will simply need to replace the (commented) call to `Ops_Alloc` with a call to an appropriate `cxvarobs_varobswriter_fill...` subroutine. For example, suppose that the `VarField_logvis` varfield should be filled with the data (observed values, observation errors, gross error probabilities, QC flags) stored in the `logarithmic_visibility` observation variable in the `ObsSpace`. The comment
+
+2. Edit the `case` corresponding to the varfield in question in the `select` statement in the `cxvarobs_varobswriter_populateobservations` subroutine in the `src/cxvarobs/cxvarobs_varobswriter_mod.F90` file. In the vast majority of cases, you will simply need to replace a commented-out call to `Ops_Alloc` with a call to an appropriate `cxvarobs_varobswriter_fill...` subroutine. For example, suppose that the `VarField_logvis` varfield should be filled with the data (observed values, observation errors, gross error probabilities and QC flags) stored in the `logarithmic_visibility` observation variable in the `ObsSpace`. The comment
 
         ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
 
@@ -74,3 +76,10 @@ should then be replaced by
 
 If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant `cxvarobs_varobswriter_fill...` subroutines.
 
+3. Add a unit test for the new varfield:
+
+   a. Create an input YAML file and put it in the `test/testinput` folder. Typically, you can copy an existing YAML file used by the test of a varfield whose implementation calls the same subroutine as that of the new varfield, and simply adjust the observation group, variable and varfield name embedded in the YAML file.
+
+   b. Create an input NetCDF file and put it in the same folder. You can use the test/generate_unittest_netcdfs.py script to create the file (add an appropriate function call at the end, again mimicking one generating input data for a previously implemented varfield, and run the script). You may need to load the `satools-py3` module before running the script to give it access to NumPy and SciPy.
+
+   c. Add a call to the `ADD_VAROBSWRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
