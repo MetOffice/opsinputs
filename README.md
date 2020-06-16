@@ -1,6 +1,6 @@
 (C) Copyright 2020 Met Office UK
 
-This software is licensed under the terms of the Apache Licence Version 2.0
+This software is licensed under the terms of the Apache Licence Version 2.0,
 which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 Overview
@@ -34,28 +34,28 @@ Building
 
 5. Run the following commands to set up your build environment:
 
-      module use /data/users/wsmigaj/Projects/JediModules/modulefiles
-      module unload R/3.6.1
+       module use /data/users/wsmigaj/Projects/JediModules/modulefiles
+       module unload R/3.6.1
 
    and, depending on whether you are using a `gfortran` or an `ifort` build of OPS, either
 
-      module load jedi/ufo-bundle-dev-stack/gnu/7.2.0
+       module load jedi/ufo-bundle-dev-stack/gnu/7.2.0
 
    or 
 
-      module load jedi/ufo-bundle-dev-stack/intel/17.0.64
+       module load jedi/ufo-bundle-dev-stack/intel/17.0.64
 
 6. Create a build directory next to the `ufo-bundle` directory, enter it and run ecbuild to configure a build, passing the path to the OPS build folder to the OPS_ROOT variable:
 
-      ecbuild -DOPS_ROOT=/path/to/OPS/build ../ufo-bundle
+       ecbuild -DOPS_ROOT=/path/to/OPS/build ../ufo-bundle
 
 7. Run make to build the the bundle:
 
-      make -j4
+       make -j4
 
-8. Optionally, run tests to verify that components of the Opsinputs package work correctly:
+8. Optionally, run tests to verify that components of the `opsinputs` package work correctly:
 
-      ctest -R opsinputs
+       ctest -R opsinputs
 
 Usage
 =====
@@ -73,13 +73,13 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
         ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
 
-should then be replaced by 
+   should then be replaced by 
 
         call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
           Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
           ObsSpace, Flags, ObsErrors, "logarithmic_visibility")
 
-If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant `opsinputs_varobswriter_fill...` subroutines.
+   If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant `opsinputs_varobswriter_fill...` subroutines.
 
 3. Add a unit test for the new varfield:
 
