@@ -88,3 +88,8 @@ If in doubt, look at similar varfields that have already been implemented or rea
    b. Create an input NetCDF file and put it in the same folder. You can use the test/generate_unittest_netcdfs.py script to create the file (add an appropriate function call at the end, again mimicking one generating input data for a previously implemented varfield, and run the script). You may need to load the `satools-py3` module before running the script to give it access to NumPy and SciPy.
 
    c. Add a call to the `ADD_VAROBSWRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
+
+Working practices
+=================
+
+The JEDI working principles are detailed at https://jointcenterforsatellitedataassimilation-jedi-docs.readthedocs-hosted.com/en/latest/working-practices/index.html.
