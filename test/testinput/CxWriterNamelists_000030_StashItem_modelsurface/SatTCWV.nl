@@ -1,0 +1,3 @@
+&CXControlNL
+CxFields=30
+/

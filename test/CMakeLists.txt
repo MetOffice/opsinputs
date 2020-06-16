@@ -227,7 +227,7 @@ ADD_CXWRITER_TEST(NAME   000004_StashItem_theta
                   DATA   000004_StashItem_theta.nc4)
 
 ADD_CXWRITER_TEST(NAME   000030_StashItem_modelsurface
-                  INPUTS 000030_StashItem_modelsurface.yaml
+                  INPUTS 000030_StashItem_modelsurface.yaml CxWriterNamelists_000030_StashItem_modelsurface/SatTCWV.nl
                   DATA   000030_StashItem_modelsurface.nc4)
 
 # Tests of auxiliary classes
