@@ -58,6 +58,7 @@ function( ADD_WRITER_TEST )
          OOPS_TRAPFPE=1
          LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
          OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_WRITER}_${_PAR_NAME}
+         OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_WRITER}_${_PAR_NAME}
          OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR})
 
   if (_PAR_MPI)
