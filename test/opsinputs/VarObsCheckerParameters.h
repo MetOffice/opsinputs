@@ -23,20 +23,9 @@ namespace opsinputs {
 /// \brief VarObsChecker options.
 class VarObsCheckerParameters : public oops::Parameters {
  public:
-  /// Directory containing namelist files specifying the varfields to output.
+  /// Directory containing the VarObs files.
   ///
-  /// The list of varfields to output for an observation group ObsGroup is controlled by the file
-  /// ObsGroup.nl located in the namelist directory.
-  ///
-  /// If this option is not set, the location of the namelist directory is controlled by the
-  /// OPS_VAROBSCONTROL_NL_DIR environment variable. If the namelist directory or the namelist file
-  /// corresponding to a particular observation group is not found, the default list of varfields
-  /// specified by OPS for that observation group is used.
-  oops::OptionalParameter<std::string> namelistDirectory{"namelist_directory", this};
-
-  /// Output directory for VarObs files.
-  ///
-  /// If this option is not set, the location of the output directory is controlled by the
+  /// If this option is not set, the location of this directory is controlled by the
   /// OPS_VAROB_OUTPUT_DIR environment variable.
   oops::OptionalParameter<std::string> outputDirectory{"output_directory", this};
 

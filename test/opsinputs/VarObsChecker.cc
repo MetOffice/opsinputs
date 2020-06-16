@@ -215,8 +215,6 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
 }
 
 void VarObsChecker::setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const {
-  if (parameters_.namelistDirectory.value() != boost::none)
-    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
 }
