@@ -517,6 +517,7 @@ end subroutine opsinputs_cxwriter_addrequiredgeovars
 
 !> Prepare Ob to hold the required number of observations.
 subroutine opsinputs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob)
+use mpl, ONLY: gc_int_kind
 implicit none
 
 ! Subroutine arguments:
@@ -526,7 +527,7 @@ integer, intent(in)                 :: RetainedObsIndices(:)
 type(OB_type), intent(inout)        :: Ob
 
 ! Local declarations:
-integer(kind=8)                     :: istat
+integer(kind=gc_int_kind)           :: istat
 
 ! Body:
 Ob % Header % obsgroup = self % obsgroup
@@ -535,7 +536,7 @@ call Ops_SetupObType(Ob)
 
 Ob % Header % NumObsLocal = size(RetainedObsIndices)
 Ob % Header % NumObsTotal = Ob % Header % NumObsLocal
-call gcg_isum (1, mpi_group, istat, Ob % Header % NumObsTotal)
+call gcg_isum (1_gc_int_kind, mpi_group, istat, Ob % Header % NumObsTotal)
 
 Ob % Header % NumCXBatches = 1
 allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
