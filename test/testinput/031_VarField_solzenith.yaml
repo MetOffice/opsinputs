@@ -14,6 +14,7 @@ Observations:
     # values are encoded correctly in the VarObsFile.
     - Filter: Reset Flags to Pass
       flags_to_reset: [1, 6]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
     - Filter: Domain Check
       where:
       - variable:
