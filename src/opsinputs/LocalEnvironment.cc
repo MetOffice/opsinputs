@@ -5,11 +5,11 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#include "cxvarobs/LocalEnvironment.h"
+#include "opsinputs/LocalEnvironment.h"
 
 #include <cstdlib>
 
-namespace cxvarobs {
+namespace opsinputs {
 
 LocalEnvironment::LocalEnvironment()
 {}
@@ -44,4 +44,4 @@ void LocalEnvironment::set(const std::string &variableName, const std::string &v
   setenv(variableName.c_str(), value.c_str(), 1 /*overwrite*/);
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs

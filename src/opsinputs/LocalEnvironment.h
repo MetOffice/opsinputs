@@ -5,14 +5,14 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_LOCALENVIRONMENT_H_
-#define CXVAROBS_LOCALENVIRONMENT_H_
+#ifndef OPSINPUTS_LOCALENVIRONMENT_H_
+#define OPSINPUTS_LOCALENVIRONMENT_H_
 
 #include <map>
 #include <set>
 #include <string>
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief Change environment variables, restoring their original values on destruction.
 class LocalEnvironment {
@@ -39,6 +39,6 @@ class LocalEnvironment {
   std::set<std::string> originallyUnsetVariables_;
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_LOCALENVIRONMENT_H_
+#endif  // OPSINPUTS_LOCALENVIRONMENT_H_

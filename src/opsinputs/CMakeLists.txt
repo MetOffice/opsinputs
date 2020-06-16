@@ -3,23 +3,23 @@
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
-list( APPEND cxvarobs_src_files
+list( APPEND opsinputs_src_files
+    opsinputs_obsspace_f.cc
+    opsinputs_obsspace_f.h
+    opsinputs_obsspace_mod.F90
+    opsinputs_obsdatavector_f.cc
+    opsinputs_obsdatavector_f.h
+    opsinputs_obsdatavector_mod.F90
+    opsinputs_varobswriter_mod.F90
     cxvarobs_cxgenerate_mod.F90
     cxvarobs_cxwriter_mod.F90
-    cxvarobs_mpl_mod.F90
-    cxvarobs_obsspace_f.cc
-    cxvarobs_obsspace_f.h
-    cxvarobs_obsspace_mod.F90
-    cxvarobs_obsdatavector_f.cc
-    cxvarobs_obsdatavector_f.h
-    cxvarobs_obsdatavector_mod.F90
     cxvarobs_utils_mod.F90
-    cxvarobs_varobswriter_mod.F90
     CxWriter.cc
     CxWriter.h
-    CxWriter.interface.F90
     CxWriter.interface.h
+    CxWriter.interface.F90
     CxWriterParameters.h
+    cxvarobs_mpl_mod.F90
     instantiateObsFilterFactory.h
     LocalEnvironment.cc
     LocalEnvironment.h
@@ -50,13 +50,13 @@ ecbuild_add_library( TARGET   ops
                      LIBS ${SHUM_LIBS}
                     )
 
-list( APPEND CXVAROBS_LIBS_DEP oops ioda ufo ${NETCDF_LIBRARIES} ops )
+list( APPEND OPSINPUTS_LIBS_DEP oops ioda ufo ${NETCDF_LIBRARIES} ops )
 
-ecbuild_add_library( TARGET   cxvarobs
-                     SOURCES  ${cxvarobs_src_files}
-                     LIBS     ${CXVAROBS_LIBS_DEP}
+ecbuild_add_library( TARGET   opsinputs
+                     SOURCES  ${opsinputs_src_files}
+                     LIBS     ${OPSINPUTS_LIBS_DEP}
                      INSTALL_HEADERS LISTED
-                     HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/cxvarobs
+                     HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/opsinputs
                      LINKER_LANGUAGE ${OOPS_LINKER_LANGUAGE}
                      PRIVATE_INCLUDES ${OPS_INCLUDE_DIR}
                      TYPE STATIC

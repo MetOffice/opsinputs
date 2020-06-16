@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_VAROBSWRITERPARAMETERS_H_
-#define CXVAROBS_VAROBSWRITERPARAMETERS_H_
+#ifndef OPSINPUTS_VAROBSWRITERPARAMETERS_H_
+#define OPSINPUTS_VAROBSWRITERPARAMETERS_H_
 
 #include <string>
 
@@ -16,7 +16,7 @@
 #include "oops/util/parameters/Parameters.h"
 #include "oops/util/parameters/RequiredParameter.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief VarObsWriter options.
 class VarObsWriterParameters : public oops::Parameters {
@@ -109,6 +109,6 @@ class VarObsWriterParameters : public oops::Parameters {
   oops::Parameter<double> RC_PoleLong{"RC_PoleLong", 0.0, this};
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_VAROBSWRITERPARAMETERS_H_
+#endif  // OPSINPUTS_VAROBSWRITERPARAMETERS_H_

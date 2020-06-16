@@ -5,15 +5,15 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H_
-#define TEST_CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H_
+#ifndef TEST_OPSINPUTS_RESETFLAGSTOPASSPARAMETERS_H_
+#define TEST_OPSINPUTS_RESETFLAGSTOPASSPARAMETERS_H_
 
 #include <vector>
 
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/Parameters.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief ResetFlagsToPass filter's options.
 class ResetFlagsToPassParameters : public oops::Parameters {
@@ -22,6 +22,6 @@ class ResetFlagsToPassParameters : public oops::Parameters {
   oops::Parameter<std::vector<int>> flagsToReset{"flags_to_reset", {}, this};
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_RESETFLAGSTOPASSPARAMETERS_H_
+#endif  // TEST_OPSINPUTS_RESETFLAGSTOPASSPARAMETERS_H_

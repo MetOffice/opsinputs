@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_CXVAROBS_OBSSPACE_F_H_
-#define CXVAROBS_CXVAROBS_OBSSPACE_F_H_
+#ifndef OPSINPUTS_OPSINPUTS_OBSSPACE_F_H_
+#define OPSINPUTS_OPSINPUTS_OBSSPACE_F_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -21,20 +21,20 @@ namespace util {
   class DateTime;
 }  // namespace util
 
-namespace cxvarobs {
+namespace opsinputs {
 
 extern "C" {
 
-  void cxvarobs_obsspace_get_db_datetime_offset_in_seconds_f(
+  void opsinputs_obsspace_get_db_datetime_offset_in_seconds_f(
       const ioda::ObsSpace &obsspace, const char *group, const char *vname,
       const util::DateTime &reference, const size_t &length, int64_t *offsets);
 
-  void cxvarobs_obsspace_get_db_string_f(
+  void opsinputs_obsspace_get_db_string_f(
       const ioda::ObsSpace &obsspace, const char *group, const char *vname,
       const size_t &string_length, const size_t &num_strings, char *characters);
 
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_CXVAROBS_OBSSPACE_F_H_
+#endif  // OPSINPUTS_OPSINPUTS_OBSSPACE_F_H_

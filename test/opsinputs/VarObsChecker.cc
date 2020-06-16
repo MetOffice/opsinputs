@@ -28,7 +28,7 @@
 
 #include "ufo/filters/Variables.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 /// Encapsulates the main table of per-observation data printed by PrintVarobs.
@@ -111,9 +111,7 @@ void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostic
   checkMainTable(output.mainTable);
 }
 
-void VarObsChecker::setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const {
-  if (parameters_.namelistDirectory.value() != boost::none)
-    localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
+void VarObsChecker::setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const {
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
 }
@@ -205,4 +203,4 @@ void VarObsChecker::print(std::ostream & os) const {
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs

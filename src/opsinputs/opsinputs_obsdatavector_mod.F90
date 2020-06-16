@@ -6,48 +6,48 @@
 
 !>  Fortran interface to ObsDataVector.
 
-module cxvarobs_obsdatavector_mod
+module opsinputs_obsdatavector_mod
 
 use kinds
 use string_f_c_mod
 
 implicit none
 
-public cxvarobs_obsdatavector_int_nlocs
-public cxvarobs_obsdatavector_int_has
-public cxvarobs_obsdatavector_int_get
-public cxvarobs_obsdatavector_float_nlocs
-public cxvarobs_obsdatavector_float_has
-public cxvarobs_obsdatavector_float_get
+public opsinputs_obsdatavector_int_nlocs
+public opsinputs_obsdatavector_int_has
+public opsinputs_obsdatavector_int_get
+public opsinputs_obsdatavector_float_nlocs
+public opsinputs_obsdatavector_float_has
+public opsinputs_obsdatavector_float_get
 
-#include "cxvarobs_obsdatavector_interface.f90"
+#include "opsinputs_obsdatavector_interface.f90"
 
 contains
 
 !> Return the number of observation locations in this ObsDataVector<int> object.
 
-integer function cxvarobs_obsdatavector_int_nlocs(c_vec)
+integer function opsinputs_obsdatavector_int_nlocs(c_vec)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), intent(in) :: c_vec
 
-  cxvarobs_obsdatavector_int_nlocs = c_cxvarobs_obsdatavector_int_nlocs(c_vec)
-end function cxvarobs_obsdatavector_int_nlocs
+  opsinputs_obsdatavector_int_nlocs = c_opsinputs_obsdatavector_int_nlocs(c_vec)
+end function opsinputs_obsdatavector_int_nlocs
 
 !> Return an object wrapping the list of names of variables held in this ObsDataVector<int> object.
 
-type(oops_variables) function cxvarobs_obsdatavector_int_varnames(c_vec)
+type(oops_variables) function opsinputs_obsdatavector_int_varnames(c_vec)
   use, intrinsic :: iso_c_binding
   use oops_variables_mod
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
 
-  cxvarobs_obsdatavector_int_varnames = oops_variables(c_cxvarobs_obsdatavector_int_varnames(c_vec))
-end function cxvarobs_obsdatavector_int_varnames
+  opsinputs_obsdatavector_int_varnames = oops_variables(c_opsinputs_obsdatavector_int_varnames(c_vec))
+end function opsinputs_obsdatavector_int_varnames
 
 !> Return true if this ObsDataVector<int> object contains a given variable.
 
-logical function cxvarobs_obsdatavector_int_has(c_vec, variable)
+logical function opsinputs_obsdatavector_int_has(c_vec, variable)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), intent(in)      :: c_vec
@@ -56,13 +56,13 @@ logical function cxvarobs_obsdatavector_int_has(c_vec, variable)
   character(kind=c_char,len=1), allocatable :: c_variable(:)
 
   call f_c_string(variable, c_variable)
-  cxvarobs_obsdatavector_int_has = c_cxvarobs_obsdatavector_int_has(c_vec, c_variable)
+  opsinputs_obsdatavector_int_has = c_opsinputs_obsdatavector_int_has(c_vec, c_variable)
   deallocate(c_variable)
-end function cxvarobs_obsdatavector_int_has
+end function opsinputs_obsdatavector_int_has
 
 !> Get a variable from this ObsDataVector<int> object.
 
-subroutine cxvarobs_obsdatavector_int_get(c_vec, variable, vect)
+subroutine opsinputs_obsdatavector_int_get(c_vec, variable, vect)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
@@ -76,37 +76,37 @@ subroutine cxvarobs_obsdatavector_int_get(c_vec, variable, vect)
   call f_c_string(variable, c_variable)
   length = size(vect)
 
-  call c_cxvarobs_obsdatavector_int_get(c_vec, c_variable, length, vect)
+  call c_opsinputs_obsdatavector_int_get(c_vec, c_variable, length, vect)
 
   deallocate(c_variable)
-end subroutine cxvarobs_obsdatavector_int_get
+end subroutine opsinputs_obsdatavector_int_get
 
 
 !> Return the number of observation locations in this ObsDataVector<float> object.
 
-integer function cxvarobs_obsdatavector_float_nlocs(c_vec)
+integer function opsinputs_obsdatavector_float_nlocs(c_vec)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), intent(in) :: c_vec
 
-  cxvarobs_obsdatavector_float_nlocs = c_cxvarobs_obsdatavector_float_nlocs(c_vec)
-end function cxvarobs_obsdatavector_float_nlocs
+  opsinputs_obsdatavector_float_nlocs = c_opsinputs_obsdatavector_float_nlocs(c_vec)
+end function opsinputs_obsdatavector_float_nlocs
 
 !> Return an object wrapping the list of names of variables held in this ObsDataVector<int> object.
 
-type(oops_variables) function cxvarobs_obsdatavector_float_varnames(c_vec)
+type(oops_variables) function opsinputs_obsdatavector_float_varnames(c_vec)
   use, intrinsic :: iso_c_binding
   use oops_variables_mod
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
 
-  cxvarobs_obsdatavector_float_varnames = &
-    oops_variables(c_cxvarobs_obsdatavector_float_varnames(c_vec))
-end function cxvarobs_obsdatavector_float_varnames
+  opsinputs_obsdatavector_float_varnames = &
+    oops_variables(c_opsinputs_obsdatavector_float_varnames(c_vec))
+end function opsinputs_obsdatavector_float_varnames
 
 !> Return true if this ObsDataVector<float> object contains a given variable.
 
-logical function cxvarobs_obsdatavector_float_has(c_vec, variable)
+logical function opsinputs_obsdatavector_float_has(c_vec, variable)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), intent(in)      :: c_vec
@@ -115,13 +115,13 @@ logical function cxvarobs_obsdatavector_float_has(c_vec, variable)
   character(kind=c_char,len=1), allocatable :: c_variable(:)
 
   call f_c_string(variable, c_variable)
-  cxvarobs_obsdatavector_float_has = c_cxvarobs_obsdatavector_float_has(c_vec, c_variable)
+  opsinputs_obsdatavector_float_has = c_opsinputs_obsdatavector_float_has(c_vec, c_variable)
   deallocate(c_variable)
-end function cxvarobs_obsdatavector_float_has
+end function opsinputs_obsdatavector_float_has
 
 !> Get a variable from this ObsDataVector<float> object.
 
-subroutine cxvarobs_obsdatavector_float_get(c_vec, variable, vect)
+subroutine opsinputs_obsdatavector_float_get(c_vec, variable, vect)
   use, intrinsic :: iso_c_binding
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
@@ -135,9 +135,9 @@ subroutine cxvarobs_obsdatavector_float_get(c_vec, variable, vect)
   call f_c_string(variable, c_variable)
   length = size(vect)
 
-  call c_cxvarobs_obsdatavector_float_get(c_vec, c_variable, length, vect)
+  call c_opsinputs_obsdatavector_float_get(c_vec, c_variable, length, vect)
 
   deallocate(c_variable)
-end subroutine cxvarobs_obsdatavector_float_get
+end subroutine opsinputs_obsdatavector_float_get
 
-end module cxvarobs_obsdatavector_mod
+end module opsinputs_obsdatavector_mod

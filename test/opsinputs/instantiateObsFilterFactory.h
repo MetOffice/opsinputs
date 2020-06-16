@@ -5,15 +5,15 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
-#define TEST_CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
+#ifndef TEST_OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
+#define TEST_OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 
 #include "../cxvarobs/CxChecker.h"
 #include "../cxvarobs/ResetFlagsToPass.h"
 #include "../cxvarobs/VarObsChecker.h"
 #include "oops/interface/ObsFilter.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 template<typename MODEL>
@@ -27,6 +27,6 @@ void instantiateObsFilterFactory() {
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_INSTANTIATEOBSFILTERFACTORY_H_
+#endif  // TEST_OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
