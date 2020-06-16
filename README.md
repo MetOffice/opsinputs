@@ -89,6 +89,8 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
    c. Add a call to the `ADD_VAROBSWRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
 
+4. Update the list of implemented varfields in `Varfields.md`. 
+
 Working practices
 =================
 
