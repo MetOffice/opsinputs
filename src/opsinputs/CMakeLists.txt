@@ -11,15 +11,15 @@ list( APPEND opsinputs_src_files
     opsinputs_obsdatavector_f.h
     opsinputs_obsdatavector_mod.F90
     opsinputs_varobswriter_mod.F90
-    cxvarobs_cxgenerate_mod.F90
-    cxvarobs_cxwriter_mod.F90
-    cxvarobs_utils_mod.F90
+    opsinputs_cxgenerate_mod.F90
+    opsinputs_cxwriter_mod.F90
+    opsinputs_utils_mod.F90
     CxWriter.cc
     CxWriter.h
     CxWriter.interface.h
     CxWriter.interface.F90
     CxWriterParameters.h
-    cxvarobs_mpl_mod.F90
+    opsinputs_mpl_mod.F90
     instantiateObsFilterFactory.h
     LocalEnvironment.cc
     LocalEnvironment.h
@@ -33,7 +33,7 @@ list( APPEND opsinputs_src_files
 )
 
 # TODO(wsmigaj): support Intel's compiler option
-set_source_files_properties(cxvarobs_cxgenerate_mod.F90 PROPERTIES
+set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                             COMPILE_FLAGS "-fdefault-real-8 -fdefault-integer-8")
 
 set(SHUM_LIB_DIR "${OPS_INSTALLS_DIR}/shumlib/lib")

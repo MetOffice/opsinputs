@@ -5,20 +5,20 @@
 
 !> Utilities used by both VarObsWriter and CxWriter.
 
-module cxvarobs_utils_mod
+module opsinputs_utils_mod
 
 use missing_values_mod
 use oops_variables_mod
 use obsspace_mod
 use ufo_vars_mod, only: MAXVARLEN
-use cxvarobs_obsdatavector_mod
+use opsinputs_obsdatavector_mod
 
 use OpsMod_ObsInfo, only: FinalRejectReport
 
 implicit none
 private
 
-public :: cxvarobs_utils_fillreportflags
+public :: opsinputs_utils_fillreportflags
 
 ! Maximum length of a variable name
 integer, parameter, public :: max_varname_length=MAXVARLEN
@@ -33,7 +33,7 @@ contains
 !>
 !> Observations are marked as rejected if the JEDI QC flags of any or all (depending on the
 !> specified options) simulated variables are set to anything different from "pass".
-subroutine cxvarobs_utils_fillreportflags( &
+subroutine opsinputs_utils_fillreportflags( &
   ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC, &
   ReportFlags)
 use, intrinsic :: iso_c_binding
@@ -53,7 +53,7 @@ integer(c_int)                           :: VarFlags(size(ReportFlags))
 
 ! Body:
 
-ObsVariables = cxvarobs_obsdatavector_int_varnames(Flags)
+ObsVariables = opsinputs_obsdatavector_int_varnames(Flags)
 NumObsVariables = ObsVariables % nvars()
 
 if (RejectObsWithAnyVariableFailingQC) then
@@ -63,7 +63,7 @@ if (RejectObsWithAnyVariableFailingQC) then
   ! in at least one variable.
   do iVar = 1, NumObsVariables
     VarName = ObsVariables % variable(iVar)
-    call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
+    call opsinputs_obsdatavector_int_get(Flags, VarName, VarFlags)
     where (VarFlags > 0)
       ReportFlags = ibset(ReportFlags, FinalRejectReport)
     end where
@@ -75,13 +75,13 @@ else if (RejectObsWithAllVariablesFailingQC) then
   ! in at least one variable.
   do iVar = 1, NumObsVariables
     VarName = ObsVariables % variable(iVar)
-    call cxvarobs_obsdatavector_int_get(Flags, VarName, VarFlags)
+    call opsinputs_obsdatavector_int_get(Flags, VarName, VarFlags)
     where (VarFlags == 0)
       ReportFlags = ibclr(ReportFlags, FinalRejectReport)
     end where
   end do
 end if
 
-end subroutine cxvarobs_utils_fillreportflags
+end subroutine opsinputs_utils_fillreportflags
 
-end module cxvarobs_utils_mod
+end module opsinputs_utils_mod

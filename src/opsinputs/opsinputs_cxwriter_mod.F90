@@ -6,7 +6,7 @@
 !> Fortran part of CxWriter. It collects data from JEDI and uses OPS functions to output these data
 !> to a Cx file.
 
-module cxvarobs_cxwriter_mod
+module opsinputs_cxwriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding
@@ -17,10 +17,10 @@ use oops_variables_mod
 use obsspace_mod
 use ufo_geovals_mod
 use ufo_vars_mod
-use cxvarobs_mpl_mod, only: cxvarobs_mpl_allgather_integer
-use cxvarobs_obsdatavector_mod
-use cxvarobs_obsspace_mod
-use cxvarobs_utils_mod
+use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
+use opsinputs_obsdatavector_mod
+use opsinputs_obsspace_mod
+use opsinputs_utils_mod
 
 use GenMod_Control, only:   &
     OperationalMode,        &
@@ -68,7 +68,7 @@ use OpsMod_Control, only:   &
 use OpsMod_CXInfo, only: &
     CXheader_type, &
     CX_type
-use cxvarobs_cxgenerate_mod, only: &
+use opsinputs_cxgenerate_mod, only: &
     MaxModelCodes,                 &
     Ops_ReadCXControlNL
 use OpsMod_DateTime
@@ -87,12 +87,12 @@ use OpsMod_ObsInfo
 use OpsMod_Stash
 
 implicit none
-public :: cxvarobs_cxwriter_create, cxvarobs_cxwriter_delete, &
-          cxvarobs_cxwriter_prior, cxvarobs_cxwriter_post
+public :: opsinputs_cxwriter_create, opsinputs_cxwriter_delete, &
+          opsinputs_cxwriter_prior, opsinputs_cxwriter_post
 private
 
 ! ------------------------------------------------------------------------------
-type, public :: cxvarobs_cxwriter
+type, public :: opsinputs_cxwriter
 private
   integer(kind=8) :: ObsGroup
   type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
@@ -125,21 +125,21 @@ private
   real(kind=8), allocatable :: EtaRho(:)
 
   type(ufo_geovals), pointer :: GeoVals
-end type cxvarobs_cxwriter
+end type opsinputs_cxwriter
 
 ! ------------------------------------------------------------------------------
 contains
 ! ------------------------------------------------------------------------------
 
-!> Set up an instance of cxvarobs_cxwriter. Returns .true. on success and .false. on failure.
-function cxvarobs_cxwriter_create(self, f_conf, geovars)
+!> Set up an instance of opsinputs_cxwriter. Returns .true. on success and .false. on failure.
+function opsinputs_cxwriter_create(self, f_conf, geovars)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(inout) :: self
+type(opsinputs_cxwriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the CxWriter.
-logical(c_bool)                            :: cxvarobs_cxwriter_create
+logical(c_bool)                            :: opsinputs_cxwriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: string
@@ -152,12 +152,12 @@ integer(kind=8), parameter                 :: zero = 0
 
 integer                                    :: i
 
-character(len=*), parameter :: RoutineName = "cxvarobs_cxwriter_create"
+character(len=*), parameter :: RoutineName = "opsinputs_cxwriter_create"
 character(len=200)          :: ErrorMessage
 
 ! Body:
 
-cxvarobs_cxwriter_create = .true.
+opsinputs_cxwriter_create = .true.
 
 ! Setup OPS
 
@@ -181,7 +181,7 @@ case ("verbose")
 case default
   write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end select
 
@@ -193,14 +193,14 @@ call Ops_InitMPI
 
 if (.not. f_conf % get("obs_group", string)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end if
 self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 
 if (.not. f_conf % get("validity_time", string)) then
   call gen_warn(RoutineName, "Mandatory validity_time option not found")
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end if
 call datetime_create(string, self % validitytime)
@@ -231,7 +231,7 @@ case ("wave")
 case default
   write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end select
 
@@ -257,7 +257,7 @@ case ("lamwrapeq")
 case default
   write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end select
 
@@ -273,7 +273,7 @@ case ("endgame")
 case default
   write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end select
 
@@ -291,7 +291,7 @@ case ("wave")
 case default
   write (ErrorMessage, '("FH_ObsFileType code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
-  cxvarobs_cxwriter_create = .false.
+  opsinputs_cxwriter_create = .false.
   goto 9999
 end select
 
@@ -343,7 +343,7 @@ found = f_conf % get("eta_theta", self % EtaTheta)
 if (found) then
   if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
     call gen_warn(RoutineName, "eta_theta should be a vector of length (IC_PLevels + 1)")
-    cxvarobs_cxwriter_create = .false.
+    opsinputs_cxwriter_create = .false.
     goto 9999
   end if
 else
@@ -355,7 +355,7 @@ found = f_conf % get("eta_rho", self % EtaRho)
 if (found) then
   if (size(self % EtaRho) /= self % IC_PLevels) then
     call gen_warn(RoutineName, "eta_theta should be a vector of length (IC_PLevels + 1)")
-    cxvarobs_cxwriter_create = .false.
+    opsinputs_cxwriter_create = .false.
     goto 9999
   end if
 else
@@ -372,20 +372,20 @@ found = f_conf % get("forecast_period", int)
 self % ForecastPeriod = int
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
-call cxvarobs_cxwriter_addrequiredgeovars(self, geovars)
+call opsinputs_cxwriter_addrequiredgeovars(self, geovars)
 
 9999 if (allocated(string)) deallocate(string)
 
-end function cxvarobs_cxwriter_create
+end function opsinputs_cxwriter_create
 
 ! ------------------------------------------------------------------------------
 
-!> Destroy an instance of cxvarobs_cxwriter.
-subroutine cxvarobs_cxwriter_delete(self)
+!> Destroy an instance of opsinputs_cxwriter.
+subroutine opsinputs_cxwriter_delete(self)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(inout) :: self
+type(opsinputs_cxwriter), intent(inout) :: self
 
 ! Body:
 call datetime_delete(self % validitytime)
@@ -393,39 +393,39 @@ call datetime_delete(self % validitytime)
 if (allocated(self % EtaRho)) deallocate(self % EtaRho)
 if (allocated(self % EtaTheta)) deallocate(self % EtaTheta)
 
-end subroutine cxvarobs_cxwriter_delete
+end subroutine opsinputs_cxwriter_delete
 
 ! ------------------------------------------------------------------------------
 
 !> Called by the priorFilter() method of the C++ CxWriter object.
 !>
 !> Set the GeoVals pointer.
-subroutine cxvarobs_cxwriter_prior(self, ObsSpace, GeoVals)
+subroutine opsinputs_cxwriter_prior(self, ObsSpace, GeoVals)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(inout) :: self
+type(opsinputs_cxwriter), intent(inout) :: self
 type(c_ptr), value, intent(in)             :: ObsSpace
 type(ufo_geovals), intent(in), pointer     :: GeoVals
 
 ! Body:
 self % GeoVals => GeoVals
 
-end subroutine cxvarobs_cxwriter_prior
+end subroutine opsinputs_cxwriter_prior
 
 ! ------------------------------------------------------------------------------
 
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
-subroutine cxvarobs_cxwriter_post( &
+subroutine opsinputs_cxwriter_post( &
   self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in) :: self
+type(opsinputs_cxwriter), intent(in) :: self
 type(c_ptr), value, intent(in) :: ObsSpace
 integer,            intent(in) :: nchannels
 integer,            intent(in) :: Channels(nchannels)
@@ -446,19 +446,19 @@ integer(kind=gc_int_kind)      :: istat
 ! Body:
 
 NumObsLocal = obsspace_get_nlocs(ObsSpace)
-RetainedObsIndices = cxvarobs_cxwriter_retainedobsindices( &
+RetainedObsIndices = opsinputs_cxwriter_retainedobsindices( &
   NumObsLocal, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
-call cxvarobs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob)
-call cxvarobs_cxwriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, &
+call opsinputs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob)
+call opsinputs_cxwriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, &
                                             NumObsLocal, RetainedObsIndices, Ob)
-call cxvarobs_cxwriter_allocatecx(self, Ob, Cx)
-call cxvarobs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, RetainedObsIndices, &
+call opsinputs_cxwriter_allocatecx(self, Ob, Cx)
+call opsinputs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, RetainedObsIndices, &
                                   Cx)
-call cxvarobs_cxwriter_populateumheader(self, UMHeader)
+call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
-call cxvarobs_mpl_allgather_integer([Cx % Header % NumLocal], 1_gc_int_kind, mpl_integer, &
+call opsinputs_mpl_allgather_integer([Cx % Header % NumLocal], 1_gc_int_kind, mpl_integer, &
                                     NumRetainedObsOnEachRank, 1_gc_int_kind, mpl_integer, &
                                     mpi_group, istat)
 allocate(mask(Cx % Header % NumLocal))
@@ -477,16 +477,16 @@ call Cx % deallocate()
 call Ob % deallocate()
 deallocate(RetainedObsIndices)
 
-end subroutine cxvarobs_cxwriter_post
+end subroutine opsinputs_cxwriter_post
 
 ! ------------------------------------------------------------------------------
 
 !> Populate the list of GeoVaLs needed to fill in any requested cxfields.
-subroutine cxvarobs_cxwriter_addrequiredgeovars(self, geovars)
+subroutine opsinputs_cxwriter_addrequiredgeovars(self, geovars)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in) :: self
+type(opsinputs_cxwriter), intent(in) :: self
 type(oops_variables), intent(inout) :: geovars
 
 ! Local declarations:
@@ -506,21 +506,21 @@ do i = 1, size(CxFields)
     call geovars % push_back("air_potential_temperature")
   case (StashItem_modelsurface)
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
-    ! here and in cxvarobs_cxwriter_populatecx.
+    ! here and in opsinputs_cxwriter_populatecx.
     call geovars % push_back("land_type_index")
   end select
 end do
 
-end subroutine cxvarobs_cxwriter_addrequiredgeovars
+end subroutine opsinputs_cxwriter_addrequiredgeovars
 
 ! ------------------------------------------------------------------------------
 
 !> Prepare Ob to hold the required number of observations.
-subroutine cxvarobs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob)
+subroutine opsinputs_cxwriter_allocateobservations(self, ObsSpace, RetainedObsIndices, Ob)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in) :: self
+type(opsinputs_cxwriter), intent(in) :: self
 type(c_ptr), value, intent(in)      :: ObsSpace
 integer, intent(in)                 :: RetainedObsIndices(:)
 type(OB_type), intent(inout)        :: Ob
@@ -541,17 +541,17 @@ Ob % Header % NumCXBatches = 1
 allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
 Ob % Header % ObsPerBatchPerPE(1,mype) = Ob % Header % NumObsLocal
 
-end subroutine cxvarobs_cxwriter_allocateobservations
+end subroutine opsinputs_cxwriter_allocateobservations
 
 ! ------------------------------------------------------------------------------
 
 !> Populate Ob fields required by the OPS routine writing a Cx file.
-subroutine cxvarobs_cxwriter_populateobservations( &
+subroutine opsinputs_cxwriter_populateobservations( &
   self, ObsSpace, Channels, Flags, ObsErrors, NumObsLocal, RetainedObsIndices, Ob)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in)     :: self
+type(opsinputs_cxwriter), intent(in)     :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
@@ -579,28 +579,28 @@ Ob % Header % ValidityTime % diff_from_utc = 0 ! TODO(wsmigaj): Is it OK to assu
 
 call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
 call obsspace_get_db(ObsSpace, "MetaData", "latitude", Reals)
-call cxvarobs_cxwriter_selectretainedobservations(Reals, RetainedObsIndices, Ob % Latitude)
+call opsinputs_cxwriter_selectretainedobservations(Reals, RetainedObsIndices, Ob % Latitude)
 
 call Ops_Alloc(Ob % Header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
 call obsspace_get_db(ObsSpace, "MetaData", "longitude", Reals)
-call cxvarobs_cxwriter_selectretainedobservations(Reals, RetainedObsIndices, Ob % Longitude)
+call opsinputs_cxwriter_selectretainedobservations(Reals, RetainedObsIndices, Ob % Longitude)
 
 call Ops_Alloc(Ob % Header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
-call cxvarobs_obsspace_get_db_datetime_offset_in_seconds( &
+call opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
   ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
 Reals = TimeOffsetsInSeconds
-call cxvarobs_cxwriter_selectretainedobservations(Reals, RetainedObsIndices, Ob % Time)
+call opsinputs_cxwriter_selectretainedobservations(Reals, RetainedObsIndices, Ob % Time)
 
-end subroutine cxvarobs_cxwriter_populateobservations
+end subroutine opsinputs_cxwriter_populateobservations
 
 ! ------------------------------------------------------------------------------
 
 !> Prepare Cx to hold the required number of model columns.
-subroutine cxvarobs_cxwriter_allocatecx(self, Ob, Cx)
+subroutine opsinputs_cxwriter_allocatecx(self, Ob, Cx)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in)     :: self
+type(opsinputs_cxwriter), intent(in)     :: self
 type(OB_type), intent(in)               :: Ob
 type(CX_type), intent(inout)            :: Cx
 
@@ -628,17 +628,17 @@ Cx % Header % NewDynamics = self % FH_ModelVersion >= 500 .and. ModelType /= Mod
 !  Cx % Header % FirstConstantRhoLevel = IMDI
 !END IF
 
-end subroutine cxvarobs_cxwriter_allocatecx
+end subroutine opsinputs_cxwriter_allocatecx
 
 ! ------------------------------------------------------------------------------
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
-subroutine cxvarobs_cxwriter_populatecx( &
+subroutine opsinputs_cxwriter_populatecx( &
   self, ObsSpace, Channels, Flags, ObsErrors, RetainedObsIndices, Cx)
 implicit none
 
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in)     :: self
+type(opsinputs_cxwriter), intent(in)     :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
@@ -647,7 +647,7 @@ integer, intent(in)                     :: RetainedObsIndices(:)
 type(CX_type), intent(inout)            :: Cx
 
 ! Local declarations:
-character(len=*), parameter             :: RoutineName = "cxvarobs_cxwriter_populatecx"
+character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_populatecx"
 character(len=80)                       :: ErrorMessage
 
 integer(kind=8)                         :: CxFields(MaxModelCodes)
@@ -660,34 +660,34 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 do iCxField = 1, size(CxFields)
   select case (CxFields(iCxField))
   case (StashItem_u)
-    call cxvarobs_cxwriter_fillreal2dfromgeoval( &
+    call opsinputs_cxwriter_fillreal2dfromgeoval( &
       Cx % Header % u, "u", Cx % u, &
       self % GeoVals, RetainedObsIndices, "eastward_wind")
   case (StashItem_v)
-    call cxvarobs_cxwriter_fillreal2dfromgeoval( &
+    call opsinputs_cxwriter_fillreal2dfromgeoval( &
       Cx % Header % v, "v", Cx % v, &
       self % GeoVals, RetainedObsIndices, "northward_wind")
   case (StashItem_theta)
-    call cxvarobs_cxwriter_fillreal2dfromgeoval( &
+    call opsinputs_cxwriter_fillreal2dfromgeoval( &
       Cx % Header % theta, "theta", Cx % theta, &
       self % GeoVals, RetainedObsIndices, "air_potential_temperature")
   case (StashItem_modelsurface)
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
-    ! here and in cxvarobs_cxwriter_addrequiredgeovars.
-    call cxvarobs_cxwriter_fillrealfromgeoval( &
+    ! here and in opsinputs_cxwriter_addrequiredgeovars.
+    call opsinputs_cxwriter_fillrealfromgeoval( &
       Cx % Header % ModelSurface, "ModelSurface", Cx % ModelSurface, &
       self % GeoVals, RetainedObsIndices, "land_type_index")
   end select
 end do
-end subroutine cxvarobs_cxwriter_populatecx
+end subroutine opsinputs_cxwriter_populatecx
 
 ! ------------------------------------------------------------------------------
 
 !> Prepare a UM header object to be given to the OPS function writing a Cx file.
-subroutine cxvarobs_cxwriter_populateumheader(self, UMHeader)
+subroutine opsinputs_cxwriter_populateumheader(self, UMHeader)
 implicit none
 ! Subroutine arguments:
-type(cxvarobs_cxwriter), intent(in) :: self
+type(opsinputs_cxwriter), intent(in) :: self
 type(UM_header_type), intent(inout) :: UmHeader
 
 ! Local declarations:
@@ -781,7 +781,7 @@ UmHeader % Lookup(LBSECD,1) = UmHeader % FixHd(FH_DTSecond)
 UmHeader % Lookup(LBTIM,1) = self % TimeIndicator
 UmHeader % Lookup(LBFT,1) = self % ForecastPeriod
 
-end subroutine cxvarobs_cxwriter_populateumheader
+end subroutine opsinputs_cxwriter_populateumheader
 
 ! ------------------------------------------------------------------------------
 
@@ -805,7 +805,7 @@ end subroutine cxvarobs_cxwriter_populateumheader
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
-subroutine cxvarobs_cxwriter_fillreal( &
+subroutine opsinputs_cxwriter_fillreal( &
   Hdr, OpsVarName, NumObs, Real1, ObsSpace, JediVarName, JediVarGroup)
 implicit none
 
@@ -837,7 +837,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (VarValue(i) /= MissingDouble) Real1(i) = VarValue(i)
   end do
 end if
-end subroutine cxvarobs_cxwriter_fillreal
+end subroutine opsinputs_cxwriter_fillreal
 
 ! ------------------------------------------------------------------------------
 
@@ -856,14 +856,14 @@ end subroutine cxvarobs_cxwriter_fillreal
 !> \param[in] JediVarName
 !>   Name of the GeoVaL used to populate \p Real1.
 !>
-!> \note If you're calling this function from cxvarobs_cxwriter_populateobservations, be sure
-!> to update cxvarobs_cxwriter_addrequiredgeovars by adding \p JediVarName to the list of
+!> \note If you're calling this function from opsinputs_cxwriter_populateobservations, be sure
+!> to update opsinputs_cxwriter_addrequiredgeovars by adding \p JediVarName to the list of
 !> GeoVaLs required by the CxWriter.
 !>
 !> \note This function returns early (without a warning) if the specified GeoVaL is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
-subroutine cxvarobs_cxwriter_fillrealfromgeoval( &
+subroutine opsinputs_cxwriter_fillrealfromgeoval( &
   Hdr, OpsVarName, Real1, GeoVals, RetainedObsIndices, JediVarName)
 implicit none
 
@@ -882,7 +882,7 @@ type(ufo_geoval), pointer                       :: GeoVal
 integer                                         :: i, iIn, iOut
 
 character(len=*), parameter                     :: &
-  RoutineName = "cxvarobs_cxwriter_fillrealfromgeoval"
+  RoutineName = "opsinputs_cxwriter_fillrealfromgeoval"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
@@ -908,7 +908,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
     iOut = iOut + 1
   end do
 end if
-end subroutine cxvarobs_cxwriter_fillrealfromgeoval
+end subroutine opsinputs_cxwriter_fillrealfromgeoval
 
 ! ------------------------------------------------------------------------------
 
@@ -930,7 +930,7 @@ end subroutine cxvarobs_cxwriter_fillrealfromgeoval
 !> \note This function returns early (without a warning) if the specified GeoVaL is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
-subroutine cxvarobs_cxwriter_fillreal2dfromgeoval( &
+subroutine opsinputs_cxwriter_fillreal2dfromgeoval( &
   Hdr, OpsVarName, Real2, GeoVals, RetainedObsIndices, JediVarName)
 implicit none
 
@@ -971,11 +971,11 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
     iOut = iOut + 1
   end do
 end if
-end subroutine cxvarobs_cxwriter_fillreal2dfromgeoval
+end subroutine opsinputs_cxwriter_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
-function cxvarobs_cxwriter_retainedobsindices( &
+function opsinputs_cxwriter_retainedobsindices( &
   NumObsLocal, ObsSpace, Flags, &
   RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
 implicit none
@@ -988,7 +988,7 @@ logical                             :: RejectObsWithAnyVariableFailingQC
 logical                             :: RejectObsWithAllVariablesFailingQC
 
 ! Return value:
-integer, allocatable                :: cxvarobs_cxwriter_retainedobsindices(:)
+integer, allocatable                :: opsinputs_cxwriter_retainedobsindices(:)
 
 ! Local declarations:
 integer(kind=8)                     :: ReportFlags(NumObsLocal)
@@ -997,27 +997,27 @@ integer                             :: iObs, iRetainedObs
 
 ! Body
 
-call cxvarobs_utils_fillreportflags(ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, &
+call opsinputs_utils_fillreportflags(ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, &
                                     RejectObsWithAllVariablesFailingQC, ReportFlags)
 
 NumRetainedObs = NumObsLocal - count(btest(ReportFlags, FinalRejectFlag))
-allocate(cxvarobs_cxwriter_retainedobsindices(NumRetainedObs))
+allocate(opsinputs_cxwriter_retainedobsindices(NumRetainedObs))
 
 iRetainedObs = 1
 do iObs = 1, NumObsLocal
   if (.not. btest(ReportFlags(iObs), FinalRejectFlag)) then
-    cxvarobs_cxwriter_retainedobsindices(iRetainedObs) = iObs
+    opsinputs_cxwriter_retainedobsindices(iRetainedObs) = iObs
     iRetainedObs = iRetainedObs + 1
   end if
 end do
 
-end function cxvarobs_cxwriter_retainedobsindices
+end function opsinputs_cxwriter_retainedobsindices
 
 ! ------------------------------------------------------------------------------
 
 !> Select the elements of \p Obs with indices \p RetainedObsIndices and store them in
 !> \p RetainedObs.
-subroutine cxvarobs_cxwriter_selectretainedobservations(Obs, RetainedObsIndices, RetainedObs)
+subroutine opsinputs_cxwriter_selectretainedobservations(Obs, RetainedObsIndices, RetainedObs)
 implicit none
 
 ! Subroutine arguments:
@@ -1034,6 +1034,6 @@ do iOut = 1, size(RetainedObsIndices)
   RetainedObs(iOut) = Obs(iIn)
 end do
 
-end subroutine cxvarobs_cxwriter_selectretainedobservations
+end subroutine opsinputs_cxwriter_selectretainedobservations
 
-end module cxvarobs_cxwriter_mod
+end module opsinputs_cxwriter_mod

@@ -5,16 +5,16 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
-#ifndef CXVAROBS_CXWRITER_H_
-#define CXVAROBS_CXWRITER_H_
+#ifndef OPSINPUTS_CXWRITER_H_
+#define OPSINPUTS_CXWRITER_H_
 
 #include <ostream>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
 
-#include "cxvarobs/CxWriter.interface.h"
-#include "cxvarobs/CxWriterParameters.h"
+#include "opsinputs/CxWriter.interface.h"
+#include "opsinputs/CxWriterParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
@@ -34,18 +34,18 @@ namespace ufo {
   class ObsDiagnostics;
 }
 
-namespace cxvarobs {
+namespace opsinputs {
 
 class LocalEnvironment;
 
 /// \brief Outputs geovals to Cx files.
 ///
-/// Most of the implementation is in Fortran (cxvarobs_cxwriter_mod.F90).
+/// Most of the implementation is in Fortran (opsinputs_cxwriter_mod.F90).
 ///
 /// \see CxWriterParameters for the list of accepted configuration parameters.
 class CxWriter : public util::Printable, private util::ObjectCounter<CxWriter> {
  public:
-  static const std::string classname() {return "cxvarobs::CxWriter";}
+  static const std::string classname() {return "opsinputs::CxWriter";}
 
   CxWriter(ioda::ObsSpace &, const eckit::Configuration &,
            boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -77,6 +77,6 @@ class CxWriter : public util::Printable, private util::ObjectCounter<CxWriter> {
   CxWriterParameters parameters_;
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_CXWRITER_H_
+#endif  // OPSINPUTS_CXWRITER_H_

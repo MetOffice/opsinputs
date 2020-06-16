@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_CHECKERUTILS_H_
-#define TEST_CXVAROBS_CHECKERUTILS_H_
+#ifndef TEST_OPSINPUTS_CHECKERUTILS_H_
+#define TEST_OPSINPUTS_CHECKERUTILS_H_
 
 #include <string>
 #include <utility>
@@ -14,7 +14,7 @@
 
 #include <boost/optional.hpp>
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 /// \brief Directory separator.
@@ -41,6 +41,6 @@ std::vector<std::string> splitIntoFixedLengthChunksAndTrim(const std::string &li
 std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputFilePath);
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_CHECKERUTILS_H_
+#endif  // TEST_OPSINPUTS_CHECKERUTILS_H_

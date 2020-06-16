@@ -5,9 +5,9 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#include "../../test/cxvarobs/TempFile.h"
+#include "../../test/opsinputs/TempFile.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 TempFile::TempFile(const eckit::PathName &fileName)
@@ -46,4 +46,4 @@ void TempFile::deleteFileAndResetFileName() {
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs

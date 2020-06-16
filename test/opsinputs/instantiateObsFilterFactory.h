@@ -8,9 +8,9 @@
 #ifndef TEST_OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 #define TEST_OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 
-#include "../cxvarobs/CxChecker.h"
-#include "../cxvarobs/ResetFlagsToPass.h"
-#include "../cxvarobs/VarObsChecker.h"
+#include "../opsinputs/CxChecker.h"
+#include "../opsinputs/ResetFlagsToPass.h"
+#include "../opsinputs/VarObsChecker.h"
 #include "oops/interface/ObsFilter.h"
 
 namespace opsinputs {

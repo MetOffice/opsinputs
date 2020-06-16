@@ -5,7 +5,7 @@
 
 !> MPL functions used by VarObsWriter or CxWriter, but not wrapped by OPS.
 
-module cxvarobs_mpl_mod
+module opsinputs_mpl_mod
 
 implicit none
 
@@ -14,7 +14,7 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Wrapper of the MPL_Allgather function for integer arguments.
-subroutine cxvarobs_mpl_allgather_integer(sendbuf, sendcount,  sendtype, &
+subroutine opsinputs_mpl_allgather_integer(sendbuf, sendcount,  sendtype, &
                                           recvbuf, recvcount,  recvtype, &
                                           comm,    error)
 use mpl, only: gc_int_kind
@@ -43,6 +43,6 @@ call mpl_allgather (sendbuf,  &
                  comm,     &
                  error)
 
-end subroutine cxvarobs_mpl_allgather_integer
+end subroutine opsinputs_mpl_allgather_integer
 
-end module cxvarobs_mpl_mod
+end module opsinputs_mpl_mod

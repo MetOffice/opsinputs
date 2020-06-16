@@ -11,10 +11,10 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include "../../test/cxvarobs/CheckerUtils.h"
-#include "../../test/cxvarobs/VarObsChecker.h"
+#include "../../test/opsinputs/CheckerUtils.h"
+#include "../../test/opsinputs/VarObsChecker.h"
 
-#include "cxvarobs/LocalEnvironment.h"
+#include "opsinputs/LocalEnvironment.h"
 
 #include "eckit/config/Configuration.h"
 #include "eckit/exception/Exceptions.h"
@@ -97,7 +97,7 @@ VarObsChecker::~VarObsChecker() {
 void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
 
-  cxvarobs::LocalEnvironment localEnvironment;
+  opsinputs::LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
   const char exeName[] = "OpsProg_PrintVarobs.exe";

@@ -5,14 +5,14 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_TEMPFILE_H_
-#define TEST_CXVAROBS_TEMPFILE_H_
+#ifndef TEST_OPSINPUTS_TEMPFILE_H_
+#define TEST_OPSINPUTS_TEMPFILE_H_
 
 #include <string>
 
 #include "eckit/filesystem/PathName.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 /// Manages a temporary file (deleted when this object is destroyed).
@@ -41,6 +41,6 @@ class TempFile {
 };
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_TEMPFILE_H_
+#endif  // TEST_OPSINPUTS_TEMPFILE_H_

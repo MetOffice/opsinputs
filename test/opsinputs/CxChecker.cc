@@ -12,11 +12,11 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include "../../test/cxvarobs/CheckerUtils.h"
-#include "../../test/cxvarobs/CxChecker.h"
+#include "../../test/opsinputs/CheckerUtils.h"
+#include "../../test/opsinputs/CxChecker.h"
 
-#include "cxvarobs/LocalEnvironment.h"
-#include "cxvarobs/MPIExceptionSynchronizer.h"
+#include "opsinputs/LocalEnvironment.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
 
 #include "eckit/config/Configuration.h"
 #include "eckit/exception/Exceptions.h"
@@ -30,7 +30,7 @@
 
 #include "ufo/filters/Variables.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 struct CxChecker::PrintCxFileOutput {
@@ -71,7 +71,7 @@ CxChecker::~CxChecker() {
 void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "CxChecker postFilter" << std::endl;
 
-  cxvarobs::LocalEnvironment localEnvironment;
+  opsinputs::LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
   const char exeName[] = "OpsProg_PrintCXFile.exe";
@@ -87,7 +87,7 @@ void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &)
   checkMainTable(output.mainTable);
 }
 
-void CxChecker::setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const {
+void CxChecker::setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const {
 //  if (parameters_.namelistDirectory.value() != boost::none)
 //    localEnvironment.set("OPS_CX_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
@@ -288,4 +288,4 @@ void CxChecker::print(std::ostream & os) const {
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs

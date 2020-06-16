@@ -13,15 +13,15 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include "../../test/cxvarobs/CheckerUtils.h"
-#include "../../test/cxvarobs/TempFile.h"
+#include "../../test/opsinputs/CheckerUtils.h"
+#include "../../test/opsinputs/TempFile.h"
 
-#include "cxvarobs/MPIExceptionSynchronizer.h"
+#include "opsinputs/MPIExceptionSynchronizer.h"
 
 #include "oops/parallel/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 namespace test {
 
 namespace {
@@ -95,7 +95,7 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
       throw std::runtime_error("File '" + inputFilePathName + "' not found");
 
     std::string exePath;
-    if (char *dir = getenv("CXVAROBS_OPS_BIN_DIR")) {
+    if (char *dir = getenv("OPSINPUTS_OPS_BIN_DIR")) {
       exePath = dir;
       exePath += PATH_SEPARATOR;
       exePath += printUtilName;
@@ -104,7 +104,7 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
     }
 
     // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
-    const std::string cmd = /*"mpiexec -n 1 " +*/ exePath + " \"" + inputFilePathName +
+    const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + inputFilePathName +
         "\" --all --outfile=\"" + tempFile->name() + "\"";
     if (oops::mpi::comm().rank() == 0) {
       oops::Log::info() << "Running " << cmd << "\n";
@@ -132,4 +132,4 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
 }
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs

@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_CXCHECKERPARAMETERS_H_
-#define TEST_CXVAROBS_CXCHECKERPARAMETERS_H_
+#ifndef TEST_OPSINPUTS_CXCHECKERPARAMETERS_H_
+#define TEST_OPSINPUTS_CXCHECKERPARAMETERS_H_
 
 #include <map>
 #include <string>
@@ -17,7 +17,7 @@
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/Parameters.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief CxChecker options.
 class CxCheckerParameters : public oops::Parameters {
@@ -58,6 +58,6 @@ class CxCheckerParameters : public oops::Parameters {
     "expected_main_table_columns", this};
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_CXCHECKERPARAMETERS_H_
+#endif  // TEST_OPSINPUTS_CXCHECKERPARAMETERS_H_

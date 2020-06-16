@@ -8,8 +8,8 @@
 #ifndef OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 #define OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 
-#include "cxvarobs/CxWriter.h"
-#include "cxvarobs/VarObsWriter.h"
+#include "opsinputs/CxWriter.h"
+#include "opsinputs/VarObsWriter.h"
 #include "oops/interface/ObsFilter.h"
 
 namespace opsinputs {

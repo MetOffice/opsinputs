@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_CXWRITERPARAMETERS_H_
-#define CXVAROBS_CXWRITERPARAMETERS_H_
+#ifndef OPSINPUTS_CXWRITERPARAMETERS_H_
+#define OPSINPUTS_CXWRITERPARAMETERS_H_
 
 #include <string>
 
@@ -16,7 +16,7 @@
 #include "oops/util/parameters/Parameters.h"
 #include "oops/util/parameters/RequiredParameter.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 /// \brief CxWriter options.
 class CxWriterParameters : public oops::Parameters {
@@ -112,6 +112,6 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<std::vector<double>> etaRho{"eta_rho", {}, this};
 };
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_CXWRITERPARAMETERS_H_
+#endif  // OPSINPUTS_CXWRITERPARAMETERS_H_

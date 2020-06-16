@@ -68,13 +68,13 @@ function( ADD_WRITER_TEST )
                       MPI     ${_PAR_MPI}
                       DEPENDS test_OpsInputsFilters.x )
   else()
-    ecbuild_add_test( TARGET  test_cxvarobs_${_PAR_WRITER}_${_PAR_NAME}
+    ecbuild_add_test( TARGET  test_opsinputs_${_PAR_WRITER}_${_PAR_NAME}
                       COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
                       ARGS    "testinput/${_PAR_NAME}.yaml"
                       ENVIRONMENT "${environment}"
                       DEPENDS test_OpsInputsFilters.x )
   endif()
-  set_tests_properties( test_cxvarobs_${_PAR_WRITER}_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+  set_tests_properties( test_opsinputs_${_PAR_WRITER}_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
 macro(ADD_VAROBSWRITER_TEST)
@@ -89,16 +89,16 @@ set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 
 ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                         SOURCES opsinputs/instantiateObsFilterFactory.h
-                                cxvarobs/CheckerUtils.cc
-                                cxvarobs/CheckerUtils.h
-                                cxvarobs/CxChecker.cc
-                                cxvarobs/CxChecker.h
-                                cxvarobs/CxCheckerParameters.h
+                                opsinputs/CheckerUtils.cc
+                                opsinputs/CheckerUtils.h
+                                opsinputs/CxChecker.cc
+                                opsinputs/CxChecker.h
+                                opsinputs/CxCheckerParameters.h
                                 opsinputs/ResetFlagsToPass.cc
                                 opsinputs/ResetFlagsToPass.h
                                 opsinputs/ResetFlagsToPassParameters.h
-                                cxvarobs/TempFile.cc
-                                cxvarobs/TempFile.h
+                                opsinputs/TempFile.cc
+                                opsinputs/TempFile.h
                                 opsinputs/VarObsChecker.cc
                                 opsinputs/VarObsChecker.h
                                 opsinputs/VarObsCheckerParameters.h

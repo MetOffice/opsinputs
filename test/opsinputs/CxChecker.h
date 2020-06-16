@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_CXVAROBS_CXCHECKER_H_
-#define TEST_CXVAROBS_CXCHECKER_H_
+#ifndef TEST_OPSINPUTS_CXCHECKER_H_
+#define TEST_OPSINPUTS_CXCHECKER_H_
 
 #include <map>
 #include <ostream>
@@ -15,7 +15,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "../cxvarobs/CxCheckerParameters.h"
+#include "../opsinputs/CxCheckerParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
@@ -35,7 +35,7 @@ namespace ufo {
   class ObsDiagnostics;
 }
 
-namespace cxvarobs {
+namespace opsinputs {
 
 class LocalEnvironment;
 
@@ -51,7 +51,7 @@ namespace test {
 /// See CxCheckerParameters for a list of available options.
 class CxChecker : public util::Printable, private util::ObjectCounter<CxChecker> {
  public:
-  static const std::string classname() {return "cxvarobs::test::CxChecker";}
+  static const std::string classname() {return "opsinputs::test::CxChecker";}
 
   CxChecker(ioda::ObsSpace &, const eckit::Configuration &,
                 boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -71,7 +71,7 @@ class CxChecker : public util::Printable, private util::ObjectCounter<CxChecker>
 
   void print(std::ostream &) const;
 
-  void setupEnvironment(cxvarobs::LocalEnvironment &localEnvironment) const;
+  void setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const;
 
   PrintCxFileOutput parsePrintCxFileOutput(const std::string &printCxFileOutput) const;
 
@@ -93,6 +93,6 @@ class CxChecker : public util::Printable, private util::ObjectCounter<CxChecker>
 };
 
 }  // namespace test
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // TEST_CXVAROBS_CXCHECKER_H_
+#endif  // TEST_OPSINPUTS_CXCHECKER_H_

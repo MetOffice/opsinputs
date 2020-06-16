@@ -7,7 +7,7 @@
 !> libodb (via the OpsMod_Extract module), which in turn is linked to a different version of eckit
 !> than the JEDI libraries).
 
-module cxvarobs_cxgenerate_mod
+module opsinputs_cxgenerate_mod
 
 use OpsMod_CXGenerate, only: &
     MaxModelCodes
@@ -22,4 +22,4 @@ include 'Ops_GetDefaultBgerrFields.inc'
 include 'Ops_GetDefaultCxFields.inc'
 include 'Ops_ReadCXControlNL.inc'
 
-end module cxvarobs_cxgenerate_mod
+end module opsinputs_cxgenerate_mod

@@ -5,8 +5,8 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef CXVAROBS_CXWRITER_INTERFACE_H_
-#define CXVAROBS_CXWRITER_INTERFACE_H_
+#ifndef OPSINPUTS_CXWRITER_INTERFACE_H_
+#define OPSINPUTS_CXWRITER_INTERFACE_H_
 
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
@@ -22,19 +22,19 @@ namespace ioda {
   template <typename T> class ObsDataVector;
 }
 
-namespace cxvarobs {
+namespace opsinputs {
 
 typedef int F90check;
 
 /// Interface to Fortran routines
 
 extern "C" {
-  bool cxvarobs_cxwriter_create_f90(F90check &, const eckit::Configuration *,
+  bool opsinputs_cxwriter_create_f90(F90check &, const eckit::Configuration *,
                                         oops::Variables &);
-  void cxvarobs_cxwriter_delete_f90(F90check &);
-  void cxvarobs_cxwriter_prior_f90(const F90check &, const ioda::ObsSpace &,
+  void opsinputs_cxwriter_delete_f90(F90check &);
+  void opsinputs_cxwriter_prior_f90(const F90check &, const ioda::ObsSpace &,
                                        const ufo::F90goms &);
-  void cxvarobs_cxwriter_post_f90(const F90check &self,
+  void opsinputs_cxwriter_post_f90(const F90check &self,
                                       const ioda::ObsSpace &obsSpace,
                                       const int &nchannels,
                                       const int *channels,
@@ -43,6 +43,6 @@ extern "C" {
                                       const int &nvars, const int &nlocs, const double &hofx);
 }  // extern C
 
-}  // namespace cxvarobs
+}  // namespace opsinputs
 
-#endif  // CXVAROBS_CXWRITER_INTERFACE_H_
+#endif  // OPSINPUTS_CXWRITER_INTERFACE_H_

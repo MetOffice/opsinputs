@@ -8,10 +8,10 @@
 #include <utility>
 #include <vector>
 
-#include "cxvarobs/CxWriter.h"
+#include "opsinputs/CxWriter.h"
 
-#include "cxvarobs/LocalEnvironment.h"
-#include "cxvarobs/CxWriterParameters.h"
+#include "opsinputs/LocalEnvironment.h"
+#include "opsinputs/CxWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 
@@ -23,7 +23,7 @@
 #include "oops/util/Logger.h"
 #include "ufo/GeoVaLs.h"
 
-namespace cxvarobs {
+namespace opsinputs {
 
 CxWriter::CxWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                    boost::shared_ptr<ioda::ObsDataVector<int> > flags,
@@ -43,7 +43,7 @@ CxWriter::CxWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
   conf.set("validity_time", obsdb.windowEnd().toString());
   conf.set("obs_group", obsdb.obsname());
 
-  if (!cxvarobs_cxwriter_create_f90(key_, &conf, geovars_))
+  if (!opsinputs_cxwriter_create_f90(key_, &conf, geovars_))
     throw std::runtime_error("CxWriter construction failed. "
                              "See earlier messages for more details");
   oops::Log::debug() << "CxWriter constructor key = " << key_ << std::endl;
@@ -55,7 +55,7 @@ CxWriter::~CxWriter() {
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  cxvarobs_cxwriter_delete_f90(key_);
+  opsinputs_cxwriter_delete_f90(key_);
 }
 
 void CxWriter::priorFilter(const ufo::GeoVaLs & gv) const {
@@ -64,7 +64,7 @@ void CxWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  cxvarobs_cxwriter_prior_f90(key_, obsdb_, gv.toFortran());
+  opsinputs_cxwriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
 void CxWriter::postFilter(const ioda::ObsVector & hofxb,
@@ -78,7 +78,7 @@ void CxWriter::postFilter(const ioda::ObsVector & hofxb,
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
   const std::vector<int> &channels = obsdb_.obsvariables().channels();
-  cxvarobs_cxwriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
+  opsinputs_cxwriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
                              *flags_, *obsErrors_,
                              hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
 }
@@ -105,4 +105,4 @@ void CxWriter::createOutputDirectory() {
   }
 }
 
-}  // namespace cxvarobs
+}  // namespace opsinputs

@@ -17,9 +17,9 @@ use oops_variables_mod
 use obsspace_mod
 use ufo_geovals_mod
 use ufo_vars_mod
-use cxvarobs_obsdatavector_mod
-use cxvarobs_obsspace_mod
-use cxvarobs_utils_mod
+use opsinputs_obsdatavector_mod
+use opsinputs_obsspace_mod
+use opsinputs_utils_mod
 
 use GenMod_Control, only:   &
     OperationalMode,        &
@@ -1737,12 +1737,12 @@ logical, intent(in)                      :: RejectObsWithAllVariablesFailingQC
 ! Body:
 call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
                Ob % Header % NumObsLocal, Ob % ReportFlags)
-call cxvarobs_utils_fillreportflags(ObsSpace, Flags, &
+call opsinputs_utils_fillreportflags(ObsSpace, Flags, &
                                    RejectObsWithAnyVariableFailingQC, &
                                    RejectObsWithAllVariablesFailingQC, &
                                    Ob % ReportFlags)
 
-end subroutine cxvarobs_varobswriter_fillreportflags
+end subroutine opsinputs_varobswriter_fillreportflags
 
 ! ------------------------------------------------------------------------------
 
