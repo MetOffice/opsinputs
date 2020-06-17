@@ -418,55 +418,70 @@ end subroutine opsinputs_cxwriter_prior
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
-subroutine opsinputs_cxwriter_post( &
-  self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
+subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags)
+implicit none
+
+! Subroutine arguments:
+type(opsinputs_cxwriter), intent(in) :: self
+type(c_ptr), value, intent(in)       :: ObsSpace
+type(c_ptr), value, intent(in)       :: Flags
+
+! Local declarations:
+integer(kind=8)                      :: NumObsLocal
+
+! Body:
+
+NumObsLocal = obsspace_get_nlocs(ObsSpace)
+call opsinputs_cxwriter_post_internal(self, NumObsLocal, ObsSpace, Flags)
+
+end subroutine opsinputs_cxwriter_post
+
+! ------------------------------------------------------------------------------
+
+!> Core implementation of opsinputs_cxwriter_post.
+!>
+!> This code has been extracted to a separate subroutine to make it possible to declare Retained as
+!> an automatic array (since the number of observations is now known).
+subroutine opsinputs_cxwriter_post_internal(self, NumObsLocal, ObsSpace, Flags)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
+integer(kind=8)                :: NumObsLocal
 type(c_ptr), value, intent(in) :: ObsSpace
-integer,            intent(in) :: nchannels
-integer,            intent(in) :: Channels(nchannels)
-type(c_ptr), value, intent(in) :: Flags, ObsErrors
-integer,            intent(in) :: nvars, nlocs
-real(c_double),     intent(in) :: hofx(nvars, nlocs)
+type(c_ptr), value, intent(in) :: Flags
 
 ! Local declarations:
-integer(kind=8)                :: NumObsLocal
 type(OB_type)                  :: Ob
 type(CX_type)                  :: Cx
 type(UM_header_type)           :: UMHeader
 integer(kind=8)                :: NumObsOnEachRank(nproc)
-logical(kind=8), allocatable   :: mask(:)
+logical(kind=8)                :: Retained(NumObsLocal)
 integer(kind=gc_int_kind)      :: istat
 
 ! Body:
 
-NumObsLocal = obsspace_get_nlocs(ObsSpace)
-
 call opsinputs_cxwriter_allocateobservations(self, ObsSpace, NumObsLocal, Ob)
-call opsinputs_cxwriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, Ob)
+call opsinputs_cxwriter_populateobservations(self, ObsSpace, Flags, Ob)
 call opsinputs_cxwriter_allocatecx(self, Ob, Cx)
-call opsinputs_cxwriter_populatecx(self, ObsSpace, Channels, Flags, ObsErrors, Cx)
+call opsinputs_cxwriter_populatecx(self, ObsSpace, Flags, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
-allocate(mask(NumObsLocal))
-mask = opsinputs_cxwriter_retainflag(NumObsLocal, ObsSpace, Flags, &
-                                     self % RejectObsWithAnyVariableFailingQC, &
-                                     self % RejectObsWithAllVariablesFailingQC)
+Retained = opsinputs_cxwriter_retainflag(NumObsLocal, ObsSpace, Flags, &
+                                         self % RejectObsWithAnyVariableFailingQC, &
+                                         self % RejectObsWithAllVariablesFailingQC)
 call opsinputs_mpl_allgather_integer([NumObsLocal], 1_gc_int_kind, mpl_integer, &
                                      NumObsOnEachRank, 1_gc_int_kind, mpl_integer, &
                                      mpi_group, istat)
-call Ops_WriteOutVarCx(Ob, Cx, NumObsOnEachRank, UMheader % IntC(IC_Plevels), UMheader, mask)
-deallocate(mask)
+call Ops_WriteOutVarCx(Ob, Cx, NumObsOnEachRank, UMheader % IntC(IC_Plevels), UMheader, Retained)
 
 call UMheader % dealloc()
 call Cx % deallocate()
 call Ob % deallocate()
 
-end subroutine opsinputs_cxwriter_post
+end subroutine opsinputs_cxwriter_post_internal
 
 ! ------------------------------------------------------------------------------
 
@@ -536,15 +551,13 @@ end subroutine opsinputs_cxwriter_allocateobservations
 ! ------------------------------------------------------------------------------
 
 !> Populate Ob fields required by the OPS routine writing a Cx file.
-subroutine opsinputs_cxwriter_populateobservations( &
-  self, ObsSpace, Channels, Flags, ObsErrors, Ob)
+subroutine opsinputs_cxwriter_populateobservations(self, ObsSpace, Flags, Ob)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)    :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
-integer(c_int), intent(in)              :: Channels(:)
-type(c_ptr), value, intent(in)          :: Flags, ObsErrors
+type(c_ptr), value, intent(in)          :: Flags
 type(OB_type), intent(inout)            :: Ob
 
 ! Local declarations:
@@ -616,15 +629,13 @@ end subroutine opsinputs_cxwriter_allocatecx
 ! ------------------------------------------------------------------------------
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
-subroutine opsinputs_cxwriter_populatecx( &
-  self, ObsSpace, Channels, Flags, ObsErrors, Cx)
+subroutine opsinputs_cxwriter_populatecx(self, ObsSpace, Flags, Cx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)     :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
-integer(c_int), intent(in)              :: Channels(:)
-type(c_ptr), value, intent(in)          :: Flags, ObsErrors
+type(c_ptr), value, intent(in)          :: Flags
 type(CX_type), intent(inout)            :: Cx
 
 ! Local declarations:

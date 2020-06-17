@@ -74,13 +74,7 @@ void CxWriter::postFilter(const ioda::ObsVector & hofxb,
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  // We need to pass the list of channels in a separate parameter because the Fortran interface to
-  // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
-  // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
-  const std::vector<int> &channels = obsdb_.obsvariables().channels();
-  opsinputs_cxwriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
-                             *flags_, *obsErrors_,
-                             hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
+  opsinputs_cxwriter_post_f90(key_, obsdb_, *flags_);
 }
 
 void CxWriter::print(std::ostream & os) const {

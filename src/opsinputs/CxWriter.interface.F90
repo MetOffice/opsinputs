@@ -87,24 +87,18 @@ end subroutine opsinputs_cxwriter_prior_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_nchannels, c_channels, &
-                                        c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx) &
+subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_flags) &
   bind(c,name='opsinputs_cxwriter_post_f90')
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
-integer(c_int), intent(in) :: c_nchannels
-integer(c_int), intent(in) :: c_channels(c_nchannels)
-type(c_ptr), value, intent(in) :: c_flags, c_obserrors
-integer(c_int), intent(in) :: c_nvars, c_nlocs
-real(c_double), intent(in) :: c_hofx(c_nvars, c_nlocs)
+type(c_ptr), value, intent(in) :: c_flags
 
 type(opsinputs_cxwriter), pointer :: self
 
 call opsinputs_cxwriter_registry%get(c_self, self)
 
-call opsinputs_cxwriter_post(self, c_obspace, c_nchannels, c_channels, &
-                                c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx)
+call opsinputs_cxwriter_post(self, c_obspace, c_flags)
 
 end subroutine opsinputs_cxwriter_post_c
 
