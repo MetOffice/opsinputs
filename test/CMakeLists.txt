@@ -222,6 +222,7 @@ ADD_VAROBSWRITER_TEST(NAME   reject_obs_with_all_variables_failing_qc
 
 ### CxWriter tests
 
+# Tests of individual varfields
 ADD_CXWRITER_TEST(NAME   000004_StashItem_theta
                   INPUTS 000004_StashItem_theta.yaml
                   DATA   000004_StashItem_theta.nc4)
@@ -229,6 +230,11 @@ ADD_CXWRITER_TEST(NAME   000004_StashItem_theta
 ADD_CXWRITER_TEST(NAME   000030_StashItem_modelsurface
                   INPUTS 000030_StashItem_modelsurface.yaml CxWriterNamelists_000030_StashItem_modelsurface/SatTCWV.nl
                   DATA   000030_StashItem_modelsurface.nc4)
+
+# Header field tests
+ADD_CXWRITER_TEST(NAME   CxWriter_FixedHeader_GridStagger
+                  INPUTS CxWriter_FixedHeader_GridStagger.yaml
+                  DATA   000004_StashItem_theta.nc4)
 
 # Tests of auxiliary classes
 list( APPEND opsinputs_test_input empty.yaml )
