@@ -69,17 +69,17 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
 1. Determine where the input data will come from (a variable stored in the `ObsSpace` object? a GeoVaL?).
 
-2. Edit the `case` corresponding to the varfield in question in the `select` statement in the `opsinputs_varobswriter_populateobservations` subroutine in the `src/opsinputs/opsinputs_varobswriter_mod.F90` file. In the vast majority of cases, you will simply need to replace a commented-out call to `Ops_Alloc` with a call to an appropriate `opsinputs_varobswriter_fill...` subroutine. For example, suppose that the `VarField_logvis` varfield should be filled with the data (observed values, observation errors, gross error probabilities and QC flags) stored in the `logarithmic_visibility` observation variable in the `ObsSpace`. The comment
+2. Edit the `case` corresponding to the varfield in question in the `select` statement in the `opsinputs_varobswriter_populateobservations` subroutine in the `src/opsinputs/opsinputs_varobswriter_mod.F90` file. In the vast majority of cases, you will simply need to replace a commented-out call to `Ops_Alloc` with a call to an appropriate `opsinputs_fill_fill...` subroutine. For example, suppose that the `VarField_logvis` varfield should be filled with the data (observed values, observation errors, gross error probabilities and QC flags) stored in the `logarithmic_visibility` observation variable in the `ObsSpace`. The comment
 
         ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
 
    should then be replaced by 
 
-        call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
           ObsSpace, Flags, ObsErrors, "logarithmic_visibility")
 
-   If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant `opsinputs_varobswriter_fill...` subroutines.
+   If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant subroutines from the `opsinputs_fill_mod.F90` module.
 
 3. Add a unit test for the new varfield:
 
