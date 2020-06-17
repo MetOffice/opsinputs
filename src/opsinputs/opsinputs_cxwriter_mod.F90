@@ -339,10 +339,10 @@ double = 0.0
 found = f_conf % get("RC_PoleLong", double)
 self % RC_PoleLong = double
 
-found = f_conf % get("eta_theta", self % EtaTheta)
+found = f_conf % get("eta_theta_levels", self % EtaTheta)
 if (found) then
   if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
-    call gen_warn(RoutineName, "eta_theta should be a vector of length (IC_PLevels + 1)")
+    call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
     goto 9999
   end if
@@ -351,10 +351,10 @@ else
   self % EtaTheta = RMDI
 end if
 
-found = f_conf % get("eta_rho", self % EtaRho)
+found = f_conf % get("eta_rho_levels", self % EtaRho)
 if (found) then
   if (size(self % EtaRho) /= self % IC_PLevels) then
-    call gen_warn(RoutineName, "eta_theta should be a vector of length (IC_PLevels + 1)")
+    call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
     goto 9999
   end if
