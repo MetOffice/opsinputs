@@ -766,62 +766,6 @@ end subroutine opsinputs_cxwriter_populateumheader
 
 ! ------------------------------------------------------------------------------
 
-!> Populate a 1D array of real numbers and its header from a JEDI variable.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Real1
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
-!> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Real1.
-!> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real1.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_cxwriter_fillreal( &
-  Hdr, OpsVarName, NumObs, Real1, ObsSpace, JediVarName, JediVarGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-
-! Local declarations:
-real(kind=c_double)                             :: VarValue(NumObs)
-real(kind=c_double)                             :: MissingDouble
-integer                                         :: i
-
-! Body:
-
-MissingDouble = missing_value(0.0_c_double)
-
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
-  ! Retrieve data from JEDI
-  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
-  do i = 1, NumObs
-    if (VarValue(i) /= MissingDouble) Real1(i) = VarValue(i)
-  end do
-end if
-end subroutine opsinputs_cxwriter_fillreal
-
-! ------------------------------------------------------------------------------
-
 !> Populate a 1D array of real numbers and its header from a GeoVaL.
 !>
 !> \param[inout] Hdr
