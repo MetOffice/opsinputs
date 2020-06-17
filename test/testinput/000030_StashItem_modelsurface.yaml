@@ -12,10 +12,11 @@ Observations:
     GeoVaLs:
       filename: Data/000030_StashItem_modelsurface.nc4
     ObsFilters:
-    # Set the flag of observations with missing values to "pass" (as in VarObs tests)
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
     - Filter: Reset Flags to Pass
       flags_to_reset: [1, 6]  # missing, Hfailed
-    # Reject some observations
+    # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
     - Filter: Domain Check
       where:
       - variable:
