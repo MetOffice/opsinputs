@@ -267,6 +267,16 @@ ADD_WRITER_TEST(NAME     cxwriter_LevelDependentConstants
                 YAML     cxwriter_LevelDependentConstants.yaml
                 DATA     000004_StashItem_theta.nc4)
 
+# MPI tests
+ADD_WRITER_TEST(NAME     cxwriter_000004_StashItem_theta_MPI_1
+                MPI      1
+                YAML     000004_StashItem_theta_MPI_1.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_000004_StashItem_theta_MPI_4
+                MPI      4
+                YAML     000004_StashItem_theta_MPI_4.yaml
+                DATA     000004_StashItem_theta.nc4)
+
 # Tests of auxiliary classes
 list( APPEND opsinputs_test_input empty.yaml )
 ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
