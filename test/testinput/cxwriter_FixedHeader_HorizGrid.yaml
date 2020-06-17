@@ -1,0 +1,97 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - &default
+      ObsSpace:
+        name: AMSUB
+        ObsDataIn:
+          obsfile: Data/019_VarField_satzenith.nc4
+        simulate:
+          variables: [dummy]
+      GeoVaLs:
+        filename: Data/000004_StashItem_theta.nc4
+      ObsFilters:
+      - Filter: Cx Writer
+        general_mode: debug
+        IC_PLevels: 5
+        # Test for the default value of FH_HorizGrid
+      - Filter: Cx Checker
+        expected_header_fields:
+          Horizontal grid type: 0
+      HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+      benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+      flaggedBenchmark: 0
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: Global
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 0
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: NH
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 1
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: SH
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 2
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: LamNoWrap
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 3
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: LamWrap
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 4
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: Eq
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 100
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: LamNoWrapEq
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 103
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_HorizGrid: LamWrapEq
+    - Filter: Cx Checker
+      expected_header_fields:
+        Horizontal grid type: 104

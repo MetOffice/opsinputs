@@ -1,0 +1,61 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - &default
+      ObsSpace:
+        name: AMSUB
+        ObsDataIn:
+          obsfile: Data/019_VarField_satzenith.nc4
+        simulate:
+          variables: [dummy]
+      GeoVaLs:
+        filename: Data/000004_StashItem_theta.nc4
+      ObsFilters:
+      - Filter: Cx Writer
+        general_mode: debug
+        IC_PLevels: 5
+        # Test for the default value of FH_ObsFileType
+      - Filter: Cx Checker
+        expected_header_fields:
+          Observation file type: 1
+      HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+      benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+      flaggedBenchmark: 0
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_ObsFileType: atmos
+    - Filter: Cx Checker
+      expected_header_fields:
+        Observation file type: 1
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_ObsFileType: ocean
+    - Filter: Cx Checker
+      expected_header_fields:
+        Observation file type: 2
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_ObsFileType: sst
+    - Filter: Cx Checker
+      expected_header_fields:
+        Observation file type: 3
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      general_mode: debug
+      IC_PLevels: 5
+      FH_ObsFileType: wave
+    - Filter: Cx Checker
+      expected_header_fields:
+        Observation file type: 4

@@ -236,8 +236,35 @@ ADD_WRITER_TEST(NAME     cxwriter_000030_StashItem_modelsurface
                 DATA     000030_StashItem_modelsurface.nc4)
 
 # Header field tests
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
+                YAML     cxwriter_FixedHeader_VertCoord.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_HorizGrid
+                YAML     cxwriter_FixedHeader_HorizGrid.yaml
+                DATA     000004_StashItem_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_GridStagger
                 YAML     cxwriter_FixedHeader_GridStagger.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_ObsFileType
+                YAML     cxwriter_FixedHeader_ObsFileType.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Times
+                YAML     cxwriter_FixedHeader_Times.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_IntegerConstants_PLevels
+                YAML     cxwriter_IntegerConstants_PLevels.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_RealConstants
+                YAML     cxwriter_RealConstants.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_Lookup_Times
+                YAML     cxwriter_Lookup_Times.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_Lookup_Numbers
+                YAML     cxwriter_Lookup_Numbers.yaml
+                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_LevelDependentConstants
+                YAML     cxwriter_LevelDependentConstants.yaml
                 DATA     000004_StashItem_theta.nc4)
 
 # Tests of auxiliary classes
