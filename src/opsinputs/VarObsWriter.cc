@@ -39,8 +39,10 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
   createOutputDirectory();
 
   eckit::LocalConfiguration conf(config);
-  // TODO(wsmigaj): is this the correct definition of the validity time?
-  conf.set("validity_time", obsdb.windowEnd().toString());
+  // Validity time is set to the midpoint of the assimilation window
+  const util::DateTime validityTime =
+      obsdb.windowStart() + (obsdb.windowEnd() - obsdb.windowStart()) / 2;
+  conf.set("validity_time", validityTime.toString());
   conf.set("obs_group", obsdb.obsname());
 
   if (!opsinputs_varobswriter_create_f90(key_, &conf, geovars_))

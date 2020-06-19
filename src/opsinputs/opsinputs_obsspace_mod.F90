@@ -7,13 +7,14 @@
 !> Extensions to the Fortran interface to ioda::ObsSpace.
 module opsinputs_obsspace_mod
 
-use datetime_mod
-use string_f_c_mod
+use datetime_mod, only: datetime, f_c_datetime
+use string_f_c_mod, only: f_c_string
 
 implicit none
 
 public opsinputs_obsspace_get_db_datetime_offset_in_seconds, &
        opsinputs_obsspace_get_db_string
+private
 
 #include "opsinputs_obsspace_interface.f90"
 
@@ -42,8 +43,6 @@ subroutine opsinputs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vna
 
   call c_opsinputs_obsspace_get_db_datetime_offset_in_seconds(obss, c_group, c_vname, c_reference, &
                                                              length, offsets)
-
-  deallocate(c_group, c_vname)
 end subroutine opsinputs_obsspace_get_db_datetime_offset_in_seconds
 
 !> Get a string variable from ObsSpace.
@@ -66,8 +65,6 @@ subroutine opsinputs_obsspace_get_db_string(obss, group, vname, string_length, s
 
   call c_opsinputs_obsspace_get_db_string(obss, c_group, c_vname, &
                                          int(string_length, kind=8), num_strings, strings)
-
-  deallocate(c_group, c_vname)
 end subroutine opsinputs_obsspace_get_db_string
 
 end module opsinputs_obsspace_mod

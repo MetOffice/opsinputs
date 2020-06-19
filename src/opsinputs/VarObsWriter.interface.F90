@@ -6,12 +6,19 @@
 !
 module opsinputs_varobswriter_mod_c
 
-use iso_c_binding
-use opsinputs_varobswriter_mod
-use string_f_c_mod
-use ufo_geovals_mod
-use ufo_geovals_mod_c,   only: ufo_geovals_registry
-use fckit_configuration_module, only: fckit_configuration 
+use fckit_configuration_module, only: fckit_configuration
+use, intrinsic :: iso_c_binding, only: &
+  c_double,                            &
+  c_int,                               &
+  c_ptr
+use opsinputs_varobswriter_mod, only:  &
+  opsinputs_varobswriter,              &
+  opsinputs_varobswriter_create,       &
+  opsinputs_varobswriter_delete,       &
+  opsinputs_varobswriter_prior,        &
+  opsinputs_varobswriter_post
+use ufo_geovals_mod, only: ufo_geovals
+use ufo_geovals_mod_c, only: ufo_geovals_registry
 implicit none
 private
 
@@ -30,6 +37,7 @@ contains
 #include "oops/util/linkedList_c.f"
 ! ------------------------------------------------------------------------------
 
+!> Creates an opsinputs_varobswriter object. Returns 1 if the creation succeeds and 0 if it fails.
 function opsinputs_varobswriter_create_c(c_self, c_conf, c_varlist) &
   bind(c,name='opsinputs_varobswriter_create_f90')
 use oops_variables_mod
@@ -37,7 +45,7 @@ implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
 type(c_ptr), intent(in), value :: c_varlist ! list of geovals variables to be requested
-logical(c_bool)                :: opsinputs_varobswriter_create_c
+integer(c_int)                 :: opsinputs_varobswriter_create_c
 
 type(opsinputs_varobswriter), pointer :: self
 type(fckit_configuration) :: f_conf
@@ -47,7 +55,11 @@ call opsinputs_varobswriter_registry%setup(c_self, self)
 
 f_conf = fckit_configuration(c_conf)
 f_varlist = oops_variables(c_varlist)
-opsinputs_varobswriter_create_c = opsinputs_varobswriter_create(self, f_conf, f_varlist)
+if (opsinputs_varobswriter_create(self, f_conf, f_varlist)) then
+  opsinputs_varobswriter_create_c = 1
+else
+  opsinputs_varobswriter_create_c = 0
+end if
 
 end function opsinputs_varobswriter_create_c
 

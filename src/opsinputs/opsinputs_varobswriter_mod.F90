@@ -9,31 +9,65 @@
 module opsinputs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
-use, intrinsic :: iso_c_binding
-use datetime_mod
-use kinds
-use oops_variables_mod
-use obsspace_mod
-use ufo_geovals_mod
+use, intrinsic :: iso_c_binding, only: &
+    c_bool,                            &
+    c_double,                          &
+    c_float,                           &
+    c_int,                             &
+    c_int32_t,                         &
+    c_int64_t,                         &
+    c_ptr
+use datetime_mod, only:        &
+    datetime,                  &
+    datetime_create,           &
+    datetime_delete,           &
+    datetime_to_YYYYMMDDhhmmss
+use kinds, only: kind_real
+use missing_values_mod, only: missing_value
+use obsspace_mod, only:  &
+    obsspace_get_db,     &
+    obsspace_get_gnlocs, &
+    obsspace_get_nlocs,  &
+    obsspace_has
+use oops_variables_mod, only: oops_variables
 use opsinputs_fill_mod
-use opsinputs_obsdatavector_mod
-use opsinputs_obsspace_mod
-use opsinputs_utils_mod
+use opsinputs_obsdatavector_mod, only:    &
+    opsinputs_obsdatavector_int_has,      &
+    opsinputs_obsdatavector_int_get,      &
+    opsinputs_obsdatavector_int_varnames, &
+    opsinputs_obsdatavector_float_has,    &
+    opsinputs_obsdatavector_float_get
+use opsinputs_obsspace_mod, only:                        &
+    opsinputs_obsspace_get_db_string,                    &
+    opsinputs_obsspace_get_db_datetime_offset_in_seconds
+use opsinputs_utils_mod, only:      &
+    max_varname_length,             &
+    opsinputs_utils_fillreportflags
+use ufo_geovals_mod, only: &
+    ufo_geoval,            &
+    ufo_geovals,           &
+    ufo_geovals_get_var
+use ufo_vars_mod, only: &
+    MAXVARLEN,          &
+    ufo_vars_getindex
 
-use GenMod_Control, only:   &
-    OperationalMode,        &
-    QuietMode,              &
-    ProductionMode,         &
-    NormalMode,             &
-    DiagnosticMode,         &
-    DebugMode,              &
-    VerboseMode,            &
-    GeneralMode,            &
-    mype,                   &
+use GenMod_Control, only: &
+    OperationalMode,      &
+    QuietMode,            &
+    ProductionMode,       &
+    NormalMode,           &
+    DiagnosticMode,       &
+    DebugMode,            &
+    VerboseMode,          &
+    GeneralMode,          &
+    mype,                 &
     nproc
 use GenMod_Core, only: &
     gen_warn,          &
     gen_fail
+use GenMod_MiscUMScienceConstants, only: &
+    IMDI,                                &
+    RMDI
 use GenMod_ModelIO, only: LenFixHd, UM_header_type
 use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
@@ -43,8 +77,13 @@ use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
     Ops_InitMPI
-use OpsMod_DateTime
-use OpsMod_MiscTypes
+use OpsMod_DateTime, only: &
+    DateTime_type,         &
+    OpsFn_DateTime_now
+use OpsMod_MiscTypes, only: &
+    Coord_Type,             &
+    Element_Type,           &
+    ElementHeader_Type
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
@@ -52,13 +91,22 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind
-use OpsMod_ObsInfo
+use OpsMod_ObsInfo, only: &
+    FinalRejectFlag,      &
+    FinalRejectReport,    &
+    LenCallsign,          &
+    OB_type,              &
+    Ops_Alloc,            &
+    Ops_SetupObType
 use OpsMod_AODGeneral, only: NAODWaves
 use OpsMod_GPSRO, only: GPSRO_TPD
 use OpsMod_Radar, only: RadFamily
 use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
 use OpsMod_Varfields
-use OpsMod_Varobs
+use OpsMod_Varobs, only: &
+    AssimDataFormat_VAR, &
+    Ops_CreateVarobs,    &
+    Ops_ReadVarobsControlNL
 
 implicit none
 public :: opsinputs_varobswriter_create, opsinputs_varobswriter_delete, &
@@ -114,16 +162,14 @@ implicit none
 type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
-logical(c_bool)                            :: opsinputs_varobswriter_create
+logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: string
-integer(kind=c_int)                        :: int
+integer                                    :: int
 logical                                    :: bool
 real(kind=c_double)                        :: double
 logical                                    :: found
-
-integer(kind=8), parameter                 :: zero = 0
 
 character(len=*), parameter :: RoutineName = "opsinputs_varobswriter_create"
 character(len=200)          :: ErrorMessage
@@ -134,8 +180,10 @@ opsinputs_varobswriter_create = .true.
 
 ! Setup OPS
 
-string = "normal"
-found = f_conf % get("general_mode", string)
+if (.not. f_conf % get("general_mode", string)) then
+  ! fall back to the default value
+  string = "normal"
+end if
 select case (ops_to_lower_case(string))
 case ("operational")
   GeneralMode = OperationalMode
@@ -155,7 +203,7 @@ case default
   write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
 call Gen_SetupControl(DefaultDocURL)
@@ -167,34 +215,44 @@ call Ops_InitMPI
 if (.not. f_conf % get("obs_group", string)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end if
 self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 
 if (.not. f_conf % get("validity_time", string)) then
   call gen_warn(RoutineName, "Mandatory validity_time option not found")
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end if
 call datetime_create(string, self % validitytime)
 
-self % RejectObsWithAnyVariableFailingQC = .false.
-found = f_conf % get("reject_obs_with_any_variable_failing_qc", &
-                     self % RejectObsWithAnyVariableFailingQC)
+if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
+                       self % RejectObsWithAnyVariableFailingQC)) then
+  ! fall back to the default value
+  self % RejectObsWithAnyVariableFailingQC = .false.
+end if
 
-self % RejectObsWithAllVariablesFailingQC = .false.
-found = f_conf % get("reject_obs_with_all_variables_failing_qc", &
-                     self % RejectObsWithAllVariablesFailingQC)
+if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
+                       self % RejectObsWithAllVariablesFailingQC)) then
+  ! fall back to the default value
+  self % RejectObsWithAllVariablesFailingQC = .false.
+end if
 
-self % AccountForGPSROTangentPointDrift = .false.
-found = f_conf % get("account_for_gpsro_tangent_point_drift", &
-                     self % AccountForGPSROTangentPointDrift)
+if (.not. f_conf % get("account_for_gpsro_tangent_point_drift", &
+                       self % AccountForGPSROTangentPointDrift)) then
+  ! fall back to the default value
+  self % AccountForGPSROTangentPointDrift = .false.
+end if
 
-self % UseRadarFamily = .false.
-found = f_conf % get("use_radar_family", self % UseRadarFamily)
+if (.not. f_conf % get("use_radar_family", self % UseRadarFamily)) then
+  ! fall back to the default value
+  self % UseRadarFamily = .false.
+end if
 
-string = "hybrid"  ! TODO(wsmigaj): is this a good default?
-found = f_conf % get("FH_VertCoord", string)
+if (.not. f_conf % get("FH_VertCoord", string)) then
+  ! fall back to the default value
+  string = "hybrid"  ! TODO(wsmigaj): is this a good default?
+end if
 select case (ops_to_lower_case(string))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -212,11 +270,13 @@ case default
   write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-string = "global"
-found = f_conf % get("FH_HorizGrid", string)
+if (.not. f_conf % get("FH_HorizGrid", string)) then
+  ! fall back to the default value
+  string = "global"
+end if
 select case (ops_to_lower_case(string))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -238,11 +298,13 @@ case default
   write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-string = "endgame"
-found = f_conf % get("FH_GridStagger", string)
+if (.not. f_conf % get("FH_GridStagger", string)) then
+  ! fall back to the default value
+  string = "endgame"
+end if
 select case (ops_to_lower_case(string))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -254,19 +316,29 @@ case default
   write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-int = 0
-found = f_conf % get("FH_ModelVersion", int)
+if (.not. f_conf % get("FH_ModelVersion", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % FH_ModelVersion = int
 
-bool = .false.
-found = f_conf % get("IC_ShipWind", bool)
-self % IC_ShipWind = merge(IC_ShipWind_10m, zero, bool)
+if (.not. f_conf % get("IC_ShipWind", bool)) then
+  ! fall back to the default value
+  bool = .false.
+end if
+if (bool) then
+  self % IC_ShipWind = IC_ShipWind_10m
+else
+  self % IC_ShipWind = 0
+end if
 
-string = "choice"
-found = f_conf % get("IC_GroundGPSOperator", string)
+if (.not. f_conf % get("IC_GroundGPSOperator", string)) then
+  ! fall back to the default value
+  string = "choice"
+end if
 select case (ops_to_lower_case(string))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
@@ -276,62 +348,92 @@ case default
   write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-bool = .false.
-found = f_conf % get("IC_GPSRO_Operator_pseudo", bool)
-self % IC_GPSRO_Operator_pseudo = merge(IC_GPSRO_Operator_pseudo_choice, zero, bool)
+if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", bool)) then
+  ! fall back to the default value
+  bool = .false.
+end if
+if (bool) then
+  self % IC_GPSRO_Operator_pseudo = IC_GPSRO_Operator_pseudo_choice
+else
+  self % IC_GPSRO_Operator_pseudo = 0
+end if
 
-bool = .false.
-found = f_conf % get("IC_GPSRO_Operator_press", bool)
-self % IC_GPSRO_Operator_press = merge(IC_GPSRO_Operator_press_choice, zero, bool)
+if (.not. f_conf % get("IC_GPSRO_Operator_press", bool)) then
+  ! fall back to the default value
+  bool = .false.
+end if
+if (bool) then
+  self % IC_GPSRO_Operator_press = IC_GPSRO_Operator_press_choice
+else
+  self % IC_GPSRO_Operator_press = 0
+end if
 
-int = 0
-found = f_conf % get("IC_XLen", int)
+if (.not. f_conf % get("IC_XLen", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_XLen = int
 
-int = 0
-found = f_conf % get("IC_YLen", int)
+if (.not. f_conf % get("IC_YLen", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_YLen = int
 
-int = 0
-found = f_conf % get("IC_PLevels", int)
+if (.not. f_conf % get("IC_PLevels", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_PLevels = int
 
-int = 0
-found = f_conf % get("IC_WetLevels", int)
+if (.not. f_conf % get("IC_WetLevels", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_WetLevels = int
 
-double = 0.0
-found = f_conf % get("RC_LongSpacing", double)
+if (.not. f_conf % get("RC_LongSpacing", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_LongSpacing = double
 
-double = 0.0
-found = f_conf % get("RC_LatSpacing", double)
+if (.not. f_conf % get("RC_LatSpacing", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_LatSpacing = double
 
-double = 0.0
-found = f_conf % get("RC_FirstLat", double)
+if (.not. f_conf % get("RC_FirstLat", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_FirstLat = double
 
-double = 0.0
-found = f_conf % get("RC_FirstLong", double)
+if (.not. f_conf % get("RC_FirstLong", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_FirstLong = double
 
-double = 0.0
-found = f_conf % get("RC_PoleLat", double)
+if (.not. f_conf % get("RC_PoleLat", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_PoleLat = double
 
-double = 0.0
-found = f_conf % get("RC_PoleLong", double)
+if (.not. f_conf % get("RC_PoleLong", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_PoleLong = double
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
-
-9999 if (allocated(string)) deallocate(string)
 
 end function opsinputs_varobswriter_create
 
@@ -401,6 +503,7 @@ call Ops_CreateVarobs (Ob,                  & ! in
                        NumVarobsTotal)
 
 call Ob % deallocate()
+call CxHeader % dealloc()
 
 end subroutine opsinputs_varobswriter_post
 
@@ -507,9 +610,9 @@ Ob % Time = TimeOffsetsInSeconds
 call opsinputs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
-! TODO(someone): This call to Ops_Alloc() will need to be replaced by
-! call opsinputs_fill_fillinteger( &
-!   Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
+! TODO(someone): The following call to Ops_Alloc() will need to be replaced by
+! call opsinputs_varobswriter_fillinteger( &
+!   Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType, &
 !   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
 ! with the placeholders replaced by an appropriate variable name and group.
 ! We call Ops_Alloc() because the Ops_CreateVarobs terminates prematurely if the ObsType array
@@ -931,7 +1034,6 @@ end subroutine opsinputs_varobswriter_populateobservations
 !> specified options) simulated variables are set to anything different from "pass".
 subroutine opsinputs_varobswriter_fillreportflags( &
   Ob, ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
-use oops_variables_mod
 implicit none
 
 ! Subroutine arguments:
@@ -997,7 +1099,6 @@ end subroutine opsinputs_varobswriter_fillchannumandnumchans
 !> simulated variable.
 subroutine opsinputs_varobswriter_findchannelspassingqc( &
   NumObs, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
-use oops_variables_mod
 implicit none
 
 ! Subroutine arguments:
@@ -1160,6 +1261,7 @@ TYPE (DateTime_type)                    :: now
 
 ! Body:
 
+CxHeader % FixHd = 0
 CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 CxHeader % FixHd(FH_IntCSize) = 49
 CxHeader % FixHd(FH_RealCStart) = CxHeader % FixHd(FH_IntCStart) + CxHeader % FixHd(FH_IntCSize)

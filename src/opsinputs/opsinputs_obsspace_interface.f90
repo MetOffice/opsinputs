@@ -11,7 +11,7 @@ interface
 subroutine c_opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
     obss, group, variable, reference, length, offsets) &
     bind(C,name='opsinputs_obsspace_get_db_datetime_offset_in_seconds_f')
-  use, intrinsic :: iso_c_binding, only: c_ptr, c_char, c_size_t, c_int64_t
+  use, intrinsic :: iso_c_binding, only: c_char, c_int64_t, c_ptr, c_size_t
   implicit none
   type(c_ptr), value :: obss
   character(kind=c_char, len=1), intent(in) :: group(*)
@@ -24,7 +24,7 @@ end subroutine c_opsinputs_obsspace_get_db_datetime_offset_in_seconds
 subroutine c_opsinputs_obsspace_get_db_string( &
     obss, group, variable, string_length, num_strings, characters) &
     bind(C,name='opsinputs_obsspace_get_db_string_f')
-  use, intrinsic :: iso_c_binding, only: c_ptr, c_char, c_size_t
+  use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_size_t
   implicit none
   type(c_ptr), value :: obss
   character(kind=c_char, len=1), intent(in) :: group(*)
