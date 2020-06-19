@@ -167,10 +167,6 @@ logical                                    :: bool
 real(kind=c_double)                        :: double
 logical                                    :: found
 
-integer(kind=8), parameter                 :: zero = 0
-
-integer                                    :: i
-
 character(len=*), parameter :: RoutineName = "opsinputs_cxwriter_create"
 character(len=200)          :: ErrorMessage
 
