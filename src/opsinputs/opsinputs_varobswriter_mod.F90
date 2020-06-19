@@ -379,7 +379,7 @@ self % RC_PoleLong = double
 
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
 
-9999 if (allocated(string)) deallocate(string)
+9999 continue
 
 end function opsinputs_varobswriter_create
 

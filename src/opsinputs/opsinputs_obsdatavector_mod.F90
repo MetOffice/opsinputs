@@ -61,7 +61,6 @@ logical function opsinputs_obsdatavector_int_has(c_vec, variable)
 
   call f_c_string(variable, c_variable)
   opsinputs_obsdatavector_int_has = c_opsinputs_obsdatavector_int_has(c_vec, c_variable)
-  deallocate(c_variable)
 end function opsinputs_obsdatavector_int_has
 
 !> Get a variable from this ObsDataVector<int> object.
@@ -81,8 +80,6 @@ subroutine opsinputs_obsdatavector_int_get(c_vec, variable, vect)
   length = size(vect)
 
   call c_opsinputs_obsdatavector_int_get(c_vec, c_variable, length, vect)
-
-  deallocate(c_variable)
 end subroutine opsinputs_obsdatavector_int_get
 
 
@@ -120,7 +117,6 @@ logical function opsinputs_obsdatavector_float_has(c_vec, variable)
 
   call f_c_string(variable, c_variable)
   opsinputs_obsdatavector_float_has = c_opsinputs_obsdatavector_float_has(c_vec, c_variable)
-  deallocate(c_variable)
 end function opsinputs_obsdatavector_float_has
 
 !> Get a variable from this ObsDataVector<float> object.
@@ -140,8 +136,6 @@ subroutine opsinputs_obsdatavector_float_get(c_vec, variable, vect)
   length = size(vect)
 
   call c_opsinputs_obsdatavector_float_get(c_vec, c_variable, length, vect)
-
-  deallocate(c_variable)
 end subroutine opsinputs_obsdatavector_float_get
 
 end module opsinputs_obsdatavector_mod
