@@ -203,7 +203,7 @@ case default
   write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end select
 
 call Gen_SetupControl(DefaultDocURL)
@@ -215,14 +215,14 @@ call Ops_InitMPI
 if (.not. f_conf % get("obs_group", string)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end if
 self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 
 if (.not. f_conf % get("validity_time", string)) then
   call gen_warn(RoutineName, "Mandatory validity_time option not found")
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end if
 call datetime_create(string, self % validitytime)
 
@@ -259,7 +259,7 @@ case default
   write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end select
 
 if (.not. f_conf % get("FH_HorizGrid", string)) then
@@ -287,7 +287,7 @@ case default
   write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end select
 
 if (.not. f_conf % get("FH_GridStagger", string)) then
@@ -305,7 +305,7 @@ case default
   write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end select
 
 if (.not. f_conf % get("FH_ObsFileType", string)) then
@@ -325,7 +325,7 @@ case default
   write (ErrorMessage, '("FH_ObsFileType code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
-  goto 9999
+  return
 end select
 
 if (.not. f_conf % get("FH_ModelVersion", int)) then
@@ -398,7 +398,7 @@ if (f_conf % get("eta_theta_levels", self % EtaTheta)) then
   if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
     call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
-    goto 9999
+    return
   end if
 else
   allocate(self % EtaTheta(self % IC_PLevels + 1))
@@ -409,7 +409,7 @@ if (f_conf % get("eta_rho_levels", self % EtaRho)) then
   if (size(self % EtaRho) /= self % IC_PLevels) then
     call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
-    goto 9999
+    return
   end if
 else
   allocate(self % EtaRho(self % IC_PLevels))
@@ -431,8 +431,6 @@ self % ForecastPeriod = int
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 call opsinputs_cxwriter_addrequiredgeovars(self, geovars)
 
-9999 if (allocated(string)) deallocate(string)
-
 end function opsinputs_cxwriter_create
 
 ! ------------------------------------------------------------------------------
@@ -446,9 +444,6 @@ type(opsinputs_cxwriter), intent(inout) :: self
 
 ! Body:
 call datetime_delete(self % validitytime)
-
-if (allocated(self % EtaRho)) deallocate(self % EtaRho)
-if (allocated(self % EtaTheta)) deallocate(self % EtaTheta)
 
 end subroutine opsinputs_cxwriter_delete
 
