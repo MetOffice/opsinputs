@@ -449,6 +449,7 @@ call Ops_CreateVarobs (Ob,                  & ! in
                        NumVarobsTotal)
 
 call Ob % deallocate()
+call CxHeader % dealloc()
 
 end subroutine opsinputs_varobswriter_post
 
