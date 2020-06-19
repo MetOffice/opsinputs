@@ -8,18 +8,29 @@
 
 module opsinputs_cxwriter_mod
 
+use datetime_mod, only:        &
+    datetime,                  &
+    datetime_create,           &
+    datetime_delete,           &
+    datetime_to_YYYYMMDDhhmmss
 use fckit_configuration_module, only: fckit_configuration
-use, intrinsic :: iso_c_binding
-use datetime_mod
-use kinds
-use oops_variables_mod
+use, intrinsic :: iso_c_binding, only: &
+    c_bool,                            &
+    c_double,                          &
+    c_float,                           &
+    c_int,                             &
+    c_int64_t,                         &
+    c_ptr
 use obsspace_mod
-use ufo_geovals_mod
-use opsinputs_fill_mod
+use oops_variables_mod
+use opsinputs_fill_mod, only:            &
+    opsinputs_fill_fillrealfromgeoval,   &
+    opsinputs_fill_fillreal2dfromgeoval
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
-use opsinputs_obsdatavector_mod
-use opsinputs_obsspace_mod
+use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_seconds
 use opsinputs_utils_mod
+use ufo_geovals_mod, only: &
+    ufo_geovals
 
 use GenMod_Control, only:   &
     OperationalMode,        &
@@ -35,6 +46,9 @@ use GenMod_Control, only:   &
 use GenMod_Core, only: &
     gen_warn,          &
     gen_fail
+use GenMod_MiscUMScienceConstants, only: &
+    IMDI,                                &
+    RMDI
 use GenMod_ModelIO, only: LenFixHd, UM_header_type
 use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
@@ -70,8 +84,10 @@ use OpsMod_CXInfo, only: &
 use opsinputs_cxgenerate_mod, only: &
     MaxModelCodes,                 &
     Ops_ReadCXControlNL
-use OpsMod_DateTime
-use OpsMod_MiscTypes
+use OpsMod_DateTime, only: &
+    DateTime_type,         &
+    OpsFn_DateTime_now
+use OpsMod_MiscTypes, only: ElementHeader_Type
 use OpsMod_ModelColumnIO, only: &
     Ops_WriteOutVarCx,      &
     Ops_WriteOutVarCx1pe
@@ -82,7 +98,11 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind
-use OpsMod_ObsInfo
+use OpsMod_ObsInfo, only: &
+    FinalRejectFlag,      &
+    OB_type,              &
+    Ops_Alloc,            &
+    Ops_SetupObType
 use OpsMod_Stash
 
 implicit none

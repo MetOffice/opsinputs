@@ -15,8 +15,8 @@ contains
 
 !> Wrapper of the MPL_Allgather function for integer arguments.
 subroutine opsinputs_mpl_allgather_integer(sendbuf, sendcount,  sendtype, &
-                                          recvbuf, recvcount,  recvtype, &
-                                          comm,    error)
+                                           recvbuf, recvcount,  recvtype, &
+                                           comm,    error)
 use mpl, only: gc_int_kind
 implicit none
 
@@ -34,14 +34,14 @@ integer(kind=gc_int_kind) :: error
 external mpl_allgather
 
 ! Body:
-call mpl_allgather (sendbuf,  &
-                 sendcount,  &
-                 sendtype, &
-                 recvbuf,  &
-                 recvcount, &
-                 recvtype, &
-                 comm,     &
-                 error)
+call mpl_allgather(sendbuf,  &
+                   sendcount,  &
+                   sendtype, &
+                   recvbuf,  &
+                   recvcount, &
+                   recvtype, &
+                   comm,     &
+                   error)
 
 end subroutine opsinputs_mpl_allgather_integer
 

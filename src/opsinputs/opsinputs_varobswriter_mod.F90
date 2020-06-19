@@ -10,11 +10,9 @@ module opsinputs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding, only: &
-    c_bool,                            &
     c_double,                          &
     c_float,                           &
     c_int,                             &
-    c_int32_t,                         &
     c_int64_t,                         &
     c_ptr
 use datetime_mod, only:        &
@@ -22,15 +20,23 @@ use datetime_mod, only:        &
     datetime_create,           &
     datetime_delete,           &
     datetime_to_YYYYMMDDhhmmss
-use kinds, only: kind_real
-use missing_values_mod, only: missing_value
 use obsspace_mod, only:  &
     obsspace_get_db,     &
     obsspace_get_gnlocs, &
     obsspace_get_nlocs,  &
     obsspace_has
 use oops_variables_mod, only: oops_variables
-use opsinputs_fill_mod
+use opsinputs_fill_mod, only: &
+    opsinputs_fill_fillelementtypefromsimulatedvariable, &
+    opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
+    opsinputs_fill_fillelementtypefromnormalvariable, &
+    opsinputs_fill_fillelementtype2dfromnormalvariable, &
+    opsinputs_fill_fillreal, &
+    opsinputs_fill_fillreal2d, &
+    opsinputs_fill_fillrealfromgeoval, &
+    opsinputs_fill_fillreal2dfromgeoval, &
+    opsinputs_fill_fillinteger, &
+    opsinputs_fill_fillcoord2d
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_has,      &
     opsinputs_obsdatavector_int_get,      &
@@ -80,10 +86,7 @@ use OpsMod_Control, only:   &
 use OpsMod_DateTime, only: &
     DateTime_type,         &
     OpsFn_DateTime_now
-use OpsMod_MiscTypes, only: &
-    Coord_Type,             &
-    Element_Type,           &
-    ElementHeader_Type
+use OpsMod_MiscTypes, only: ElementHeader_Type
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
@@ -92,7 +95,6 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSatwind,           &
     ObsGroupScatwind
 use OpsMod_ObsInfo, only: &
-    FinalRejectFlag,      &
     FinalRejectReport,    &
     LenCallsign,          &
     OB_type,              &

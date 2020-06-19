@@ -7,23 +7,42 @@
 
 module opsinputs_fill_mod
 
-use, intrinsic :: iso_c_binding
-use kinds
-use missing_values_mod
-use obsspace_mod
-use ufo_geovals_mod
-use ufo_vars_mod
-use opsinputs_obsdatavector_mod
-use opsinputs_obsspace_mod
-use opsinputs_utils_mod
+use, intrinsic :: iso_c_binding, only: &
+    c_double,                          &
+    c_float,                           &
+    c_int,                             &
+    c_int32_t,                         &
+    c_int64_t,                         &
+    c_ptr
+use kinds, only: kind_real
+use missing_values_mod, only: missing_value
+use obsspace_mod, only: &
+    obsspace_has,         &
+    obsspace_get_db
+use ufo_geovals_mod, only: &
+    ufo_geoval,            &
+    ufo_geovals,           &
+    ufo_geovals_get_var
+use ufo_vars_mod, only: ufo_vars_getindex
+use opsinputs_obsdatavector_mod, only:    &
+    opsinputs_obsdatavector_int_has,      &
+    opsinputs_obsdatavector_int_get,      &
+    opsinputs_obsdatavector_float_has,    &
+    opsinputs_obsdatavector_float_get
+use opsinputs_utils_mod, only: max_varname_with_channel_length
 
 use GenMod_Core, only: &
     gen_warn,          &
     gen_fail
 
 use OpsMod_Constants, only: PPF ! PGE packing factor
-use OpsMod_MiscTypes
-use OpsMod_ObsInfo
+use OpsMod_MiscTypes, only: &
+    Coord_Type,             &
+    Element_Type,           &
+    ElementHeader_Type
+use OpsMod_ObsInfo, only: &
+    FinalRejectFlag,      &
+    Ops_Alloc
 
 implicit none
 public :: opsinputs_fill_fillelementtypefromsimulatedvariable, &

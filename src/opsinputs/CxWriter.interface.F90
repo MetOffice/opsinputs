@@ -6,12 +6,20 @@
 !
 module opsinputs_cxwriter_mod_c
 
-use iso_c_binding
-use opsinputs_cxwriter_mod
-use string_f_c_mod
-use ufo_geovals_mod
-use ufo_geovals_mod_c,   only: ufo_geovals_registry
-use fckit_configuration_module, only: fckit_configuration 
+use fckit_configuration_module, only: fckit_configuration
+use, intrinsic :: iso_c_binding, only: &
+  c_bool,                              &
+  c_int,                               &
+  c_ptr
+use oops_variables_mod, only: oops_variables
+use opsinputs_cxwriter_mod, only:  &
+  opsinputs_cxwriter,              &
+  opsinputs_cxwriter_create,       &
+  opsinputs_cxwriter_delete,       &
+  opsinputs_cxwriter_prior,        &
+  opsinputs_cxwriter_post
+use ufo_geovals_mod, only: ufo_geovals
+use ufo_geovals_mod_c, only: ufo_geovals_registry
 implicit none
 private
 
@@ -32,7 +40,6 @@ contains
 
 function opsinputs_cxwriter_create_c(c_self, c_conf, c_varlist) &
   bind(c,name='opsinputs_cxwriter_create_f90')
-use oops_variables_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
