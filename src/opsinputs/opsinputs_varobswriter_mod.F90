@@ -162,7 +162,7 @@ implicit none
 type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
-logical(c_bool)                            :: opsinputs_varobswriter_create
+logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: string
