@@ -171,8 +171,6 @@ logical                                    :: bool
 real(kind=c_double)                        :: double
 logical                                    :: found
 
-integer(kind=8), parameter                 :: zero = 0
-
 character(len=*), parameter :: RoutineName = "opsinputs_varobswriter_create"
 character(len=200)          :: ErrorMessage
 
@@ -331,7 +329,11 @@ if (.not. f_conf % get("IC_ShipWind", bool)) then
   ! fall back to the default value
   bool = .false.
 end if
-self % IC_ShipWind = merge(IC_ShipWind_10m, zero, bool)
+if (bool) then
+  self % IC_ShipWind = IC_ShipWind_10m
+else
+  self % IC_ShipWind = 0
+end if
 
 if (.not. f_conf % get("IC_GroundGPSOperator", string)) then
   ! fall back to the default value
@@ -353,13 +355,21 @@ if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", bool)) then
   ! fall back to the default value
   bool = .false.
 end if
-self % IC_GPSRO_Operator_pseudo = merge(IC_GPSRO_Operator_pseudo_choice, zero, bool)
+if (bool) then
+  self % IC_GPSRO_Operator_pseudo = IC_GPSRO_Operator_pseudo_choice
+else
+  self % IC_GPSRO_Operator_pseudo = 0
+end if
 
 if (.not. f_conf % get("IC_GPSRO_Operator_press", bool)) then
   ! fall back to the default value
   bool = .false.
 end if
-self % IC_GPSRO_Operator_press = merge(IC_GPSRO_Operator_press_choice, zero, bool)
+if (bool) then
+  self % IC_GPSRO_Operator_press = IC_GPSRO_Operator_press_choice
+else
+  self % IC_GPSRO_Operator_press = 0
+end if
 
 if (.not. f_conf % get("IC_XLen", int)) then
   ! fall back to the default value
@@ -600,9 +610,9 @@ Ob % Time = TimeOffsetsInSeconds
 call opsinputs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
-! TODO(someone): This call to Ops_Alloc() will need to be replaced by
+! TODO(someone): The following call to Ops_Alloc() will need to be replaced by
 ! call opsinputs_varobswriter_fillinteger( &
-!   Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
+!   Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType, &
 !   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
 ! with the placeholders replaced by an appropriate variable name and group.
 ! We call Ops_Alloc() because the Ops_CreateVarobs terminates prematurely if the ObsType array
