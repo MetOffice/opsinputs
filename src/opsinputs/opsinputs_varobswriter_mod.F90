@@ -182,8 +182,10 @@ opsinputs_varobswriter_create = .true.
 
 ! Setup OPS
 
-string = "normal"
-found = f_conf % get("general_mode", string)
+if (.not. f_conf % get("general_mode", string)) then
+  ! fall back to the default value
+  string = "normal"
+end if
 select case (ops_to_lower_case(string))
 case ("operational")
   GeneralMode = OperationalMode
@@ -203,7 +205,7 @@ case default
   write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
 call Gen_SetupControl(DefaultDocURL)
@@ -215,34 +217,44 @@ call Ops_InitMPI
 if (.not. f_conf % get("obs_group", string)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end if
 self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
 
 if (.not. f_conf % get("validity_time", string)) then
   call gen_warn(RoutineName, "Mandatory validity_time option not found")
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end if
 call datetime_create(string, self % validitytime)
 
-self % RejectObsWithAnyVariableFailingQC = .false.
-found = f_conf % get("reject_obs_with_any_variable_failing_qc", &
-                     self % RejectObsWithAnyVariableFailingQC)
+if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
+                       self % RejectObsWithAnyVariableFailingQC)) then
+  ! fall back to the default value
+  self % RejectObsWithAnyVariableFailingQC = .false.
+end if
 
-self % RejectObsWithAllVariablesFailingQC = .false.
-found = f_conf % get("reject_obs_with_all_variables_failing_qc", &
-                     self % RejectObsWithAllVariablesFailingQC)
+if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
+                       self % RejectObsWithAllVariablesFailingQC)) then
+  ! fall back to the default value
+  self % RejectObsWithAllVariablesFailingQC = .false.
+end if
 
-self % AccountForGPSROTangentPointDrift = .false.
-found = f_conf % get("account_for_gpsro_tangent_point_drift", &
-                     self % AccountForGPSROTangentPointDrift)
+if (.not. f_conf % get("account_for_gpsro_tangent_point_drift", &
+                       self % AccountForGPSROTangentPointDrift)) then
+  ! fall back to the default value
+  self % AccountForGPSROTangentPointDrift = .false.
+end if
 
-self % UseRadarFamily = .false.
-found = f_conf % get("use_radar_family", self % UseRadarFamily)
+if (.not. f_conf % get("use_radar_family", self % UseRadarFamily)) then
+  ! fall back to the default value
+  self % UseRadarFamily = .false.
+end if
 
-string = "hybrid"  ! TODO(wsmigaj): is this a good default?
-found = f_conf % get("FH_VertCoord", string)
+if (.not. f_conf % get("FH_VertCoord", string)) then
+  ! fall back to the default value
+  string = "hybrid"  ! TODO(wsmigaj): is this a good default?
+end if
 select case (ops_to_lower_case(string))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -260,11 +272,13 @@ case default
   write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-string = "global"
-found = f_conf % get("FH_HorizGrid", string)
+if (.not. f_conf % get("FH_HorizGrid", string)) then
+  ! fall back to the default value
+  string = "global"
+end if
 select case (ops_to_lower_case(string))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -286,11 +300,13 @@ case default
   write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-string = "endgame"
-found = f_conf % get("FH_GridStagger", string)
+if (.not. f_conf % get("FH_GridStagger", string)) then
+  ! fall back to the default value
+  string = "endgame"
+end if
 select case (ops_to_lower_case(string))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -302,19 +318,25 @@ case default
   write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-int = 0
-found = f_conf % get("FH_ModelVersion", int)
+if (.not. f_conf % get("FH_ModelVersion", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % FH_ModelVersion = int
 
-bool = .false.
-found = f_conf % get("IC_ShipWind", bool)
+if (.not. f_conf % get("IC_ShipWind", bool)) then
+  ! fall back to the default value
+  bool = .false.
+end if
 self % IC_ShipWind = merge(IC_ShipWind_10m, zero, bool)
 
-string = "choice"
-found = f_conf % get("IC_GroundGPSOperator", string)
+if (.not. f_conf % get("IC_GroundGPSOperator", string)) then
+  ! fall back to the default value
+  string = "choice"
+end if
 select case (ops_to_lower_case(string))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
@@ -324,62 +346,84 @@ case default
   write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') string
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
-  goto 9999
+  return
 end select
 
-bool = .false.
-found = f_conf % get("IC_GPSRO_Operator_pseudo", bool)
+if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", bool)) then
+  ! fall back to the default value
+  bool = .false.
+end if
 self % IC_GPSRO_Operator_pseudo = merge(IC_GPSRO_Operator_pseudo_choice, zero, bool)
 
-bool = .false.
-found = f_conf % get("IC_GPSRO_Operator_press", bool)
+if (.not. f_conf % get("IC_GPSRO_Operator_press", bool)) then
+  ! fall back to the default value
+  bool = .false.
+end if
 self % IC_GPSRO_Operator_press = merge(IC_GPSRO_Operator_press_choice, zero, bool)
 
-int = 0
-found = f_conf % get("IC_XLen", int)
+if (.not. f_conf % get("IC_XLen", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_XLen = int
 
-int = 0
-found = f_conf % get("IC_YLen", int)
+if (.not. f_conf % get("IC_YLen", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_YLen = int
 
-int = 0
-found = f_conf % get("IC_PLevels", int)
+if (.not. f_conf % get("IC_PLevels", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_PLevels = int
 
-int = 0
-found = f_conf % get("IC_WetLevels", int)
+if (.not. f_conf % get("IC_WetLevels", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_WetLevels = int
 
-double = 0.0
-found = f_conf % get("RC_LongSpacing", double)
+if (.not. f_conf % get("RC_LongSpacing", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_LongSpacing = double
 
-double = 0.0
-found = f_conf % get("RC_LatSpacing", double)
+if (.not. f_conf % get("RC_LatSpacing", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_LatSpacing = double
 
-double = 0.0
-found = f_conf % get("RC_FirstLat", double)
+if (.not. f_conf % get("RC_FirstLat", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_FirstLat = double
 
-double = 0.0
-found = f_conf % get("RC_FirstLong", double)
+if (.not. f_conf % get("RC_FirstLong", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_FirstLong = double
 
-double = 0.0
-found = f_conf % get("RC_PoleLat", double)
+if (.not. f_conf % get("RC_PoleLat", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_PoleLat = double
 
-double = 0.0
-found = f_conf % get("RC_PoleLong", double)
+if (.not. f_conf % get("RC_PoleLong", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_PoleLong = double
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
-
-9999 continue
 
 end function opsinputs_varobswriter_create
 
