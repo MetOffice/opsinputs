@@ -166,7 +166,7 @@ logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: string
-integer(kind=c_int)                        :: int
+integer                                    :: int
 logical                                    :: bool
 real(kind=c_double)                        :: double
 logical                                    :: found
