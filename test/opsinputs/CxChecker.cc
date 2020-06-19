@@ -88,8 +88,6 @@ void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &)
 }
 
 void CxChecker::setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const {
-//  if (parameters_.namelistDirectory.value() != boost::none)
-//    localEnvironment.set("OPS_CX_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_CX_DIR_LIST", *parameters_.outputDirectory.value());
 }
@@ -148,7 +146,7 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
         section = InMainTable;
         batchIndex = std::stoi(line.substr(13)) - 1;
         output.mainTable.resize(batchIndex + 1);
-      } else if (startsWith(line, "For batch number ")){
+      } else if (startsWith(line, "For batch number ")) {
         batchIndex = std::stoi(line.substr(17)) - 1;
         output.lookupFields.resize(batchIndex + 1);
       } else if (auto nameAndValue = splitAtEqualsSignAndTrim(line)) {
@@ -159,7 +157,7 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
       if (startsWith(line, "Batch number ")) {
         batchIndex = std::stoi(line.substr(13)) - 1;
         output.mainTable.resize(batchIndex + 1);
-      } else if (startsWith(line, "Column number ")){
+      } else if (startsWith(line, "Column number ")) {
         columnIndex = std::stoi(line.substr(14)) - 1;
         output.mainTable[batchIndex].resize(columnIndex + 1);
       } else if (line.empty() || line == "doesn't exist") {
@@ -242,7 +240,7 @@ void CxChecker::checkMainTable(
   }
 
   for (size_t batch = 0; batch < expectedValues.size(); ++batch) {
-    if (mainTable[batch].size() < expectedValues[batch].size() ) {
+    if (mainTable[batch].size() < expectedValues[batch].size()) {
       std::stringstream str;
       str << "Batch " << batch << ": expected " << expectedValues[batch].size()
           << " columns, but only " << mainTable[batch].size() << " found ";

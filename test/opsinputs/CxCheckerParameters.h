@@ -22,18 +22,6 @@ namespace opsinputs {
 /// \brief CxChecker options.
 class CxCheckerParameters : public oops::Parameters {
  public:
-  // TODO(wsmigaj): remove (together with corresp. fragment in the cc file)?
-//  /// Directory containing namelist files specifying the cxfields to output.
-//  ///
-//  /// The list of cxfields to output for an observation group ObsGroup is controlled by the file
-//  /// ObsGroup.nl located in the namelist directory.
-//  ///
-//  /// If this option is not set, the location of the namelist directory is controlled by the
-//  /// OPS_VAROBSCONTROL_NL_DIR environment variable. If the namelist directory or the namelist file
-//  /// corresponding to a particular observation group is not found, the default list of varfields
-//  /// specified by OPS for that observation group is used.
-//  oops::OptionalParameter<std::string> namelistDirectory{"namelist_directory", this};
-
   /// Output directory for Cx files.
   ///
   /// If this option is not set, the location of the output directory is controlled by the
@@ -54,8 +42,8 @@ class CxCheckerParameters : public oops::Parameters {
     "expected_lookup_fields", {}, this};
 
   /// Expected contents of columns of the main table with per-observation data.
-  oops::OptionalParameter<std::vector<std::vector<std::vector<std::string>>>> expectedMainTableColumns{
-    "expected_main_table_columns", this};
+  oops::OptionalParameter<std::vector<std::vector<std::vector<std::string>>>>
+    expectedMainTableColumns{"expected_main_table_columns", this};
 };
 
 }  // namespace opsinputs

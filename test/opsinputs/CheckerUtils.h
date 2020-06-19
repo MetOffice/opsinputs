@@ -18,7 +18,7 @@ namespace opsinputs {
 namespace test {
 
 /// \brief Directory separator.
-constexpr char PATH_SEPARATOR = '/'; // This could be made OS-dependent.
+constexpr char PATH_SEPARATOR = '/';  // This could be made OS-dependent.
 
 std::string getEnvVariableOrThrow(const char *variableName);
 
@@ -34,7 +34,8 @@ boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
 /// into a vector.
 ///
 /// Any leftover characters at the end of \p line are ignored.
-std::vector<std::string> splitIntoFixedLengthChunksAndTrim(const std::string &line, size_t chunkSize);
+std::vector<std::string> splitIntoFixedLengthChunksAndTrim(const std::string &line,
+                                                           size_t chunkSize);
 
 /// \brief Return the contents of \p inputFilePath printed in a textual form using the OPS utility
 /// \p printUtilName.

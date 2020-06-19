@@ -9,6 +9,7 @@
 #define OPSINPUTS_CXWRITERPARAMETERS_H_
 
 #include <string>
+#include <vector>
 
 #include "eckit/exception/Exceptions.h"
 #include "oops/util/parameters/OptionalParameter.h"

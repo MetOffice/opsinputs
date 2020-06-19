@@ -5,13 +5,10 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#include <utility>
-#include <vector>
-
 #include "opsinputs/CxWriter.h"
 
-#include "opsinputs/LocalEnvironment.h"
-#include "opsinputs/CxWriterParameters.h"
+#include <utility>
+#include <vector>
 
 #include "eckit/config/Configuration.h"
 
@@ -21,6 +18,8 @@
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
 #include "oops/util/Logger.h"
+#include "opsinputs/CxWriterParameters.h"
+#include "opsinputs/LocalEnvironment.h"
 #include "ufo/GeoVaLs.h"
 
 namespace opsinputs {
