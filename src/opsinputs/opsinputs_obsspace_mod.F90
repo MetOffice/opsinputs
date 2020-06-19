@@ -7,13 +7,14 @@
 !> Extensions to the Fortran interface to ioda::ObsSpace.
 module opsinputs_obsspace_mod
 
-use datetime_mod
-use string_f_c_mod
+use datetime_mod, only: datetime, f_c_datetime
+use string_f_c_mod, only: f_c_string
 
 implicit none
 
 public opsinputs_obsspace_get_db_datetime_offset_in_seconds, &
        opsinputs_obsspace_get_db_string
+private
 
 #include "opsinputs_obsspace_interface.f90"
 

@@ -9,31 +9,61 @@
 module opsinputs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
-use, intrinsic :: iso_c_binding
-use datetime_mod
-use kinds
-use missing_values_mod
-use oops_variables_mod
-use obsspace_mod
-use ufo_geovals_mod
-use ufo_vars_mod
-use opsinputs_obsdatavector_mod
-use opsinputs_obsspace_mod
+use, intrinsic :: iso_c_binding, only: &
+    c_bool,                            &
+    c_double,                          &
+    c_float,                           &
+    c_int,                             &
+    c_int32_t,                         &
+    c_int64_t,                         &
+    c_ptr
+use datetime_mod, only:        &
+    datetime,                  &
+    datetime_create,           &
+    datetime_delete,           &
+    datetime_to_YYYYMMDDhhmmss
+use kinds, only: kind_real
+use missing_values_mod, only: missing_value
+use obsspace_mod, only:  &
+    obsspace_get_db,     &
+    obsspace_get_gnlocs, &
+    obsspace_get_nlocs,  &
+    obsspace_has
+use oops_variables_mod, only: oops_variables
+use opsinputs_obsdatavector_mod, only:    &
+    opsinputs_obsdatavector_int_has,      &
+    opsinputs_obsdatavector_int_get,      &
+    opsinputs_obsdatavector_int_varnames, &
+    opsinputs_obsdatavector_float_has,    &
+    opsinputs_obsdatavector_float_get
+use opsinputs_obsspace_mod, only:                        &
+    opsinputs_obsspace_get_db_string,                    &
+    opsinputs_obsspace_get_db_datetime_offset_in_seconds
+use ufo_geovals_mod, only: &
+    ufo_geoval,            &
+    ufo_geovals,           &
+    ufo_geovals_get_var
+use ufo_vars_mod, only: &
+    MAXVARLEN,          &
+    ufo_vars_getindex
 
-use GenMod_Control, only:   &
-    OperationalMode,        &
-    QuietMode,              &
-    ProductionMode,         &
-    NormalMode,             &
-    DiagnosticMode,         &
-    DebugMode,              &
-    VerboseMode,            &
-    GeneralMode,            &
-    mype,                   &
+use GenMod_Control, only: &
+    OperationalMode,      &
+    QuietMode,            &
+    ProductionMode,       &
+    NormalMode,           &
+    DiagnosticMode,       &
+    DebugMode,            &
+    VerboseMode,          &
+    GeneralMode,          &
+    mype,                 &
     nproc
 use GenMod_Core, only: &
     gen_warn,          &
     gen_fail
+use GenMod_MiscUMScienceConstants, only: &
+    IMDI,                                &
+    RMDI
 use GenMod_ModelIO, only: LenFixHd, UM_header_type
 use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
@@ -43,8 +73,13 @@ use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
     Ops_InitMPI
-use OpsMod_DateTime
-use OpsMod_MiscTypes
+use OpsMod_DateTime, only: &
+    DateTime_type,         &
+    OpsFn_DateTime_now
+use OpsMod_MiscTypes, only: &
+    Coord_Type,             &
+    Element_Type,           &
+    ElementHeader_Type
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
@@ -52,13 +87,22 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind
-use OpsMod_ObsInfo
+use OpsMod_ObsInfo, only: &
+    FinalRejectFlag,      &
+    FinalRejectReport,    &
+    LenCallsign,          &
+    OB_type,              &
+    Ops_Alloc,            &
+    Ops_SetupObType
 use OpsMod_AODGeneral, only: NAODWaves
 use OpsMod_GPSRO, only: GPSRO_TPD
 use OpsMod_Radar, only: RadFamily
 use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
 use OpsMod_Varfields
-use OpsMod_Varobs
+use OpsMod_Varobs, only: &
+    AssimDataFormat_VAR, &
+    Ops_CreateVarobs,    &
+    Ops_ReadVarobsControlNL
 
 implicit none
 public :: opsinputs_varobswriter_create, opsinputs_varobswriter_delete, &
@@ -1728,7 +1772,6 @@ end subroutine opsinputs_varobswriter_fillcoord2d
 !> specified options) simulated variables are set to anything different from "pass".
 subroutine opsinputs_varobswriter_fillreportflags( &
   Ob, ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
-use oops_variables_mod
 implicit none
 
 ! Subroutine arguments:
@@ -1826,7 +1869,6 @@ end subroutine opsinputs_varobswriter_fillchannumandnumchans
 !> simulated variable.
 subroutine opsinputs_varobswriter_findchannelspassingqc( &
   NumObs, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
-use oops_variables_mod
 implicit none
 
 ! Subroutine arguments:

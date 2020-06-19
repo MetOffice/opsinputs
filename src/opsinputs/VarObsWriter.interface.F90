@@ -6,12 +6,20 @@
 !
 module opsinputs_varobswriter_mod_c
 
-use iso_c_binding
-use opsinputs_varobswriter_mod
-use string_f_c_mod
-use ufo_geovals_mod
-use ufo_geovals_mod_c,   only: ufo_geovals_registry
-use fckit_configuration_module, only: fckit_configuration 
+use fckit_configuration_module, only: fckit_configuration
+use, intrinsic :: iso_c_binding, only: &
+  c_bool,                              &
+  c_double,                            &
+  c_int,                               &
+  c_ptr
+use opsinputs_varobswriter_mod, only:  &
+  opsinputs_varobswriter,              &
+  opsinputs_varobswriter_create,       &
+  opsinputs_varobswriter_delete,       &
+  opsinputs_varobswriter_prior,        &
+  opsinputs_varobswriter_post
+use ufo_geovals_mod, only: ufo_geovals
+use ufo_geovals_mod_c, only: ufo_geovals_registry
 implicit none
 private
 
