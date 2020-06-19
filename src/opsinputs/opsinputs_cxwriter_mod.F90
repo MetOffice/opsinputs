@@ -155,10 +155,10 @@ function opsinputs_cxwriter_create(self, f_conf, geovars)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(inout) :: self
+type(opsinputs_cxwriter), intent(inout)    :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the CxWriter.
-logical(c_bool)                            :: opsinputs_cxwriter_create
+logical                                    :: opsinputs_cxwriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: string

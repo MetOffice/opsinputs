@@ -29,8 +29,8 @@ typedef int F90check;
 /// Interface to Fortran routines
 
 extern "C" {
-  bool opsinputs_cxwriter_create_f90(F90check &, const eckit::Configuration *,
-                                     oops::Variables &);
+  int opsinputs_cxwriter_create_f90(F90check &, const eckit::Configuration *,
+                                    oops::Variables &);
   void opsinputs_cxwriter_delete_f90(F90check &);
   void opsinputs_cxwriter_prior_f90(const F90check &, const ioda::ObsSpace &,
                                     const ufo::F90goms &);
