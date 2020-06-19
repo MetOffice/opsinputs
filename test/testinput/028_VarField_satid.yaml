@@ -30,7 +30,7 @@ Observations:
         ob value: ["5.00000", "-32768.00000", "8.00000"]
         lat:      ["21.00000", "22.00000", "24.00000"]
         lon:      ["31.00000", "32.00000", "34.00000"]
-        time:     ["-3540.00000", "-3480.00000", "-3360.00000"]
+        time:     ["-1740.00000", "-1680.00000", "-1560.00000"]
         Callsign: ["station_1", "station_2", "station_4"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
