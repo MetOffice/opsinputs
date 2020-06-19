@@ -2055,6 +2055,7 @@ TYPE (DateTime_type)                    :: now
 
 ! Body:
 
+CxHeader % FixHd = 0
 CxHeader % FixHd(FH_IntCStart) = LenFixHd + 1
 CxHeader % FixHd(FH_IntCSize) = 49
 CxHeader % FixHd(FH_RealCStart) = CxHeader % FixHd(FH_IntCStart) + CxHeader % FixHd(FH_IntCSize)
