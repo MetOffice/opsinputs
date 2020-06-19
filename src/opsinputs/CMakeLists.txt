@@ -44,7 +44,7 @@ ecbuild_add_library( TARGET   opsinputs
                      LIBS     ${OPSINPUTS_LIBS_DEP}
                      INSTALL_HEADERS LISTED
                      HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/opsinputs
-                     LINKER_LANGUAGE ${OOPS_LINKER_LANGUAGE}
+                     LINKER_LANGUAGE ${OPSINPUTS_LINKER_LANGUAGE}
                      PRIVATE_INCLUDES ${OPS_INCLUDE_DIR}
                      TYPE STATIC
                     )
