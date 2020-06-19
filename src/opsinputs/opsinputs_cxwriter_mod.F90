@@ -180,8 +180,10 @@ opsinputs_cxwriter_create = .true.
 
 ! Setup OPS
 
-string = "normal"
-found = f_conf % get("general_mode", string)
+if (.not. f_conf % get("general_mode", string)) then
+  ! fall back to the default value
+  string = "normal"
+end if
 select case (ops_to_lower_case(string))
 case ("operational")
   GeneralMode = OperationalMode
@@ -224,16 +226,22 @@ if (.not. f_conf % get("validity_time", string)) then
 end if
 call datetime_create(string, self % validitytime)
 
-self % RejectObsWithAnyVariableFailingQC = .false.
-found = f_conf % get("reject_obs_with_any_variable_failing_qc", &
-                     self % RejectObsWithAnyVariableFailingQC)
+if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
+                       self % RejectObsWithAnyVariableFailingQC)) then
+  ! fall back to the default value
+  self % RejectObsWithAnyVariableFailingQC = .false.
+end if
 
-self % RejectObsWithAllVariablesFailingQC = .false.
-found = f_conf % get("reject_obs_with_all_variables_failing_qc", &
-                     self % RejectObsWithAllVariablesFailingQC)
+if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
+                     self % RejectObsWithAllVariablesFailingQC)) then
+  ! fall back to the default value
+  self % RejectObsWithAllVariablesFailingQC = .false.
+end if
 
-string = "hybrid"  ! TODO(wsmigaj): is this a good default?
-found = f_conf % get("FH_VertCoord", string)
+if (.not. f_conf % get("FH_VertCoord", string)) then
+  ! fall back to the default value
+  string = "hybrid"  ! TODO(wsmigaj): is this a good default?
+end if
 select case (ops_to_lower_case(string))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -254,8 +262,10 @@ case default
   goto 9999
 end select
 
-string = "global"
-found = f_conf % get("FH_HorizGrid", string)
+if (.not. f_conf % get("FH_HorizGrid", string)) then
+  ! fall back to the default value
+  string = "global"
+end if
 select case (ops_to_lower_case(string))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -280,8 +290,10 @@ case default
   goto 9999
 end select
 
-string = "endgame"
-found = f_conf % get("FH_GridStagger", string)
+if (.not. f_conf % get("FH_GridStagger", string)) then
+  ! fall back to the default value
+  string = "endgame"
+end if
 select case (ops_to_lower_case(string))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -296,8 +308,10 @@ case default
   goto 9999
 end select
 
-string = "atmos"
-found = f_conf % get("FH_ObsFileType", string)
+if (.not. f_conf % get("FH_ObsFileType", string)) then
+  ! fall back to the default value
+  string = "atmos"
+end if
 select case (ops_to_lower_case(string))
 case ("atmos")
   self % FH_ObsFileType = FH_ObsFileType_Atmos
@@ -314,52 +328,73 @@ case default
   goto 9999
 end select
 
-int = 0
-found = f_conf % get("FH_ModelVersion", int)
+if (.not. f_conf % get("FH_ModelVersion", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % FH_ModelVersion = int
 
-int = 0
-found = f_conf % get("IC_XLen", int)
+if (.not. f_conf % get("IC_XLen", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_XLen = int
 
-int = 0
-found = f_conf % get("IC_YLen", int)
+if (.not. f_conf % get("IC_YLen", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_YLen = int
 
-int = 0
-found = f_conf % get("IC_PLevels", int)
+if (.not. f_conf % get("IC_PLevels", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_PLevels = int
 
-int = 0
-found = f_conf % get("IC_WetLevels", int)
+if (.not. f_conf % get("IC_WetLevels", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % IC_WetLevels = int
 
-double = 0.0
-found = f_conf % get("RC_LongSpacing", double)
+if (.not. f_conf % get("RC_LongSpacing", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_LongSpacing = double
 
-double = 0.0
-found = f_conf % get("RC_LatSpacing", double)
+if (.not. f_conf % get("RC_LatSpacing", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_LatSpacing = double
 
-double = 0.0
-found = f_conf % get("RC_FirstLat", double)
+if (.not. f_conf % get("RC_FirstLat", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_FirstLat = double
 
-double = 0.0
-found = f_conf % get("RC_FirstLong", double)
+if (.not. f_conf % get("RC_FirstLong", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_FirstLong = double
 
-double = 0.0
-found = f_conf % get("RC_PoleLat", double)
+if (.not. f_conf % get("RC_PoleLat", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_PoleLat = double
 
-double = 0.0
-found = f_conf % get("RC_PoleLong", double)
+if (.not. f_conf % get("RC_PoleLong", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
 self % RC_PoleLong = double
 
-found = f_conf % get("eta_theta_levels", self % EtaTheta)
-if (found) then
+if (f_conf % get("eta_theta_levels", self % EtaTheta)) then
   if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
     call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
@@ -370,8 +405,7 @@ else
   self % EtaTheta = RMDI
 end if
 
-found = f_conf % get("eta_rho_levels", self % EtaRho)
-if (found) then
+if (f_conf % get("eta_rho_levels", self % EtaRho)) then
   if (size(self % EtaRho) /= self % IC_PLevels) then
     call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
@@ -382,12 +416,16 @@ else
   self % EtaRho = RMDI
 end if
 
-int = 0
-found = f_conf % get("time_indicator", int)
+if (.not. f_conf % get("time_indicator", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % TimeIndicator = int
 
-int = 0
-found = f_conf % get("forecast_period", int)
+if (.not. f_conf % get("forecast_period", int)) then
+  ! fall back to the default value
+  int = 0
+end if
 self % ForecastPeriod = int
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
