@@ -74,6 +74,7 @@ use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
     ModelType,              &
+    ModelType_Atmos,        &
     ModelType_Ocean,        &
     ModelType_SST,          &
     mpi_group,              &
@@ -129,6 +130,7 @@ private
   integer(kind=8) :: IC_YLen
   integer(kind=8) :: IC_PLevels
   integer(kind=8) :: IC_WetLevels
+  integer(kind=8) :: IC_FirstConstantRhoLevel
 
   real(kind=8)    :: RC_LongSpacing
   real(kind=8)    :: RC_LatSpacing
@@ -354,6 +356,12 @@ if (.not. f_conf % get("IC_WetLevels", int)) then
 end if
 self % IC_WetLevels = int
 
+if (.not. f_conf % get("IC_FirstConstantRhoLevel", int)) then
+  ! fall back to the default value
+  int = 0
+end if
+self % IC_FirstConstantRhoLevel = int
+
 if (.not. f_conf % get("RC_LongSpacing", double)) then
   ! fall back to the default value
   double = 0.0
@@ -423,6 +431,24 @@ if (.not. f_conf % get("forecast_period", int)) then
   int = 0
 end if
 self % ForecastPeriod = int
+
+if (.not. f_conf % get("model_type", string)) then
+  ! fall back to the default value
+  string = "atmos"
+end if
+select case (ops_to_lower_case(string))
+case ("atmos")
+  ModelType = ModelType_Atmos
+case ("ocean")
+  ModelType = ModelType_Ocean
+case ("sst")
+  ModelType = ModelType_SST
+case default
+  write (ErrorMessage, '("model_type code not recognised: ",A)') string
+  call gen_warn(RoutineName, ErrorMessage)
+  opsinputs_cxwriter_create = .false.
+  return
+end select
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 call opsinputs_cxwriter_addrequiredgeovars(self, geovars)
@@ -644,7 +670,7 @@ subroutine opsinputs_cxwriter_allocatecx(self, Ob, Cx)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)     :: self
+type(opsinputs_cxwriter), intent(in)    :: self
 type(OB_type), intent(in)               :: Ob
 type(CX_type), intent(inout)            :: Cx
 
@@ -652,25 +678,19 @@ type(CX_type), intent(inout)            :: Cx
 
 call CX % init
 
-! TODO(wsmigaj): calculate the number of non-rejected observations
-
-! From Ops_CXSetup
+! Inspired by Ops_CXSetup:
 
 Cx % Header % NumLocal = Ob % Header % NumObsLocal
 Cx % Header % NumTotal = Ob % Header % NumObsTotal
 Cx % Header % ModelVersion = self % FH_ModelVersion
 Cx % Header % SubModel = FH_SubModel_Atmos
-! TODO(wsmigaj): to use this criterion, ModelType would need to be set appropriately.
 Cx % Header % NewDynamics = self % FH_ModelVersion >= 500 .and. ModelType /= ModelType_Ocean
 
-! TODO(wsmigaj)
-!IF (Cx % Header % NewDynamics) THEN
-!  IF (.NOT. BGECall .AND. ModelType /= ModelType_SST) THEN
-!    Cx % Header % FirstConstantRhoLevel = UMheader % IntC(IC_FirstConstantRhoLevel)
-!  END IF
-!ELSE
-!  Cx % Header % FirstConstantRhoLevel = IMDI
-!END IF
+if (Cx % Header % NewDynamics .and. ModelType /= ModelType_SST) then
+  Cx % Header % FirstConstantRhoLevel = self % IC_FirstConstantRhoLevel
+else
+  Cx % Header % FirstConstantRhoLevel = IMDI
+end if
 
 end subroutine opsinputs_cxwriter_allocatecx
 
@@ -794,6 +814,7 @@ UmHeader % IntC(IC_XLen) = self % IC_XLen
 UmHeader % IntC(IC_YLen) = self % IC_Ylen
 UmHeader % IntC(IC_PLevels) = self % IC_PLevels
 UmHeader % IntC(IC_WetLevels) = self % IC_WetLevels
+UmHeader % IntC(IC_FirstConstantRhoLevel) = self % IC_FirstConstantRhoLevel
 
 UmHeader % RealC = RMDI
 UmHeader % RealC(RC_LongSpacing) = self % RC_LongSpacing

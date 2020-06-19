@@ -85,6 +85,8 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<int> IC_PLevels{"IC_PLevels", 0, this};
   /// Number of wet levels (QLEVELS).
   oops::Parameter<int> IC_WetLevels{"IC_WetLevels", 0, this};
+  /// First rho level at which height is constant.
+  oops::Parameter<int> IC_FirstConstantRhoLevel{"IC_FirstConstantRhoLevel", 0, this};
 
   /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_LongSpacing{"RC_LongSpacing", 0.0, this};
@@ -103,6 +105,11 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<int> timeIndicator{"time_indicator", 0, this};
   /// The LBFT element of the UM header look-up table.
   oops::Parameter<int> forecastPeriod{"forecast_period", 0, this};
+
+  /// Model type.
+  ///
+  /// Valid values (case-insensitive): Atmos, Ocean, SST.
+  oops::Parameter<std::string> modelType{"model_type", "atmos", this};
 
   // TODO(wsmigaj): I hope these comments are correct -- please let me know if not.
   // Can these parameters be given more widely understandable names (without Greek letters)?
