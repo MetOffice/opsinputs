@@ -6,7 +6,7 @@
  */
 
 #include "../opsinputs/instantiateObsFilterFactory.h"
-#include "../test/ufo/ObsFilters.h"
+#include "../opsinputs/ObsFilters.h"
 #include "oops/runs/Run.h"
 #include "opsinputs/instantiateObsFilterFactory.h"
 #include "ufo/instantiateObsFilterFactory.h"
@@ -17,6 +17,6 @@ int main(int argc,  char ** argv) {
   ufo::instantiateObsFilterFactory<ufo::UfoTrait>();
   opsinputs::instantiateObsFilterFactory<ufo::UfoTrait>();
   opsinputs::test::instantiateObsFilterFactory<ufo::UfoTrait>();
-  ufo::test::ObsFilters tests;
+  opsinputs::test::ObsFilters tests;
   return run.execute(tests);
 }

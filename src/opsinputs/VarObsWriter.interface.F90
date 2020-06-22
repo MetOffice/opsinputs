@@ -10,7 +10,8 @@ use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding, only: &
   c_double,                            &
   c_int,                               &
-  c_ptr
+  c_ptr,                               &
+  c_size_t
 use opsinputs_varobswriter_mod, only:  &
   opsinputs_varobswriter,              &
   opsinputs_varobswriter_create,       &
@@ -19,6 +20,7 @@ use opsinputs_varobswriter_mod, only:  &
   opsinputs_varobswriter_post
 use ufo_geovals_mod, only: ufo_geovals
 use ufo_geovals_mod_c, only: ufo_geovals_registry
+use mpl, only: gc_int_kind
 implicit none
 private
 
@@ -38,24 +40,27 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Creates an opsinputs_varobswriter object. Returns 1 if the creation succeeds and 0 if it fails.
-function opsinputs_varobswriter_create_c(c_self, c_conf, c_varlist) &
+function opsinputs_varobswriter_create_c(c_self, c_conf, c_comm, c_varlist) &
   bind(c,name='opsinputs_varobswriter_create_f90')
 use oops_variables_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
+integer(c_size_t), intent(in)  :: c_comm ! MPI communicator to be used by OPS
 type(c_ptr), intent(in), value :: c_varlist ! list of geovals variables to be requested
 integer(c_int)                 :: opsinputs_varobswriter_create_c
 
 type(opsinputs_varobswriter), pointer :: self
 type(fckit_configuration) :: f_conf
+integer(gc_int_kind) :: f_comm
 type(oops_variables) :: f_varlist
 
 call opsinputs_varobswriter_registry%setup(c_self, self)
 
 f_conf = fckit_configuration(c_conf)
+f_comm = c_comm
 f_varlist = oops_variables(c_varlist)
-if (opsinputs_varobswriter_create(self, f_conf, f_varlist)) then
+if (opsinputs_varobswriter_create(self, f_conf, f_comm, f_varlist)) then
   opsinputs_varobswriter_create_c = 1
 else
   opsinputs_varobswriter_create_c = 0

@@ -5,22 +5,24 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
  */
 
+#include "opsinputs/VarObsWriter.h"
+
 #include <utility>
 #include <vector>
 
-#include "opsinputs/VarObsWriter.h"
-
-#include "opsinputs/LocalEnvironment.h"
-#include "opsinputs/VarObsWriterParameters.h"
-
 #include "eckit/config/Configuration.h"
+#include "eckit/mpi/Comm.h"
+#include "eckit/mpi/Parallel.h"
 
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
 #include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
+#include "oops/parallel/mpi/mpi.h"
 #include "oops/util/Logger.h"
+#include "opsinputs/LocalEnvironment.h"
+#include "opsinputs/VarObsWriterParameters.h"
 #include "ufo/GeoVaLs.h"
 
 namespace opsinputs {
@@ -45,7 +47,12 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
   conf.set("validity_time", validityTime.toString());
   conf.set("obs_group", obsdb.obsname());
 
-  if (!opsinputs_varobswriter_create_f90(key_, &conf, geovars_))
+  MPI_Comm mpiComm = MPI_COMM_WORLD;
+  if (auto parallelComm = dynamic_cast<const eckit::mpi::Parallel*>(&obsdb.comm())) {
+    mpiComm = parallelComm->MPIComm();
+  }
+
+  if (!opsinputs_varobswriter_create_f90(key_, &conf, mpiComm, geovars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
   oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;

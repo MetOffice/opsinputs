@@ -47,6 +47,8 @@ use ufo_vars_mod, only: &
     MAXVARLEN,          &
     ufo_vars_getindex
 
+use mpl, only: gc_int_kind, mpl_comm_world
+
 use GenMod_Control, only: &
     OperationalMode,      &
     QuietMode,            &
@@ -105,6 +107,8 @@ use OpsMod_Varobs, only: &
     Ops_ReadVarobsControlNL
 
 implicit none
+external gc_init_final
+
 public :: opsinputs_varobswriter_create, opsinputs_varobswriter_delete, &
           opsinputs_varobswriter_prior, opsinputs_varobswriter_post
 private
@@ -155,12 +159,14 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Set up an instance of opsinputs_varobswriter. Returns .true. on success and .false. on failure.
-function opsinputs_varobswriter_create(self, f_conf, geovars)
+function opsinputs_varobswriter_create(self, f_conf, comm, geovars)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
+integer(gc_int_kind)                       :: comm    ! MPI communicator standing for the processes
+                                                      ! holding the data to be written to VarObs
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
@@ -206,6 +212,9 @@ case default
   return
 end select
 
+if (comm /= mpl_comm_world) then
+  call gc_init_final(mype, nproc, comm)
+end if
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
 
