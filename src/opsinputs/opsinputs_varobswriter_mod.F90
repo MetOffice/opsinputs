@@ -98,6 +98,9 @@ use OpsMod_ObsInfo, only: &
     Ops_SetupObType
 use OpsMod_AODGeneral, only: NAODWaves
 use OpsMod_GPSRO, only: GPSRO_TPD
+use OpsMod_Kinds, only: &
+    integer64,          &
+    real64
 use OpsMod_Radar, only: RadFamily
 use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
 use OpsMod_Varfields
@@ -120,36 +123,36 @@ integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_varobswriter
 private
-  integer(kind=8) :: ObsGroup
-  type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
+  integer(integer64) :: ObsGroup
+  type(datetime)     :: ValidityTime  ! Corresponds to OPS validity time
 
-  logical         :: RejectObsWithAnyVariableFailingQC
-  logical         :: RejectObsWithAllVariablesFailingQC
+  logical            :: RejectObsWithAnyVariableFailingQC
+  logical            :: RejectObsWithAllVariablesFailingQC
 
-  logical         :: AccountForGPSROTangentPointDrift
-  logical         :: UseRadarFamily
+  logical            :: AccountForGPSROTangentPointDrift
+  logical            :: UseRadarFamily
 
-  integer(kind=8) :: FH_VertCoord
-  integer(kind=8) :: FH_HorizGrid
-  integer(kind=8) :: FH_GridStagger
-  integer(kind=8) :: FH_ModelVersion
+  integer(integer64) :: FH_VertCoord
+  integer(integer64) :: FH_HorizGrid
+  integer(integer64) :: FH_GridStagger
+  integer(integer64) :: FH_ModelVersion
 
-  integer(kind=8) :: IC_ShipWind
-  integer(kind=8) :: IC_GroundGPSOperator
-  integer(kind=8) :: IC_GPSRO_Operator_pseudo
-  integer(kind=8) :: IC_GPSRO_Operator_press
+  integer(integer64) :: IC_ShipWind
+  integer(integer64) :: IC_GroundGPSOperator
+  integer(integer64) :: IC_GPSRO_Operator_pseudo
+  integer(integer64) :: IC_GPSRO_Operator_press
 
-  integer(kind=8) :: IC_XLen
-  integer(kind=8) :: IC_YLen
-  integer(kind=8) :: IC_PLevels
-  integer(kind=8) :: IC_WetLevels
+  integer(integer64) :: IC_XLen
+  integer(integer64) :: IC_YLen
+  integer(integer64) :: IC_PLevels
+  integer(integer64) :: IC_WetLevels
 
-  real(kind=8)    :: RC_LongSpacing
-  real(kind=8)    :: RC_LatSpacing
-  real(kind=8)    :: RC_FirstLat
-  real(kind=8)    :: RC_FirstLong
-  real(kind=8)    :: RC_PoleLat
-  real(kind=8)    :: RC_PoleLong
+  real(real64)       :: RC_LongSpacing
+  real(real64)       :: RC_LatSpacing
+  real(real64)       :: RC_FirstLat
+  real(real64)       :: RC_FirstLong
+  real(real64)       :: RC_PoleLat
+  real(real64)       :: RC_PoleLong
 
   type(ufo_geovals), pointer :: GeoVals
 end type opsinputs_varobswriter
@@ -499,7 +502,7 @@ real(c_double),     intent(in) :: hofx(nvars, nlocs)
 ! Local declarations:
 type(OB_type)                  :: Ob
 type(UM_header_type)           :: CxHeader
-integer(kind=8)                :: NumVarObsTotal
+integer(integer64)             :: NumVarObsTotal
 
 ! Body:
 call opsinputs_varobswriter_allocateobservations(self, ObsSpace, Ob)
@@ -524,11 +527,11 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(oops_variables), intent(inout)     :: geovars
+type(oops_variables), intent(inout)      :: geovars
 
 ! Local declarations:
-integer(kind=8)                         :: VarFields(ActualMaxVarfield)
-integer                                 :: i
+integer(integer64)                       :: VarFields(ActualMaxVarfield)
+integer                                  :: i
 
 ! Body:
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
@@ -587,7 +590,7 @@ type(OB_type), intent(inout)            :: Ob
 character(len=*), parameter             :: RoutineName = "opsinputs_varobswriter_populateobservations"
 character(len=80)                       :: ErrorMessage
 
-integer(kind=8)                         :: VarFields(ActualMaxVarfield)
+integer(integer64)                      :: VarFields(ActualMaxVarfield)
 integer                                 :: nVarFields
 integer                                 :: iVarField
 
@@ -1068,7 +1071,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
@@ -1172,7 +1175,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
@@ -1210,7 +1213,7 @@ JediVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels(JediVar
 if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
 
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI:
@@ -1289,7 +1292,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediValueVarName
@@ -1383,7 +1386,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
@@ -1425,7 +1428,7 @@ end if
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 num_levels = int(size(JediValueVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediValueVarNamesWithChannels), kind=integer64))
 
   do iChannel = 1, size(JediValueVarNamesWithChannels)
     ! Retrieve data from JEDI:
@@ -1489,8 +1492,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real1(:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
@@ -1547,8 +1550,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real1(:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real1(:)
 type(ufo_geovals), intent(in)                   :: GeoVals
 character(len=*), intent(in)                    :: JediVarName
 
@@ -1615,8 +1618,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real2(:,:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
@@ -1637,7 +1640,7 @@ JediVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels(JediVar
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
   print *, "size(Real2): ", size(Real2,1), " ", size(Real2,2)
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
@@ -1678,8 +1681,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real2(:,:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real2(:,:)
 character(len=*), intent(in)                    :: JediVarName
 type(ufo_geovals), intent(in)                   :: GeoVals
 
@@ -1732,8 +1735,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-integer(kind=8), pointer                        :: Int1(:)
+integer(integer64), intent(in)                  :: NumObs
+integer(integer64), pointer                     :: Int1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
@@ -1792,7 +1795,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(coord_type), pointer                       :: Coord2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
@@ -1814,7 +1817,7 @@ JediVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels(JediVar
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Coord2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
 
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
@@ -1904,9 +1907,9 @@ type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 
 ! Local declarations:
-integer(kind=8)                :: NumChannels
-integer(kind=8)                :: ChannelIndices(Ob % Header % NumObsLocal, size(Channels))
-integer(kind=8)                :: ChannelCounts(Ob % Header % NumObsLocal)
+integer(integer64)             :: NumChannels
+integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size(Channels))
+integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 
 ! Body:
 NumChannels = size(Channels)
@@ -1936,21 +1939,21 @@ subroutine opsinputs_varobswriter_findchannelspassingqc( &
 implicit none
 
 ! Subroutine arguments:
-integer(kind=8), intent(in)               :: NumObs
-type(c_ptr), value, intent(in)            :: ObsSpace
-integer(c_int), intent(in)                :: Channels(:)
-type(c_ptr), value, intent(in)            :: Flags
-integer(kind=8), intent(out)              :: ChannelIndices(NumObs, size(Channels))
-integer(kind=8), intent(out)              :: ChannelCounts(NumObs)
+integer(integer64), intent(in)  :: NumObs
+type(c_ptr), value, intent(in)  :: ObsSpace
+integer(c_int), intent(in)      :: Channels(:)
+type(c_ptr), value, intent(in)  :: Flags
+integer(integer64), intent(out) :: ChannelIndices(NumObs, size(Channels))
+integer(integer64), intent(out) :: ChannelCounts(NumObs)
 
 ! Local declarations:
-integer                        :: NumChannels
-type(oops_variables)           :: Variables
-character(max_varname_length)  :: VariableName
-integer                        :: NumVariables, NumMultichannelVariables
-integer                        :: iMultichannelVariable, iChannel, iVariable, iObs
-integer(c_int)                 :: VarFlags(NumObs)
-character(len=*), parameter    :: RoutineName = "opsinputs_varobswriter_findchannelspassingqc"
+integer                         :: NumChannels
+type(oops_variables)            :: Variables
+character(max_varname_length)   :: VariableName
+integer                         :: NumVariables, NumMultichannelVariables
+integer                         :: iMultichannelVariable, iChannel, iVariable, iObs
+integer(c_int)                  :: VarFlags(NumObs)
+character(len=*), parameter     :: RoutineName = "opsinputs_varobswriter_findchannelspassingqc"
 
 ! Body:
 NumChannels = size(Channels)
@@ -2002,7 +2005,7 @@ integer(c_int), intent(in)               :: Channels(:)
 
 ! Local declarations:
 type(ElementHeader_type)                 :: CorBriTempBiasHeader
-real(kind=8), pointer                    :: CorBriTempBias(:,:)
+real(real64), pointer                    :: CorBriTempBias(:,:)
 character(len=*), parameter              :: RoutineName = "opsinputs_varobswriter_fillcorbritemp"
 character(len=256)                       :: ErrorMessage
 

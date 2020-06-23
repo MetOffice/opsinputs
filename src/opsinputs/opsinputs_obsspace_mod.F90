@@ -64,7 +64,7 @@ subroutine opsinputs_obsspace_get_db_string(obss, group, vname, string_length, s
   num_strings = size(strings)
 
   call c_opsinputs_obsspace_get_db_string(obss, c_group, c_vname, &
-                                         int(string_length, kind=8), num_strings, strings)
+                                          int(string_length, kind=c_size_t), num_strings, strings)
 end subroutine opsinputs_obsspace_get_db_string
 
 end module opsinputs_obsspace_mod
