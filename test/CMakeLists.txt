@@ -39,7 +39,7 @@ endfunction()
 # - num_tasks: number of MPI tasks to spawn when running the test. If the MPI clause is not present,
 #   the test will be run without MPI.
 function( ADD_VAROBSWRITER_TEST )
-  set( options )
+  set( options DONT_SET_OPS_VAROB_OUTPUT_DIR)
   set( single_value_args NAME MPI )
   set( multi_value_args INPUTS DATA)
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
@@ -56,8 +56,11 @@ function( ADD_VAROBSWRITER_TEST )
   set( environment
          OOPS_TRAPFPE=1
          LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-         OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_varobswriter_${_PAR_NAME}
          OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR})
+  if (NOT ${_PAR_DONT_SET_OPS_VAROB_OUTPUT_DIR})
+    list (APPEND environment
+      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_varobswriter_${_PAR_NAME})
+  endif()
 
   if (_PAR_MPI)
     ecbuild_add_test( TARGET  test_opsinputs_varobswriter_${_PAR_NAME}
@@ -209,6 +212,10 @@ ADD_VAROBSWRITER_TEST(NAME   RealConstants
 ADD_VAROBSWRITER_TEST(NAME   reject_obs_with_all_variables_failing_qc
                       INPUTS reject_obs_with_all_variables_failing_qc.yaml
                       DATA   reject_obs_with_all_variables_failing_qc.nc4)
+ADD_VAROBSWRITER_TEST(NAME   nested_output_directory
+                      INPUTS nested_output_directory.yaml
+                      DATA   028_VarField_satid.nc4
+                      DONT_SET_OPS_VAROB_OUTPUT_DIR)
 
 # Tests of auxiliary classes
 list( APPEND opsinputs_test_input empty.yaml )
