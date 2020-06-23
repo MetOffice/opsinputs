@@ -127,9 +127,6 @@ ADD_VAROBSWRITER_TEST(NAME   005_VarField_v_Surface
 ADD_VAROBSWRITER_TEST(NAME   005_VarField_v_Sonde
                       INPUTS 005_VarField_v_Sonde.yaml
                       DATA   005_VarField_v_Sonde.nc4)
-ADD_VAROBSWRITER_TEST(NAME   010_VarField_britemp
-                      INPUTS 010_VarField_britemp.yaml VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
-                      DATA   010_VarField_britemp.nc4)
 ADD_VAROBSWRITER_TEST(NAME   019_VarField_satzenith
                       INPUTS 019_VarField_satzenith.yaml VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
                       DATA   019_VarField_satzenith.nc4)
