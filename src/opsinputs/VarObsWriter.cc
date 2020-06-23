@@ -109,9 +109,7 @@ void VarObsWriter::createOutputDirectory() {
   eckit::PathName outputPath(outputDirectory);
   ASSERT_MSG(!outputPath.exists() || outputPath.isDir(),
              "The output path '" + std::string(outputDirectory) + "'is not a directory");
-  if (!outputPath.exists()) {
-    outputPath.mkdir();
-  }
+  outputPath.mkdir();
 }
 
 }  // namespace opsinputs
