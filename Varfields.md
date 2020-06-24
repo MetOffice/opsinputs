@@ -4,7 +4,7 @@
 | 2 | `VarField_temperature` | `t2(:)` or `t(:,:)` | temperature | `air_temperature@ObsValue` (Perhaps `surface_temperature@ObsValue` for t2?) | |
 | 3 | `VarField_rh` | `rh2(:)` or `rh(:,:)` | relative humidity | `relative_humidity@ObsValue` | |
 | 4 | `VarField_u` | `u10(:)` or `u(:,:)` | eastward wind | `eastward_wind@ObsValue` | |
-| 5 | `VarField_v` | `v10(:)` or `v(:,:)` | northward wind | northward `wind@ObsValue` | |
+| 5 | `VarField_v` | `v10(:)` or `v(:,:)` | northward wind | `northward_wind@ObsValue` | |
 | 6 | `VarField_logvis` | | | | Implement |
 | 7 | `VarField_tcwv` | | | | Implement |
 | 8 | `VarField_windspeed` | | | | Implement |
