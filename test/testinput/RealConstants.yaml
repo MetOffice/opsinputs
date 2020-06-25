@@ -1,0 +1,49 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Longitude spacing: "0.00"
+        Latitude spacing: "0.00"
+        First latitude: "0.00"
+        First longitude: "0.00"
+        Pole latitude: "0.00"
+        Pole longitude: "0.00"
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/028_VarField_satid.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    - Filter: VarObs Writer
+      RC_LongSpacing: 0.10
+      RC_LatSpacing: 0.20
+      RC_FirstLat: 1.50
+      RC_FirstLong: 2.50
+      RC_PoleLat: 3.50
+      RC_PoleLong: 4.50
+    - Filter: VarObs Checker
+      expected_header_fields:
+        Longitude spacing: "0.10"
+        Latitude spacing: "0.20"
+        First latitude: "1.50"
+        First longitude: "2.50"
+        Pole latitude: "3.50"
+        Pole longitude: "4.50"
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

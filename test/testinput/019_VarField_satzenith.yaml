@@ -1,0 +1,37 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: AMSUB
+      ObsDataIn:
+        obsfile: Data/019_VarField_satzenith.nc4
+      simulate:
+        variables: [dummy]
+    ObsFilters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - Filter: Reset Flags to Pass
+      flags_to_reset: [1, 6]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
+    - Filter: Domain Check
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.
+    - Filter: VarObs Writer
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+    - Filter: VarObs Checker
+      expected_main_table_columns:
+        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
+        field:    ["19", "19", "19"]
+        ob value: ["5.10000", "-1073741824.00000", "5.40000"]
+        lat:      ["21.00000", "22.00000", "24.00000"]
+        lon:      ["31.00000", "32.00000", "34.00000"]
+        time:     ["-1740.00000", "-1680.00000", "-1560.00000"]
+        Callsign: ["station_1", "station_2", "station_4"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
