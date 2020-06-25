@@ -83,7 +83,6 @@ set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 
 ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                         SOURCES opsinputs/instantiateObsFilterFactory.h
-                                opsinputs/ObsFilters.h
                                 opsinputs/ResetFlagsToPass.cc
                                 opsinputs/ResetFlagsToPass.h
                                 opsinputs/ResetFlagsToPassParameters.h
@@ -176,14 +175,6 @@ ADD_VAROBSWRITER_TEST(NAME   002_VarField_temperature_RadarZ_MPI_4
                       MPI    4
                       INPUTS 002_VarField_temperature_RadarZ_MPI_4.yaml
                       DATA   002_VarField_temperature_RadarZ.nc4)
-ADD_VAROBSWRITER_TEST(NAME   split_communicator_all_processes_writing_varobs_files
-                      MPI    4
-                      INPUTS split_communicator_all_processes_writing_varobs_files.yaml
-                      DATA   002_VarField_temperature_RadarZ.nc4 001_VarField_pstar.nc4)
-ADD_VAROBSWRITER_TEST(NAME   split_communicator_only_some_processes_writing_varobs_files
-                      MPI    4
-                      INPUTS split_communicator_only_some_processes_writing_varobs_files.yaml
-                      DATA   002_VarField_temperature_RadarZ.nc4 001_VarField_pstar.nc4)
 
 # Header field tests
 ADD_VAROBSWRITER_TEST(NAME   FixedHeader_VertCoord
