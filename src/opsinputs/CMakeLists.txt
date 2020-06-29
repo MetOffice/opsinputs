@@ -71,6 +71,7 @@ set(OPS_O_FILES
     genmod_sleep.o
     genmod_utilities.o
     mpl_abort.o
+    mpl_allgather.o
     mpl_allreduce.o
     mpl_alltoallv.o
     mpl_barrier.o
@@ -112,18 +113,22 @@ set(OPS_O_FILES
     opsmod_cxinfo.o
     opsmod_datetime.o
     opsmod_envutils.o
+    opsmod_fieldread.o
     opsmod_gatherspread.o
     opsmod_gcom.o
     opsmod_gpsro.o
     opsmod_gpsroinfo_ba.o
     opsmod_groundgps.o
+    opsmod_horizontalinterp.o
     opsmod_ioutils.o
     opsmod_misctypes.o
+    opsmod_modelcolumnio.o
     opsmod_modelio.o
     opsmod_modelobinfo.o
     opsmod_mplinterface.o
     opsmod_obsgroupinfo.o
     opsmod_obsinfo.o
+    opsmod_obtypeutils.o
     opsmod_portio_wrappers.o
     opsmod_process.o
     opsmod_qc.o
@@ -133,6 +138,7 @@ set(OPS_O_FILES
     opsmod_random.o
     opsmod_satrad_rtmodel.o
     opsmod_satrad_setup.o
+    opsmod_sondedrift.o
     opsmod_sort.o
     opsmod_utilities.o
     opsmod_varobs.o
