@@ -34,13 +34,13 @@ integer(kind=gc_int_kind) :: error
 external mpl_allgather
 
 ! Body:
-call mpl_allgather(sendbuf,  &
-                   sendcount,  &
-                   sendtype, &
-                   recvbuf,  &
+call mpl_allgather(sendbuf,   &
+                   sendcount, &
+                   sendtype,  &
+                   recvbuf,   &
                    recvcount, &
-                   recvtype, &
-                   comm,     &
+                   recvtype,  &
+                   comm,      &
                    error)
 
 end subroutine opsinputs_mpl_allgather_integer

@@ -547,7 +547,7 @@ integer(kind=gc_int_kind)            :: istat
 
 ! Body:
 
-call opsinputs_cxwriter_allocateobservations(self, ObsSpace, NumObsLocal, Ob)
+call opsinputs_cxwriter_allocateobservations(self, NumObsLocal, Ob)
 call opsinputs_cxwriter_populateobservations(self, ObsSpace, Flags, Ob)
 call opsinputs_cxwriter_allocatecx(self, Ob, Cx)
 call opsinputs_cxwriter_populatecx(self, ObsSpace, Flags, Cx)
@@ -604,13 +604,12 @@ end subroutine opsinputs_cxwriter_addrequiredgeovars
 ! ------------------------------------------------------------------------------
 
 !> Prepare Ob to hold the required number of observations.
-subroutine opsinputs_cxwriter_allocateobservations(self, ObsSpace, NumObsLocal, Ob)
+subroutine opsinputs_cxwriter_allocateobservations(self, NumObsLocal, Ob)
 use mpl, ONLY: gc_int_kind
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
-type(c_ptr), value, intent(in)       :: ObsSpace
 integer(integer64), intent(in)       :: NumObsLocal
 type(OB_type), intent(inout)         :: Ob
 
@@ -624,6 +623,7 @@ call Ops_SetupObType(Ob)
 
 Ob % Header % NumObsLocal = NumObsLocal
 Ob % Header % NumObsTotal = Ob % Header % NumObsLocal
+! Sum the number of local observations on each process into NumObsTotal
 call gcg_isum (1_gc_int_kind, mpi_group, istat, Ob % Header % NumObsTotal)
 
 Ob % Header % NumCXBatches = 1
@@ -688,7 +688,7 @@ type(CX_type), intent(inout)            :: Cx
 
 call CX % init
 
-! Inspired by Ops_CXSetup:
+! The following code is inspired by Ops_CXSetup.
 
 Cx % Header % NumLocal = Ob % Header % NumObsLocal
 Cx % Header % NumTotal = Ob % Header % NumObsTotal
@@ -711,7 +711,7 @@ subroutine opsinputs_cxwriter_populatecx(self, ObsSpace, Flags, Cx)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)     :: self
+type(opsinputs_cxwriter), intent(in)    :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 type(c_ptr), value, intent(in)          :: Flags
 type(CX_type), intent(inout)            :: Cx
@@ -844,12 +844,11 @@ UmHeader % Lookup = IMDI
 UmHeader % Lookup(LBYR:LBMIN,1) = UmHeader % FixHd(FH_VTYear:FH_VTMinute)
 UmHeader % Lookup(LBDAY,1) = UmHeader % FixHd(FH_VTDayNo)
 UmHeader % Lookup(LBSEC,1) = UmHeader % FixHd(FH_VTSecond)
-
 ! Data time
 UmHeader % Lookup(LBYRD:LBMIND,1) = UmHeader % FixHd(FH_DTYear:FH_DTMinute)
 UmHeader % Lookup(LBDAYD,1) = UmHeader % FixHd(FH_DTDayNo)
 UmHeader % Lookup(LBSECD,1) = UmHeader % FixHd(FH_DTSecond)
-
+! Others
 UmHeader % Lookup(LBTIM,1) = self % TimeIndicator
 UmHeader % Lookup(LBFT,1) = self % ForecastPeriod
 
