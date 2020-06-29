@@ -20,6 +20,8 @@ namespace test {
 /// \brief Directory separator.
 constexpr char PATH_SEPARATOR = '/';  // This could be made OS-dependent.
 
+/// \brief Return the value of the environment variable \p variableName or throw an exception
+/// it it doesn't exist.
 std::string getEnvVariableOrThrow(const char *variableName);
 
 /// \brief Return true if \p string starts with \p prefix, false otherwise.
@@ -37,8 +39,8 @@ boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
 std::vector<std::string> splitIntoFixedLengthChunksAndTrim(const std::string &line,
                                                            size_t chunkSize);
 
-/// \brief Return the contents of \p inputFilePath printed in a textual form using the OPS utility
-/// \p printUtilName.
+/// \brief Return the contents of file \p inputFilePath printed in a textual form using the OPS
+/// utility \p printUtilName.
 std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputFilePath);
 
 }  // namespace test

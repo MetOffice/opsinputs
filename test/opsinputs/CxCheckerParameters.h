@@ -32,16 +32,20 @@ class CxCheckerParameters : public oops::Parameters {
   oops::Parameter<std::map<std::string, std::string>> expectedHeaderFields{
     "expected_header_fields", {}, this};
 
+  /// Expected Eta_Theta levels.
   oops::OptionalParameter<std::vector<std::string>> expectedEtaThetaLevels{
     "expected_eta_theta_levels", this};
 
+  /// Expected Eta_Rho levels.
   oops::OptionalParameter<std::vector<std::string>> expectedEtaRhoLevels{
     "expected_eta_rho_levels", this};
 
+  /// Expected values of lookup table fields.
   oops::Parameter<std::map<std::string, std::string>> expectedLookupFields{
     "expected_lookup_fields", {}, this};
 
-  /// Expected contents of columns of the main table with per-observation data.
+  /// expected_main_table_columns[i][j][k] is the expected value of kth element of jth model column
+  /// in ith batch.
   oops::OptionalParameter<std::vector<std::vector<std::vector<std::string>>>>
     expectedMainTableColumns{"expected_main_table_columns", this};
 };

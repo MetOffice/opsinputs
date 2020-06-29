@@ -68,8 +68,7 @@ void CxWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   opsinputs_cxwriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
-void CxWriter::postFilter(const ioda::ObsVector & hofxb,
-                          const ufo::ObsDiagnostics &) const {
+void CxWriter::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "CxWriter postFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
@@ -79,6 +78,8 @@ void CxWriter::postFilter(const ioda::ObsVector & hofxb,
 }
 
 void CxWriter::print(std::ostream & os) const {
+  // To implement this, it would be best to add a print method or equivalent to Parameters.
+  // Something to think of in future.
   os << "CxWriter::print not yet implemented " << key_;
 }
 

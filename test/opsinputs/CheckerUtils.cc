@@ -103,7 +103,6 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
       exePath = printUtilName;
     }
 
-    // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
     const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + inputFilePathName +
         "\" --all --outfile=\"" + tempFile->name() + "\"";
     if (oops::mpi::comm().rank() == 0) {
