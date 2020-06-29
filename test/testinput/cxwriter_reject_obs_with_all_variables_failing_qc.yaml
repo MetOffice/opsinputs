@@ -10,7 +10,7 @@ Observations:
       simulate:
         variables: [eastward_wind, northward_wind]
     GeoVaLs:
-      filename: Data/000004_StashItem_theta.nc4
+      filename: Data/001_UpperAirCxField_theta.nc4
     ObsFilters:
     # BlackList all eastward_wind observations...
     - Filter: BlackList

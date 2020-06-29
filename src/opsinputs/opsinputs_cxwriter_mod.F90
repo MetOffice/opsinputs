@@ -586,16 +586,19 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 
 do i = 1, size(CxFields)
   select case (CxFields(i))
-  case (StashItem_u)
-    call geovars % push_back("eastward_wind")
-  case (StashItem_v)
-    call geovars % push_back("northward_wind")
-  case (StashItem_theta)
-    call geovars % push_back("air_potential_temperature")
-  case (StashItem_modelsurface)
+  ! Surface variables
+  case (StashItem_modelsurface)         ! IndexCxmodelsurface = 7
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
     ! here and in opsinputs_cxwriter_populatecx.
     call geovars % push_back("land_type_index")
+
+  ! Upper-air variables
+  case (StashItem_theta)                ! IndexCxtheta = 1
+    call geovars % push_back("air_potential_temperature")
+  case (StashItem_u)                    ! IndexCxu = 3
+    call geovars % push_back("eastward_wind")
+  case (StashItem_v)                    ! IndexCxv = 4
+    call geovars % push_back("northward_wind")
   end select
 end do
 
@@ -729,24 +732,28 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 
 do iCxField = 1, size(CxFields)
   select case (CxFields(iCxField))
-  case (StashItem_u)
-    call opsinputs_fill_fillreal2dfromgeoval( &
-      Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
-      self % GeoVals, "eastward_wind")
-  case (StashItem_v)
-    call opsinputs_fill_fillreal2dfromgeoval( &
-      Cx % Header % v, "v", Cx % Header % NumLocal, Cx % v, &
-      self % GeoVals, "northward_wind")
-  case (StashItem_theta)
-    call opsinputs_fill_fillreal2dfromgeoval( &
-      Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
-      self % GeoVals, "air_potential_temperature")
-  case (StashItem_modelsurface)
+
+  ! Surface variables
+  case (StashItem_modelsurface)         ! IndexCxmodelsurface
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
     ! here and in opsinputs_cxwriter_addrequiredgeovars.
     call opsinputs_fill_fillrealfromgeoval( &
       Cx % Header % ModelSurface, "ModelSurface", Cx % Header % NumLocal, Cx % ModelSurface, &
       self % GeoVals, "land_type_index")
+
+  ! Upper-air variables
+  case (StashItem_theta)                ! IndexCxtheta = 1
+    call opsinputs_fill_fillreal2dfromgeoval( &
+      Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
+      self % GeoVals, "air_potential_temperature")
+  case (StashItem_u)                    ! IndexCxu = 3
+    call opsinputs_fill_fillreal2dfromgeoval( &
+      Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
+      self % GeoVals, "eastward_wind")
+  case (StashItem_v)                    ! IndexCxv = 4
+    call opsinputs_fill_fillreal2dfromgeoval( &
+      Cx % Header % v, "v", Cx % Header % NumLocal, Cx % v, &
+      self % GeoVals, "northward_wind")
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx

@@ -4,13 +4,13 @@ window_end: 2018-01-01T01:00:00Z
 Observations:
   ObsTypes:
   - ObsSpace:
-      name: AMSUB
+      name: SatTCWV
       ObsDataIn:
-        obsfile: Data/019_VarField_satzenith.nc4
+        obsfile: Data/002_VarField_temperature_Surface.nc4
       simulate:
-        variables: [dummy]
+        variables: [air_temperature]
     GeoVaLs:
-      filename: Data/000004_StashItem_theta.nc4
+      filename: Data/007_SurfaceCxField_modelsurface.nc4
     ObsFilters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the Cx file.
@@ -23,17 +23,18 @@ Observations:
           name: latitude@MetaData
         minvalue: 0.
     - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_007_SurfaceCxField_modelsurface
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
       IC_PLevels: 5
     - Filter: Cx Checker
-      expected_surface_variables: []
-      expected_upper_air_variables: ["1"] # IndexCxtheta
+      expected_surface_variables: ["7"] # IndexCxmodelsurface
+      expected_upper_air_variables: []
       expected_main_table_columns:
       - # batch 1
-        - ["1.10", "1.20", "1.30"]       # column 1
-        - ["2.10", "**********", "2.30"] # column 2 (the asterisks represent a missing float)
-        - ["4.10", "4.20", "4.30"]       # column 3
+        - ["7.10"]       # column 1
+        - ["**********"] # column 2 (the asterisks represent a missing float)
+        - ["7.40"]       # column 3
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

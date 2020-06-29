@@ -11,7 +11,7 @@ Observations:
         simulate:
           variables: [dummy]
       GeoVaLs:
-        filename: Data/000004_StashItem_theta.nc4
+        filename: Data/001_UpperAirCxField_theta.nc4
       ObsFilters:
       - Filter: Cx Writer
         general_mode: debug

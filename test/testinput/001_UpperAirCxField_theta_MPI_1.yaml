@@ -10,7 +10,7 @@ Observations:
       simulate:
         variables: [dummy]
     GeoVaLs:
-      filename: Data/000004_StashItem_theta.nc4
+      filename: Data/001_UpperAirCxField_theta.nc4
     ObsFilters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the Cx file.

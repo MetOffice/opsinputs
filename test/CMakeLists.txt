@@ -231,56 +231,56 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
 ### CxWriter tests
 
 # Tests of individual varfields
-ADD_WRITER_TEST(NAME     cxwriter_000004_StashItem_theta
-                YAML     000004_StashItem_theta.yaml
-                DATA     000004_StashItem_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
+                YAML     001_UpperAirCxField_theta.yaml
+                DATA     001_UpperAirCxField_theta.nc4)
 
-ADD_WRITER_TEST(NAME     cxwriter_000030_StashItem_modelsurface
-                YAML     000030_StashItem_modelsurface.yaml
-                NAMELIST CxWriterNamelists_000030_StashItem_modelsurface/SatTCWV.nl
-                DATA     000030_StashItem_modelsurface.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_007_SurfaceCxField_modelsurface
+                YAML     007_SurfaceCxField_modelsurface.yaml
+                NAMELIST CxWriterNamelists_007_SurfaceCxField_modelsurface/SatTCWV.nl
+                DATA     007_SurfaceCxField_modelsurface.nc4)
 
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
                 YAML     cxwriter_FixedHeader_VertCoord.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_HorizGrid
                 YAML     cxwriter_FixedHeader_HorizGrid.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_GridStagger
                 YAML     cxwriter_FixedHeader_GridStagger.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_ObsFileType
                 YAML     cxwriter_FixedHeader_ObsFileType.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Times
                 YAML     cxwriter_FixedHeader_Times.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_IntegerConstants_PLevels
                 YAML     cxwriter_IntegerConstants_PLevels.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_RealConstants
                 YAML     cxwriter_RealConstants.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_Lookup_Times
                 YAML     cxwriter_Lookup_Times.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_Lookup_Numbers
                 YAML     cxwriter_Lookup_Numbers.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_LevelDependentConstants
                 YAML     cxwriter_LevelDependentConstants.yaml
-                DATA     000004_StashItem_theta.nc4)
+                DATA     001_UpperAirCxField_theta.nc4)
 
 # MPI tests
-ADD_WRITER_TEST(NAME     cxwriter_000004_StashItem_theta_MPI_1
+ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_1
                 MPI      1
-                YAML     000004_StashItem_theta_MPI_1.yaml
-                DATA     000004_StashItem_theta.nc4)
-ADD_WRITER_TEST(NAME     cxwriter_000004_StashItem_theta_MPI_4
+                YAML     001_UpperAirCxField_theta_MPI_1.yaml
+                DATA     001_UpperAirCxField_theta.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_4
                 MPI      4
-                YAML     000004_StashItem_theta_MPI_4.yaml
-                DATA     000004_StashItem_theta.nc4)
+                YAML     001_UpperAirCxField_theta_MPI_4.yaml
+                DATA     001_UpperAirCxField_theta.nc4)
 
 # Tests of other options
 ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
@@ -288,7 +288,7 @@ ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
                 DATA     reject_obs_with_all_variables_failing_qc.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 YAML     cxwriter_nested_output_directory.yaml
-                DATA     000004_StashItem_theta.nc4
+                DATA     001_UpperAirCxField_theta.nc4
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 ### Tests of auxiliary classes
