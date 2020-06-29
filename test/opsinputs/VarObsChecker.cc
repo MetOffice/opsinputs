@@ -141,7 +141,7 @@ VarObsChecker::PrintVarObsOutput VarObsChecker::parsePrintVarObsOutput(
         section = BeforeLevelDependentConstants;
       } else {
         const char separator[] = " = ";
-        auto separatorPos = line.find(separator);
+        const std::string::size_type separatorPos = line.find(separator);
         if (separatorPos != std::string::npos) {
           std::string name = line.substr(0, separatorPos);
           std::string value = line.substr(separatorPos + sizeof(separator) - 1);

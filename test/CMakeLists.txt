@@ -44,7 +44,7 @@ endfunction()
 # - num_tasks: Number of MPI tasks to spawn when running the test. If the MPI option is not present,
 #   the test will be run without MPI.
 function( ADD_WRITER_TEST )
-  set( options )
+  set( options DONT_SET_OPS_VAROB_OUTPUT_DIR)
   set( single_value_args NAME YAML NAMELIST MPI )
   set( multi_value_args DATA)
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
@@ -65,6 +65,10 @@ function( ADD_WRITER_TEST )
          OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
          OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
          OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR})
+  if (NOT ${_PAR_DONT_SET_OPS_VAROB_OUTPUT_DIR})
+    list (APPEND environment
+      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_varobswriter_${_PAR_NAME})
+  endif()
 
   if (_PAR_MPI)
     ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
@@ -100,7 +104,7 @@ ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                                 opsinputs/VarObsChecker.cc
                                 opsinputs/VarObsChecker.h
                                 opsinputs/VarObsCheckerParameters.h
-                                mains/TestOpsInputsFilters.cc
+                                mains/TestObsFilters.cc
                         LIBS    opsinputs )
 
 # Cleans up the output directory
@@ -139,10 +143,6 @@ ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Surface
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Sonde
                 YAML     005_VarField_v_Sonde.yaml
                 DATA     005_VarField_v_Sonde.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_010_VarField_britemp
-                YAML     010_VarField_britemp.yaml
-                NAMELIST VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
-                DATA     010_VarField_britemp.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
@@ -222,6 +222,10 @@ ADD_WRITER_TEST(NAME     varobswriter_RealConstants
 ADD_WRITER_TEST(NAME     varobswriter_reject_obs_with_all_variables_failing_qc
                 YAML     varobswriter_reject_obs_with_all_variables_failing_qc.yaml
                 DATA     reject_obs_with_all_variables_failing_qc.nc4)
+ADD_WRITER_TEST(NAME     nested_output_directory
+                YAML     nested_output_directory.yaml
+                DATA   028_VarField_satid.nc4
+                DONT_SET_OPS_VAROB_OUTPUT_DIR)
 
 ### CxWriter tests
 

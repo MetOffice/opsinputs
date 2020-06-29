@@ -30,6 +30,7 @@ typedef int F90check;
 
 extern "C" {
   int opsinputs_varobswriter_create_f90(F90check &, const eckit::Configuration *,
+                                        const size_t &comm,
                                         oops::Variables &);
   void opsinputs_varobswriter_delete_f90(F90check &);
   void opsinputs_varobswriter_prior_f90(const F90check &, const ioda::ObsSpace &,

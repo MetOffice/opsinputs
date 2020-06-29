@@ -1,3 +1,0 @@
-&VarobsControlNL
-Varfields=10
-/

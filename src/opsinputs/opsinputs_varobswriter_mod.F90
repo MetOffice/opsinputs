@@ -57,6 +57,8 @@ use ufo_vars_mod, only: &
     MAXVARLEN,          &
     ufo_vars_getindex
 
+use mpl, only: gc_int_kind, mpl_comm_world
+
 use GenMod_Control, only: &
     OperationalMode,      &
     QuietMode,            &
@@ -102,6 +104,9 @@ use OpsMod_ObsInfo, only: &
     Ops_SetupObType
 use OpsMod_AODGeneral, only: NAODWaves
 use OpsMod_GPSRO, only: GPSRO_TPD
+use OpsMod_Kinds, only: &
+    integer64,          &
+    real64
 use OpsMod_Radar, only: RadFamily
 use OpsMod_SatRad_RTmodel, only: nlevels_strat_varobs
 use OpsMod_Varfields
@@ -111,6 +116,8 @@ use OpsMod_Varobs, only: &
     Ops_ReadVarobsControlNL
 
 implicit none
+external gc_init_final
+
 public :: opsinputs_varobswriter_create, opsinputs_varobswriter_delete, &
           opsinputs_varobswriter_prior, opsinputs_varobswriter_post
 private
@@ -118,36 +125,36 @@ private
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_varobswriter
 private
-  integer(kind=8) :: ObsGroup
-  type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
+  integer(integer64) :: ObsGroup
+  type(datetime)     :: ValidityTime  ! Corresponds to OPS validity time
 
-  logical         :: RejectObsWithAnyVariableFailingQC
-  logical         :: RejectObsWithAllVariablesFailingQC
+  logical            :: RejectObsWithAnyVariableFailingQC
+  logical            :: RejectObsWithAllVariablesFailingQC
 
-  logical         :: AccountForGPSROTangentPointDrift
-  logical         :: UseRadarFamily
+  logical            :: AccountForGPSROTangentPointDrift
+  logical            :: UseRadarFamily
 
-  integer(kind=8) :: FH_VertCoord
-  integer(kind=8) :: FH_HorizGrid
-  integer(kind=8) :: FH_GridStagger
-  integer(kind=8) :: FH_ModelVersion
+  integer(integer64) :: FH_VertCoord
+  integer(integer64) :: FH_HorizGrid
+  integer(integer64) :: FH_GridStagger
+  integer(integer64) :: FH_ModelVersion
 
-  integer(kind=8) :: IC_ShipWind
-  integer(kind=8) :: IC_GroundGPSOperator
-  integer(kind=8) :: IC_GPSRO_Operator_pseudo
-  integer(kind=8) :: IC_GPSRO_Operator_press
+  integer(integer64) :: IC_ShipWind
+  integer(integer64) :: IC_GroundGPSOperator
+  integer(integer64) :: IC_GPSRO_Operator_pseudo
+  integer(integer64) :: IC_GPSRO_Operator_press
 
-  integer(kind=8) :: IC_XLen
-  integer(kind=8) :: IC_YLen
-  integer(kind=8) :: IC_PLevels
-  integer(kind=8) :: IC_WetLevels
+  integer(integer64) :: IC_XLen
+  integer(integer64) :: IC_YLen
+  integer(integer64) :: IC_PLevels
+  integer(integer64) :: IC_WetLevels
 
-  real(kind=8)    :: RC_LongSpacing
-  real(kind=8)    :: RC_LatSpacing
-  real(kind=8)    :: RC_FirstLat
-  real(kind=8)    :: RC_FirstLong
-  real(kind=8)    :: RC_PoleLat
-  real(kind=8)    :: RC_PoleLong
+  real(real64)       :: RC_LongSpacing
+  real(real64)       :: RC_LatSpacing
+  real(real64)       :: RC_FirstLat
+  real(real64)       :: RC_FirstLong
+  real(real64)       :: RC_PoleLat
+  real(real64)       :: RC_PoleLong
 
   type(ufo_geovals), pointer :: GeoVals
 end type opsinputs_varobswriter
@@ -157,12 +164,14 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Set up an instance of opsinputs_varobswriter. Returns .true. on success and .false. on failure.
-function opsinputs_varobswriter_create(self, f_conf, geovars)
+function opsinputs_varobswriter_create(self, f_conf, comm, geovars)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
+integer(gc_int_kind)                       :: comm    ! MPI communicator standing for the processes
+                                                      ! holding the data to be written to VarObs
 type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
@@ -208,6 +217,9 @@ case default
   return
 end select
 
+if (comm /= mpl_comm_world) then
+  call gc_init_final(mype, nproc, comm)
+end if
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
 
@@ -492,7 +504,7 @@ real(c_double),     intent(in) :: hofx(nvars, nlocs)
 ! Local declarations:
 type(OB_type)                  :: Ob
 type(UM_header_type)           :: CxHeader
-integer(kind=8)                :: NumVarObsTotal
+integer(integer64)             :: NumVarObsTotal
 
 ! Body:
 call opsinputs_varobswriter_allocateobservations(self, ObsSpace, Ob)
@@ -517,11 +529,11 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(oops_variables), intent(inout)     :: geovars
+type(oops_variables), intent(inout)      :: geovars
 
 ! Local declarations:
-integer(kind=8)                         :: VarFields(ActualMaxVarfield)
-integer                                 :: i
+integer(integer64)                       :: VarFields(ActualMaxVarfield)
+integer                                  :: i
 
 ! Body:
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
@@ -580,7 +592,7 @@ type(OB_type), intent(inout)            :: Ob
 character(len=*), parameter             :: RoutineName = "opsinputs_varobswriter_populateobservations"
 character(len=80)                       :: ErrorMessage
 
-integer(kind=8)                         :: VarFields(ActualMaxVarfield)
+integer(integer64)                      :: VarFields(ActualMaxVarfield)
 integer                                 :: nVarFields
 integer                                 :: iVarField
 
@@ -715,7 +727,8 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
     case (VarField_britemp)
-      call opsinputs_varobswriter_fillcorbritemp(Ob, ObsSpace, Channels)
+      ! TODO(someone): handle this varfield
+      ! call Ops_Alloc(Ob % Header % CorBriTemp, "CorBriTemp", Ob % Header % NumObsLocal, Ob % CorBriTemp)
     case (VarField_tskin)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
@@ -1072,9 +1085,9 @@ type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 
 ! Local declarations:
-integer(kind=8)                :: NumChannels
-integer(kind=8)                :: ChannelIndices(Ob % Header % NumObsLocal, size(Channels))
-integer(kind=8)                :: ChannelCounts(Ob % Header % NumObsLocal)
+integer(integer64)             :: NumChannels
+integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size(Channels))
+integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 
 ! Body:
 NumChannels = size(Channels)
@@ -1104,21 +1117,21 @@ subroutine opsinputs_varobswriter_findchannelspassingqc( &
 implicit none
 
 ! Subroutine arguments:
-integer(kind=8), intent(in)               :: NumObs
-type(c_ptr), value, intent(in)            :: ObsSpace
-integer(c_int), intent(in)                :: Channels(:)
-type(c_ptr), value, intent(in)            :: Flags
-integer(kind=8), intent(out)              :: ChannelIndices(NumObs, size(Channels))
-integer(kind=8), intent(out)              :: ChannelCounts(NumObs)
+integer(integer64), intent(in)  :: NumObs
+type(c_ptr), value, intent(in)  :: ObsSpace
+integer(c_int), intent(in)      :: Channels(:)
+type(c_ptr), value, intent(in)  :: Flags
+integer(integer64), intent(out) :: ChannelIndices(NumObs, size(Channels))
+integer(integer64), intent(out) :: ChannelCounts(NumObs)
 
 ! Local declarations:
-integer                        :: NumChannels
-type(oops_variables)           :: Variables
-character(max_varname_length)  :: VariableName
-integer                        :: NumVariables, NumMultichannelVariables
-integer                        :: iMultichannelVariable, iChannel, iVariable, iObs
-integer(c_int)                 :: VarFlags(NumObs)
-character(len=*), parameter    :: RoutineName = "opsinputs_varobswriter_findchannelspassingqc"
+integer                         :: NumChannels
+type(oops_variables)            :: Variables
+character(max_varname_length)   :: VariableName
+integer                         :: NumVariables, NumMultichannelVariables
+integer                         :: iMultichannelVariable, iChannel, iVariable, iObs
+integer(c_int)                  :: VarFlags(NumObs)
+character(len=*), parameter     :: RoutineName = "opsinputs_varobswriter_findchannelspassingqc"
 
 ! Body:
 NumChannels = size(Channels)
@@ -1157,49 +1170,6 @@ if (NumMultichannelVariables > 0) then
 end if
 
 end subroutine opsinputs_varobswriter_findchannelspassingqc
-
-! ------------------------------------------------------------------------------
-
-!> Populate the Ob % CorBriTemp field.
-subroutine opsinputs_varobswriter_fillcorbritemp(Ob, ObsSpace, Channels)
-implicit none
-! Subroutine arguments:
-type(OB_type), intent(inout)             :: Ob
-type(c_ptr), value, intent(in)           :: ObsSpace
-integer(c_int), intent(in)               :: Channels(:)
-
-! Local declarations:
-type(ElementHeader_type)                 :: CorBriTempBiasHeader
-real(kind=8), pointer                    :: CorBriTempBias(:,:)
-character(len=*), parameter              :: RoutineName = "opsinputs_varobswriter_fillcorbritemp"
-character(len=256)                       :: ErrorMessage
-
-! Body:
-
-CorBriTempBias => null()
-
-! Retrieve the uncorrected brightness temperature...
-call opsinputs_fill_fillreal2d( &
-  Ob % Header % CorBriTemp, "CorBriTemp", Ob % Header % NumObsLocal, Ob % CorBriTemp, &
-  ObsSpace, Channels, "brightness_temperature", "ObsValue")
-
-! ... and correct it by subtracting the bias.
-if (Ob % Header % CorBriTemp % Present) then
-  call opsinputs_fill_fillreal2d( &
-    CorBriTempBiasHeader, "CorBriTemp", Ob % Header % NumObsLocal, CorBriTempBias, &
-    ObsSpace, Channels, "brightness_temperature", "ObsBias")
-  if (CorBriTempBiasHeader % Present) then
-    where (Ob % CorBriTemp /= RMDI .and. CorBriTempBias /= RMDI)
-      Ob % CorBriTemp = Ob % CorBriTemp - CorBriTempBias
-    end where
-  else
-    write (ErrorMessage, '(A)') "Warning: variable brightness_temperature*@ObsBias not found"
-    call gen_warn(RoutineName, ErrorMessage)
-  end if
-end if ! brightness_temperature@ObsValue not present? OPS will produce a warning
-       ! -- we don't need to duplicate it.
-
-end subroutine opsinputs_varobswriter_fillcorbritemp
 
 ! ------------------------------------------------------------------------------
 

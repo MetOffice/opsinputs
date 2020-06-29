@@ -42,6 +42,12 @@ class LocalEnvironment;
 ///
 /// Most of the implementation is in Fortran (opsinputs_varobswriter_mod.F90).
 ///
+/// \note This filter must only be used with ObsSpaces using the \c MPI_COMM_WORLD communicator,
+/// otherwise a deadlock will occur while writing the VarObs file. This is due to a limitation of
+/// the \c Ops_WriteVarobs function, which could be removed by replacing \c mpl_comm_world in the
+/// call to \c Ops_Mpl_Gatherv by \c mpi_group (for consistency with all other MPI calls in \c
+/// Ops_WriteVarobs).
+///
 /// \see VarObsWriterParameters for the list of accepted configuration parameters.
 class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
  public:
