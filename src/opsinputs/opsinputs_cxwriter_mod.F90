@@ -88,6 +88,10 @@ use opsinputs_cxgenerate_mod, only: &
 use OpsMod_DateTime, only: &
     DateTime_type,         &
     OpsFn_DateTime_now
+use OpsMod_Kinds, only: &
+    integer64,          &
+    logical64,          &
+    real64
 use OpsMod_MiscTypes, only: ElementHeader_Type
 use OpsMod_ModelColumnIO, only: &
     Ops_WriteOutVarCx,      &
@@ -114,36 +118,36 @@ private
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_cxwriter
 private
-  integer(kind=8) :: ObsGroup
-  type(datetime)  :: ValidityTime  ! Corresponds to OPS validity time
+  integer(integer64)         :: ObsGroup
+  type(datetime)             :: ValidityTime  ! Corresponds to OPS validity time
 
-  logical         :: RejectObsWithAnyVariableFailingQC
-  logical         :: RejectObsWithAllVariablesFailingQC
+  logical                    :: RejectObsWithAnyVariableFailingQC
+  logical                    :: RejectObsWithAllVariablesFailingQC
 
-  integer(kind=8) :: FH_VertCoord
-  integer(kind=8) :: FH_HorizGrid
-  integer(kind=8) :: FH_GridStagger
-  integer(kind=8) :: FH_ObsFileType
-  integer(kind=8) :: FH_ModelVersion
+  integer(integer64)         :: FH_VertCoord
+  integer(integer64)         :: FH_HorizGrid
+  integer(integer64)         :: FH_GridStagger
+  integer(integer64)         :: FH_ObsFileType
+  integer(integer64)         :: FH_ModelVersion
 
-  integer(kind=8) :: IC_XLen
-  integer(kind=8) :: IC_YLen
-  integer(kind=8) :: IC_PLevels
-  integer(kind=8) :: IC_WetLevels
-  integer(kind=8) :: IC_FirstConstantRhoLevel
+  integer(integer64)         :: IC_XLen
+  integer(integer64)         :: IC_YLen
+  integer(integer64)         :: IC_PLevels
+  integer(integer64)         :: IC_WetLevels
+  integer(integer64)         :: IC_FirstConstantRhoLevel
 
-  real(kind=8)    :: RC_LongSpacing
-  real(kind=8)    :: RC_LatSpacing
-  real(kind=8)    :: RC_FirstLat
-  real(kind=8)    :: RC_FirstLong
-  real(kind=8)    :: RC_PoleLat
-  real(kind=8)    :: RC_PoleLong
+  real(real64)               :: RC_LongSpacing
+  real(real64)               :: RC_LatSpacing
+  real(real64)               :: RC_FirstLat
+  real(real64)               :: RC_FirstLong
+  real(real64)               :: RC_PoleLat
+  real(real64)               :: RC_PoleLong
 
-  integer(kind=8) :: TimeIndicator
-  integer(kind=8) :: ForecastPeriod
+  integer(integer64)         :: TimeIndicator
+  integer(integer64)         :: ForecastPeriod
 
-  real(kind=8), allocatable :: EtaTheta(:)
-  real(kind=8), allocatable :: EtaRho(:)
+  real(real64), allocatable  :: EtaTheta(:)
+  real(real64), allocatable  :: EtaRho(:)
 
   type(ufo_geovals), pointer :: GeoVals
 end type opsinputs_cxwriter
@@ -157,20 +161,19 @@ function opsinputs_cxwriter_create(self, f_conf, geovars)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(inout)    :: self
-type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
-type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the CxWriter.
-logical                                    :: opsinputs_cxwriter_create
+type(opsinputs_cxwriter), intent(inout) :: self
+type(fckit_configuration), intent(in)   :: f_conf  ! Configuration
+type(oops_variables), intent(inout)     :: geovars ! GeoVaLs required by the CxWriter.
+logical                                 :: opsinputs_cxwriter_create
 
 ! Local declarations:
-character(len=:), allocatable              :: string
-integer                                    :: int
-logical                                    :: bool
-real(kind=c_double)                        :: double
-logical                                    :: found
+character(len=:), allocatable           :: string
+integer                                 :: int
+logical                                 :: bool
+real(kind=c_double)                     :: double
 
-character(len=*), parameter :: RoutineName = "opsinputs_cxwriter_create"
-character(len=200)          :: ErrorMessage
+character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_create"
+character(len=200)                      :: ErrorMessage
 
 ! Body:
 
@@ -501,7 +504,7 @@ type(c_ptr), value, intent(in)       :: ObsSpace
 type(c_ptr), value, intent(in)       :: Flags
 
 ! Local declarations:
-integer(kind=8)                      :: NumObsLocal
+integer(integer64)                   :: NumObsLocal
 
 ! Body:
 
@@ -523,17 +526,17 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
-integer(kind=8)                :: NumObsLocal
-type(c_ptr), value, intent(in) :: ObsSpace
-type(c_ptr), value, intent(in) :: Flags
+integer(integer64)                   :: NumObsLocal
+type(c_ptr), value, intent(in)       :: ObsSpace
+type(c_ptr), value, intent(in)       :: Flags
 
 ! Local declarations:
-type(OB_type)                  :: Ob
-type(CX_type)                  :: Cx
-type(UM_header_type)           :: UMHeader
-integer(kind=8)                :: NumObsOnEachRank(nproc)
-logical(kind=8)                :: Retained(NumObsLocal)
-integer(kind=gc_int_kind)      :: istat
+type(OB_type)                        :: Ob
+type(CX_type)                        :: Cx
+type(UM_header_type)                 :: UMHeader
+integer(integer64)                   :: NumObsOnEachRank(nproc)
+logical(logical64)                   :: Retained(NumObsLocal)
+integer(kind=gc_int_kind)            :: istat
 
 ! Body:
 
@@ -565,11 +568,11 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
-type(oops_variables), intent(inout) :: geovars
+type(oops_variables), intent(inout)  :: geovars
 
 ! Local declarations:
-integer(kind=8)                     :: CxFields(MaxModelCodes) ! MaxModelCodes)
-integer                             :: i
+integer(integer64)                   :: CxFields(MaxModelCodes) ! MaxModelCodes)
+integer                              :: i
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
@@ -601,7 +604,7 @@ implicit none
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
 type(c_ptr), value, intent(in)       :: ObsSpace
-integer(kind=8), intent(in)          :: NumObsLocal
+integer(integer64), intent(in)       :: NumObsLocal
 type(OB_type), intent(inout)         :: Ob
 
 ! Local declarations:
@@ -710,7 +713,7 @@ type(CX_type), intent(inout)            :: Cx
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_populatecx"
 character(len=80)                       :: ErrorMessage
 
-integer(kind=8)                         :: CxFields(MaxModelCodes)
+integer(integer64)                      :: CxFields(MaxModelCodes)
 integer                                 :: nCxFields
 integer                                 :: iCxField
 
@@ -748,12 +751,12 @@ subroutine opsinputs_cxwriter_populateumheader(self, UMHeader)
 implicit none
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
-type(UM_header_type), intent(inout) :: UmHeader
+type(UM_header_type), intent(inout)  :: UmHeader
 
 ! Local declarations:
-integer                             :: NumLevels
-integer(c_int)                      :: year, month, day, hour, minute, second
-TYPE (DateTime_type)                :: now
+integer                              :: NumLevels
+integer(c_int)                       :: year, month, day, hour, minute, second
+TYPE (DateTime_type)                 :: now
 
 ! Body:
 
@@ -854,17 +857,17 @@ function opsinputs_cxwriter_retainflag( &
 implicit none
 
 ! Function arguments:
-integer(kind=8), intent(in)         :: NumObsLocal
-type(c_ptr), value, intent(in)      :: ObsSpace
-type(c_ptr), value, intent(in)      :: Flags
-logical                             :: RejectObsWithAnyVariableFailingQC
-logical                             :: RejectObsWithAllVariablesFailingQC
+integer(integer64), intent(in) :: NumObsLocal
+type(c_ptr), value, intent(in) :: ObsSpace
+type(c_ptr), value, intent(in) :: Flags
+logical                        :: RejectObsWithAnyVariableFailingQC
+logical                        :: RejectObsWithAllVariablesFailingQC
 
 ! Return value:
-logical(kind=8)                     :: opsinputs_cxwriter_retainflag(NumObsLocal)
+logical(logical64)             :: opsinputs_cxwriter_retainflag(NumObsLocal)
 
 ! Local declarations:
-integer(kind=8)                     :: ReportFlags(NumObsLocal)
+integer(integer64)             :: ReportFlags(NumObsLocal)
 
 ! Body
 

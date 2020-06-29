@@ -36,6 +36,10 @@ use GenMod_Core, only: &
     gen_fail
 
 use OpsMod_Constants, only: PPF ! PGE packing factor
+use OpsMod_Kinds, only: &
+    integer64,          &
+    logical64,          &
+    real64
 use OpsMod_MiscTypes, only: &
     Coord_Type,             &
     Element_Type,           &
@@ -92,7 +96,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
@@ -196,7 +200,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
@@ -234,7 +238,7 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
 
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI:
@@ -313,7 +317,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediValueVarName
@@ -407,7 +411,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
@@ -449,7 +453,7 @@ end if
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 num_levels = int(size(JediValueVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediValueVarNamesWithChannels), kind=integer64))
 
   do iChannel = 1, size(JediValueVarNamesWithChannels)
     ! Retrieve data from JEDI:
@@ -513,8 +517,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real1(:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
@@ -574,8 +578,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real2(:,:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
@@ -596,7 +600,7 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
   print *, "size(Real2): ", size(Real2,1), " ", size(Real2,2)
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
@@ -641,8 +645,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real1(:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real1(:)
 type(ufo_geovals), intent(in)                   :: GeoVals
 character(len=*), intent(in)                    :: JediVarName
 
@@ -703,8 +707,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-real(kind=8), pointer                           :: Real2(:,:)
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real2(:,:)
 character(len=*), intent(in)                    :: JediVarName
 type(ufo_geovals), intent(in)                   :: GeoVals
 
@@ -757,8 +761,8 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
-integer(kind=8), pointer                        :: Int1(:)
+integer(integer64), intent(in)                  :: NumObs
+integer(integer64), pointer                     :: Int1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
@@ -817,7 +821,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
-integer(kind=8), intent(in)                     :: NumObs
+integer(integer64), intent(in)                  :: NumObs
 type(coord_type), pointer                       :: Coord2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
@@ -839,7 +843,7 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Coord2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=8))
+                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
 
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI

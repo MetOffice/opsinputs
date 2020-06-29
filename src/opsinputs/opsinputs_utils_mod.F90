@@ -13,6 +13,10 @@ use obsspace_mod
 use ufo_vars_mod, only: MAXVARLEN
 use opsinputs_obsdatavector_mod
 
+use OpsMod_Kinds, only: &
+    integer64,          &
+    logical64,          &
+    real64
 use OpsMod_ObsInfo, only: FinalRejectReport
 
 implicit none
@@ -43,7 +47,7 @@ implicit none
 type(c_ptr), value, intent(in)           :: ObsSpace, Flags
 logical, intent(in)                      :: RejectObsWithAnyVariableFailingQC
 logical, intent(in)                      :: RejectObsWithAllVariablesFailingQC
-integer(kind=8), intent(out)             :: ReportFlags(:)
+integer(kind=integer64), intent(out)     :: ReportFlags(:)
 
 ! Local declarations:
 type(oops_variables)                     :: ObsVariables
