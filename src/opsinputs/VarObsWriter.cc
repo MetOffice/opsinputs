@@ -108,7 +108,7 @@ void VarObsWriter::createOutputDirectory() {
   ASSERT_MSG(outputDirectory != nullptr, "The output directory has not been set");
   eckit::PathName outputPath(outputDirectory);
   ASSERT_MSG(!outputPath.exists() || outputPath.isDir(),
-             "The output path '" + std::string(outputDirectory) + "'is not a directory");
+             "The output path '" + std::string(outputDirectory) + "' is not a directory");
   outputPath.mkdir();
 }
 
