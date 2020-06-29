@@ -26,12 +26,11 @@ function(CREATE_SYMLINKS src dst)
 endfunction()
 
 # Syntax: ADD_WRITER_TEST( NAME <name> YAML <yaml> [NAMELIST <namelist>]
-#                          [DATA <data>...] [MPI <num_tasks>] )
+#                          [DATA <data>...] [MPI <num_tasks>] [DONT_SET_OPS_OUTPUT_DIR] )
 #
 # Defines a VarObsWriter or CxWriter test.
 #
 # Arguments:
-# - writer: Filter to test (varobswriter or cxwriter).
 # - name: Test name (will be prefixed by "test_opsvalues_").
 # - yaml: path to the test's input YAML file, relative to the testinput subfolder.
 # - namelist: path to the test's input namelist file, relative to the testinput subfolder. May be
@@ -43,8 +42,11 @@ endfunction()
 #   folder.
 # - num_tasks: Number of MPI tasks to spawn when running the test. If the MPI option is not present,
 #   the test will be run without MPI.
+# Options:
+# - DONT_SET_OPS_OUTPUT_DIR_ENV_VAR: if set, OPS environment variables specifying output folders
+#   won't be defined, so the output folder needs to be defined in the YAML file.
 function( ADD_WRITER_TEST )
-  set( options DONT_SET_OPS_VAROB_OUTPUT_DIR)
+  set( options DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
   set( single_value_args NAME YAML NAMELIST MPI )
   set( multi_value_args DATA)
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
@@ -57,20 +59,19 @@ function( ADD_WRITER_TEST )
   list( APPEND opsinputs_test_input ${_PAR_NAMELIST} )
   set ( opsinputs_test_input ${opsinputs_test_input} PARENT_SCOPE )
   list( APPEND opsinputs_test_data ${_PAR_DATA})
-  set ( opsinputs_test_data ${opsinputs_test_data} PARENT_SCOPE )
+  set( opsinputs_test_data ${opsinputs_test_data} PARENT_SCOPE )
 
   set( environment
-         OOPS_TRAPFPE=1
-         LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-         OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
-         OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
-         OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR})
-  if (NOT ${_PAR_DONT_SET_OPS_VAROB_OUTPUT_DIR})
-    list (APPEND environment
-      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_varobswriter_${_PAR_NAME})
+       OOPS_TRAPFPE=1
+       LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
+       OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR} )
+  if ( NOT ${_PAR_DONT_SET_OPS_OUTPUT_DIR_ENV_VAR} )
+    list ( APPEND environment
+      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
+      OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME} )
   endif()
 
-  if (_PAR_MPI)
+  if ( _PAR_MPI )
     ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
                       COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
                       ARGS    "testinput/${_PAR_YAML}"
@@ -222,10 +223,10 @@ ADD_WRITER_TEST(NAME     varobswriter_RealConstants
 ADD_WRITER_TEST(NAME     varobswriter_reject_obs_with_all_variables_failing_qc
                 YAML     varobswriter_reject_obs_with_all_variables_failing_qc.yaml
                 DATA     reject_obs_with_all_variables_failing_qc.nc4)
-ADD_WRITER_TEST(NAME     nested_output_directory
-                YAML     nested_output_directory.yaml
-                DATA   028_VarField_satid.nc4
-                DONT_SET_OPS_VAROB_OUTPUT_DIR)
+ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
+                YAML     varobswriter_nested_output_directory.yaml
+                DATA     028_VarField_satid.nc4
+                DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 ### CxWriter tests
 
@@ -281,7 +282,17 @@ ADD_WRITER_TEST(NAME     cxwriter_000004_StashItem_theta_MPI_4
                 YAML     000004_StashItem_theta_MPI_4.yaml
                 DATA     000004_StashItem_theta.nc4)
 
-# Tests of auxiliary classes
+# Tests of other options
+ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
+                YAML     cxwriter_reject_obs_with_all_variables_failing_qc.yaml
+                DATA     reject_obs_with_all_variables_failing_qc.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
+                YAML     cxwriter_nested_output_directory.yaml
+                DATA     000004_StashItem_theta.nc4
+                DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
+
+### Tests of auxiliary classes
+
 list( APPEND opsinputs_test_input empty.yaml )
 ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
                   SOURCES mains/TestMPIExceptionSynchronizer.cc
@@ -289,6 +300,8 @@ ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
                   ENVIRONMENT OOPS_TRAPFPE=1
                   MPI     4
                   LIBS    opsinputs)
+
+### Final things to do
 
 # Create symlinks to test inputs and data files
 CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/testinput ${opsinputs_test_input} )

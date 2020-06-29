@@ -6,27 +6,31 @@ Observations:
   - ObsSpace:
       name: AMSUB
       ObsDataIn:
-        obsfile: Data/028_VarField_satid.nc4
+        obsfile: Data/019_VarField_satzenith.nc4
       simulate:
         variables: [dummy]
+    GeoVaLs:
+      filename: Data/000004_StashItem_theta.nc4
     ObsFilters:
-    - Filter: VarObs Writer
-      output_directory: testoutput/nested/path
+    - Filter: Cx Writer
+      output_directory: testoutput/nested/path/cx
+      general_mode: debug
+      IC_PLevels: 5
       RC_LongSpacing: 0.10
       RC_LatSpacing: 0.20
       RC_FirstLat: 1.50
       RC_FirstLong: 2.50
       RC_PoleLat: 3.50
       RC_PoleLong: 4.50
-    - Filter: VarObs Checker
-      output_directory: testoutput/nested/path
+    - Filter: Cx Checker
+      output_directory: testoutput/nested/path/cx
       expected_header_fields:
-        Longitude spacing: "0.10"
-        Latitude spacing: "0.20"
-        First latitude: "1.50"
-        First longitude: "2.50"
-        Pole latitude: "3.50"
-        Pole longitude: "4.50"
+        EW grid spacing (degrees): "0.1000"
+        NS grid spacing (degrees): "0.2000"
+        First latitude: "1.5000"
+        First longitude: "2.5000"
+        North pole latitude (degrees): "3.5000"
+        North pole longitude (degrees): "4.5000"
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
