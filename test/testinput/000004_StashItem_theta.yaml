@@ -27,6 +27,8 @@ Observations:
       general_mode: debug
       IC_PLevels: 5
     - Filter: Cx Checker
+      expected_surface_variables: []
+      expected_upper_air_variables: ["1"] # IndexCxtheta
       expected_main_table_columns:
       - # batch 1
         - ["1.10", "1.20", "1.30"]       # column 1

@@ -78,6 +78,8 @@ class CxChecker : public util::Printable, private util::ObjectCounter<CxChecker>
   void checkHeader(const std::map<std::string, std::string> &headerFields) const;
   void checkLevelDependentConstants(const std::vector<std::string> &etaThetaLevels,
                                     const std::vector<std::string> &etaRhoLevels) const;
+  void checkVariables(const std::vector<std::string> &surfaceVariables,
+                      const std::vector<std::string> &upperAirVariables) const;
   void checkLookup(
       const std::vector<std::map<std::string, std::string>> &lookupFields) const;
   void checkMainTable(

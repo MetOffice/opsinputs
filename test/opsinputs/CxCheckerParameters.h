@@ -40,6 +40,14 @@ class CxCheckerParameters : public oops::Parameters {
   oops::OptionalParameter<std::vector<std::string>> expectedEtaRhoLevels{
     "expected_eta_rho_levels", this};
 
+  /// Expected surface variable indices (corresponding to constants from OpsMod_CXIndices.
+  oops::OptionalParameter<std::vector<std::string>> expectedSurfaceVariables{
+    "expected_surface_variables", this};
+
+  /// Expected upper-air variable indices (corresponding to constants from OpsMod_CXIndices.
+  oops::OptionalParameter<std::vector<std::string>> expectedUpperAirVariables{
+    "expected_upper_air_variables", this};
+
   /// Expected values of lookup table fields.
   oops::Parameter<std::map<std::string, std::string>> expectedLookupFields{
     "expected_lookup_fields", {}, this};

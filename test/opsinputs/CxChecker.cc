@@ -38,6 +38,12 @@ struct CxChecker::PrintCxFileOutput {
   std::map<std::string, std::string> headerFields;
   std::vector<std::string> etaThetaLevels;
   std::vector<std::string> etaRhoLevels;
+  /// Indices of surface variables present in the file, corresponding to constants defined in
+  /// OpsMod_CXIndexes.
+  std::vector<std::string> surfaceVariables;
+  /// Indices of upper-air variables present in the file, corresponding to constants defined in
+  /// OpsMod_CXIndexes.
+  std::vector<std::string> upperAirVariables;
   /// Element i stores elements of the lookup table for batch (i + 1), as a map of field names
   /// to values.
   std::vector<std::map<std::string, std::string>> lookupFields;
@@ -59,6 +65,8 @@ CxChecker::CxChecker(ioda::ObsSpace & obsdb, const eckit::Configuration & config
   ASSERT_MSG(!parameters_.expectedHeaderFields.value().empty() ||
              parameters_.expectedEtaThetaLevels.value() != boost::none ||
              parameters_.expectedEtaRhoLevels.value() != boost::none ||
+             parameters_.expectedSurfaceVariables.value() != boost::none ||
+             parameters_.expectedUpperAirVariables.value() != boost::none ||
              !parameters_.expectedLookupFields.value().empty() ||
              parameters_.expectedMainTableColumns.value() != boost::none,
              "No Cx file components to check have been specified");
@@ -82,6 +90,7 @@ void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &)
   PrintCxFileOutput output = parsePrintCxFileOutput(printCxFileOutput);
 
   checkHeader(output.headerFields);
+  checkVariables(output.surfaceVariables, output.upperAirVariables);
   checkLevelDependentConstants(output.etaThetaLevels, output.etaRhoLevels);
   checkLookup(output.lookupFields);
   checkMainTable(output.mainTable);
@@ -103,6 +112,8 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
     InEtaThetaLevels,
     InEtaRhoLevels,
     InColumnDependentConstants,
+    InSurfaceVariablesPresent,
+    InUpperAirVariablesPresent,
     InLookup,
     InMainTable
   };
@@ -138,8 +149,20 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
       section = InLevelDependentConstants;
       break;
     case InColumnDependentConstants:
+      if (line == "Surface variables present:")
+        section = InSurfaceVariablesPresent;
+      break;
+    case InSurfaceVariablesPresent:
+      if (line == "Upper-air variables present:")
+        section = InUpperAirVariablesPresent;
+      else if (startsWith(line, " Variable"))
+        output.surfaceVariables.push_back(boost::algorithm::trim_copy(line.substr(10, 5)));
+      break;
+    case InUpperAirVariablesPresent:
       if (line == "Lookup:")
         section = InLookup;
+      else if (startsWith(line, " Variable"))
+        output.upperAirVariables.push_back(boost::algorithm::trim_copy(line.substr(10, 5)));
       break;
     case InLookup:
       if (startsWith(line, "Batch number ")) {
@@ -180,6 +203,28 @@ void CxChecker::checkHeader(const std::map<std::string, std::string> &headerFiel
       std::stringstream str;
       str << "Header field '" << expectedNameAndValue.first << "':\n  received: " << value
           << "\n  expected: " << expectedNameAndValue.second;
+      throw std::runtime_error(str.str());
+    }
+  }
+}
+
+void CxChecker::checkVariables(const std::vector<std::string> &surfaceVariables,
+                               const std::vector<std::string> &upperAirVariables) const {
+  if (parameters_.expectedSurfaceVariables.value() != boost::none) {
+    const std::vector<std::string> &expectedValue = *parameters_.expectedSurfaceVariables.value();
+    if (surfaceVariables != expectedValue) {
+      std::stringstream str;
+      str << "Surface variables:\n  received: " << surfaceVariables
+          << "\n  expected: " << expectedValue;
+      throw std::runtime_error(str.str());
+    }
+  }
+  if (parameters_.expectedUpperAirVariables.value() != boost::none) {
+    const std::vector<std::string> &expectedValue = *parameters_.expectedUpperAirVariables.value();
+    if (upperAirVariables != expectedValue) {
+      std::stringstream str;
+      str << "Upper-air variables:\n  received: " << upperAirVariables
+          << "\n  expected: " << expectedValue;
       throw std::runtime_error(str.str());
     }
   }
