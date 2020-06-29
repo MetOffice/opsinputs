@@ -4,6 +4,7 @@
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 list( APPEND opsinputs_src_files
+    opsinputs_cxfields_mod.F90
     opsinputs_fill_mod.F90
     opsinputs_obsspace_f.cc
     opsinputs_obsspace_f.h
