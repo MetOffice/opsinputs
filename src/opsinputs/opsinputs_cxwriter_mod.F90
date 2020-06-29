@@ -69,6 +69,7 @@ use GenMod_CLookAdd, only: &
     LBSECD,                &
     LBTIM,                 &
     LBFT
+use OpsMod_Ancil
 use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
@@ -83,7 +84,7 @@ use OpsMod_CXInfo, only: &
     CXheader_type, &
     CX_type
 use opsinputs_cxgenerate_mod, only: &
-    MaxModelCodes,                 &
+    MaxModelCodes,                  &
     Ops_ReadCXControlNL
 use OpsMod_DateTime, only: &
     DateTime_type,         &
@@ -94,12 +95,13 @@ use OpsMod_Kinds, only: &
     real64
 use OpsMod_MiscTypes, only: ElementHeader_Type
 use OpsMod_ModelColumnIO, only: &
-    Ops_WriteOutVarCx,      &
+    Ops_WriteOutVarCx,          &
     Ops_WriteOutVarCx1pe
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
     ObsGroupGPSRO,             &
+    ObsGroupGroundLidar,       &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind
@@ -733,27 +735,416 @@ call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_cal
 do iCxField = 1, size(CxFields)
   select case (CxFields(iCxField))
 
-  ! Surface variables
-  case (StashItem_modelsurface)         ! IndexCxmodelsurface
-    ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
-    ! here and in opsinputs_cxwriter_addrequiredgeovars.
-    call opsinputs_fill_fillrealfromgeoval( &
-      Cx % Header % ModelSurface, "ModelSurface", Cx % Header % NumLocal, Cx % ModelSurface, &
-      self % GeoVals, "land_type_index")
+    ! Surface variables
 
-  ! Upper-air variables
-  case (StashItem_theta)                ! IndexCxtheta = 1
-    call opsinputs_fill_fillreal2dfromgeoval( &
-      Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
-      self % GeoVals, "air_potential_temperature")
-  case (StashItem_u)                    ! IndexCxu = 3
-    call opsinputs_fill_fillreal2dfromgeoval( &
-      Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
-      self % GeoVals, "eastward_wind")
-  case (StashItem_v)                    ! IndexCxv = 4
-    call opsinputs_fill_fillreal2dfromgeoval( &
-      Cx % Header % v, "v", Cx % Header % NumLocal, Cx % v, &
-      self % GeoVals, "northward_wind")
+    case (StashItem_Orog) ! IndexCxorog
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % Orog, "Orog", Cx % Header % NumLocal, Cx % Orog, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_Pstar, StashItem_P_surface) ! IndexCxpstar
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % pstar, "pstar", Cx % Header % NumLocal, Cx % pstar, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_t2) ! IndexCxt2
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % t2, "t2", Cx % Header % NumLocal, Cx % t2, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_rh2) ! IndexCxrh2
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % rh2, "rh2", Cx % Header % NumLocal, Cx % rh2, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_u10, StashCode_U10_B_grid) ! IndexCxu10
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % u10, "u10", Cx % Header % NumLocal, Cx % u10, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_v10, StashCode_V10_B_grid) ! IndexCxv10
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % v10, "v10", Cx % Header % NumLocal, Cx % v10, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_modelsurface)         ! IndexCxmodelsurface
+      ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
+      ! here and in opsinputs_cxwriter_addrequiredgeovars.
+      call opsinputs_fill_fillrealfromgeoval( &
+        Cx % Header % ModelSurface, "ModelSurface", Cx % Header % NumLocal, Cx % ModelSurface, &
+        self % GeoVals, "land_type_index")
+    case (StashCode_vis) ! IndexCxvis
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % vis, "vis", Cx % Header % NumLocal, Cx % vis, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_WAVE_HGHT) ! IndexCxWAVE_HGHT
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % WAVE_HGHT, "WAVE_HGHT", Cx % Header % NumLocal, Cx % WAVE_HGHT, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_WIND_SPED) ! IndexCxWIND_SPED
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % WIND_SPED, "WIND_SPED", Cx % Header % NumLocal, Cx % WIND_SPED, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (AncilCode_SeaHeight) ! IndexCxSeaHeight
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SeaHeight, "SeaHeight", Cx % Header % NumLocal, Cx % SeaHeight, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_SST) ! IndexCxTskinSea
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % TskinSea, "TskinSea", Cx % Header % NumLocal, Cx % TskinSea, &
+      !   self % GeoVals, "PLACEHOLDER")
+    ! wsmigaj: I haven't been able to identify the stash code associated with this field
+    ! case (?) ! IndexCxTropPres
+      !  call opsinputs_fill_fillrealfromgeoval( &
+      !    Cx % Header % TropPres, "TropPres", Cx % Header % NumLocal, Cx % TropPres, &
+      !    self % GeoVals, "PLACEHOLDER")
+    case (StashCode_pmsl) ! IndexCxpmsl
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % pmsl, "pmsl", Cx % Header % NumLocal, Cx % pmsl, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_SeaIce) ! IndexCxSeaIce
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SeaIce, "SeaIce", Cx % Header % NumLocal, Cx % SeaIce, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_SnowAmount) ! IndexCxSnowAmount
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SnowAmount, "SnowAmount", Cx % Header % NumLocal, Cx % SnowAmount, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_qt2) ! IndexCxqt2
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % qt2, "qt2", Cx % Header % NumLocal, Cx % qt2, &
+      !   self % GeoVals, "PLACEHOLDER")
+    ! wsmigaj: I haven't been able to identify the stash code associated with this field
+    ! case (?) ! IndexCxaerosol
+      !  if (Cx % Header % ObsGroup == ObsGroupSurface) then
+      !    call opsinputs_fill_fillrealfromgeoval( &
+      !      Cx % Header % aerosol, "aerosol", Cx % Header % NumLocal, Cx % aerosol, &
+      !      self % GeoVals, "PLACEHOLDER")
+      !  end if
+    case (StashCode_PsurfParamA) ! IndexCxPsurfParamA
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % PSurfParamA, "PSurfParamA", Cx % Header % NumLocal, Cx % PSurfParamA, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_PSurfParamB) ! IndexCxPSurfParamB
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % PSurfParamB, "PSurfParamB", Cx % Header % NumLocal, Cx % PSurfParamB, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_LapseRate) ! IndexCxLapseRate
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % LapseRate, "LapseRate", Cx % Header % NumLocal, Cx % LapseRate, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_CloudAmount) ! IndexCxCloudAmount
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % CloudAmount, "CloudAmount", Cx % Header % NumLocal, Cx % CloudAmount, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_ConvCloudAmount) ! IndexCxConvCloudAmount
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % ConvCloudAmount, "ConvCloudAmount", Cx % Header % NumLocal, Cx % ConvCloudAmount, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_ConvCloudBase) ! IndexCxConvCloudBaseLevel
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % ConvCloudBaseLevel, "ConvCloudBaseLevel", Cx % Header % NumLocal, Cx % ConvCloudBaseLevel, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_ConvCloudTop) ! IndexCxConvCloudTopLevel
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % ConvCloudTopLevel, "ConvCloudTopLevel", Cx % Header % NumLocal, Cx % ConvCloudTopLevel, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SurfRainRate_conv) ! IndexCxSurfRainRate_conv
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SurfRainRate_conv, "SurfRainRate_conv", Cx % Header % NumLocal, Cx % SurfRainRate_conv, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SurfSnowRate_conv) ! IndexCxSurfSnowRate_conv
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SurfSnowRate_conv, "SurfSnowRate_conv", Cx % Header % NumLocal, Cx % SurfSnowRate_conv, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (AncilCode_SeaSrfcHeight) ! IndexCxSeaSrfcHeight
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SeaSrfcHeight, "SeaSrfcHeight", Cx % Header % NumLocal, Cx % SeaSrfcHeight, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (AncilCode_MeanSeaHeight) ! IndexCxMeanSeaHeight
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % MeanSeaHeight, "MeanSeaHeight", Cx % Header % NumLocal, Cx % MeanSeaHeight, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SurfRainRate_LS) ! IndexCxSurfRainRate_LS
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SurfRainRate_LS, "SurfRainRate_LS", Cx % Header % NumLocal, Cx % SurfRainRate_LS, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SurfSnowRate_LS) ! IndexCxSurfSnowRate_LS
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SurfSnowRate_LS, "SurfSnowRate_LS", Cx % Header % NumLocal, Cx % SurfSnowRate_LS, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SWradiation) ! IndexCxSWradiation
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SWradiation, "SWradiation", Cx % Header % NumLocal, Cx % SWradiation, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_BLheight) ! IndexCxBLheight
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % BLheight, "BLheight", Cx % Header % NumLocal, Cx % BLheight, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_ObukhovLength) ! IndexCxObukhovLength
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % ObukhovLength, "ObukhovLength", Cx % Header % NumLocal, Cx % ObukhovLength, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_FrictionVel) ! IndexCxFrictionVel
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % FrictionVel, "FrictionVel", Cx % Header % NumLocal, Cx % FrictionVel, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_PrecipAcc6hr) ! IndexCxPrecipAcc6hr
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % PrecipAcc6hr, "PrecipAcc6hr", Cx % Header % NumLocal, Cx % PrecipAcc6hr, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_LowCloudAmount) ! IndexCxLowCloudAmount
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % LowCloudAmount, "LowCloudAmount", Cx % Header % NumLocal, Cx % LowCloudAmount, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_MedCloudAmount) ! IndexCxMedCloudAmount
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % MedCloudAmount, "MedCloudAmount", Cx % Header % NumLocal, Cx % MedCloudAmount, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_LowCloudBase, StashCode_2p5CloudBase) ! IndexCxLowCloudBase
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % LowCloudBase, "LowCloudBase", Cx % Header % NumLocal, Cx % LowCloudBase, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SO2_AQ) ! IndexCxSO2_AQ
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % SO2_AQ, "SO2_AQ", Cx % Header % NumLocal, Cx % SO2_AQ, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_PM10_AQ) ! IndexCxPM10_AQ
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % PM10_AQ, "PM10_AQ", Cx % Header % NumLocal, Cx % PM10_AQ, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_PM2p5_AQ) ! IndexCxPM2p5_AQ
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % PM2p5_AQ, "PM2p5_AQ", Cx % Header % NumLocal, Cx % PM2p5_AQ, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_O3_AQ) ! IndexCxO3_AQ
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % O3_AQ, "O3_AQ", Cx % Header % NumLocal, Cx % O3_AQ, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_NO2_AQ) ! IndexCxNO2_AQ
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % NO2_AQ, "NO2_AQ", Cx % Header % NumLocal, Cx % NO2_AQ, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_CO_AQ) ! IndexCxCO_AQ
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % CO_AQ, "CO_AQ", Cx % Header % NumLocal, Cx % CO_AQ, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_BLtype) ! IndexCxBLtype
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillrealfromgeoval( &
+      !   Cx % Header % BLtype, "BLtype", Cx % Header % NumLocal, Cx % BLtype, &
+      !   self % GeoVals, "PLACEHOLDER")
+
+    ! Upper-air variables
+    case (StashItem_theta) ! IndexCxtheta
+      call opsinputs_fill_fillreal2dfromgeoval( &
+        Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
+        self % GeoVals, "air_potential_temperature")
+    case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
+      call opsinputs_fill_fillreal2dfromgeoval( &
+        Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
+        self % GeoVals, "eastward_wind")
+    case (StashItem_v) ! IndexCxv
+      call opsinputs_fill_fillreal2dfromgeoval( &
+        Cx % Header % v, "v", Cx % Header % NumLocal, Cx % v, &
+        self % GeoVals, "northward_wind")
+    case (StashItem_w) ! IndexCxw
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % w, "w", Cx % Header % NumLocal, Cx % w, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_q) ! IndexCxq
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % q, "q", Cx % Header % NumLocal, Cx % q, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_qc) ! IndexCxqc
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % qc, "qc", Cx % Header % NumLocal, Cx % qc, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_p_bar) ! IndexCxp_bar
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % p_bar, "p_bar", Cx % Header % NumLocal, Cx % p_bar, &
+      !   self % GeoVals, "PLACEHOLDER")
+    ! wsmigaj: I haven't been able to identify the stash code associated with this field
+    ! case (?) ! IndexCxcloud
+      !  call opsinputs_fill_fillreal2dfromgeoval( &
+      !    Cx % Header % cloud, "cloud", Cx % Header % NumLocal, Cx % cloud, &
+      !    self % GeoVals, "PLACEHOLDER")
+    case (StashCode_ql_layer) ! IndexCxql_layer
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % ql_layer, "ql_layer", Cx % Header % NumLocal, Cx % ql_layer, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_p) ! IndexCxP
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % PLevelsA, "PLevelsA", Cx % Header % NumLocal, Cx % PLevelsA, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (AncilCode_salt) ! IndexCxSalt
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % Salt, "Salt", Cx % Header % NumLocal, Cx % Salt, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_t_p) ! IndexCxt
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % t, "t", Cx % Header % NumLocal, Cx % t, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_qf_layer) ! IndexCxqf_layer
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % qf_layer, "qf_layer", Cx % Header % NumLocal, Cx % qf_layer, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_RainRate_layer) ! IndexCxRainRate_layer
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % RainRate_layer, "RainRate_layer", Cx % Header % NumLocal, Cx % RainRate_layer, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_cloud_conv) ! IndexCxcloud_conv
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % cloud_conv, "cloud_conv", Cx % Header % NumLocal, Cx % cloud_conv, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_qc_conv) ! IndexCxqc_conv
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % qc_conv, "qc_conv", Cx % Header % NumLocal, Cx % qc_conv, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_cloud_layer) ! IndexCxcloud_layer
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % cloud_layer, "cloud_layer", Cx % Header % NumLocal, Cx % cloud_layer, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_ozone_new) ! IndexCxOzone
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % ozone, "ozone", Cx % Header % NumLocal, Cx % ozone, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_qcf) ! IndexCxqcf
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % qcf, "qcf", Cx % Header % NumLocal, Cx % qcf, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_qcl) ! IndexCxqcl
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % qcl, "qcl", Cx % Header % NumLocal, Cx % qcl, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_cloud_bulk) ! IndexCxcloud_bulk
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % cloud_bulk, "cloud_bulk", Cx % Header % NumLocal, Cx % cloud_bulk, &
+      !   self % GeoVals, "PLACEHOLDER")
+    ! wsmigaj: I haven't been able to identify the stash code associated with this field
+    ! case (?)
+      ! if (Cx % Header % ObsGroup == ObsGroupGroundLidar) then
+      !   call opsinputs_fill_fillreal2dfromgeoval( &
+      !     Cx % Header % aerosol_p, "aerosol_p", Cx % Header % NumLocal, Cx % aerosol_p, &
+      !     self % GeoVals, "PLACEHOLDER")
+      ! end if
+    case (StashCode_CDNC) ! IndexCxCDNC
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % CDNC, "CDNC", Cx % Header % NumLocal, Cx % CDNC, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_RH_AfterMainCloud) ! IndexCxRH_AMC
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % RH_AMC, "RH_AMC", Cx % Header % NumLocal, Cx % RH_AMC, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_Cl) ! IndexCxCl
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % Cl, "Cl", Cx % Header % NumLocal, Cx % Cl, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_Cf) ! IndexCxCf
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % Cf, "Cf", Cx % Header % NumLocal, Cx % Cf, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_qrain) ! IndexCxqrain
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % qrain, "qrain", Cx % Header % NumLocal, Cx % qrain, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashItem_Exner) ! IndexCxExnerA
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % ExnerA, "ExnerA", Cx % Header % NumLocal, Cx % ExnerA, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_RichNumber) ! IndexCxRichNumber
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % RichNumber, "RichNumber", Cx % Header % NumLocal, Cx % RichNumber, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SoilMoisture) ! IndexCxSoilMoisture
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % SoilMoisture, "SoilMoisture", Cx % Header % NumLocal, Cx % SoilMoisture, &
+      !   self % GeoVals, "PLACEHOLDER")
+    case (StashCode_SoilTemp) ! IndexCxSoilTemp
+      ! TODO(someone): replace "PLACEHOLDER" with the name of an appropriate geoval
+      ! call opsinputs_fill_fillreal2dfromgeoval( &
+      !   Cx % Header % SoilTemp, "SoilTemp", Cx % Header % NumLocal, Cx % SoilTemp, &
+      !   self % GeoVals, "PLACEHOLDER")
+    ! TODO(someone): support dust bins and set NDustBins correctly
+    ! CASE (IndexCxDust1, IndexCxDust2, &
+      !      IndexCxDust3, IndexCxDust4, &
+      !      IndexCxDust5, IndexCxDust6)
+      !  call opsinputs_fill_fillreal2dfromgeoval( &
+      !    Cx % Header % SoilTemp, "SoilTemp", Cx % Header % NumLocal, Cx % SoilTemp, &
+      !    self % GeoVals, "PLACEHOLDER")
+      !  CxHdrVrbl = Cx % Header % dustp
+      !  IF (Ivar > IndexCxDustMax .OR. .NOT. CxHdrVrbl % Present) THEN
+      !    CxHdrVrbl % Present = .FALSE.
+      !    CYCLE UairVrbl
+      !  ENDIF
+      !  DustInd = Ivar - IndexCxDustMin + 1
+      !  CxVrblUair => Cx % dustp(DustInd) % field(:,:)
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx
