@@ -22,6 +22,7 @@ Observations:
       RC_FirstLong: 2.50
       RC_PoleLat: 3.50
       RC_PoleLong: 4.50
+      RC_z_ModelTop: 5.50
     - Filter: Cx Checker
       output_directory: testoutput/nested/path/cx
       expected_header_fields:
@@ -31,6 +32,7 @@ Observations:
         First longitude: "2.5000"
         North pole latitude (degrees): "3.5000"
         North pole longitude (degrees): "4.5000"
+        Height of model top: "5.5000"
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

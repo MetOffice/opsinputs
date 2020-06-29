@@ -142,6 +142,7 @@ private
   real(real64)               :: RC_FirstLong
   real(real64)               :: RC_PoleLat
   real(real64)               :: RC_PoleLong
+  real(real64)               :: RC_z_ModelTop
 
   integer(integer64)         :: TimeIndicator
   integer(integer64)         :: ForecastPeriod
@@ -400,6 +401,12 @@ if (.not. f_conf % get("RC_PoleLong", double)) then
   double = 0.0
 end if
 self % RC_PoleLong = double
+
+if (.not. f_conf % get("RC_z_ModelTop", double)) then
+  ! fall back to the default value
+  double = 0.0
+end if
+self % RC_z_ModelTop = double
 
 if (f_conf % get("eta_theta_levels", self % EtaTheta)) then
   if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
@@ -826,6 +833,7 @@ UmHeader % RealC(RC_FirstLat) = self % RC_FirstLat
 UmHeader % RealC(RC_FirstLong) = self % RC_FirstLong
 UmHeader % RealC(RC_PoleLat) = self % RC_PoleLat
 UmHeader % RealC(RC_PoleLong) = self % RC_PoleLong
+UmHeader % RealC(RC_z_ModelTop) = self % RC_z_ModelTop
 
 UmHeader % LevDepC = RMDI
 UmHeader % LevDepC(1 : NumLevels+1) = self % EtaTheta
