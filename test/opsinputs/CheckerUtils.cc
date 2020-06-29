@@ -49,7 +49,7 @@ bool startsWith(const std::string &string, const char *prefix) {
 boost::optional<std::pair<std::string, std::string>> splitAtEqualsSignAndTrim(
     const std::string &line) {
   const char separator[] = " = ";
-  auto separatorPos = line.find(separator);
+  std::string::size_type separatorPos = line.find(separator);
   if (separatorPos != std::string::npos) {
     std::string name = line.substr(0, separatorPos);
     std::string value = line.substr(separatorPos + sizeof(separator) - 1);
