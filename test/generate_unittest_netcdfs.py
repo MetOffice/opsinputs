@@ -345,5 +345,6 @@ if __name__ == "__main__":
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
 
     # Cx
+    output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
     output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/007_SurfaceCxField_modelsurface.nc4')

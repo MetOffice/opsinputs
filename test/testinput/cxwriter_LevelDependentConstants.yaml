@@ -7,7 +7,7 @@ Observations:
       ObsSpace:
         name: AMSUB
         ObsDataIn:
-          obsfile: Data/019_VarField_satzenith.nc4
+          obsfile: Data/dummy.nc4
         simulate:
           variables: [dummy]
       GeoVaLs:
