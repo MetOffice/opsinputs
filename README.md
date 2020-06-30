@@ -6,7 +6,7 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 Overview
 ========
 
-This software makes it possible for NG-OPS to write observation data to files in the VarObs format. In future it will also allow writing geovals to files in the Cx format.
+This software makes it possible for NG-OPS to write observation data to files in the VarObs format and model data (geovals) to files in the Cx format.
 
 Dependencies
 ============
@@ -29,8 +29,6 @@ Building
 4. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
 
        ecbuild_bundle( PROJECT opsinputs GIT "https://github.com/MetOffice/opsinputs.git" BRANCH develop UPDATE)
-
-   (Git repository path to be confirmed.)
 
 5. Run the following commands to set up your build environment:
 
@@ -60,10 +58,13 @@ Building
 Usage
 =====
 
-VarObs files are written by the `VarObsWriter` observation filter. See the documentation of this filter for more information. YAML files illustrating its use can be found in the `test/opsinputs/testinput` folder.
+VarObs and Cx files are written by the `VarObsWriter` and `CxWriter` observation filters, respectively. See the documentation of these filters for more information. YAML files illustrating their use can be found in the `test/opsinputs/testinput` folder.
 
 Development
 ===========
+
+VarObs
+------
 
 Only a subset of varfields recognised by OPS and VAR can currently be output. To add support for a new varfield:
 
@@ -85,11 +86,37 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
    a. Create an input YAML file and put it in the `test/testinput` folder. Typically, you can copy an existing YAML file used by the test of a varfield whose implementation calls the same subroutine as that of the new varfield, and simply adjust the observation group, variable and varfield name embedded in the YAML file.
 
-   b. Create an input NetCDF file and put it in the same folder. You can use the test/generate_unittest_netcdfs.py script to create the file (add an appropriate function call at the end, again mimicking one generating input data for a previously implemented varfield, and run the script). You may need to load the `satools-py3` module before running the script to give it access to NumPy and SciPy.
+   b. Create an input NetCDF file and put it in the same folder. You can use the `test/generate_unittest_netcdfs.py` script to create the file (add an appropriate function call in the `VarObs` section at the end of the script, again mimicking one generating input data for a previously implemented varfield, and run the script). You may need to load the `satools-py3` module before running the script to give it access to NumPy and SciPy.
 
-   c. Add a call to the `ADD_VAROBSWRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
+   c. Add a call to the `ADD_WRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
 
 4. Update the list of implemented varfields in `Varfields.md`. 
+
+Cx
+--
+
+Only a subset of cxfields recognised by OPS and VAR can currently be output. To add support for a new cxfield:
+
+1. Determine the name of the GeoVal from which the cxfield will be retrieved and the name of the component of the `CX_type` type in OPS holding the value of that cxfield.
+
+2. Set the appropriate `opsinputs_cxfields_*` constant in the `opsinputs_cxfields_mod.F90` file to the name of the GeoVal identified in the previous step.
+
+3. Add a unit test for the new cxfield:
+
+   a. Create an input NetCDF file and put it in the `test/testinput` folder. You can use the `test/generate_unittest_netcdfs.py` script to create the file (add a call to `output_1d_geoval_to_netcdf` or `output_2d_geoval_to_netcdf` in the `Cx` section at the end of the script, mimicking one generating input data for a previously implemented cxfield, and run the script). You may need to load the `satools-py3` module before running the script to give it access to NumPy and SciPy.
+   
+   b. Create an input namelist file that will be read by OPS to determine which cxfield needs to be written, and put it in an appropriate subfolder of `test/testinput`. Typically, you can:
+      
+      - Copy the existing `CxWriterNamelists_007_SurfaceCxField_modelsurface` or `CxWriterNamelists_001_UpperAirCxField_theta` subfolder (for surface, i.e. 1D, and upper-air, i.e. 2D, cxfields, respectively) to a new subfolder. For consistency, name that folder so that the embedded number is the index of the newly implemented cxfield (defined in the `OpsMod_CXIndexes.f90` file in OPS) and the suffix is the cxfield name. 
+      - Adjust the name of the `*.nl` file in the subfolder; the part before the `.nl` extension must be the name of an observation group defined in OPS. It's best to pick a group to which the cxfield is relevant.
+      - Edit the `CxFields=...` line in that file so that the number following `CxFields=` is the stash/ancillary code corresponding to the cxfield. To determine it, find the name of the appropriate `StashItem_*`, `StashCode_*` or `AncilCode_` constant in the `select case` statement in the `opsinputs_cxwriter_addrequiredgeovars` subroutine in `opsinputs_cxwriter_mod.F90` and look up the numeric value of that constant in the `OpsMod_Stash.f90` or `OpsMod_Ancil.f90` file in OPS.
+
+   c. Create an input YAML file and put it in the `test/testinput` folder. Typically, you can
+
+      - Copy the existing `007_SurfaceCxField_modelsurface.yaml` or `001_UpperAirCxField_theta.yaml` file and rename it, following the pattern described above for the folder containing a namelist file.
+      - Edit the file, setting the ObsSpace name to the name of the OPS observation group, the GeoVaLs filename to the name of the file created in step a, and the expected variable index in the `expected_surface_variables` or `expected_upper_air_variables` section to the index of the newly defined cxfield.
+   
+   d. Add a call to the `ADD_WRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
 
 Working practices
 =================
