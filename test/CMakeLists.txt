@@ -239,57 +239,72 @@ ADD_WRITER_TEST(NAME     cxwriter_007_SurfaceCxField_modelsurface
 # Tests of individual upper-air varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
                 YAML     001_UpperAirCxField_theta.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
                 YAML     cxwriter_FixedHeader_VertCoord.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_HorizGrid
                 YAML     cxwriter_FixedHeader_HorizGrid.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_GridStagger
                 YAML     cxwriter_FixedHeader_GridStagger.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_ObsFileType
                 YAML     cxwriter_FixedHeader_ObsFileType.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Times
                 YAML     cxwriter_FixedHeader_Times.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_IntegerConstants_PLevels
                 YAML     cxwriter_IntegerConstants_PLevels.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_RealConstants
                 YAML     cxwriter_RealConstants.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_Lookup_Times
                 YAML     cxwriter_Lookup_Times.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_Lookup_Numbers
                 YAML     cxwriter_Lookup_Numbers.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_LevelDependentConstants
                 YAML     cxwriter_LevelDependentConstants.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 
 # MPI tests
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_1
                 MPI      1
                 YAML     001_UpperAirCxField_theta_MPI_1.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_4
                 MPI      4
                 YAML     001_UpperAirCxField_theta_MPI_4.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 
 # Tests of other options
 ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
                 YAML     cxwriter_reject_obs_with_all_variables_failing_qc.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 reject_obs_with_all_variables_failing_qc.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 YAML     cxwriter_nested_output_directory.yaml
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 ### Tests of auxiliary classes
