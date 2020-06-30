@@ -241,6 +241,14 @@ ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
                 YAML     001_UpperAirCxField_theta.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_003_UpperAirCxField_u
+                YAML     003_UpperAirCxField_u.yaml
+                NAMELIST CxWriterNamelists_003_UpperAirCxField_u/HLOSwind.nl
+                DATA     003_UpperAirCxField_u.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_004_UpperAirCxField_v
+                YAML     004_UpperAirCxField_v.yaml
+                NAMELIST CxWriterNamelists_004_UpperAirCxField_v/HLOSwind.nl
+                DATA     004_UpperAirCxField_v.nc4 dummy.nc4)
 
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord

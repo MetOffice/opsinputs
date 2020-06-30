@@ -347,4 +347,6 @@ if __name__ == "__main__":
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
     output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
+    output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
+    output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/007_SurfaceCxField_modelsurface.nc4')
