@@ -21,15 +21,19 @@ use, intrinsic :: iso_c_binding, only: &
     c_int,                             &
     c_int64_t,                         &
     c_ptr
-use obsspace_mod
-use oops_variables_mod
+use obsspace_mod, only: &
+    obsspace_get_db,    &
+    obsspace_get_nlocs
+use oops_variables_mod, only: oops_variables
 use opsinputs_cxfields_mod
 use opsinputs_fill_mod, only:            &
     opsinputs_fill_fillrealfromgeoval,   &
     opsinputs_fill_fillreal2dfromgeoval
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
 use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_seconds
-use opsinputs_utils_mod
+use opsinputs_utils_mod, only:      &
+    max_varname_length,             &
+    opsinputs_utils_fillreportflags
 use ufo_geovals_mod, only: &
     ufo_geovals
 

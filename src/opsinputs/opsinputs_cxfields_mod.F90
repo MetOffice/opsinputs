@@ -3,7 +3,8 @@
 ! This software is licensed under the terms of the Apache Licence Version 2.0
 ! which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
-!> Maps names of fields of the Cx_Info type to names of JEDI geovals used to fill these fields.
+!> Maps names of fields defined in the Cx_Info type to names of JEDI geovals used to fill
+!> these fields.
 
 module opsinputs_cxfields_mod
 

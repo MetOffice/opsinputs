@@ -7,11 +7,11 @@
 
 module opsinputs_utils_mod
 
-use missing_values_mod
-use oops_variables_mod
-use obsspace_mod
+use oops_variables_mod, only: oops_variables
 use ufo_vars_mod, only: MAXVARLEN
-use opsinputs_obsdatavector_mod
+use opsinputs_obsdatavector_mod, only:    &
+    opsinputs_obsdatavector_int_varnames, &
+    opsinputs_obsdatavector_int_get
 
 use OpsMod_Kinds, only: &
     integer64,          &
