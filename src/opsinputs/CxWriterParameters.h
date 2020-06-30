@@ -11,11 +11,9 @@
 #include <string>
 #include <vector>
 
-#include "eckit/exception/Exceptions.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/Parameters.h"
-#include "oops/util/parameters/RequiredParameter.h"
 
 namespace opsinputs {
 
@@ -114,7 +112,7 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<std::string> modelType{"model_type", "atmos", this};
 
   // TODO(wsmigaj): I hope these comments are correct -- please let me know if not.
-  // Can these parameters be given more widely understandable names (without Greek letters)?
+  // Can these parameters be given names understandable to a layman (without Greek letters)?
   /// New dynamics vertical coordinate theta. Should have length IC_PLevels + 1 (with the
   /// first element denoting the value at the surface).
   oops::Parameter<std::vector<double>> etaThetaLevels{"eta_theta_levels", {}, this};
