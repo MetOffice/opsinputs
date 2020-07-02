@@ -826,7 +826,8 @@ Ob % Header % ValidityTime % day = day
 Ob % Header % ValidityTime % hour = hour
 Ob % Header % ValidityTime % minute = minute
 Ob % Header % ValidityTime % second = second
-Ob % Header % ValidityTime % diff_from_utc = 0 ! TODO(wsmigaj): Is it OK to assume this?
+! util::DateTime is represented internally as UTC quantized to the nearest second.
+Ob % Header % ValidityTime % diff_from_utc = 0
 
 end subroutine opsinputs_cxwriter_populateobservations
 
