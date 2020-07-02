@@ -601,7 +601,6 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
-  print *, "size(Real2): ", size(Real2,1), " ", size(Real2,2)
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
