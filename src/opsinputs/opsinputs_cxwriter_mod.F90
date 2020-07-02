@@ -922,7 +922,7 @@ do iCxField = 1, size(CxFields)
     ! case (?) ! IndexCxTropPres
       !  call opsinputs_fill_fillrealfromgeoval( &
       !    Cx % Header % TropPres, "TropPres", Cx % Header % NumLocal, Cx % TropPres, &
-      !    self % GeoVals, "PLACEHOLDER")
+      !    self % GeoVals, opsinputs_cxfields_TropPres)
     case (StashCode_pmsl) ! IndexCxpmsl
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % pmsl, "pmsl", Cx % Header % NumLocal, Cx % pmsl, &
@@ -944,7 +944,7 @@ do iCxField = 1, size(CxFields)
       !  if (Cx % Header % ObsGroup == ObsGroupSurface) then
       !    call opsinputs_fill_fillrealfromgeoval( &
       !      Cx % Header % aerosol, "aerosol", Cx % Header % NumLocal, Cx % aerosol, &
-      !      self % GeoVals, "PLACEHOLDER")
+      !      self % GeoVals, opsinputs_cxfields_aerosol)
       !  end if
     case (StashCode_PsurfParamA) ! IndexCxPsurfParamA
       call opsinputs_fill_fillrealfromgeoval( &
@@ -1096,7 +1096,7 @@ do iCxField = 1, size(CxFields)
     ! case (?) ! IndexCxcloud
       !  call opsinputs_fill_fillreal2dfromgeoval( &
       !    Cx % Header % cloud, "cloud", Cx % Header % NumLocal, Cx % cloud, &
-      !    self % GeoVals, "PLACEHOLDER")
+      !    self % GeoVals, opsinputs_cxfields_cloud)
     case (StashCode_ql_layer) ! IndexCxql_layer
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % ql_layer, "ql_layer", Cx % Header % NumLocal, Cx % ql_layer, &
@@ -1154,7 +1154,7 @@ do iCxField = 1, size(CxFields)
       ! if (Cx % Header % ObsGroup == ObsGroupGroundLidar) then
       !   call opsinputs_fill_fillreal2dfromgeoval( &
       !     Cx % Header % aerosol_p, "aerosol_p", Cx % Header % NumLocal, Cx % aerosol_p, &
-      !     self % GeoVals, "PLACEHOLDER")
+      !     self % GeoVals, opsinputs_cxfields_aerosol_p)
       ! end if
     case (StashCode_CDNC) ! IndexCxCDNC
       call opsinputs_fill_fillreal2dfromgeoval( &
