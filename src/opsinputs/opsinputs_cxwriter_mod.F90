@@ -816,8 +816,6 @@ type(OB_type), intent(inout)            :: Ob
 
 ! Local declarations:
 integer(c_int)                          :: year, month, day, hour, minute, second
-real(c_double)                          :: Reals(Ob % Header % NumObsLocal)
-integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
 
 ! Body:
 
@@ -829,17 +827,6 @@ Ob % Header % ValidityTime % hour = hour
 Ob % Header % ValidityTime % minute = minute
 Ob % Header % ValidityTime % second = second
 Ob % Header % ValidityTime % diff_from_utc = 0 ! TODO(wsmigaj): Is it OK to assume this?
-
-call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
-call obsspace_get_db(ObsSpace, "MetaData", "latitude", Reals)
-
-call Ops_Alloc(Ob % Header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
-call obsspace_get_db(ObsSpace, "MetaData", "longitude", Reals)
-
-call Ops_Alloc(Ob % Header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
-call opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
-  ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
-Reals = TimeOffsetsInSeconds
 
 end subroutine opsinputs_cxwriter_populateobservations
 
