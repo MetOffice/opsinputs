@@ -554,10 +554,9 @@ integer(kind=gc_int_kind)            :: istat
 
 ! Body:
 
-call opsinputs_cxwriter_allocateobservations(self, NumObsLocal, Ob)
-call opsinputs_cxwriter_populateobservations(self, ObsSpace, Flags, Ob)
-call opsinputs_cxwriter_allocatecx(self, Ob, Cx)
-call opsinputs_cxwriter_populatecx(self, ObsSpace, Flags, Cx)
+call opsinputs_cxwriter_initialiseobservations(self, NumObsLocal, Ob)
+call opsinputs_cxwriter_initialisecx(self, Ob, Cx)
+call opsinputs_cxwriter_populatecx(self, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
 Retained = opsinputs_cxwriter_retainflag(NumObsLocal, ObsSpace, Flags, &
@@ -773,8 +772,10 @@ end subroutine opsinputs_cxwriter_addrequiredgeovars
 
 ! ------------------------------------------------------------------------------
 
-!> Prepare Ob to hold the required number of observations.
-subroutine opsinputs_cxwriter_allocateobservations(self, NumObsLocal, Ob)
+!> Fill components of the Ob structure required by the OPS subroutine writing a Cx file.
+!>
+!> This includes the number of observations and the validity time.
+subroutine opsinputs_cxwriter_initialiseobservations(self, NumObsLocal, Ob)
 use mpl, ONLY: gc_int_kind
 implicit none
 
@@ -785,6 +786,7 @@ type(OB_type), intent(inout)         :: Ob
 
 ! Local declarations:
 integer(kind=gc_int_kind)            :: istat
+integer(c_int)                       :: year, month, day, hour, minute, second
 
 ! Body:
 Ob % Header % obsgroup = self % obsgroup
@@ -800,25 +802,6 @@ Ob % Header % NumCXBatches = 1
 allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
 Ob % Header % ObsPerBatchPerPE(1,mype) = Ob % Header % NumObsLocal
 
-end subroutine opsinputs_cxwriter_allocateobservations
-
-! ------------------------------------------------------------------------------
-
-!> Populate Ob fields required by the OPS routine writing a Cx file.
-subroutine opsinputs_cxwriter_populateobservations(self, ObsSpace, Flags, Ob)
-implicit none
-
-! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)    :: self
-type(c_ptr), value, intent(in)          :: ObsSpace
-type(c_ptr), value, intent(in)          :: Flags
-type(OB_type), intent(inout)            :: Ob
-
-! Local declarations:
-integer(c_int)                          :: year, month, day, hour, minute, second
-
-! Body:
-
 call datetime_to_YYYYMMDDhhmmss(self % ValidityTime, year, month, day, hour, minute, second)
 Ob % Header % ValidityTime % year = year
 Ob % Header % ValidityTime % month = month
@@ -829,12 +812,13 @@ Ob % Header % ValidityTime % second = second
 ! util::DateTime is represented internally as UTC quantized to the nearest second.
 Ob % Header % ValidityTime % diff_from_utc = 0
 
-end subroutine opsinputs_cxwriter_populateobservations
+end subroutine opsinputs_cxwriter_initialiseobservations
 
 ! ------------------------------------------------------------------------------
 
-!> Prepare Cx to hold the required number of model columns.
-subroutine opsinputs_cxwriter_allocatecx(self, Ob, Cx)
+!> Prepare Cx to hold the required number of model columns and set properties unrelated to any
+!> specific cxfield.
+subroutine opsinputs_cxwriter_initialisecx(self, Ob, Cx)
 implicit none
 
 ! Subroutine arguments:
@@ -860,18 +844,16 @@ else
   Cx % Header % FirstConstantRhoLevel = IMDI
 end if
 
-end subroutine opsinputs_cxwriter_allocatecx
+end subroutine opsinputs_cxwriter_initialisecx
 
 ! ------------------------------------------------------------------------------
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
-subroutine opsinputs_cxwriter_populatecx(self, ObsSpace, Flags, Cx)
+subroutine opsinputs_cxwriter_populatecx(self, Cx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)    :: self
-type(c_ptr), value, intent(in)          :: ObsSpace
-type(c_ptr), value, intent(in)          :: Flags
 type(CX_type), intent(inout)            :: Cx
 
 ! Local declarations:
