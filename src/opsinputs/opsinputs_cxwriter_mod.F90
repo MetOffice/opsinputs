@@ -99,9 +99,7 @@ use OpsMod_Kinds, only: &
     logical64,          &
     real64
 use OpsMod_MiscTypes, only: ElementHeader_Type
-use OpsMod_ModelColumnIO, only: &
-    Ops_WriteOutVarCx,          &
-    Ops_WriteOutVarCx1pe
+use OpsMod_ModelColumnIO, only: Ops_WriteOutVarCx
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
