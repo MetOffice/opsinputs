@@ -824,7 +824,8 @@ type(CX_type), intent(inout)            :: Cx
 
 ! Body:
 
-call CX % init
+Cx % Header % obsgroup = self % obsgroup
+call Cx % init
 
 ! The following code is inspired by Ops_CXSetup.
 
