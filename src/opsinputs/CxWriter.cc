@@ -88,6 +88,10 @@ void CxWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
     localEnvironment.set("OPS_CX_CONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_CX_DIR_LIST", *parameters_.outputDirectory.value());
+
+  // Hack taken from OpsScr_Setup; prevents ODB code (which provides yomhook and parkind1)
+  // from calling mpi_buffer_attach. gc_init() already does this.
+  localEnvironment.set("MPL_METHOD", "JP_BLOCKING_STANDARD");
 }
 
 void CxWriter::createOutputDirectory() {
