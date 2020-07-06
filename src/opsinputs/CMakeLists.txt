@@ -38,11 +38,16 @@ list( APPEND opsinputs_src_files
 set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                             COMPILE_FLAGS "-fdefault-real-8 -fdefault-integer-8")
 
+set(ODB_LIB_DIR "${OPS_INSTALLS_DIR}/odb/lib")
+set(ODB_LIBS odb odbifsaux odbemos)
+list(TRANSFORM ODB_LIBS PREPEND "${ODB_LIB_DIR}/lib")
+list(TRANSFORM ODB_LIBS APPEND ".so")
+
 set(SHUM_LIB_DIR "${OPS_INSTALLS_DIR}/shumlib/lib")
-set(SHUM_LIBS 
-    "${SHUM_LIB_DIR}/libshum_byteswap.so"
-    "${SHUM_LIB_DIR}/libshum_string_conv.so"
-    "${SHUM_LIB_DIR}/libshum_wgdos_packing.so")
+set(SHUM_LIBS shum_byteswap shum_string_conv shum_wgdos_packing)
+list(TRANSFORM SHUM_LIBS PREPEND "${SHUM_LIB_DIR}/lib")
+list(TRANSFORM SHUM_LIBS APPEND ".so")
+
 set(OPS_O_FILES
     gc__abort.o
     gc__flush.o
@@ -146,11 +151,13 @@ set(OPS_O_FILES
     opsmod_varobslib.o)
 list(TRANSFORM OPS_O_FILES PREPEND "${OPS_O_DIR}/")
 
+ecbuild_find_mpi( COMPONENTS Fortran REQUIRED )
+
 ecbuild_add_library( TARGET ops
                      SOURCES ${OPS_O_FILES}
                      LINKER_LANGUAGE Fortran
                      TYPE STATIC
-                     LIBS ${SHUM_LIBS}
+                     LIBS ${ODB_LIBS} ${SHUM_LIBS} ${MPI_Fortran_LIBRARIES}
                     )
 
 list( APPEND OPSINPUTS_LIBS_DEP oops ioda ufo ${NETCDF_LIBRARIES} ops )
