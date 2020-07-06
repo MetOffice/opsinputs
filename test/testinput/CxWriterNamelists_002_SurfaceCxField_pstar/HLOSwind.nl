@@ -1,3 +1,3 @@
 &CXControlNL
-CxFields=30
+CxFields=409
 /

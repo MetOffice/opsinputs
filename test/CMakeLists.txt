@@ -231,10 +231,10 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
 ### CxWriter tests
 
 # Tests of individual surface varfields
-ADD_WRITER_TEST(NAME     cxwriter_007_SurfaceCxField_modelsurface
-                YAML     007_SurfaceCxField_modelsurface.yaml
-                NAMELIST CxWriterNamelists_007_SurfaceCxField_modelsurface/SatTCWV.nl
-                DATA     007_SurfaceCxField_modelsurface.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_002_SurfaceCxField_pstar
+                YAML     002_SurfaceCxField_pstar.yaml
+                NAMELIST CxWriterNamelists_002_SurfaceCxField_pstar/HLOSwind.nl
+                DATA     002_SurfaceCxField_pstar.nc4 dummy.nc4)
 
 # Tests of individual upper-air varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta

@@ -608,8 +608,6 @@ do i = 1, size(CxFields)
       GeoVarName = opsinputs_cxfields_u10
     case (StashCode_v10, StashCode_V10_B_grid) ! IndexCxv10
       GeoVarName = opsinputs_cxfields_v10
-    case (StashItem_modelsurface) ! IndexCxmodelsurface
-      GeoVarName = opsinputs_cxfields_modelsurface
     case (StashCode_vis) ! IndexCxvis
       GeoVarName = opsinputs_cxfields_vis
     case (StashCode_WAVE_HGHT) ! IndexCxWAVE_HGHT
@@ -894,10 +892,6 @@ do iCxField = 1, size(CxFields)
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % v10, "v10", Cx % Header % NumLocal, Cx % v10, &
         self % GeoVals, opsinputs_cxfields_v10)
-    case (StashItem_modelsurface) ! IndexCxmodelsurface
-      call opsinputs_fill_fillrealfromgeoval( &
-        Cx % Header % ModelSurface, "ModelSurface", Cx % Header % NumLocal, Cx % ModelSurface, &
-        self % GeoVals, opsinputs_cxfields_modelsurface)
     case (StashCode_vis) ! IndexCxvis
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % vis, "vis", Cx % Header % NumLocal, Cx % vis, &

@@ -14,13 +14,11 @@ character(len=*), parameter :: opsinputs_cxfields_unknown = "UNKNOWN"
 
 ! TODO(someone): Replace instances of opsinputs_cxfields_unknown with appropriate geoval names.
 character(len=*), parameter :: opsinputs_cxfields_Orog = opsinputs_cxfields_unknown
-character(len=*), parameter :: opsinputs_cxfields_pstar = opsinputs_cxfields_unknown
+character(len=*), parameter :: opsinputs_cxfields_pstar = "surface_pressure"
 character(len=*), parameter :: opsinputs_cxfields_t2 = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_rh2 = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_u10 = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_v10 = opsinputs_cxfields_unknown
-! TODO(someone): Verify that this is the right geoval name to use
-character(len=*), parameter :: opsinputs_cxfields_ModelSurface = "land_type_index"
 character(len=*), parameter :: opsinputs_cxfields_vis = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_WAVE_HGHT = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_WIND_SPED = opsinputs_cxfields_unknown
