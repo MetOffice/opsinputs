@@ -609,7 +609,7 @@ do i = 1, size(CxFields)
     case (StashCode_v10, StashCode_V10_B_grid) ! IndexCxv10
       GeoVarName = opsinputs_cxfields_v10
     case (StashItem_modelsurface) ! IndexCxmodelsurface
-      GeoVarName = "land_type_index"
+      GeoVarName = opsinputs_cxfields_modelsurface
     case (StashCode_vis) ! IndexCxvis
       GeoVarName = opsinputs_cxfields_vis
     case (StashCode_WAVE_HGHT) ! IndexCxWAVE_HGHT
@@ -691,13 +691,13 @@ do i = 1, size(CxFields)
 
     ! Upper-air variables
     case (StashItem_theta) ! IndexCxtheta
-      GeoVarName = "air_potential_temperature"
+      GeoVarName = opsinputs_cxfields_theta
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
       GeoVarName = opsinputs_cxfields_rh
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
-      GeoVarName = "eastward_wind"
+      GeoVarName = opsinputs_cxfields_u
     case (StashItem_v) ! IndexCxv
-      GeoVarName = "northward_wind"
+      GeoVarName = opsinputs_cxfields_v
     case (StashItem_w) ! IndexCxw
       GeoVarName = opsinputs_cxfields_w
     case (StashItem_q) ! IndexCxq
@@ -897,7 +897,7 @@ do iCxField = 1, size(CxFields)
     case (StashItem_modelsurface) ! IndexCxmodelsurface
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % ModelSurface, "ModelSurface", Cx % Header % NumLocal, Cx % ModelSurface, &
-        self % GeoVals, "land_type_index")
+        self % GeoVals, opsinputs_cxfields_modelsurface)
     case (StashCode_vis) ! IndexCxvis
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % vis, "vis", Cx % Header % NumLocal, Cx % vis, &
@@ -1063,7 +1063,7 @@ do iCxField = 1, size(CxFields)
     case (StashItem_theta) ! IndexCxtheta
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
-        self % GeoVals, "air_potential_temperature")
+        self % GeoVals, opsinputs_cxfields_theta)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
@@ -1071,11 +1071,11 @@ do iCxField = 1, size(CxFields)
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
-        self % GeoVals, "eastward_wind")
+        self % GeoVals, opsinputs_cxfields_u)
     case (StashItem_v) ! IndexCxv
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % v, "v", Cx % Header % NumLocal, Cx % v, &
-        self % GeoVals, "northward_wind")
+        self % GeoVals, opsinputs_cxfields_v)
     case (StashItem_w) ! IndexCxw
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % w, "w", Cx % Header % NumLocal, Cx % w, &
