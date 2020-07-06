@@ -13,6 +13,7 @@ Observations:
       filename: Data/001_UpperAirCxField_theta.nc4
     ObsFilters:
     - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
     - Filter: Cx Checker

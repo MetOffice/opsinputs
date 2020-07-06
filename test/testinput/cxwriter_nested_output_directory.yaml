@@ -14,6 +14,7 @@ Observations:
     ObsFilters:
     - Filter: Cx Writer
       output_directory: testoutput/nested/path/cx
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       RC_LongSpacing: 0.10

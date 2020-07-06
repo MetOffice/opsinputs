@@ -14,6 +14,7 @@ Observations:
         filename: Data/001_UpperAirCxField_theta.nc4
       ObsFilters:
       - Filter: Cx Writer
+        namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
         general_mode: debug
         IC_PLevels: 5
         # Test for the default value of FH_GridStagger
@@ -26,6 +27,7 @@ Observations:
   - <<: *default
     ObsFilters:
     - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_GridStagger: ArakawaB
@@ -35,6 +37,7 @@ Observations:
   - <<: *default
     ObsFilters:
     - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_GridStagger: ArakawaC
@@ -44,6 +47,7 @@ Observations:
   - <<: *default
     ObsFilters:
     - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_GridStagger: EndGame
