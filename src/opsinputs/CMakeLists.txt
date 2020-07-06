@@ -34,9 +34,15 @@ list( APPEND opsinputs_src_files
     VarObsWriterParameters.h
 )
 
-# TODO(wsmigaj): support Intel's compiler option
+# This module includes *.inc files from OPS, so it must be compiled with similar flags as OPS,
+# in particular assuming that integers and reals without kind are 64-bit.
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-real-8 -fdefault-integer-8")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-integer-size 64 -real-size 64")
+endif()
 set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
-                            COMPILE_FLAGS "-fdefault-real-8 -fdefault-integer-8")
+                            COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
 
 set(ODB_LIB_DIR "${OPS_INSTALLS_DIR}/odb/lib")
 set(ODB_LIBS odb odbifsaux odbemos)
