@@ -95,13 +95,12 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
       throw std::runtime_error("File '" + inputFilePathName + "' not found");
 
     std::string exePath;
-    if (char *dir = getenv("OPSINPUTS_OPS_BIN_DIR")) {
-      exePath = dir;
-      exePath += PATH_SEPARATOR;
-      exePath += printUtilName;
-    } else {
-      exePath = printUtilName;
+    if (char *runner = getenv("OPSINPUTS_OPSPROG_RUNNER")) {
+      exePath = "\"";
+      exePath += runner;
+      exePath += "\" ";
     }
+    exePath += printUtilName;
 
     const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + inputFilePathName +
         "\" --all --outfile=\"" + tempFile->name() + "\"";

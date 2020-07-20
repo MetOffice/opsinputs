@@ -63,8 +63,7 @@ function( ADD_WRITER_TEST )
 
   set( environment
        OOPS_TRAPFPE=1
-       LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-       OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR} )
+       OPSINPUTS_OPSPROG_RUNNER=${OPSINPUTS_OPSPROG_RUNNER} )
   if ( NOT ${_PAR_DONT_SET_OPS_OUTPUT_DIR_ENV_VAR} )
     list ( APPEND environment
       OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
@@ -89,6 +88,10 @@ function( ADD_WRITER_TEST )
 endfunction()
 
 set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
+set( OPSINPUTS_OPSPROG_RUNNER ${CMAKE_CURRENT_BINARY_DIR}/opsprog_runner.sh)
+
+# Shell script running OPS programs with PATH and LD_LIBRARY_PATH set appropriately
+configure_file(opsprog_runner.sh.in ${OPSINPUTS_OPSPROG_RUNNER} @ONLY)
 
 ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                         SOURCES opsinputs/instantiateObsFilterFactory.h
