@@ -51,6 +51,8 @@ Building
 
        make -j4
 
+   Note: if using the gfortran 7.2 compiler in the Debug configuration, you may need to remove the -finit-derived flag from the saber/cmake/compiler_flags_GNU_Fortran.cmake file to avoid an internal compiler error during compilation of some saber source files.
+
 8. Optionally, run tests to verify that components of the `opsinputs` package work correctly:
 
        ctest -R opsinputs
