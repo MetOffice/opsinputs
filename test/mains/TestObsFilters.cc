@@ -10,13 +10,13 @@
 #include "oops/runs/Run.h"
 #include "opsinputs/instantiateObsFilterFactory.h"
 #include "ufo/instantiateObsFilterFactory.h"
-#include "ufo/UfoTrait.h"
+#include "ufo/ObsTraits.h"
 
 int main(int argc,  char ** argv) {
   oops::Run run(argc, argv);
-  ufo::instantiateObsFilterFactory<ufo::UfoTrait>();
-  opsinputs::instantiateObsFilterFactory<ufo::UfoTrait>();
-  opsinputs::test::instantiateObsFilterFactory<ufo::UfoTrait>();
+  ufo::instantiateObsFilterFactory<ufo::ObsTraits>();
+  opsinputs::instantiateObsFilterFactory<ufo::ObsTraits>();
+  opsinputs::test::instantiateObsFilterFactory<ufo::ObsTraits>();
   ufo::test::ObsFilters tests;
   return run.execute(tests);
 }
