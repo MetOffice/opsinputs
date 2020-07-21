@@ -5,16 +5,17 @@
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-#ifndef TEST_OPSINPUTS_VAROBSCHECKER_H_
-#define TEST_OPSINPUTS_VAROBSCHECKER_H_
+#ifndef TEST_OPSINPUTS_CXCHECKER_H_
+#define TEST_OPSINPUTS_CXCHECKER_H_
 
 #include <map>
 #include <ostream>
 #include <string>
+#include <vector>
 
 #include <boost/shared_ptr.hpp>
 
-#include "../opsinputs/VarObsCheckerParameters.h"
+#include "../opsinputs/CxCheckerParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
 #include "oops/util/ObjectCounter.h"
@@ -40,22 +41,22 @@ class LocalEnvironment;
 
 namespace test {
 
-/// \brief Compares contents of VarObs files against reference values specified in the
+/// \brief Compares contents of Cx files against reference values specified in the
 /// configuration.
 ///
-/// The OpsProg_PrintVarobs.exe OPS utility is used to print the contents of VarObs files in textual
+/// The OpsProg_PrintCxFile.exe OPS utility is used to print the contents of Cx files in textual
 /// form. Reference values of individual fields/arrays are then compared against values extracted
 /// from that output.
 ///
-/// See VarObsCheckerParameters for a list of available options.
-class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObsChecker> {
+/// See CxCheckerParameters for a list of available options.
+class CxChecker : public util::Printable, private util::ObjectCounter<CxChecker> {
  public:
-  static const std::string classname() {return "opsinputs::test::VarObsChecker";}
+  static const std::string classname() {return "opsinputs::test::CxChecker";}
 
-  VarObsChecker(ioda::ObsSpace &, const eckit::Configuration &,
+  CxChecker(ioda::ObsSpace &, const eckit::Configuration &,
                 boost::shared_ptr<ioda::ObsDataVector<int> > flags,
                 boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
-  ~VarObsChecker();
+  ~CxChecker();
 
   void preProcess() const {}
   void priorFilter(const ufo::GeoVaLs &) const {}
@@ -65,18 +66,24 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
 
  private:
-  class PrintVarObsOutput;
+  class PrintCxFileOutput;
   class MainTable;
 
   void print(std::ostream &) const;
 
   void setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const;
 
-  PrintVarObsOutput parsePrintVarObsOutput(const std::string &printVarObsOutput) const;
+  PrintCxFileOutput parsePrintCxFileOutput(const std::string &printCxFileOutput) const;
 
   void checkHeader(const std::map<std::string, std::string> &headerFields) const;
-
-  void checkMainTable(const MainTable &mainTable) const;
+  void checkLevelDependentConstants(const std::vector<std::string> &etaThetaLevels,
+                                    const std::vector<std::string> &etaRhoLevels) const;
+  void checkVariables(const std::vector<std::string> &surfaceVariables,
+                      const std::vector<std::string> &upperAirVariables) const;
+  void checkLookup(
+      const std::vector<std::map<std::string, std::string>> &lookupFields) const;
+  void checkMainTable(
+      const std::vector<std::vector<std::vector<std::string>>> &mainTable) const;
 
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
@@ -84,10 +91,10 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
   boost::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
 
-  VarObsCheckerParameters parameters_;
+  CxCheckerParameters parameters_;
 };
 
 }  // namespace test
 }  // namespace opsinputs
 
-#endif  // TEST_OPSINPUTS_VAROBSCHECKER_H_
+#endif  // TEST_OPSINPUTS_CXCHECKER_H_

@@ -9,14 +9,12 @@
 #include <fstream>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+#include "../../test/opsinputs/CheckerUtils.h"
 #include "../../test/opsinputs/VarObsChecker.h"
 
 #include "opsinputs/LocalEnvironment.h"
-#include "opsinputs/MPIExceptionSynchronizer.h"
-#include "opsinputs/VarObsWriterParameters.h"
 
 #include "eckit/config/Configuration.h"
 #include "eckit/exception/Exceptions.h"
@@ -32,60 +30,6 @@
 
 namespace opsinputs {
 namespace test {
-
-namespace {
-
-// This could be made OS-dependent.
-const char PATH_SEPARATOR = '/';
-
-std::string getEnvVariableOrThrow(const char *variableName) {
-  const char *value = std::getenv(variableName);
-  if (!value)
-    throw std::runtime_error("Environment variable '" + std::string(variableName) + "' not set");
-  return value;
-}
-
-bool startsWith(const std::string &string, const char *prefix) {
-  return string.rfind(prefix, 0 /*look only at the beginning of string*/);
-}
-
-/// Manages a temporary file (deleted when this object is destroyed).
-class TempFile {
- public:
-  explicit TempFile(const eckit::PathName &fileName) : fileName_(fileName) {}
-  explicit TempFile(const char *fileName) : fileName_(fileName) {}
-
-  TempFile(const TempFile &) = delete;
-  TempFile(TempFile &&other) { std::swap(fileName_, other.fileName_); }
-
-  TempFile & operator=(const TempFile &) = delete;
-  TempFile & operator=(TempFile &&other) {
-    if (this != &other) {
-      deleteFileAndResetFileName();
-      std::swap(fileName_, other.fileName_);
-    }
-    return *this;
-  }
-
-  ~TempFile() {
-    deleteFileAndResetFileName();
-  }
-
-  std::string name() const { return fileName_.asString(); }
-
- private:
-  void deleteFileAndResetFileName() {
-    if (fileName_.exists()) {
-      fileName_.unlink();
-    }
-    fileName_ = eckit::PathName();
-  }
-
- private:
-  eckit::PathName fileName_;
-};
-
-}  // namespace
 
 /// Encapsulates the main table of per-observation data printed by PrintVarobs.
 class VarObsChecker::MainTable {
@@ -153,62 +97,15 @@ VarObsChecker::~VarObsChecker() {
 void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
 
-  MPIExceptionSynchronizer exceptionSynchronizer;
+  opsinputs::LocalEnvironment localEnvironment;
+  setupEnvironment(localEnvironment);
 
-  const size_t rootProcessRank = 0;
+  const char exeName[] = "OpsProg_PrintVarobs.exe";
+  const std::string varObsFileName(getEnvVariableOrThrow("OPS_VAROB_OUTPUT_DIR") +
+            PATH_SEPARATOR + obsdb_.obsname() + ".varobs");
+  std::string printVarObsOutput = runOpsPrintUtil(exeName, varObsFileName);
 
-  // Print the contents of the varobs file to a temporary file...
-
-  char tempFileName[L_tmpnam];
-  std::unique_ptr<TempFile> tempFile;
-  if (oops::mpi::comm().rank() == rootProcessRank) {
-    std::tmpnam(tempFileName);
-    tempFile.reset(new TempFile(tempFileName));
-  }
-  exceptionSynchronizer.throwIfAnyProcessHasThrown();
-  oops::mpi::comm().broadcast(tempFileName, L_tmpnam, rootProcessRank);
-
-  if (oops::mpi::comm().rank() == rootProcessRank) {
-    opsinputs::LocalEnvironment localEnvironment;
-    setupEnvironment(localEnvironment);
-
-    const eckit::PathName varObsFileName(getEnvVariableOrThrow("OPS_VAROB_OUTPUT_DIR") +
-              PATH_SEPARATOR + obsdb_.obsname() + ".varobs");
-    if (!varObsFileName.exists())
-      throw std::runtime_error("File '" + varObsFileName + "' not found");
-
-    const char exeName[] = "OpsProg_PrintVarobs.exe";
-    std::string exePath;
-    if (char *dir = getenv("OPSINPUTS_OPS_BIN_DIR")) {
-      exePath = dir;
-      exePath += PATH_SEPARATOR;
-      exePath += exeName;
-    } else {
-      exePath = exeName;
-    }
-
-    // TODO(wsmigaj): perhaps read the name of the MPI runner from an environment variable
-    const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + varObsFileName +
-        "\" --all --outfile=\"" + tempFile->name() + "\"";
-    if (oops::mpi::comm().rank() == 0) {
-      oops::Log::info() << "Running " << cmd << "\n";
-      const int exitCode = std::system(cmd.c_str());
-      if (exitCode != 0)
-        throw std::runtime_error("PrintVarobs failed with exit code " + std::to_string(exitCode));
-    }
-  }
-
-  exceptionSynchronizer.throwIfAnyProcessHasThrown();
-  // Ensure rootProcessRank has written the file
-  oops::mpi::comm().barrier();
-
-  // ... parse them and check them
-  PrintVarObsOutput output = parsePrintVarObsOutput(tempFileName);
-
-  exceptionSynchronizer.throwIfAnyProcessHasThrown();
-  // Ensure all processes have read the file before rootProcessRank deletes it
-  // as TempFile goes out of scope
-  oops::mpi::comm().barrier();
+  PrintVarObsOutput output = parsePrintVarObsOutput(printVarObsOutput);
 
   checkHeader(output.headerFields);
   checkMainTable(output.mainTable);
@@ -220,8 +117,8 @@ void VarObsChecker::setupEnvironment(opsinputs::LocalEnvironment &localEnvironme
 }
 
 VarObsChecker::PrintVarObsOutput VarObsChecker::parsePrintVarObsOutput(
-    const char *fileName) const {
-  std::ifstream is(fileName);
+    const std::string &printVarObsOutput) const {
+  std::istringstream is(printVarObsOutput);
   std::string line;
 
   enum FileSection {

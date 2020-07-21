@@ -4,6 +4,8 @@
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 list( APPEND opsinputs_src_files
+    opsinputs_cxfields_mod.F90
+    opsinputs_fill_mod.F90
     opsinputs_obsspace_f.cc
     opsinputs_obsspace_f.h
     opsinputs_obsspace_mod.F90
@@ -11,6 +13,15 @@ list( APPEND opsinputs_src_files
     opsinputs_obsdatavector_f.h
     opsinputs_obsdatavector_mod.F90
     opsinputs_varobswriter_mod.F90
+    opsinputs_cxgenerate_mod.F90
+    opsinputs_cxwriter_mod.F90
+    opsinputs_utils_mod.F90
+    CxWriter.cc
+    CxWriter.h
+    CxWriter.interface.h
+    CxWriter.interface.F90
+    CxWriterParameters.h
+    opsinputs_mpl_mod.F90
     instantiateObsFilterFactory.h
     LocalEnvironment.cc
     LocalEnvironment.h
@@ -23,11 +34,26 @@ list( APPEND opsinputs_src_files
     VarObsWriterParameters.h
 )
 
+# This module includes *.inc files from OPS, so it must be compiled with similar flags as OPS,
+# in particular assuming that integers and reals without kind are 64-bit.
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-real-8 -fdefault-integer-8")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-integer-size 64 -real-size 64")
+endif()
+set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                            COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+
+set(ODB_LIB_DIR "${OPS_INSTALLS_DIR}/odb/lib")
+set(ODB_LIBS odb odbifsaux odbemos)
+list(TRANSFORM ODB_LIBS PREPEND "${ODB_LIB_DIR}/lib")
+list(TRANSFORM ODB_LIBS APPEND ".so")
+
 set(SHUM_LIB_DIR "${OPS_INSTALLS_DIR}/shumlib/lib")
-set(SHUM_LIBS 
-    "${SHUM_LIB_DIR}/libshum_byteswap.so"
-    "${SHUM_LIB_DIR}/libshum_string_conv.so"
-    "${SHUM_LIB_DIR}/libshum_wgdos_packing.so")
+set(SHUM_LIBS shum_byteswap shum_string_conv shum_wgdos_packing)
+list(TRANSFORM SHUM_LIBS PREPEND "${SHUM_LIB_DIR}/lib")
+list(TRANSFORM SHUM_LIBS APPEND ".so")
+
 set(OPS_O_FILES
     gc__abort.o
     gc__flush.o
@@ -57,6 +83,7 @@ set(OPS_O_FILES
     genmod_sleep.o
     genmod_utilities.o
     mpl_abort.o
+    mpl_allgather.o
     mpl_allreduce.o
     mpl_alltoallv.o
     mpl_barrier.o
@@ -98,18 +125,22 @@ set(OPS_O_FILES
     opsmod_cxinfo.o
     opsmod_datetime.o
     opsmod_envutils.o
+    opsmod_fieldread.o
     opsmod_gatherspread.o
     opsmod_gcom.o
     opsmod_gpsro.o
     opsmod_gpsroinfo_ba.o
     opsmod_groundgps.o
+    opsmod_horizontalinterp.o
     opsmod_ioutils.o
     opsmod_misctypes.o
+    opsmod_modelcolumnio.o
     opsmod_modelio.o
     opsmod_modelobinfo.o
     opsmod_mplinterface.o
     opsmod_obsgroupinfo.o
     opsmod_obsinfo.o
+    opsmod_obtypeutils.o
     opsmod_portio_wrappers.o
     opsmod_process.o
     opsmod_qc.o
@@ -119,17 +150,20 @@ set(OPS_O_FILES
     opsmod_random.o
     opsmod_satrad_rtmodel.o
     opsmod_satrad_setup.o
+    opsmod_sondedrift.o
     opsmod_sort.o
     opsmod_utilities.o
     opsmod_varobs.o
     opsmod_varobslib.o)
 list(TRANSFORM OPS_O_FILES PREPEND "${OPS_O_DIR}/")
 
+ecbuild_find_mpi( COMPONENTS Fortran REQUIRED )
+
 ecbuild_add_library( TARGET ops
                      SOURCES ${OPS_O_FILES}
                      LINKER_LANGUAGE Fortran
                      TYPE STATIC
-                     LIBS ${SHUM_LIBS}
+                     LIBS ${ODB_LIBS} ${SHUM_LIBS} ${MPI_Fortran_LIBRARIES}
                     )
 
 list( APPEND OPSINPUTS_LIBS_DEP oops ioda ufo ${NETCDF_LIBRARIES} ops )

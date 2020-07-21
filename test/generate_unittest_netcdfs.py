@@ -302,7 +302,23 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_fa
 
     f.close()
 
+def output_2d_geoval_to_netcdf(var_name, file_name):
+    f = netcdf.netcdf_file(file_name, 'w')
+
+    nlocs = 4
+    nlevs = 3
+    f.createDimension('nlocs', nlocs)
+    f.createDimension('nlevs', nlevs)
+
+    var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+    var[:] = [[1.1, 1.2, 1.3], [2.1, missing_float, 2.3], [3.1, 3.2, 3.3], [4.1, 4.2, 4.3]]
+
+    f.date_time = 2018010100
+
+    f.close()
+
 if __name__ == "__main__":
+    # VarObs
     output_1d_simulated_var_to_netcdf('surface_pressure',           'testinput/001_VarField_pstar.nc4') # Surface
     output_1d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_Surface.nc4')
     output_2d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_RadarZ.nc4')
@@ -315,16 +331,22 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('brightness_temperature',     'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
-    output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',  'testinput/028_VarField_satid.nc4')
+    output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
     output_2d_simulated_var_to_netcdf('bending_angle',              'testinput/071_VarField_bendingangle.nc4')
-    output_2d_normal_var_to_netcdf   ('impact_parameter', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
-    output_1d_normal_var_to_netcdf   ('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
-    output_1d_normal_var_to_netcdf   ('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
-    output_2d_simulated_var_to_netcdf('aerosol_optical_depth',      'testinput/077_VarField_aod.nc4')
+    output_2d_normal_var_to_netcdf('impact_parameter', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
+    output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
+    output_1d_normal_var_to_netcdf('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
+    output_2d_simulated_var_to_netcdf('aerosol_optical_depth', 'testinput/077_VarField_aod.nc4')
     output_2d_simulated_var_to_netcdf('air_potential_temperature',  'testinput/078_VarField_theta.nc4') # Sonde
-
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind', 
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
+
+    # Cx
+    output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
+    output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/002_SurfaceCxField_pstar.nc4')
+    output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
+    output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
+    output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')

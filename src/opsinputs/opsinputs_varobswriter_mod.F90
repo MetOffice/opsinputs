@@ -10,11 +10,9 @@ module opsinputs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding, only: &
-    c_bool,                            &
     c_double,                          &
     c_float,                           &
     c_int,                             &
-    c_int32_t,                         &
     c_int64_t,                         &
     c_ptr
 use datetime_mod, only:        &
@@ -22,14 +20,23 @@ use datetime_mod, only:        &
     datetime_create,           &
     datetime_delete,           &
     datetime_to_YYYYMMDDhhmmss
-use kinds, only: kind_real
-use missing_values_mod, only: missing_value
 use obsspace_mod, only:  &
     obsspace_get_db,     &
     obsspace_get_gnlocs, &
     obsspace_get_nlocs,  &
     obsspace_has
 use oops_variables_mod, only: oops_variables
+use opsinputs_fill_mod, only: &
+    opsinputs_fill_fillelementtypefromsimulatedvariable, &
+    opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
+    opsinputs_fill_fillelementtypefromnormalvariable, &
+    opsinputs_fill_fillelementtype2dfromnormalvariable, &
+    opsinputs_fill_fillreal, &
+    opsinputs_fill_fillreal2d, &
+    opsinputs_fill_fillrealfromgeoval, &
+    opsinputs_fill_fillreal2dfromgeoval, &
+    opsinputs_fill_fillinteger, &
+    opsinputs_fill_fillcoord2d
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_has,      &
     opsinputs_obsdatavector_int_get,      &
@@ -39,6 +46,9 @@ use opsinputs_obsdatavector_mod, only:    &
 use opsinputs_obsspace_mod, only:                        &
     opsinputs_obsspace_get_db_string,                    &
     opsinputs_obsspace_get_db_datetime_offset_in_seconds
+use opsinputs_utils_mod, only:      &
+    max_varname_length,             &
+    opsinputs_utils_fillreportflags
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
     ufo_geovals,           &
@@ -78,10 +88,7 @@ use OpsMod_Control, only:   &
 use OpsMod_DateTime, only: &
     DateTime_type,         &
     OpsFn_DateTime_now
-use OpsMod_MiscTypes, only: &
-    Coord_Type,             &
-    Element_Type,           &
-    ElementHeader_Type
+use OpsMod_MiscTypes, only: ElementHeader_Type
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
@@ -90,7 +97,6 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSatwind,           &
     ObsGroupScatwind
 use OpsMod_ObsInfo, only: &
-    FinalRejectFlag,      &
     FinalRejectReport,    &
     LenCallsign,          &
     OB_type,              &
@@ -115,10 +121,6 @@ external gc_init_final
 public :: opsinputs_varobswriter_create, opsinputs_varobswriter_delete, &
           opsinputs_varobswriter_prior, opsinputs_varobswriter_post
 private
-! Maximum length of a variable name
-integer, parameter :: max_varname_length=MAXVARLEN
-! Maximum length of a variable name with channel suffix
-integer, parameter :: max_varname_with_channel_length=max_varname_length + 10
 
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_varobswriter
@@ -637,7 +639,7 @@ if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
     ObsSpace, "MetaData", "station_id", int(LenCallSign, kind=4), Ob % Callsign)
 end if
 
-call opsinputs_varobswriter_fillcoord2d( &
+call opsinputs_fill_fillcoord2d( &
   Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA, &
    ObsSpace, Channels, "air_pressure", "MetaData")
 
@@ -649,7 +651,7 @@ end if
 ! TODO(wsmigaj): it may be possible to derive RadFamily directly from the observation group.
 RadFamily = self % UseRadarFamily
 if (RadFamily) then
-  call opsinputs_varobswriter_fillinteger( &
+  call opsinputs_fill_fillinteger( &
     Ob % Header % Family, "Family", Ob % Header % NumObsLocal, Ob % Family, &
     ObsSpace, "radar_family", "MetaData")
 end if
@@ -661,54 +663,54 @@ do iVarField = 1, nVarFields
     case (imdi)
       cycle
     case (VarField_pstar)
-      call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
+      call opsinputs_fill_fillelementtypefromsimulatedvariable( &
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
       ! TODO(wsmigaj): check if air_potential_temperature is the correct variable name
       ! (it isn't used in JEDI, but virtual_temperature is)
-      call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta, &
         ObsSpace, Channels, Flags, ObsErrors, "air_potential_temperature")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
-        call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
           ObsSpace, Flags, ObsErrors, "air_temperature")
       else
-        call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
           ObsSpace, Channels, Flags, ObsErrors, "air_temperature")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
-        call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
           ObsSpace, Flags, ObsErrors, "relative_humidity")
       else
-        call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
           ObsSpace, Channels, Flags, ObsErrors, "relative_humidity")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
-        call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
           ObsSpace, Flags, ObsErrors, "eastward_wind")
       else
-        call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
           ObsSpace, Channels, Flags, ObsErrors, "eastward_wind")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
           Ob % Header % ObsGroup == ObsGroupScatwind) then
-        call opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
           ObsSpace, Flags, ObsErrors, "northward_wind")
       else
-        call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
           ObsSpace, Channels, Flags, ObsErrors, "northward_wind")
       end if
@@ -730,7 +732,7 @@ do iVarField = 1, nVarFields
     case (VarField_tskin)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillelementtypefromnormalvariable( &
+      call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_gpstzdelay)
@@ -742,17 +744,17 @@ do iVarField = 1, nVarFields
     case (VarField_mwemiss)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillreal2d( &
+      call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss, &
         ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_TCozone)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillreal( &
+      call opsinputs_fill_fillreal( &
         Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_satzenith)
-      call opsinputs_varobswriter_fillreal( &
+      call opsinputs_fill_fillreal( &
         Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle, &
         ObsSpace, "sensor_zenith_angle", "MetaData")
     case (VarField_scanpos)
@@ -761,7 +763,7 @@ do iVarField = 1, nVarFields
     case (VarField_surface)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillinteger( &
+      call opsinputs_fill_fillinteger( &
         Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_elevation)
@@ -770,7 +772,7 @@ do iVarField = 1, nVarFields
     case (VarField_modelsurface)
       ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
       ! here and in opsinputs_varobswriter_addrequiredgeovars.
-      call opsinputs_varobswriter_fillrealfromgeoval( &
+      call opsinputs_fill_fillrealfromgeoval( &
         Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface, &
         self % GeoVals, "land_type_index")
     case (VarField_modelorog)
@@ -793,7 +795,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % LocalAzimuth, "LocalAzimuth", Ob % Header % NumObsLocal, Ob % LocalAzimuth)
     case (VarField_solzenith)
-      call opsinputs_varobswriter_fillreal( &
+      call opsinputs_fill_fillreal( &
         Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith, &
         ObsSpace, "solar_zenith_angle", "MetaData")
     case (VarField_solazimth)
@@ -802,7 +804,7 @@ do iVarField = 1, nVarFields
     case (VarField_iremiss)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillreal( &
+      call opsinputs_fill_fillreal( &
         Ob % Header % IREmiss, "IREmiss", Ob % Header % NumObsLocal, Ob % IREmiss, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_cloudtopp)
@@ -857,13 +859,13 @@ do iVarField = 1, nVarFields
     case (VarField_Emissivity)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillreal2d( &
+      call opsinputs_fill_fillreal2d( &
         Ob % Header % Emissivity, "Emissivity", Ob % Header % NumObsLocal, Ob % Emissivity, &
         ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_QCinfo)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
-      call opsinputs_varobswriter_fillinteger( &
+      call opsinputs_fill_fillinteger( &
         Ob % Header % QCinfo, "QCinfo", Ob % Header % NumObsLocal, Ob % QCinfo, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_SBUVozone)
@@ -888,7 +890,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
     case (VarField_RadarObAzim)
-      call opsinputs_varobswriter_fillreal2d( &
+      call opsinputs_fill_fillreal2d( &
         Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim, &
         ObsSpace, Channels, "radar_azimuth", "MetaData")
     case (VarField_RadIdent)
@@ -916,11 +918,11 @@ do iVarField = 1, nVarFields
       if (GPSRO_TPD) then
         ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
         ! once it is known.
-        call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll, &
           ObsSpace, Channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
       else
-        call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle, &
           ObsSpace, Channels, Flags, ObsErrors, "bending_angle")
       end if
@@ -928,24 +930,24 @@ do iVarField = 1, nVarFields
        if (GPSRO_TPD) then
          ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
          ! once it is known.
-         call opsinputs_varobswriter_fillelementtype2dfromnormalvariable( &
+         call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll, &
            ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
        else
-         call opsinputs_varobswriter_fillelementtype2dfromnormalvariable( &
+         call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam, &
            ObsSpace, Channels, "impact_parameter", "MetaData")
        end if
     case (VarField_RO_Rad_Curv)
-      call opsinputs_varobswriter_fillelementtypefromnormalvariable( &
+      call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % RO_Rad_Curv, "RO_Rad_Curv", Ob % Header % NumObsLocal, Ob % RO_Rad_Curv, &
         ObsSpace, "earth_radius_of_curvature", "MetaData")
     case (VarField_RO_geoid_und)
-      call opsinputs_varobswriter_fillelementtypefromnormalvariable( &
+      call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
         ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData")
     case (VarField_AOD)
-      call opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
         ObsSpace, Channels, Flags, ObsErrors, "aerosol_optical_depth")
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
@@ -973,7 +975,7 @@ do iVarField = 1, nVarFields
       ! and what is RepObs?
       ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
       ! once it is known.
-      call opsinputs_varobswriter_fillreal2dfromgeoval( &
+      call opsinputs_fill_fillreal2dfromgeoval( &
         Ob % Header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat, &
         self % GeoVals, "PLACEHOLDER_VARIABLE_NAME")
     case (VarField_LevelLon)
@@ -1041,799 +1043,6 @@ end subroutine opsinputs_varobswriter_populateobservations
 
 ! ------------------------------------------------------------------------------
 
-!> Populate a 1D array of Element_type objects and its header from a set of variables whose name
-!> is included in the list passed to the 'simulate' option of the JEDI ObsSpace.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p El1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] El1
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
-!> \param[in] Flags
-!>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
-!> \param[in] ObsErrors
-!>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
-!> \param[in] JediVarName
-!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate \p El1 and \p Hdr.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillelementtypefromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-type(c_ptr), value, intent(in)                  :: Flags
-type(c_ptr), value, intent(in)                  :: ObsErrors
-character(len=*), intent(in)                    :: JediVarName
-
-! Local declarations:
-real(kind=c_double)                             :: ObsValue(NumObs)
-integer(kind=c_int)                             :: Flag(NumObs)
-real(kind=c_float)                              :: ObsError(NumObs)
-real(kind=c_double)                             :: PGE(NumObs)
-real(kind=c_double)                             :: MissingDouble
-real(kind=c_float)                              :: MissingFloat
-integer                                         :: i
-character(len=*), parameter                     :: &
-  RoutineName = "opsinputs_varobswriter_fillelementtypefromsimulatedvariable"
-character(len=256)                              :: ErrorMessage
-
-! Body:
-
-! The types of floating-point numbers used in this function are a bit confusing. OPS stores
-! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
-! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
-! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles. Observation
-! errors, though, are retrieved as floats.
-
-MissingDouble = missing_value(0.0_c_double)
-MissingFloat  = missing_value(0.0_c_float)
-
-if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
-  ! Retrieve data from JEDI:
-  ! - observation value
-  call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
-  ! - QC flag
-  if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
-    call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
-  else
-    write (ErrorMessage, '(A,A)') "QC flags not found for variable ", JediVarName
-    call gen_warn(RoutineName, ErrorMessage)
-    Flag = 0 ! assume all observations passed QC
-  end if
-  ! - observation error
-  if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
-    call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
-  else
-    write (ErrorMessage, '(A,A,A)') "Variable ", JediVarName, "@ObsError not found"
-    call gen_warn(RoutineName, ErrorMessage)
-    ObsError = MissingFloat
-  end if
-  ! - gross error probability
-  if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarName)) then
-    call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarName, PGE)
-  else
-    PGE = MissingDouble
-  end if
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1)
-  do i = 1, NumObs
-    if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
-    if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
-    if (PGE(i) /= MissingDouble)      El1(i) % PGEFinal = PGE(i) * PPF
-    if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
-  end do
-end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine opsinputs_varobswriter_fillelementtypefromsimulatedvariable
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of Element_type objects and its header from a set of variables whose name
-!> is included in the list passed to the 'simulate' option of the JEDI ObsSpace.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p El2 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] El2
-!>   Pointer to the array to be populated.
-!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
-!> \param[in] Flags
-!>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
-!> \param[in] ObsErrors
-!>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
-!> \param[in] JediVarName
-!>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate El1 and Hdr. The variables can either have no channel suffix (in which case
-!>   \p El2 will have only a single row) or have suffixes representing the indices specified in
-!>   \p Channels.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-type(c_ptr), value, intent(in)                  :: Flags
-type(c_ptr), value, intent(in)                  :: ObsErrors
-character(len=*), intent(in)                    :: JediVarName
-
-! Local declarations:
-real(kind=c_double)                             :: ObsValue(NumObs)
-integer(kind=c_int)                             :: Flag(NumObs)
-real(kind=c_float)                              :: ObsError(NumObs)
-real(kind=c_double)                             :: PGE(NumObs)
-real(kind=c_double)                             :: MissingDouble
-real(kind=c_float)                              :: MissingFloat
-character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
-
-integer                                         :: iChannel, iObs
-character(len=*), parameter                     :: &
-  RoutineName = "opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable"
-character(len=256)                              :: ErrorMessage
-
-! Body:
-
-! The types of floating-point numbers used in this function are a bit confusing. OPS stores
-! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
-! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
-! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles. Observation
-! errors, though, are retrieved as floats.
-
-MissingDouble = missing_value(0.0_c_double)
-MissingFloat  = missing_value(0.0_c_float)
-
-JediVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels(JediVarName, Channels)
-
-if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
-  ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
-
-  do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI:
-    ! - observation value
-    call obsspace_get_db(ObsSpace, "ObsValue", JediVarNamesWithChannels(iChannel), ObsValue)
-    ! - QC flag
-    if (opsinputs_obsdatavector_int_has(Flags, JediVarNamesWithChannels(iChannel))) then
-      call opsinputs_obsdatavector_int_get(Flags, JediVarNamesWithChannels(iChannel), Flag)
-    else
-      write (ErrorMessage, '(A,A,A)') &
-        "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
-      call gen_warn(RoutineName, ErrorMessage)
-      Flag = 0 ! assume all observations passed QC
-    end if
-    ! - observation error
-    if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarNamesWithChannels(iChannel))) then
-      call opsinputs_obsdatavector_float_get(ObsErrors, JediVarNamesWithChannels(iChannel), ObsError)
-    else
-      write (ErrorMessage, '(A,A,A)') &
-        "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
-      call gen_warn(RoutineName, ErrorMessage)
-      ObsError = MissingFloat
-    end if
-    ! - gross error probability
-    if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarNamesWithChannels(iChannel))) then
-      call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarNamesWithChannels(iChannel), &
-                           PGE)
-    else
-      PGE = MissingDouble
-    end if
-
-    ! Fill the OPS data structures
-    do iObs = 1, NumObs
-      if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
-      if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
-      if (PGE(iObs) /= MissingDouble)      El2(iObs, iChannel) % PGEFinal = PGE(iObs) * PPF
-      if (Flag(iObs) /= 0)                 El2(iObs, iChannel) % Flags = ibset(0, FinalRejectFlag)
-    end do
-  end do
-end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine opsinputs_varobswriter_fillelementtype2dfromsimulatedvariable
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 1D array of Element_type objects and its header from an arbitrary JEDI variable
-!> (not included in the list passed to the 'simulate' option of the JEDI ObsSpace) containing
-!> obsevation values and optionally another variable containing observation errors.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p El1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] El1
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables.
-!> \param[in] JediValueVarName
-!>   Name of the JEDI variable containing observation values.
-!> \param[in] JediValueGroup
-!>   Group of the JEDI variable containing observation values.
-!> \param[in] JediErrorVarName
-!>   (Optional) Name of the JEDI variable containing observation errors.
-!> \param[in] JediErrorGroup
-!>   (Optional) Group of the JEDI variable containing observation errors.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillelementtypefromnormalvariable( &
-  Hdr, OpsVarName, NumObs, El1, ObsSpace, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediValueVarName
-character(len=*), intent(in)                    :: JediValueGroup
-character(len=*), optional, intent(in)          :: JediErrorVarName
-character(len=*), optional, intent(in)          :: JediErrorGroup
-
-! Local declarations:
-real(kind=c_double)                             :: ObsValue(NumObs)
-real(kind=c_float)                              :: ObsError(NumObs)
-real(kind=c_double)                             :: MissingDouble
-real(kind=c_float)                              :: MissingFloat
-integer                                         :: i
-character(len=*), parameter                     :: &
-  RoutineName = "opsinputs_varobswriter_fillelementtypefromnormalvariable"
-character(len=256)                              :: ErrorMessage
-
-! Body:
-
-if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
-  write (ErrorMessage, '(A)') &
-    "JediErrorVarName and JediErrorGroup must be either both absent or both present"
-  call gen_warn(RoutineName, ErrorMessage)
-end if
-
-MissingDouble = missing_value(0.0_c_double)
-
-if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
-  ! Retrieve data from JEDI
-  call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarName, ObsValue)
-  if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
-    if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarName)) then
-      call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarName, ObsError)
-    else
-      write (ErrorMessage, '("Variable ",A,"@",A," not found")') JediErrorVarName, JediErrorGroup
-      call gen_warn(RoutineName, ErrorMessage)
-      ObsError = MissingDouble
-    end if
-  else
-    ObsError = MissingDouble
-  end if
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, El1)
-  do i = 1, NumObs
-    if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
-    if (ObsError(i) /= MissingDouble)  El1(i) % OBErr = ObsError(i)
-    ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
-    ! variables. At present, however, we don't even have a use case where there is a separate
-    ! variable storing the observation error.
-  end do
-end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine opsinputs_varobswriter_fillelementtypefromnormalvariable
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of Element_type objects and its header from an arbitrary JEDI variable
-!> (not included in the list passed to the 'simulate' option of the JEDI ObsSpace) containing
-!> obsevation values and optionally another variable containing observation errors.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which El1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] El2
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can
-!>   have either no channel suffix (in which case \p El2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
-!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
-!> \param[in] JediValueVarName
-!>   Name of the JEDI variable containing observation values.
-!> \param[in] JediValueGroup
-!>   Group of the JEDI variable containing observation values.
-!> \param[in] JediErrorVarName
-!>   (Optional) Name of the JEDI variable containing observation errors.
-!> \param[in] JediErrorGroup
-!>   (Optional) Group of the JEDI variable containing observation errors.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillelementtype2dfromnormalvariable( &
-  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediValueVarName
-character(len=*), intent(in)                    :: JediValueGroup
-character(len=*), optional, intent(in)          :: JediErrorVarName
-character(len=*), optional, intent(in)          :: JediErrorGroup
-
-! Local declarations:
-real(kind=c_double)                             :: ObsValue(NumObs)
-real(kind=c_float)                              :: ObsError(NumObs)
-real(kind=c_double)                             :: MissingDouble
-real(kind=c_float)                              :: MissingFloat
-character(len=max_varname_with_channel_length)  :: &
-  JediValueVarNamesWithChannels(max(size(Channels), 1)), &
-  JediErrorVarNamesWithChannels(max(size(Channels), 1))
-integer                                         :: iChannel, iObs
-character(len=*), parameter                     :: &
-  RoutineName = "opsinputs_varobswriter_fillelementtype2dfromnormalvariable"
-character(len=256)                              :: ErrorMessage
-
-! Body:
-
-if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
-  write (ErrorMessage, '(A)') &
-    "JediErrorVarName and JediErrorGroup must be either both absent or both present"
-  call gen_warn(RoutineName, ErrorMessage)
-end if
-
-MissingDouble = missing_value(0.0_c_double)
-
-JediValueVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels( &
-  JediValueVarName, Channels)
-if (present(JediErrorVarName)) then
-  JediErrorVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels( &
-    JediErrorVarName, Channels)
-end if
-
-if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
-  ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
-                 num_levels = int(size(JediValueVarNamesWithChannels), kind=integer64))
-
-  do iChannel = 1, size(JediValueVarNamesWithChannels)
-    ! Retrieve data from JEDI:
-    ! - observation value
-    call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(iChannel), &
-                         ObsValue)
-    ! - observation error
-    if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
-      if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel))) then
-        call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
-                             ObsError)
-      else
-        write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
-          JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
-        call gen_warn(RoutineName, ErrorMessage)
-        ObsError = MissingDouble
-      end if
-    else
-      ObsError = MissingDouble
-    end if
-
-    ! Fill the OPS data structures
-    do iObs = 1, NumObs
-      if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
-      if (ObsError(iObs) /= MissingDouble) El2(iObs, iChannel) % OBErr = ObsError(iObs)
-      ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
-      ! variables. At present, however, we don't even have a use case where there is a separate
-      ! variable storing the observation error.
-    end do
-  end do
-end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-
-end subroutine opsinputs_varobswriter_fillelementtype2dfromnormalvariable
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 1D array of real numbers and its header from a JEDI variable.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Real1
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
-!> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Real1.
-!> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real1.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillreal( &
-  Hdr, OpsVarName, NumObs, Real1, ObsSpace, JediVarName, JediVarGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-
-! Local declarations:
-real(kind=c_double)                             :: VarValue(NumObs)
-real(kind=c_double)                             :: MissingDouble
-integer                                         :: i
-
-! Body:
-
-MissingDouble = missing_value(0.0_c_double)
-
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
-  ! Retrieve data from JEDI
-  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
-  do i = 1, NumObs
-    if (VarValue(i) /= MissingDouble) Real1(i) = VarValue(i)
-  end do
-end if
-end subroutine opsinputs_varobswriter_fillreal
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 1D array of real numbers and its header from a GeoVaL.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Real1
-!>   Pointer to the array to be populated.
-!> \param[in] GeoVals
-!>   A container holding the specified GeoVaL.
-!> \param[in] JediVarName
-!>   Name of the GeoVaL used to populate \p Real1.
-!>
-!> \note If you're calling this function from opsinputs_varobswriter_populateobservations, be sure
-!> to update opsinputs_varobswriter_addrequiredgeovars by adding \p JediVarName to the list of
-!> GeoVaLs required by the VarObsWriter.
-!>
-!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillrealfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real1, GeoVals, JediVarName)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real1(:)
-type(ufo_geovals), intent(in)                   :: GeoVals
-character(len=*), intent(in)                    :: JediVarName
-
-! Local declarations:
-type(ufo_geoval), pointer                       :: GeoVal
-real(kind_real)                                 :: MissingReal
-
-character(len=*), parameter                     :: &
-  RoutineName = "opsinputs_varobswriter_fillrealfromgeoval"
-character(len=256)                              :: ErrorMessage
-
-! Body:
-
-MissingReal = missing_value(0.0_c_float)
-
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-  if (GeoVal % nval /= 1) then
-    write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
-      &Only the first of these values will be written to the VarObs file")') JediVarName
-    call gen_warn(RoutineName, ErrorMessage)
-  end if
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
-  where (GeoVal % vals(1,:) /= MissingReal)
-    Real1 = GeoVal % vals(1,:)
-  end where
-end if
-end subroutine opsinputs_varobswriter_fillrealfromgeoval
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of real numbers and its header from a JEDI variable.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Real2
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
-!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
-!> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Real2. This can represent either a single
-!>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
-!>   of variables with suffixes corresponding to the indices specified in \p Channels.
-!> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillreal2d( &
-  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-
-! Local declarations:
-real(kind=c_double)                             :: VarValue(NumObs)
-real(kind=c_double)                             :: MissingDouble
-character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
-integer                                         :: iChannel
-
-! Body:
-
-MissingDouble = missing_value(0.0_c_double)
-
-JediVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels(JediVarName, Channels)
-
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
-  ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
-  print *, "size(Real2): ", size(Real2,1), " ", size(Real2,2)
-  do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI
-    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
-
-    ! Fill the OPS data structures
-    where (VarValue /= MissingDouble)
-      Real2(:, iChannel) = VarValue
-    end where
-  end do
-end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine opsinputs_varobswriter_fillreal2d
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of real numbers and its header from a GeoVaL.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Real2
-!>   Pointer to the array to be populated.
-!> \param[in] GeoVals
-!>   A container holding the specified GeoVaL.
-!> \param[in] JediVarName
-!>   Name of the GeoVal used to populate \p Real2.
-!>
-!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillreal2dfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real2(:,:)
-character(len=*), intent(in)                    :: JediVarName
-type(ufo_geovals), intent(in)                   :: GeoVals
-
-! Local declarations:
-type(ufo_geoval), pointer                       :: GeoVal
-real(kind_real)                                 :: MissingReal
-
-! Body:
-
-MissingReal = missing_value(0.0_c_float)
-
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(GeoVal % nval, kind = 8))
-  where (transpose(GeoVal % vals) /= MissingReal)
-    Real2 = transpose(GeoVal % vals)
-  end where
-end if
-end subroutine opsinputs_varobswriter_fillreal2dfromgeoval
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 1D array of integers and its header from a JEDI variable.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Int1 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Int1
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
-!> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Int1.
-!> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Int1.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillinteger( &
-  Hdr, OpsVarName, NumObs, Int1, ObsSpace, JediVarName, JediVarGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-integer(integer64), pointer                     :: Int1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-
-! Local declarations:
-integer(kind=4)                                 :: VarValue(NumObs)
-integer(kind=4)                                 :: MissingInt
-
-! Body:
-
-MissingInt = missing_value(0_c_int32_t)
-
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
-  ! Retrieve data from JEDI
-  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
-
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Int1)
-  where (VarValue /= MissingInt)
-    Int1 = VarValue
-  end where
-end if
-end subroutine opsinputs_varobswriter_fillinteger
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of Coord_type objects and its header from a JEDI variable.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Coord2 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Coord2
-!>   Pointer to the array to be populated.
-!> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Coord2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
-!> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
-!> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Coord2. This can represent either a single
-!>   variable with no channel suffix (in which case \p Coord2 will have only a single row) or a set
-!>   of variables with suffixes corresponding to the indices specified in \p Channels.
-!> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Coord2.
-!>
-!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
-subroutine opsinputs_varobswriter_fillcoord2d( &
-  Hdr, OpsVarName, NumObs, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-type(coord_type), pointer                       :: Coord2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-
-! Local declarations:
-real(kind=c_double)                             :: VarValue(NumObs)
-real(kind=c_double)                             :: MissingDouble
-character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
-integer                                         :: iChannel
-
-! Body:
-
-MissingDouble = missing_value(0.0_c_double)
-
-JediVarNamesWithChannels = opsinputs_varobswriter_varnames_with_channels(JediVarName, Channels)
-
-if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
-  ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Coord2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
-
-  do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI
-    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
-
-    ! Fill the OPS data structures
-    where (VarValue /= MissingDouble)
-      Coord2(:, iChannel) % Value = VarValue
-    end where
-  end do
-end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-end subroutine opsinputs_varobswriter_fillcoord2d
-
-! ------------------------------------------------------------------------------
-
 !> Populate the Ob % ReportFlags field.
 !>
 !> Observations are marked as rejected if the JEDI QC flags of any or all (depending on the
@@ -1848,45 +1057,13 @@ type(c_ptr), value, intent(in)           :: ObsSpace, Flags
 logical, intent(in)                      :: RejectObsWithAnyVariableFailingQC
 logical, intent(in)                      :: RejectObsWithAllVariablesFailingQC
 
-! Local declarations:
-type(oops_variables)                     :: ObsVariables
-character(max_varname_length)            :: VarName
-integer                                  :: NumObsVariables, iVar
-integer(c_int)                           :: VarFlags(Ob % Header % NumObsLocal)
-
 ! Body:
 call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
                Ob % Header % NumObsLocal, Ob % ReportFlags)
-Ob % ReportFlags = 0
-
-ObsVariables = opsinputs_obsdatavector_int_varnames(Flags)
-NumObsVariables = ObsVariables % nvars()
-
-if (RejectObsWithAnyVariableFailingQC) then
-  Ob % ReportFlags = 0
-
-  ! Set the FinalRejectReport bit in ReportFlags for observations with a non-zero QC flag
-  ! in at least one variable.
-  do iVar = 1, NumObsVariables
-    VarName = ObsVariables % variable(iVar)
-    call opsinputs_obsdatavector_int_get(Flags, VarName, VarFlags)
-    where (VarFlags > 0)
-      Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
-    end where
-  end do
-else if (RejectObsWithAllVariablesFailingQC) then
-  Ob % ReportFlags = ibset(Ob % ReportFlags, FinalRejectReport)
-
-  ! Clear the FinalRejectReport bit in ReportFlags for observations with a zero QC flag
-  ! in at least one variable.
-  do iVar = 1, NumObsVariables
-    VarName = ObsVariables % variable(iVar)
-    call opsinputs_obsdatavector_int_get(Flags, VarName, VarFlags)
-    where (VarFlags == 0)
-      Ob % ReportFlags = ibclr(Ob % ReportFlags, FinalRejectReport)
-    end where
-  end do
-end if
+call opsinputs_utils_fillreportflags(ObsSpace, Flags, &
+                                   RejectObsWithAnyVariableFailingQC, &
+                                   RejectObsWithAllVariablesFailingQC, &
+                                   Ob % ReportFlags)
 
 end subroutine opsinputs_varobswriter_fillreportflags
 
@@ -2008,16 +1185,16 @@ type(c_ptr), value, intent(in)           :: ObsSpace
 call opsinputs_varobswriter_fillsatid(Ob, ObsSpace)
 ! TODO(someone): Replace the placeholder in the call below with an appropriate variable name
 ! and group, once they're known.
-call opsinputs_varobswriter_fillinteger( &
+call opsinputs_fill_fillinteger( &
   Ob % Header % RO_quality, "RO_quality", Ob % Header % NumObsLocal, Ob % RO_quality, &
   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
 ! TODO(someone): Replace "latitude" and "longitude" variable names in the two calls below with
 ! appropriate GPSRO-specific variable names, once they're known. The group name may need to be
 ! adjusted as well.
-call opsinputs_varobswriter_fillreal( &
+call opsinputs_fill_fillreal( &
   Ob % Header % ro_occ_lat, "ro_occ_lat", Ob % Header % NumObsLocal, Ob % ro_occ_lat, &
   ObsSpace, "latitude", "MetaData")
-call opsinputs_varobswriter_fillreal( &
+call opsinputs_fill_fillreal( &
   Ob % Header % ro_occ_lon, "ro_occ_lon", Ob % Header % NumObsLocal, Ob % ro_occ_lon, &
   ObsSpace, "longitude", "MetaData")
 
@@ -2035,35 +1212,11 @@ type(OB_type), intent(inout)             :: Ob
 type(c_ptr), value, intent(in)           :: ObsSpace
 
 ! Body:
-call opsinputs_varobswriter_fillinteger( &
+call opsinputs_fill_fillinteger( &
   Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
   ObsSpace, "satellite_id", "MetaData")
 
 end subroutine opsinputs_varobswriter_fillsatid
-
-! ------------------------------------------------------------------------------
-
-!> Return an array containing the names of JEDI variables storing individual channels of the
-!> variable \p VarName. If the list of channels is empty, this means the variable in question is
-!> 1D and hence the returned array contains just the single string \p VarName.
-function opsinputs_varobswriter_varnames_with_channels(VarName, Channels) result(VarNames)
-implicit none
-! Subroutine arguments:
-character(len=*), intent(in)                   :: VarName
-integer(c_int), intent(in)                     :: Channels(:)
-
-! Local declarations:
-character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
-integer                                        :: i
-
-if (size(Channels) == 0) then
-  VarNames(1) = VarName
-else
-  do i = 1, size(Channels)
-    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
-  end do
-end if
-end function opsinputs_varobswriter_varnames_with_channels
 
 ! ------------------------------------------------------------------------------
 

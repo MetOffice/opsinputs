@@ -1,0 +1,56 @@
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - &default
+      ObsSpace:
+        name: AMSUB
+        ObsDataIn:
+          obsfile: Data/dummy.nc4
+        simulate:
+          variables: [dummy]
+      GeoVaLs:
+        filename: Data/001_UpperAirCxField_theta.nc4
+      ObsFilters:
+      - Filter: Cx Writer
+        namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
+        general_mode: debug
+        IC_PLevels: 5
+        # Test for the default value of FH_GridStagger
+      - Filter: Cx Checker
+        expected_header_fields:
+          Grid staggering type: 6
+      HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+      benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+      flaggedBenchmark: 0
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
+      general_mode: debug
+      IC_PLevels: 5
+      FH_GridStagger: ArakawaB
+    - Filter: Cx Checker
+      expected_header_fields:
+        Grid staggering type: 2
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
+      general_mode: debug
+      IC_PLevels: 5
+      FH_GridStagger: ArakawaC
+    - Filter: Cx Checker
+      expected_header_fields:
+        Grid staggering type: 3
+  - <<: *default
+    ObsFilters:
+    - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
+      general_mode: debug
+      IC_PLevels: 5
+      FH_GridStagger: EndGame
+    - Filter: Cx Checker
+      expected_header_fields:
+        Grid staggering type: 6

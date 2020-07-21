@@ -25,67 +25,86 @@ function(CREATE_SYMLINKS src dst)
   endforeach(FILENAME)
 endfunction()
 
-# Syntax: ADDVAROBSWRITER_TEST( NAME <name> [INPUTS <input>...] [DATA <data>...] [MPI <num_tasks>] )
+# Syntax: ADD_WRITER_TEST( NAME <name> YAML <yaml> [NAMELIST <namelist>]
+#                          [DATA <data>...] [MPI <num_tasks>] [DONT_SET_OPS_OUTPUT_DIR] )
 #
-# Defines a VarObsWriter test.
+# Defines a VarObsWriter or CxWriter test.
 #
 # Arguments:
-# - name: test name
-# - input: paths to 0 or more input files (typically YAML files and/or namelist files) relative
-#   to the testinput folder. Symlinks to these files will be created from the testinput folder in
-#   the build folder.
-# - data: paths to 0 or more data files (typically NetCDF files) relative to the testinput folder.
-#   Symlinks to these files will be created from the Data folder in the build folder.
-# - num_tasks: number of MPI tasks to spawn when running the test. If the MPI clause is not present,
+# - name: Test name (will be prefixed by "test_opsvalues_").
+# - yaml: path to the test's input YAML file, relative to the testinput subfolder.
+# - namelist: path to the test's input namelist file, relative to the testinput subfolder. May be
+#   omitted if the test does not use a namelist file.
+#   Symlinks to the input YAML and namelist files will be added to the testinput subfolder of the
+#   build folder.
+# - data: Paths to any data files (typically NetCDF files) required by the test, relative to the
+#   testinput folder. Symlinks to these files will be added to the Data subfolder of the build
+#   folder.
+# - num_tasks: Number of MPI tasks to spawn when running the test. If the MPI option is not present,
 #   the test will be run without MPI.
-function( ADD_VAROBSWRITER_TEST )
-  set( options DONT_SET_OPS_VAROB_OUTPUT_DIR)
-  set( single_value_args NAME MPI )
-  set( multi_value_args INPUTS DATA)
+# Options:
+# - DONT_SET_OPS_OUTPUT_DIR_ENV_VAR: if true, OPS environment variables specifying output folders
+#   won't be set, so the output folder needs to be defined in the YAML file.
+function( ADD_WRITER_TEST )
+  set( options DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
+  set( single_value_args NAME YAML NAMELIST MPI )
+  set( multi_value_args DATA)
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
                          ${_FIRST_ARG} ${ARGN} )
   if(_PAR_UNPARSED_ARGUMENTS)
-    ecbuild_critical("Unknown keywords given to ADD_VAROBSWRITER_TEST(): \"${_PAR_UNPARSED_ARGUMENTS}\"")
+    ecbuild_critical("Unknown keywords given to ADD_WRITER_TEST(): \"${_PAR_UNPARSED_ARGUMENTS}\"")
   endif()
 
-  list( APPEND opsinputs_test_input ${_PAR_INPUTS} )
+  list( APPEND opsinputs_test_input ${_PAR_YAML} )
+  list( APPEND opsinputs_test_input ${_PAR_NAMELIST} )
   set ( opsinputs_test_input ${opsinputs_test_input} PARENT_SCOPE )
   list( APPEND opsinputs_test_data ${_PAR_DATA})
-  set ( opsinputs_test_data ${opsinputs_test_data} PARENT_SCOPE )
+  set( opsinputs_test_data ${opsinputs_test_data} PARENT_SCOPE )
 
   set( environment
-         OOPS_TRAPFPE=1
-         LD_LIBRARY_PATH=${OPS_INSTALLS_DIR}/odb/lib:${OPS_INSTALLS_DIR}/shumlib/lib:$ENV{LD_LIBRARY_PATH}
-         OPSINPUTS_OPS_BIN_DIR=${OPS_BIN_DIR})
-  if (NOT ${_PAR_DONT_SET_OPS_VAROB_OUTPUT_DIR})
-    list (APPEND environment
-      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_varobswriter_${_PAR_NAME})
+       OOPS_TRAPFPE=1
+       OPSINPUTS_OPSPROG_RUNNER=${OPSINPUTS_OPSPROG_RUNNER} )
+  if ( NOT ${_PAR_DONT_SET_OPS_OUTPUT_DIR_ENV_VAR} )
+    list ( APPEND environment
+      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
+      OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME} )
   endif()
 
-  if (_PAR_MPI)
-    ecbuild_add_test( TARGET  test_opsinputs_varobswriter_${_PAR_NAME}
+  if ( _PAR_MPI )
+    ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
                       COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
-                      ARGS    "testinput/${_PAR_NAME}.yaml"
+                      ARGS    "testinput/${_PAR_YAML}"
                       ENVIRONMENT "${environment}"
                       MPI     ${_PAR_MPI}
                       DEPENDS test_OpsInputsFilters.x )
   else()
-    ecbuild_add_test( TARGET  test_opsinputs_varobswriter_${_PAR_NAME}
+    ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
                       COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
-                      ARGS    "testinput/${_PAR_NAME}.yaml"
+                      ARGS    "testinput/${_PAR_YAML}"
                       ENVIRONMENT "${environment}"
                       DEPENDS test_OpsInputsFilters.x )
   endif()
-  set_tests_properties( test_opsinputs_varobswriter_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+  set_tests_properties( test_opsinputs_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
 set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
+set( OPSINPUTS_OPSPROG_RUNNER ${CMAKE_CURRENT_BINARY_DIR}/opsprog_runner.sh)
+
+# Shell script running OPS programs with PATH and LD_LIBRARY_PATH set appropriately
+configure_file(opsprog_runner.sh.in ${OPSINPUTS_OPSPROG_RUNNER} @ONLY)
 
 ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                         SOURCES opsinputs/instantiateObsFilterFactory.h
+                                opsinputs/CheckerUtils.cc
+                                opsinputs/CheckerUtils.h
+                                opsinputs/CxChecker.cc
+                                opsinputs/CxChecker.h
+                                opsinputs/CxCheckerParameters.h
                                 opsinputs/ResetFlagsToPass.cc
                                 opsinputs/ResetFlagsToPass.h
                                 opsinputs/ResetFlagsToPassParameters.h
+                                opsinputs/TempFile.cc
+                                opsinputs/TempFile.h
                                 opsinputs/VarObsChecker.cc
                                 opsinputs/VarObsChecker.h
                                 opsinputs/VarObsCheckerParameters.h
@@ -98,114 +117,209 @@ ecbuild_add_test( TARGET  test_opsinputs_varobswriter_setup
                   ARGS    "-E" "remove_directory" ${OPSINPUTS_OUTPUT_DIR})
 set_tests_properties(test_opsinputs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
 
+### VarObsWriter tests
+
 # Tests of individual varfields
-ADD_VAROBSWRITER_TEST(NAME   001_VarField_pstar
-                      INPUTS 001_VarField_pstar.yaml
-                      DATA   001_VarField_pstar.nc4)
-ADD_VAROBSWRITER_TEST(NAME   002_VarField_temperature_Surface
-                      INPUTS 002_VarField_temperature_Surface.yaml
-                      DATA   002_VarField_temperature_Surface.nc4)
-ADD_VAROBSWRITER_TEST(NAME   002_VarField_temperature_RadarZ
-                      INPUTS 002_VarField_temperature_RadarZ.yaml
-                      DATA   002_VarField_temperature_RadarZ.nc4)
-ADD_VAROBSWRITER_TEST(NAME   003_VarField_rh_Surface
-                      INPUTS 003_VarField_rh_Surface.yaml
-                      DATA   003_VarField_rh_Surface.nc4)
-ADD_VAROBSWRITER_TEST(NAME   003_VarField_rh_Sonde
-                      INPUTS 003_VarField_rh_Sonde.yaml
-                      DATA   003_VarField_rh_Sonde.nc4)
-ADD_VAROBSWRITER_TEST(NAME   004_VarField_u_Surface
-                      INPUTS 004_VarField_u_Surface.yaml
-                      DATA   004_VarField_u_Surface.nc4)
-ADD_VAROBSWRITER_TEST(NAME   004_VarField_u_Sonde
-                      INPUTS 004_VarField_u_Sonde.yaml
-                      DATA   004_VarField_u_Sonde.nc4)
-ADD_VAROBSWRITER_TEST(NAME   005_VarField_v_Surface
-                      INPUTS 005_VarField_v_Surface.yaml
-                      DATA   005_VarField_v_Surface.nc4)
-ADD_VAROBSWRITER_TEST(NAME   005_VarField_v_Sonde
-                      INPUTS 005_VarField_v_Sonde.yaml
-                      DATA   005_VarField_v_Sonde.nc4)
-ADD_VAROBSWRITER_TEST(NAME   019_VarField_satzenith
-                      INPUTS 019_VarField_satzenith.yaml VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
-                      DATA   019_VarField_satzenith.nc4)
-ADD_VAROBSWRITER_TEST(NAME   023_VarField_modelsurface_geoval
-                      INPUTS 023_VarField_modelsurface_geoval.yaml VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
-                      DATA   023_VarField_modelsurface_geoval.nc4)
-ADD_VAROBSWRITER_TEST(NAME   028_VarField_satid
-                      INPUTS 028_VarField_satid.yaml
-                      DATA   028_VarField_satid.nc4)
-ADD_VAROBSWRITER_TEST(NAME   031_VarField_solzenith
-                      INPUTS 031_VarField_solzenith.yaml VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
-                      DATA   031_VarField_solzenith.nc4)
-ADD_VAROBSWRITER_TEST(NAME   054_VarField_numchans
-                      INPUTS 054_VarField_numchans.yaml VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
-                      DATA   010_VarField_britemp.nc4)
-ADD_VAROBSWRITER_TEST(NAME   055_VarField_channum
-                      INPUTS 055_VarField_channum.yaml VarObsWriterNamelists_055_VarField_channum/AMSUB.nl
-                      DATA   010_VarField_britemp.nc4)
-ADD_VAROBSWRITER_TEST(NAME   066_VarField_radarobazim
-                      INPUTS 066_VarField_radarobazim.yaml
-                      DATA   066_VarField_radarobazim.nc4)
-ADD_VAROBSWRITER_TEST(NAME   071_VarField_bendingangle
-                      INPUTS 071_VarField_bendingangle.yaml
-                      DATA   071_VarField_bendingangle.nc4)
-ADD_VAROBSWRITER_TEST(NAME   072_VarField_impactparam
-                      INPUTS 072_VarField_impactparam.yaml
-                      DATA   072_VarField_impactparam.nc4)
-ADD_VAROBSWRITER_TEST(NAME   073_VarField_ro_rad_curv
-                      INPUTS 073_VarField_ro_rad_curv.yaml
-                      DATA   073_VarField_ro_rad_curv.nc4)
-ADD_VAROBSWRITER_TEST(NAME   074_VarField_ro_geoid_und
-                      INPUTS 074_VarField_ro_geoid_und.yaml
-                      DATA   074_VarField_ro_geoid_und.nc4)
-ADD_VAROBSWRITER_TEST(NAME   077_VarField_aod
-                      INPUTS 077_VarField_aod.yaml
-                      DATA   077_VarField_aod.nc4)
-ADD_VAROBSWRITER_TEST(NAME   078_VarField_theta
-                      INPUTS 078_VarField_theta.yaml
-                      DATA   078_VarField_theta.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_001_VarField_pstar
+                YAML     001_VarField_pstar.yaml
+                DATA     001_VarField_pstar.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_Surface
+                YAML     002_VarField_temperature_Surface.yaml
+                DATA     002_VarField_temperature_Surface.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ
+                YAML     002_VarField_temperature_RadarZ.yaml
+                DATA     002_VarField_temperature_RadarZ.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_003_VarField_rh_Surface
+                YAML     003_VarField_rh_Surface.yaml
+                DATA     003_VarField_rh_Surface.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_003_VarField_rh_Sonde
+                YAML     003_VarField_rh_Sonde.yaml
+                DATA     003_VarField_rh_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Surface
+                YAML     004_VarField_u_Surface.yaml
+                DATA     004_VarField_u_Surface.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Sonde
+                YAML     004_VarField_u_Sonde.yaml
+                DATA     004_VarField_u_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Surface
+                YAML     005_VarField_v_Surface.yaml
+                DATA     005_VarField_v_Surface.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Sonde
+                YAML     005_VarField_v_Sonde.yaml
+                DATA     005_VarField_v_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
+                YAML     019_VarField_satzenith.yaml
+                NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
+                DATA     019_VarField_satzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_023_VarField_modelsurface_geoval
+                YAML     023_VarField_modelsurface_geoval.yaml
+                NAMELIST VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
+                DATA     023_VarField_modelsurface_geoval.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_028_VarField_satid
+                YAML     028_VarField_satid.yaml
+                DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
+                YAML     031_VarField_solzenith.yaml
+                NAMELIST VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
+                DATA     031_VarField_solzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_054_VarField_numchans
+                YAML     054_VarField_numchans.yaml
+                NAMELIST VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
+                DATA     010_VarField_britemp.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_055_VarField_channum
+                YAML     055_VarField_channum.yaml
+                NAMELIST VarObsWriterNamelists_055_VarField_channum/AMSUB.nl
+                DATA     010_VarField_britemp.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
+                YAML     066_VarField_radarobazim.yaml
+                DATA     066_VarField_radarobazim.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_071_VarField_bendingangle
+                YAML     071_VarField_bendingangle.yaml
+                DATA     071_VarField_bendingangle.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_072_VarField_impactparam
+                YAML     072_VarField_impactparam.yaml
+                DATA     072_VarField_impactparam.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_073_VarField_ro_rad_curv
+                YAML     073_VarField_ro_rad_curv.yaml
+                DATA     073_VarField_ro_rad_curv.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_074_VarField_ro_geoid_und
+                YAML     074_VarField_ro_geoid_und.yaml
+                DATA     074_VarField_ro_geoid_und.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_077_VarField_aod
+                YAML     077_VarField_aod.yaml
+                DATA     077_VarField_aod.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_078_VarField_theta
+                YAML     078_VarField_theta.yaml
+                DATA     078_VarField_theta.nc4)
 
 # MPI tests
-ADD_VAROBSWRITER_TEST(NAME   002_VarField_temperature_RadarZ_MPI_1
-                      MPI    1
-                      INPUTS 002_VarField_temperature_RadarZ_MPI_1.yaml
-                      DATA   002_VarField_temperature_RadarZ.nc4)
-ADD_VAROBSWRITER_TEST(NAME   002_VarField_temperature_RadarZ_MPI_4
-                      MPI    4
-                      INPUTS 002_VarField_temperature_RadarZ_MPI_4.yaml
-                      DATA   002_VarField_temperature_RadarZ.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_1
+                MPI      1
+                YAML     002_VarField_temperature_RadarZ_MPI_1.yaml
+                DATA     002_VarField_temperature_RadarZ.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_4
+                MPI      4
+                YAML     002_VarField_temperature_RadarZ_MPI_4.yaml
+                DATA     002_VarField_temperature_RadarZ.nc4)
 
 # Header field tests
-ADD_VAROBSWRITER_TEST(NAME   FixedHeader_VertCoord
-                      INPUTS FixedHeader_VertCoord.yaml
-                      DATA   028_VarField_satid.nc4)
-ADD_VAROBSWRITER_TEST(NAME   FixedHeader_HorizGrid
-                      INPUTS FixedHeader_HorizGrid.yaml
-                      DATA   028_VarField_satid.nc4)
-ADD_VAROBSWRITER_TEST(NAME   FixedHeader_GridStagger
-                      INPUTS FixedHeader_GridStagger.yaml
-                      DATA   028_VarField_satid.nc4)
-ADD_VAROBSWRITER_TEST(NAME   FixedHeader_Times
-                      INPUTS FixedHeader_Times.yaml
-                      DATA   028_VarField_satid.nc4)
-ADD_VAROBSWRITER_TEST(NAME   IntegerConstants_LensAndLevels
-                      INPUTS IntegerConstants_LensAndLevels.yaml
-                      DATA   028_VarField_satid.nc4)
-ADD_VAROBSWRITER_TEST(NAME   RealConstants
-                      INPUTS RealConstants.yaml
-                      DATA   028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_VertCoord
+                YAML     varobswriter_FixedHeader_VertCoord.yaml
+                DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_HorizGrid
+                YAML     varobswriter_FixedHeader_HorizGrid.yaml
+                DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_GridStagger
+                YAML     varobswriter_FixedHeader_GridStagger.yaml
+                DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_Times
+                YAML     varobswriter_FixedHeader_Times.yaml
+                DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_IntegerConstants_LensAndLevels
+                YAML     varobswriter_IntegerConstants_LensAndLevels.yaml
+                DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_RealConstants
+                YAML     varobswriter_RealConstants.yaml
+                DATA     028_VarField_satid.nc4)
 
 # Tests of other options
-ADD_VAROBSWRITER_TEST(NAME   reject_obs_with_all_variables_failing_qc
-                      INPUTS reject_obs_with_all_variables_failing_qc.yaml
-                      DATA   reject_obs_with_all_variables_failing_qc.nc4)
-ADD_VAROBSWRITER_TEST(NAME   nested_output_directory
-                      INPUTS nested_output_directory.yaml
-                      DATA   028_VarField_satid.nc4
-                      DONT_SET_OPS_VAROB_OUTPUT_DIR)
+ADD_WRITER_TEST(NAME     varobswriter_reject_obs_with_all_variables_failing_qc
+                YAML     varobswriter_reject_obs_with_all_variables_failing_qc.yaml
+                DATA     reject_obs_with_all_variables_failing_qc.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
+                YAML     varobswriter_nested_output_directory.yaml
+                DATA     028_VarField_satid.nc4
+                DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
-# Tests of auxiliary classes
+### CxWriter tests
+
+# Tests of individual surface varfields
+ADD_WRITER_TEST(NAME     cxwriter_002_SurfaceCxField_pstar
+                YAML     002_SurfaceCxField_pstar.yaml
+                NAMELIST CxWriterNamelists_002_SurfaceCxField_pstar/HLOSwind.nl
+                DATA     002_SurfaceCxField_pstar.nc4 dummy.nc4)
+
+# Tests of individual upper-air varfields
+ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
+                YAML     001_UpperAirCxField_theta.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_003_UpperAirCxField_u
+                YAML     003_UpperAirCxField_u.yaml
+                NAMELIST CxWriterNamelists_003_UpperAirCxField_u/HLOSwind.nl
+                DATA     003_UpperAirCxField_u.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_004_UpperAirCxField_v
+                YAML     004_UpperAirCxField_v.yaml
+                NAMELIST CxWriterNamelists_004_UpperAirCxField_v/HLOSwind.nl
+                DATA     004_UpperAirCxField_v.nc4 dummy.nc4)
+
+# Header field tests
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
+                YAML     cxwriter_FixedHeader_VertCoord.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_HorizGrid
+                YAML     cxwriter_FixedHeader_HorizGrid.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_GridStagger
+                YAML     cxwriter_FixedHeader_GridStagger.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_ObsFileType
+                YAML     cxwriter_FixedHeader_ObsFileType.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Times
+                YAML     cxwriter_FixedHeader_Times.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_IntegerConstants_PLevels
+                YAML     cxwriter_IntegerConstants_PLevels.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_RealConstants
+                YAML     cxwriter_RealConstants.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_Lookup_Times
+                YAML     cxwriter_Lookup_Times.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_Lookup_Numbers
+                YAML     cxwriter_Lookup_Numbers.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_LevelDependentConstants
+                YAML     cxwriter_LevelDependentConstants.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+
+# MPI tests
+ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_1
+                MPI      1
+                YAML     001_UpperAirCxField_theta_MPI_1.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_4
+                MPI      4
+                YAML     001_UpperAirCxField_theta_MPI_4.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+
+# Tests of other options
+ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
+                YAML     cxwriter_reject_obs_with_all_variables_failing_qc.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 reject_obs_with_all_variables_failing_qc.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
+                YAML     cxwriter_nested_output_directory.yaml
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
+
+### Tests of auxiliary classes
+
 list( APPEND opsinputs_test_input empty.yaml )
 ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
                   SOURCES mains/TestMPIExceptionSynchronizer.cc
@@ -213,6 +327,8 @@ ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
                   ENVIRONMENT OOPS_TRAPFPE=1
                   MPI     4
                   LIBS    opsinputs)
+
+### Final things to do
 
 # Create symlinks to test inputs and data files
 CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/testinput ${opsinputs_test_input} )
@@ -223,4 +339,3 @@ list( TRANSFORM opsinputs_test_input PREPEND testinput/ )
 ecbuild_add_resources( TARGET opsinputs_test_scripts
                        SOURCES_PACK
                        ${opsinputs_test_input} )
-

@@ -11,7 +11,7 @@ Observations:
         variables: [dummy]
     ObsFilters:
     - Filter: VarObs Writer
-      output_directory: testoutput/nested/path
+      output_directory: testoutput/nested/path/varobs
       RC_LongSpacing: 0.10
       RC_LatSpacing: 0.20
       RC_FirstLat: 1.50
@@ -19,7 +19,7 @@ Observations:
       RC_PoleLat: 3.50
       RC_PoleLong: 4.50
     - Filter: VarObs Checker
-      output_directory: testoutput/nested/path
+      output_directory: testoutput/nested/path/varobs
       expected_header_fields:
         Longitude spacing: "0.10"
         Latitude spacing: "0.20"

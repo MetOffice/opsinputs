@@ -101,6 +101,10 @@ void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {
     localEnvironment.set("OPS_VAROBSCONTROL_NL_DIR", *parameters_.namelistDirectory.value());
   if (parameters_.outputDirectory.value() != boost::none)
     localEnvironment.set("OPS_VAROB_OUTPUT_DIR", *parameters_.outputDirectory.value());
+
+  // Hack taken from OpsScr_Setup; prevents ODB code (which provides yomhook and parkind1)
+  // from calling mpi_buffer_attach. gc_init() already does this.
+  localEnvironment.set("MPL_METHOD", "JP_BLOCKING_STANDARD");
 }
 
 void VarObsWriter::createOutputDirectory() {
@@ -108,7 +112,7 @@ void VarObsWriter::createOutputDirectory() {
   ASSERT_MSG(outputDirectory != nullptr, "The output directory has not been set");
   eckit::PathName outputPath(outputDirectory);
   ASSERT_MSG(!outputPath.exists() || outputPath.isDir(),
-             "The output path '" + std::string(outputDirectory) + "'is not a directory");
+             "The output path '" + std::string(outputDirectory) + "' is not a directory");
   outputPath.mkdir();
 }
 
