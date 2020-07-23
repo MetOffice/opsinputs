@@ -303,6 +303,9 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_fa
     f.close()
 
 def output_2d_geoval_to_netcdf(var_name, file_name):
+    return output_2d_geovals_to_netcdf([var_name], file_name)
+
+def output_2d_geovals_to_netcdf(var_names, file_name):
     f = netcdf.netcdf_file(file_name, 'w')
 
     nlocs = 4
@@ -310,8 +313,13 @@ def output_2d_geoval_to_netcdf(var_name, file_name):
     f.createDimension('nlocs', nlocs)
     f.createDimension('nlevs', nlevs)
 
-    var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
-    var[:] = [[1.1, 1.2, 1.3], [2.1, missing_float, 2.3], [3.1, 3.2, 3.3], [4.1, 4.2, 4.3]]
+    for var_index, var_name in enumerate(var_names):
+      var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+      shift = 10 * var_index
+      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
+                [shift + 2.1, missing_float, shift + 2.3],
+                [shift + 3.1, shift + 3.2, shift + 3.3],
+                [shift + 4.1, shift + 4.2, shift + 4.3]]
 
     f.date_time = 2018010100
 
@@ -350,3 +358,4 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
+    output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')

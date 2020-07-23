@@ -253,6 +253,15 @@ ADD_WRITER_TEST(NAME     cxwriter_004_UpperAirCxField_v
                 NAMELIST CxWriterNamelists_004_UpperAirCxField_v/HLOSwind.nl
                 DATA     004_UpperAirCxField_v.nc4 dummy.nc4)
 
+ADD_WRITER_TEST(NAME     cxwriter_041-042_UpperAirCxField_dust1-dust2
+                YAML     041-042_UpperAirCxField_dust1-dust2.yaml
+                NAMELIST CxWriterNamelists_041-042_UpperAirCxField_dust1-dust2/AOD.nl
+                DATA     041-046_UpperAirCxField_dust1-dust6.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_041-046_UpperAirCxField_dust1-dust6
+                YAML     041-046_UpperAirCxField_dust1-dust6.yaml
+                NAMELIST CxWriterNamelists_041-046_UpperAirCxField_dust1-dust6/AOD.nl
+                DATA     041-046_UpperAirCxField_dust1-dust6.nc4 dummy.nc4)
+
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
                 YAML     cxwriter_FixedHeader_VertCoord.yaml

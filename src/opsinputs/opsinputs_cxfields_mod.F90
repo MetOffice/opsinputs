@@ -90,6 +90,8 @@ character(len=*), parameter :: opsinputs_cxfields_ExnerA = opsinputs_cxfields_un
 character(len=*), parameter :: opsinputs_cxfields_RichNumber = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_SoilMoisture = opsinputs_cxfields_unknown
 character(len=*), parameter :: opsinputs_cxfields_SoilTemp = opsinputs_cxfields_unknown
-character(len=*), parameter :: opsinputs_cxfields_dustp = opsinputs_cxfields_unknown
+! TODO(someone): is this geoval name correct? It matches the name used in the
+! aod_geoval_2018041500_s.nc4 file in UFO.
+character(len=*), parameter :: opsinputs_cxfields_dustp = "dust"
 
 end module opsinputs_cxfields_mod

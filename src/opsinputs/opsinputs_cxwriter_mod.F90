@@ -75,6 +75,7 @@ use GenMod_CLookAdd, only: &
     LBTIM,                 &
     LBFT
 use OpsMod_Ancil
+use OpsMod_AODGeneral, only: NDustBins
 use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
@@ -465,6 +466,18 @@ case default
   return
 end select
 
+if (.not. f_conf % get("num_dust_bins", int)) then
+  ! fall back to the default value
+  int = 2
+end if
+if (int /= 2 .and. int /= 6) then
+  write (ErrorMessage, '("num_dust_bins is ",I0," but must be either 2 or 6")') int
+  call gen_warn(RoutineName, ErrorMessage)
+  opsinputs_cxwriter_create = .false.
+  return
+end if
+NDustBins = int
+
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 call opsinputs_cxwriter_addrequiredgeovars(self, geovars)
 
@@ -582,17 +595,20 @@ type(opsinputs_cxwriter), intent(in) :: self
 type(oops_variables), intent(inout)  :: geovars
 
 ! Local declarations:
-integer(integer64)                   :: CxFields(MaxModelCodes)
+integer(integer64)                   :: CxFields(MaxModelCodes), CxField
 integer                              :: i
 character(len=max_varname_length)    :: GeoVarName
+integer                              :: DustBinIndex
+character                            :: DustBinIndexStr
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
 
 do i = 1, size(CxFields)
+  CxField = CxFields(i)
   GeoVarName = opsinputs_cxfields_unknown
 
-  select case (CxFields(i))
+  select case (CxField)
 
     ! Surface variables
 
@@ -752,11 +768,13 @@ do i = 1, size(CxFields)
       GeoVarName = opsinputs_cxfields_SoilMoisture
     case (StashCode_SoilTemp) ! IndexCxSoilTemp
       GeoVarName = opsinputs_cxfields_SoilTemp
-    ! TODO(someone): add support for these cxfields
-    ! case (IndexCxDust1, IndexCxDust2, &
-    !       IndexCxDust3, IndexCxDust4, &
-    !       IndexCxDust5, IndexCxDust6)
-    !   GeoVarName = opsinputs_cxfields_dustp
+    case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:6
+      DustBinIndex = CxField - StashItem_dustMin + 1
+      if (DustBinIndex <= NDustBins) then
+        write (DustBinIndexStr, '(i1)') DustBinIndex
+        GeoVarName = opsinputs_cxfields_dustp // DustBinIndexStr
+      end if
+
   end select
   
   if (GeoVarName /= opsinputs_cxfields_unknown) then
@@ -857,15 +875,17 @@ type(CX_type), intent(inout)            :: Cx
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_populatecx"
 character(len=80)                       :: ErrorMessage
 
-integer(integer64)                      :: CxFields(MaxModelCodes)
-integer                                 :: nCxFields
+integer(integer64)                      :: CxFields(MaxModelCodes), CxField
 integer                                 :: iCxField
+integer                                 :: DustBinIndex
+character                               :: DustBinIndexStr
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
 
 do iCxField = 1, size(CxFields)
-  select case (CxFields(iCxField))
+  CxField = CxFields(iCxField)
+  select case (CxField)
 
     ! Surface variables
 
@@ -1187,17 +1207,14 @@ do iCxField = 1, size(CxFields)
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % SoilTemp, "SoilTemp", Cx % Header % NumLocal, Cx % SoilTemp, &
         self % GeoVals, opsinputs_cxfields_SoilTemp)
-    ! TODO(someone): support dust bins and set NDustBins correctly
-    ! CASE (IndexCxDust1, IndexCxDust2, &
-      !      IndexCxDust3, IndexCxDust4, &
-      !      IndexCxDust5, IndexCxDust6)
-      !  CxHdrVrbl = Cx % Header % dustp
-      !  IF (Ivar > IndexCxDustMax .OR. .NOT. CxHdrVrbl % Present) THEN
-      !    CxHdrVrbl % Present = .FALSE.
-      !    CYCLE UairVrbl
-      !  ENDIF
-      !  DustInd = Ivar - IndexCxDustMin + 1
-      !  CxVrblUair => Cx % dustp(DustInd) % field(:,:)
+    case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:IndexCxDust6
+      DustBinIndex = CxField - StashItem_dustMin + 1
+      if (DustBinIndex <= NDustBins) then
+        write (DustBinIndexStr, '(i1)') DustBinIndex
+        call opsinputs_fill_fillreal2dfromgeoval( &
+          Cx % Header % dustp, "dustp", Cx % Header % NumLocal, Cx % dustp(DustBinIndex) % field, &
+          self % GeoVals, opsinputs_cxfields_dustp // DustBinIndexStr)
+      end if
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx

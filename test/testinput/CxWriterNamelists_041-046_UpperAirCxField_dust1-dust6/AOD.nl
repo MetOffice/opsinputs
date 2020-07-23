@@ -1,0 +1,3 @@
+&CXControlNL
+CxFields=431,432,433,434,435,436
+/
