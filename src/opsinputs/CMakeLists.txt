@@ -160,30 +160,27 @@ set(OPS_O_FILES
     opsmod_varobslib.o)
 list(TRANSFORM OPS_O_FILES PREPEND "${OPS_O_DIR}/")
 
-ecbuild_find_mpi( COMPONENTS Fortran REQUIRED )
+if( NOT (MPI_FOUND AND MPI_Fortran_FOUND) )
+  find_package( MPI REQUIRED COMPONENTS Fortran )
+endif()
 
 ecbuild_add_library( TARGET gcom
                      SOURCES ${GCOM_O_FILES}
                      LINKER_LANGUAGE Fortran
-                     TYPE STATIC
-                     LIBS ${MPI_Fortran_LIBRARIES}
-                    )
+                     TYPE STATIC )
+target_link_libraries( gcom PUBLIC MPI::MPI_Fortran )
 
 ecbuild_add_library( TARGET ops
                      SOURCES ${OPS_O_FILES}
                      LINKER_LANGUAGE Fortran
-                     TYPE STATIC
-                     LIBS gcom ${ODB_LIBS} ${SHUM_LIBS} ${MPI_Fortran_LIBRARIES}
-                    )
-
-list( APPEND OPSINPUTS_LIBS_DEP ufo ioda oops ops gcom ${NETCDF_LIBRARIES} )
+                     TYPE STATIC )
+target_link_libraries( ops PUBLIC gcom PRIVATE ${ODB_LIBS} ${SHUM_LIBS} )
 
 ecbuild_add_library( TARGET   opsinputs
                      SOURCES  ${opsinputs_src_files}
-                     LIBS     ${OPSINPUTS_LIBS_DEP}
                      INSTALL_HEADERS LISTED
                      HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/opsinputs
                      LINKER_LANGUAGE ${OPSINPUTS_LINKER_LANGUAGE}
                      PRIVATE_INCLUDES ${OPS_INCLUDE_DIR}
-                     TYPE STATIC
-                    )
+                     TYPE STATIC )
+target_link_libraries( opsinputs PUBLIC ufo ioda oops PRIVATE ops )
