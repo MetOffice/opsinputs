@@ -54,7 +54,7 @@ set(SHUM_LIBS shum_byteswap shum_string_conv shum_wgdos_packing)
 list(TRANSFORM SHUM_LIBS PREPEND "${SHUM_LIB_DIR}/lib")
 list(TRANSFORM SHUM_LIBS APPEND ".so")
 
-set(OPS_O_FILES
+set(GCOM_O_FILES
     gc__abort.o
     gc__flush.o
     gc__get_mpi_type.o
@@ -70,18 +70,6 @@ set(OPS_O_FILES
     gcg__mpi_rank.o
     gcg_isum.o
     gcg_rsumr.o
-    gen_clockticks.o
-    gen_cputime.o
-    gen_memory.o
-    gen_sleepwrapper.o
-    genmod_control.o
-    genmod_core.o
-    genmod_matmul.o
-    genmod_modelio.o
-    genmod_platform.o
-    genmod_setup.o
-    genmod_sleep.o
-    genmod_utilities.o
     mpl_abort.o
     mpl_allgather.o
     mpl_allreduce.o
@@ -114,7 +102,22 @@ set(OPS_O_FILES
     mpl_waitall.o
     mpl_win_allocate_shared.o
     mpl_win_free.o
-    mpl_win_shared_query.o
+    mpl_win_shared_query.o)
+list(TRANSFORM GCOM_O_FILES PREPEND "${OPS_O_DIR}/")
+
+set(OPS_O_FILES
+    gen_clockticks.o
+    gen_cputime.o
+    gen_memory.o
+    gen_sleepwrapper.o
+    genmod_control.o
+    genmod_core.o
+    genmod_matmul.o
+    genmod_modelio.o
+    genmod_platform.o
+    genmod_setup.o
+    genmod_sleep.o
+    genmod_utilities.o
     ops_ereport_mod.o
     ops_file_size.o
     ops_netcdf_wrappers.o
@@ -159,14 +162,21 @@ list(TRANSFORM OPS_O_FILES PREPEND "${OPS_O_DIR}/")
 
 ecbuild_find_mpi( COMPONENTS Fortran REQUIRED )
 
+ecbuild_add_library( TARGET gcom
+                     SOURCES ${GCOM_O_FILES}
+                     LINKER_LANGUAGE Fortran
+                     TYPE STATIC
+                     LIBS ${MPI_Fortran_LIBRARIES}
+                    )
+
 ecbuild_add_library( TARGET ops
                      SOURCES ${OPS_O_FILES}
                      LINKER_LANGUAGE Fortran
                      TYPE STATIC
-                     LIBS ${ODB_LIBS} ${SHUM_LIBS} ${MPI_Fortran_LIBRARIES}
+                     LIBS gcom ${ODB_LIBS} ${SHUM_LIBS} ${MPI_Fortran_LIBRARIES}
                     )
 
-list( APPEND OPSINPUTS_LIBS_DEP oops ioda ufo ${NETCDF_LIBRARIES} ops )
+list( APPEND OPSINPUTS_LIBS_DEP ufo ioda oops ops gcom ${NETCDF_LIBRARIES} )
 
 ecbuild_add_library( TARGET   opsinputs
                      SOURCES  ${opsinputs_src_files}
