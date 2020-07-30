@@ -1,0 +1,25 @@
+MODULE GenMod_MTrace
+
+CONTAINS
+
+SUBROUTINE Gen_MTrace
+#ifdef HAVE_MTRACE
+INTERFACE
+  SUBROUTINE mtrace() BIND (C, NAME = "mtrace")
+  END SUBROUTINE mtrace
+END INTERFACE
+CALL mtrace
+#endif
+END SUBROUTINE Gen_MTrace
+
+SUBROUTINE Gen_MUnTrace
+#ifdef HAVE_MTRACE
+INTERFACE
+  SUBROUTINE muntrace() BIND (C, NAME = "muntrace")
+  END SUBROUTINE muntrace
+END INTERFACE
+CALL muntrace
+#endif
+END SUBROUTINE Gen_MUnTrace
+
+END MODULE GenMod_MTrace
