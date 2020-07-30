@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# Run an OPS utility from the appropriate directory.
+export PATH=@OPSPROG_BIN_DIR@:$PATH
+$@
