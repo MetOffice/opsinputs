@@ -66,9 +66,6 @@ include_directories( ${IODA_INCLUDE_DIRS} )
 ecbuild_use_package( PROJECT oops VERSION 0.2.1 REQUIRED )
 include_directories( ${OOPS_INCLUDE_DIRS} )
 
-# OPS
-find_package(OPS)
-
 ################################################################################
 # Export package info
 ################################################################################
@@ -95,10 +92,7 @@ endforeach()
 include( opsinputs_compiler_flags )
 include_directories( ${OPSINPUTS_INCLUDE_DIRS} ${OPSINPUTS_EXTRA_INCLUDE_DIRS} )
 
-if (NOT OPS_FOUND)
-  # Use our own copy of the relevant parts of OPS
-  add_subdirectory( deps )
-endif()
+add_subdirectory( deps )
 add_subdirectory( src )
 add_subdirectory( test )
 

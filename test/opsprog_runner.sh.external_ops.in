@@ -1,7 +1,0 @@
-#!/bin/bash
-#
-# Run an executable from the OPS binary directory with LD_LIBRARY_PATH set appropriately
-
-export LD_LIBRARY_PATH=@OPS_INSTALLS_DIR@/odb/lib:@OPS_INSTALLS_DIR@/shumlib/lib:$LD_LIBRARY_PATH 
-export PATH=@OPS_BIN_DIR@:$PATH 
-$@
