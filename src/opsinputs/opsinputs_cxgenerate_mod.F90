@@ -9,12 +9,10 @@
 
 module opsinputs_cxgenerate_mod
 
-use OpsMod_CXGenerate, only: &
-    MaxModelCodes
-
 implicit none
 
-integer :: CxLevels = 30
+integer            :: CxLevels = 30
+integer, parameter :: MaxModelCodes = 100
 
 contains
 
