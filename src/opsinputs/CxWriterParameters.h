@@ -106,11 +106,6 @@ class CxWriterParameters : public oops::Parameters {
   /// The LBFT element of the UM header look-up table.
   oops::Parameter<int> forecastPeriod{"forecast_period", 0, this};
 
-  /// Model type.
-  ///
-  /// Valid values (case-insensitive): Atmos, Ocean, SST.
-  oops::Parameter<std::string> modelType{"model_type", "atmos", this};
-
   // TODO(wsmigaj): I hope these comments are correct -- please let me know if not.
   // Can these parameters be given names understandable to a layman (without Greek letters)?
   /// New dynamics vertical coordinate theta. Should have length IC_PLevels + 1 (with the
@@ -118,6 +113,18 @@ class CxWriterParameters : public oops::Parameters {
   oops::Parameter<std::vector<double>> etaThetaLevels{"eta_theta_levels", {}, this};
   /// New dynamics vertical coordinate rho. Should have length IC_PLevels.
   oops::Parameter<std::vector<double>> etaRhoLevels{"eta_rho_levels", {}, this};
+
+  // Parameters corresponding to certain global variables in the OPS.
+
+  /// Model type.
+  ///
+  /// Valid values (case-insensitive): Atmos, Ocean, SST.
+  oops::Parameter<std::string> modelType{"model_type", "atmos", this};
+
+  /// Number of model dust bins.
+  ///
+  /// Valid values: 2 (global), 6 (CAM).
+  oops::Parameter<int> numDustBins{"num_dust_bins", 2, this};
 };
 
 }  // namespace opsinputs

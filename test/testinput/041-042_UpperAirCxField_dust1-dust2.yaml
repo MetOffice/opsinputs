@@ -1,0 +1,44 @@
+# OPS does not make it possible to output individual dust* geovals; instead, all these geovals
+# (either 2 or 6, depending on the num_dust_bins option), if required, must be output together.
+
+window_begin: 2018-01-01T00:00:00Z
+window_end: 2018-01-01T01:00:00Z
+
+Observations:
+  ObsTypes:
+  - ObsSpace:
+      name: AOD
+      ObsDataIn:
+        obsfile: Data/dummy.nc4
+      simulate:
+        variables: [dummy]
+    GeoVaLs:
+      filename: Data/041-046_UpperAirCxField_dust1-dust6.nc4
+    ObsFilters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
+    - Filter: Reset Flags to Pass
+      flags_to_reset: [1, 6]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
+    - Filter: Domain Check
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.
+    - Filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_041-042_UpperAirCxField_dust1-dust2
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+      IC_PLevels: 5
+      num_dust_bins: 2
+    - Filter: Cx Checker
+      expected_surface_variables: []
+      expected_upper_air_variables: ["41", "42"] # IndexCxDust1, IndexCxDust2
+      expected_main_table_columns:
+      - # batch 1
+        - ["1.10", "1.20", "1.30", "11.10", "11.20", "11.30"]       # column 1
+        - ["2.10", "**********", "2.30", "12.10", "**********", "12.30"] # column 2 (the asterisks represent a missing float)
+        - ["4.10", "4.20", "4.30", "14.10", "14.20", "14.30"]       # column 3
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

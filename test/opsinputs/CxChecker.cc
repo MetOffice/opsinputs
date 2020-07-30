@@ -186,7 +186,10 @@ CxChecker::PrintCxFileOutput CxChecker::parsePrintCxFileOutput(
       } else if (line.empty() || line == "doesn't exist") {
         // nothing to do
       } else {
-        output.mainTable[batchIndex][columnIndex] = splitIntoFixedLengthChunksAndTrim(line, 10);
+        std::vector<std::string> &destination = output.mainTable[batchIndex][columnIndex];
+        std::vector<std::string> source = splitIntoFixedLengthChunksAndTrim(line, 10);
+        // Long columns may be split into multiple lines, so append to any existing contents
+        destination.insert(destination.end(), source.begin(), source.end());
       }
       break;
     }

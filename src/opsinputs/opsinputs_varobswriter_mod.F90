@@ -176,11 +176,10 @@ type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the 
 logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
-character(len=:), allocatable              :: string
-integer                                    :: int
-logical                                    :: bool
-real(kind=c_double)                        :: double
-logical                                    :: found
+character(len=:), allocatable              :: StringValue
+integer                                    :: IntValue
+logical                                    :: BoolValue
+real(kind=c_double)                        :: DoubleValue
 
 character(len=*), parameter :: RoutineName = "opsinputs_varobswriter_create"
 character(len=200)          :: ErrorMessage
@@ -191,11 +190,11 @@ opsinputs_varobswriter_create = .true.
 
 ! Setup OPS
 
-if (.not. f_conf % get("general_mode", string)) then
+if (.not. f_conf % get("general_mode", StringValue)) then
   ! fall back to the default value
-  string = "normal"
+  StringValue = "normal"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("operational")
   GeneralMode = OperationalMode
 case ("quiet")
@@ -211,7 +210,7 @@ case ("debug")
 case ("verbose")
   GeneralMode = VerboseMode
 case default
-  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
+  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -226,19 +225,19 @@ call Ops_InitMPI
 ! Retrieve parameter values from the input configuration object
 ! and store them in member variables
 
-if (.not. f_conf % get("obs_group", string)) then
+if (.not. f_conf % get("obs_group", StringValue)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
   opsinputs_varobswriter_create = .false.
   return
 end if
-self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
+self % ObsGroup = OpsFn_ObsGroupNameToNum(StringValue)
 
-if (.not. f_conf % get("validity_time", string)) then
+if (.not. f_conf % get("validity_time", StringValue)) then
   call gen_warn(RoutineName, "Mandatory validity_time option not found")
   opsinputs_varobswriter_create = .false.
   return
 end if
-call datetime_create(string, self % validitytime)
+call datetime_create(StringValue, self % validitytime)
 
 if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
                        self % RejectObsWithAnyVariableFailingQC)) then
@@ -263,11 +262,11 @@ if (.not. f_conf % get("use_radar_family", self % UseRadarFamily)) then
   self % UseRadarFamily = .false.
 end if
 
-if (.not. f_conf % get("FH_VertCoord", string)) then
+if (.not. f_conf % get("FH_VertCoord", StringValue)) then
   ! fall back to the default value
-  string = "hybrid"  ! TODO(wsmigaj): is this a good default?
+  StringValue = "hybrid"  ! TODO(wsmigaj): is this a good default?
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
 case ("sigma")
@@ -281,17 +280,17 @@ case ("cp")
 case ("wave")
   self % FH_VertCoord = FH_VertCoord_Wave
 case default
-  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_HorizGrid", string)) then
+if (.not. f_conf % get("FH_HorizGrid", StringValue)) then
   ! fall back to the default value
-  string = "global"
+  StringValue = "global"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
 case ("nh")
@@ -309,17 +308,17 @@ case ("lamnowrapeq")
 case ("lamwrapeq")
   self % FH_HorizGrid = FH_HorizGrid_LamWrapEq
 case default
-  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_GridStagger", string)) then
+if (.not. f_conf % get("FH_GridStagger", StringValue)) then
   ! fall back to the default value
-  string = "endgame"
+  StringValue = "endgame"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
 case ("arakawac")
@@ -327,123 +326,123 @@ case ("arakawac")
 case ("endgame")
   self % FH_GridStagger = FH_GridStagger_EndGame
 case default
-  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_ModelVersion", int)) then
+if (.not. f_conf % get("FH_ModelVersion", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % FH_ModelVersion = int
+self % FH_ModelVersion = IntValue
 
-if (.not. f_conf % get("IC_ShipWind", bool)) then
+if (.not. f_conf % get("IC_ShipWind", BoolValue)) then
   ! fall back to the default value
-  bool = .false.
+  BoolValue = .false.
 end if
-if (bool) then
+if (BoolValue) then
   self % IC_ShipWind = IC_ShipWind_10m
 else
   self % IC_ShipWind = 0
 end if
 
-if (.not. f_conf % get("IC_GroundGPSOperator", string)) then
+if (.not. f_conf % get("IC_GroundGPSOperator", StringValue)) then
   ! fall back to the default value
-  string = "choice"
+  StringValue = "choice"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
 case ("generic")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorGeneric
 case default
-  write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') string
+  write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", bool)) then
+if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", BoolValue)) then
   ! fall back to the default value
-  bool = .false.
+  BoolValue = .false.
 end if
-if (bool) then
+if (BoolValue) then
   self % IC_GPSRO_Operator_pseudo = IC_GPSRO_Operator_pseudo_choice
 else
   self % IC_GPSRO_Operator_pseudo = 0
 end if
 
-if (.not. f_conf % get("IC_GPSRO_Operator_press", bool)) then
+if (.not. f_conf % get("IC_GPSRO_Operator_press", BoolValue)) then
   ! fall back to the default value
-  bool = .false.
+  BoolValue = .false.
 end if
-if (bool) then
+if (BoolValue) then
   self % IC_GPSRO_Operator_press = IC_GPSRO_Operator_press_choice
 else
   self % IC_GPSRO_Operator_press = 0
 end if
 
-if (.not. f_conf % get("IC_XLen", int)) then
+if (.not. f_conf % get("IC_XLen", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_XLen = int
+self % IC_XLen = IntValue
 
-if (.not. f_conf % get("IC_YLen", int)) then
+if (.not. f_conf % get("IC_YLen", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_YLen = int
+self % IC_YLen = IntValue
 
-if (.not. f_conf % get("IC_PLevels", int)) then
+if (.not. f_conf % get("IC_PLevels", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_PLevels = int
+self % IC_PLevels = IntValue
 
-if (.not. f_conf % get("IC_WetLevels", int)) then
+if (.not. f_conf % get("IC_WetLevels", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_WetLevels = int
+self % IC_WetLevels = IntValue
 
-if (.not. f_conf % get("RC_LongSpacing", double)) then
+if (.not. f_conf % get("RC_LongSpacing", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_LongSpacing = double
+self % RC_LongSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_LatSpacing", double)) then
+if (.not. f_conf % get("RC_LatSpacing", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_LatSpacing = double
+self % RC_LatSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLat", double)) then
+if (.not. f_conf % get("RC_FirstLat", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_FirstLat = double
+self % RC_FirstLat = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLong", double)) then
+if (.not. f_conf % get("RC_FirstLong", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_FirstLong = double
+self % RC_FirstLong = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLat", double)) then
+if (.not. f_conf % get("RC_PoleLat", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_PoleLat = double
+self % RC_PoleLat = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLong", double)) then
+if (.not. f_conf % get("RC_PoleLong", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_PoleLong = double
+self % RC_PoleLong = DoubleValue
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 

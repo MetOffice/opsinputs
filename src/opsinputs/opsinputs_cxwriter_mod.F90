@@ -75,6 +75,7 @@ use GenMod_CLookAdd, only: &
     LBTIM,                 &
     LBFT
 use OpsMod_Ancil
+use OpsMod_AODGeneral, only: NDustBins
 use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
@@ -173,10 +174,11 @@ type(oops_variables), intent(inout)     :: geovars ! GeoVaLs required by the CxW
 logical                                 :: opsinputs_cxwriter_create
 
 ! Local declarations:
-character(len=:), allocatable           :: string
-integer                                 :: int
-logical                                 :: bool
-real(kind=c_double)                     :: double
+
+! Values loaded from the f_conf
+character(len=:), allocatable           :: StringValue
+integer                                 :: IntValue
+real(kind=c_double)                     :: DoubleValue
 
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_create"
 character(len=200)                      :: ErrorMessage
@@ -187,11 +189,11 @@ opsinputs_cxwriter_create = .true.
 
 ! Setup OPS
 
-if (.not. f_conf % get("general_mode", string)) then
+if (.not. f_conf % get("general_mode", StringValue)) then
   ! fall back to the default value
-  string = "normal"
+  StringValue = "normal"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("operational")
   GeneralMode = OperationalMode
 case ("quiet")
@@ -207,7 +209,7 @@ case ("debug")
 case ("verbose")
   GeneralMode = VerboseMode
 case default
-  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') string
+  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -219,19 +221,19 @@ call Ops_InitMPI
 ! Retrieve parameter values from the input configuration object
 ! and store them in member variables
 
-if (.not. f_conf % get("obs_group", string)) then
+if (.not. f_conf % get("obs_group", StringValue)) then
   call gen_warn(RoutineName, "Mandatory obs_group option not found")
   opsinputs_cxwriter_create = .false.
   return
 end if
-self % ObsGroup = OpsFn_ObsGroupNameToNum(string)
+self % ObsGroup = OpsFn_ObsGroupNameToNum(StringValue)
 
-if (.not. f_conf % get("validity_time", string)) then
+if (.not. f_conf % get("validity_time", StringValue)) then
   call gen_warn(RoutineName, "Mandatory validity_time option not found")
   opsinputs_cxwriter_create = .false.
   return
 end if
-call datetime_create(string, self % validitytime)
+call datetime_create(StringValue, self % validitytime)
 
 if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
                        self % RejectObsWithAnyVariableFailingQC)) then
@@ -245,11 +247,11 @@ if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
   self % RejectObsWithAllVariablesFailingQC = .false.
 end if
 
-if (.not. f_conf % get("FH_VertCoord", string)) then
+if (.not. f_conf % get("FH_VertCoord", StringValue)) then
   ! fall back to the default value
-  string = "hybrid"  ! TODO(wsmigaj): is this a good default?
+  StringValue = "hybrid"  ! TODO(wsmigaj): is this a good default?
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
 case ("sigma")
@@ -263,17 +265,17 @@ case ("cp")
 case ("wave")
   self % FH_VertCoord = FH_VertCoord_Wave
 case default
-  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_HorizGrid", string)) then
+if (.not. f_conf % get("FH_HorizGrid", StringValue)) then
   ! fall back to the default value
-  string = "global"
+  StringValue = "global"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
 case ("nh")
@@ -291,17 +293,17 @@ case ("lamnowrapeq")
 case ("lamwrapeq")
   self % FH_HorizGrid = FH_HorizGrid_LamWrapEq
 case default
-  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_GridStagger", string)) then
+if (.not. f_conf % get("FH_GridStagger", StringValue)) then
   ! fall back to the default value
-  string = "endgame"
+  StringValue = "endgame"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
 case ("arakawac")
@@ -309,17 +311,17 @@ case ("arakawac")
 case ("endgame")
   self % FH_GridStagger = FH_GridStagger_EndGame
 case default
-  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_ObsFileType", string)) then
+if (.not. f_conf % get("FH_ObsFileType", StringValue)) then
   ! fall back to the default value
-  string = "atmos"
+  StringValue = "atmos"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("atmos")
   self % FH_ObsFileType = FH_ObsFileType_Atmos
 case ("ocean")
@@ -329,89 +331,89 @@ case ("sst")
 case ("wave")
   self % FH_ObsFileType = FH_ObsFileType_Wave
 case default
-  write (ErrorMessage, '("FH_ObsFileType code not recognised: ",A)') string
+  write (ErrorMessage, '("FH_ObsFileType code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
 end select
 
-if (.not. f_conf % get("FH_ModelVersion", int)) then
+if (.not. f_conf % get("FH_ModelVersion", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % FH_ModelVersion = int
+self % FH_ModelVersion = IntValue
 
-if (.not. f_conf % get("IC_XLen", int)) then
+if (.not. f_conf % get("IC_XLen", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_XLen = int
+self % IC_XLen = IntValue
 
-if (.not. f_conf % get("IC_YLen", int)) then
+if (.not. f_conf % get("IC_YLen", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_YLen = int
+self % IC_YLen = IntValue
 
-if (.not. f_conf % get("IC_PLevels", int)) then
+if (.not. f_conf % get("IC_PLevels", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_PLevels = int
+self % IC_PLevels = IntValue
 
-if (.not. f_conf % get("IC_WetLevels", int)) then
+if (.not. f_conf % get("IC_WetLevels", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_WetLevels = int
+self % IC_WetLevels = IntValue
 
-if (.not. f_conf % get("IC_FirstConstantRhoLevel", int)) then
+if (.not. f_conf % get("IC_FirstConstantRhoLevel", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % IC_FirstConstantRhoLevel = int
+self % IC_FirstConstantRhoLevel = IntValue
 
-if (.not. f_conf % get("RC_LongSpacing", double)) then
+if (.not. f_conf % get("RC_LongSpacing", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_LongSpacing = double
+self % RC_LongSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_LatSpacing", double)) then
+if (.not. f_conf % get("RC_LatSpacing", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_LatSpacing = double
+self % RC_LatSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLat", double)) then
+if (.not. f_conf % get("RC_FirstLat", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_FirstLat = double
+self % RC_FirstLat = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLong", double)) then
+if (.not. f_conf % get("RC_FirstLong", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_FirstLong = double
+self % RC_FirstLong = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLat", double)) then
+if (.not. f_conf % get("RC_PoleLat", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_PoleLat = double
+self % RC_PoleLat = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLong", double)) then
+if (.not. f_conf % get("RC_PoleLong", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_PoleLong = double
+self % RC_PoleLong = DoubleValue
 
-if (.not. f_conf % get("RC_z_ModelTop", double)) then
+if (.not. f_conf % get("RC_z_ModelTop", DoubleValue)) then
   ! fall back to the default value
-  double = 0.0
+  DoubleValue = 0.0
 end if
-self % RC_z_ModelTop = double
+self % RC_z_ModelTop = DoubleValue
 
 if (f_conf % get("eta_theta_levels", self % EtaTheta)) then
   if (size(self % EtaTheta) /= self % IC_PLevels + 1) then
@@ -435,23 +437,23 @@ else
   self % EtaRho = RMDI
 end if
 
-if (.not. f_conf % get("time_indicator", int)) then
+if (.not. f_conf % get("time_indicator", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % TimeIndicator = int
+self % TimeIndicator = IntValue
 
-if (.not. f_conf % get("forecast_period", int)) then
+if (.not. f_conf % get("forecast_period", IntValue)) then
   ! fall back to the default value
-  int = 0
+  IntValue = 0
 end if
-self % ForecastPeriod = int
+self % ForecastPeriod = IntValue
 
-if (.not. f_conf % get("model_type", string)) then
+if (.not. f_conf % get("model_type", StringValue)) then
   ! fall back to the default value
-  string = "atmos"
+  StringValue = "atmos"
 end if
-select case (ops_to_lower_case(string))
+select case (ops_to_lower_case(StringValue))
 case ("atmos")
   ModelType = ModelType_Atmos
 case ("ocean")
@@ -459,11 +461,23 @@ case ("ocean")
 case ("sst")
   ModelType = ModelType_SST
 case default
-  write (ErrorMessage, '("model_type code not recognised: ",A)') string
+  write (ErrorMessage, '("model_type code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
 end select
+
+if (.not. f_conf % get("num_dust_bins", IntValue)) then
+  ! fall back to the default value
+  IntValue = 2
+end if
+if (IntValue /= 2 .and. IntValue /= 6) then
+  write (ErrorMessage, '("num_dust_bins is ",I0," but must be either 2 or 6")') IntValue
+  call gen_warn(RoutineName, ErrorMessage)
+  opsinputs_cxwriter_create = .false.
+  return
+end if
+NDustBins = IntValue
 
 ! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
 call opsinputs_cxwriter_addrequiredgeovars(self, geovars)
@@ -582,17 +596,20 @@ type(opsinputs_cxwriter), intent(in) :: self
 type(oops_variables), intent(inout)  :: geovars
 
 ! Local declarations:
-integer(integer64)                   :: CxFields(MaxModelCodes)
+integer(integer64)                   :: CxFields(MaxModelCodes), CxField
 integer                              :: i
 character(len=max_varname_length)    :: GeoVarName
+integer                              :: DustBinIndex
+character                            :: DustBinIndexStr
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
 
 do i = 1, size(CxFields)
+  CxField = CxFields(i)
   GeoVarName = opsinputs_cxfields_unknown
 
-  select case (CxFields(i))
+  select case (CxField)
 
     ! Surface variables
 
@@ -752,11 +769,13 @@ do i = 1, size(CxFields)
       GeoVarName = opsinputs_cxfields_SoilMoisture
     case (StashCode_SoilTemp) ! IndexCxSoilTemp
       GeoVarName = opsinputs_cxfields_SoilTemp
-    ! TODO(someone): add support for these cxfields
-    ! case (IndexCxDust1, IndexCxDust2, &
-    !       IndexCxDust3, IndexCxDust4, &
-    !       IndexCxDust5, IndexCxDust6)
-    !   GeoVarName = opsinputs_cxfields_dustp
+    case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:6
+      DustBinIndex = CxField - StashItem_dustMin + 1
+      if (DustBinIndex <= NDustBins) then
+        write (DustBinIndexStr, '(i1)') DustBinIndex
+        GeoVarName = opsinputs_cxfields_dustp // DustBinIndexStr
+      end if
+
   end select
   
   if (GeoVarName /= opsinputs_cxfields_unknown) then
@@ -824,7 +843,8 @@ type(CX_type), intent(inout)            :: Cx
 
 ! Body:
 
-call CX % init
+Cx % Header % obsgroup = self % obsgroup
+call Cx % init
 
 ! The following code is inspired by Ops_CXSetup.
 
@@ -856,15 +876,17 @@ type(CX_type), intent(inout)            :: Cx
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_populatecx"
 character(len=80)                       :: ErrorMessage
 
-integer(integer64)                      :: CxFields(MaxModelCodes)
-integer                                 :: nCxFields
+integer(integer64)                      :: CxFields(MaxModelCodes), CxField
 integer                                 :: iCxField
+integer                                 :: DustBinIndex
+character                               :: DustBinIndexStr
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
 
 do iCxField = 1, size(CxFields)
-  select case (CxFields(iCxField))
+  CxField = CxFields(iCxField)
+  select case (CxField)
 
     ! Surface variables
 
@@ -1186,17 +1208,14 @@ do iCxField = 1, size(CxFields)
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % SoilTemp, "SoilTemp", Cx % Header % NumLocal, Cx % SoilTemp, &
         self % GeoVals, opsinputs_cxfields_SoilTemp)
-    ! TODO(someone): support dust bins and set NDustBins correctly
-    ! CASE (IndexCxDust1, IndexCxDust2, &
-      !      IndexCxDust3, IndexCxDust4, &
-      !      IndexCxDust5, IndexCxDust6)
-      !  CxHdrVrbl = Cx % Header % dustp
-      !  IF (Ivar > IndexCxDustMax .OR. .NOT. CxHdrVrbl % Present) THEN
-      !    CxHdrVrbl % Present = .FALSE.
-      !    CYCLE UairVrbl
-      !  ENDIF
-      !  DustInd = Ivar - IndexCxDustMin + 1
-      !  CxVrblUair => Cx % dustp(DustInd) % field(:,:)
+    case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:IndexCxDust6
+      DustBinIndex = CxField - StashItem_dustMin + 1
+      if (DustBinIndex <= NDustBins) then
+        write (DustBinIndexStr, '(i1)') DustBinIndex
+        call opsinputs_fill_fillreal2dfromgeoval( &
+          Cx % Header % dustp, "dustp", Cx % Header % NumLocal, Cx % dustp(DustBinIndex) % field, &
+          self % GeoVals, opsinputs_cxfields_dustp // DustBinIndexStr)
+      end if
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx
