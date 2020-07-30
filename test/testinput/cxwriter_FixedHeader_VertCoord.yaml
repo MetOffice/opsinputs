@@ -1,86 +1,84 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
+observations:
   - &default
-      ObsSpace:
+      obs space:
         name: AMSUB
-        ObsDataIn:
+        obsdatain:
           obsfile: Data/dummy.nc4
-        simulate:
-          variables: [dummy]
-      GeoVaLs:
+        simulated variables: [dummy]
+      geovals:
         filename: Data/001_UpperAirCxField_theta.nc4
-      ObsFilters:
-      - Filter: Cx Writer
+      obs filters:
+      - filter: Cx Writer
         namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
         general_mode: debug
         IC_PLevels: 5
         # Test for the default value of FH_VertCoord
-      - Filter: Cx Checker
+      - filter: Cx Checker
         expected_header_fields:
           Vertical coordinate type: 1
       HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
       benchmarkFlag: 1000 # just to keep the ObsFilters test happy
       flaggedBenchmark: 0
   - <<: *default
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_VertCoord: Hybrid
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_header_fields:
         Vertical coordinate type: 1
   - <<: *default
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_VertCoord: Sigma
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_header_fields:
         Vertical coordinate type: 2
   - <<: *default
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_VertCoord: Pressure
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_header_fields:
         Vertical coordinate type: 3
   - <<: *default
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_VertCoord: Depth
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_header_fields:
         Vertical coordinate type: 4
   - <<: *default
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_VertCoord: CP
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_header_fields:
         Vertical coordinate type: 5
   - <<: *default
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
       FH_VertCoord: Wave
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_header_fields:
         Vertical coordinate type: 6

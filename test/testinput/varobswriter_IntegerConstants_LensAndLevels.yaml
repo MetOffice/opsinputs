@@ -1,17 +1,15 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
-  - ObsSpace:
+observations:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
-    - Filter: VarObs Checker
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
+    - filter: VarObs Checker
       expected_header_fields:
         Number EW points: "0"
         Number NS points: "0"
@@ -20,19 +18,18 @@ Observations:
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       IC_XLen: 1
       IC_YLen: 2
       IC_PLevels: 3
       IC_WetLevels: 4
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Number EW points: "1"
         Number NS points: "2"

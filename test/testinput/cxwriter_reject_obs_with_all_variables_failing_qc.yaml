@@ -1,23 +1,21 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
-  - ObsSpace:
+observations:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/reject_obs_with_all_variables_failing_qc.nc4
-      simulate:
-        variables: [eastward_wind, northward_wind]
-    GeoVaLs:
+      simulated variables: [eastward_wind, northward_wind]
+    geovals:
       filename: Data/001_UpperAirCxField_theta.nc4
-    ObsFilters:
+    obs filters:
     # BlackList all eastward_wind observations...
-    - Filter: BlackList
+    - filter: BlackList
       filter variables:
       - name: eastward_wind
     # But only one northward_wind observation.
-    - Filter: Domain Check
+    - filter: Domain Check
       filter variables:
       - name: northward_wind
       where:
@@ -25,14 +23,14 @@ Observations:
           name: latitude@MetaData
         minvalue: 0.
     # Set the flag of observations with missing values to "pass".
-    - Filter: Reset Flags to Pass
+    - filter: Reset Flags to Pass
       flags_to_reset: [1, 6]  # missing, Hfailed
-    - Filter: Cx Writer
+    - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       reject_obs_with_all_variables_failing_qc: true
       general_mode: debug
       IC_PLevels: 5
-    - Filter: Cx Checker
+    - filter: Cx Checker
       expected_main_table_columns:
       expected_main_table_columns:
       - # batch 1

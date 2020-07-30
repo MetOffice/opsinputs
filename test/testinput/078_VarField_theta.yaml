@@ -1,37 +1,35 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
-  - ObsSpace:
+observations:
+  - obs space:
       name: Sonde
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/078_VarField_theta.nc4
-      simulate:
-        variables: [air_potential_temperature]
-        channels: 1, 3
-    ObsFilters:
+      simulated variables: [air_potential_temperature]
+      channels: 1, 3
+    obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
-    - Filter: BlackList
+    - filter: BlackList
       variables: air_potential_temperature
       action:
         name: inflate error
         inflation factor: 2.0
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
-    - Filter: Reset Flags to Pass
+    - filter: Reset Flags to Pass
       flags_to_reset: [1, 6]  # missing, Hfailed
     # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
-    - Filter: Domain Check
+    - filter: Domain Check
       where:
       - variable:
           name: latitude@MetaData
         minvalue: 0.
-    - Filter: VarObs Writer
+    - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_main_table_columns:
         # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check.
         # Only levels 1 and 3 are simulated and hence written to the VarObs file.

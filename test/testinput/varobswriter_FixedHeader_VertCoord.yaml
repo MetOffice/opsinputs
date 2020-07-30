@@ -1,107 +1,99 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
-  - ObsSpace:
+observations:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
-    - Filter: VarObs Checker
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 1
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       FH_VertCoord: Hybrid
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 1
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       FH_VertCoord: Sigma
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 2
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       FH_VertCoord: Pressure
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 3
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       FH_VertCoord: Depth
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 4
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       FH_VertCoord: CP
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 5
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-  - ObsSpace:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       FH_VertCoord: Wave
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 6
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
