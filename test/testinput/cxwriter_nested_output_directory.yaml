@@ -1,18 +1,16 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
-  - ObsSpace:
+observations:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/dummy.nc4
-      simulate:
-        variables: [dummy]
-    GeoVaLs:
+      simulated variables: [dummy]
+    geovals:
       filename: Data/001_UpperAirCxField_theta.nc4
-    ObsFilters:
-    - Filter: Cx Writer
+    obs filters:
+    - filter: Cx Writer
       output_directory: testoutput/nested/path/cx
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
@@ -24,7 +22,7 @@ Observations:
       RC_PoleLat: 3.50
       RC_PoleLong: 4.50
       RC_z_ModelTop: 5.50
-    - Filter: Cx Checker
+    - filter: Cx Checker
       output_directory: testoutput/nested/path/cx
       expected_header_fields:
         EW grid spacing (degrees): "0.1000"

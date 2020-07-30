@@ -1,16 +1,14 @@
-window_begin: 2018-01-01T00:00:00Z
-window_end: 2018-01-01T01:00:00Z
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
 
-Observations:
-  ObsTypes:
-  - ObsSpace:
+observations:
+  - obs space:
       name: AMSUB
-      ObsDataIn:
+      obsdatain:
         obsfile: Data/028_VarField_satid.nc4
-      simulate:
-        variables: [dummy]
-    ObsFilters:
-    - Filter: VarObs Writer
+      simulated variables: [dummy]
+    obs filters:
+    - filter: VarObs Writer
       output_directory: testoutput/nested/path/varobs
       RC_LongSpacing: 0.10
       RC_LatSpacing: 0.20
@@ -18,7 +16,7 @@ Observations:
       RC_FirstLong: 2.50
       RC_PoleLat: 3.50
       RC_PoleLong: 4.50
-    - Filter: VarObs Checker
+    - filter: VarObs Checker
       output_directory: testoutput/nested/path/varobs
       expected_header_fields:
         Longitude spacing: "0.10"
