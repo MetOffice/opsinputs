@@ -79,8 +79,8 @@ struct VarObsChecker::PrintVarObsOutput {
 
 
 VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
-                             boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                             boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
+                             std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                             std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
 {
   oops::Log::trace() << "VarObsChecker constructor starting" << std::endl;

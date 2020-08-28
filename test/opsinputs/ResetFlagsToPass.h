@@ -8,11 +8,10 @@
 #ifndef TEST_OPSINPUTS_RESETFLAGSTOPASS_H_
 #define TEST_OPSINPUTS_RESETFLAGSTOPASS_H_
 
+#include <memory>
 #include <ostream>
 #include <set>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
 
 #include "../opsinputs/ResetFlagsToPassParameters.h"
 #include "ioda/ObsDataVector.h"
@@ -46,8 +45,8 @@ class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<Res
   static const std::string classname() {return "opsinputs::test::ResetFlagsToPass";}
 
   ResetFlagsToPass(ioda::ObsSpace &, const eckit::Configuration &,
-                   boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                   boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
+                   std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                   std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~ResetFlagsToPass();
 
   void preProcess() const {}
@@ -63,7 +62,7 @@ class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<Res
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::Variables extradiagvars_;
-  boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
+  std::shared_ptr<ioda::ObsDataVector<int>> flags_;
 
   std::set<int> flagsToReset_;
 };

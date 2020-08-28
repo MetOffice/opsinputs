@@ -21,8 +21,8 @@ namespace opsinputs {
 namespace test {
 
 ResetFlagsToPass::ResetFlagsToPass(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
-                                   boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                                   boost::shared_ptr<ioda::ObsDataVector<float> > /*obsErrors*/)
+                                   std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                                   std::shared_ptr<ioda::ObsDataVector<float> > /*obsErrors*/)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags))
 {
   oops::Log::trace() << "ResetFlagsToPass constructor starting" << std::endl;
