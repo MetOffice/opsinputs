@@ -389,14 +389,14 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !>   Header to be populated.
 !> \param[in] OpsVarName
 !>   Name of the OB_type field to which El2 corresponds.
-!> \param[in] NumGroupedObs
-!>   Number of grouped observations held by this process.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variables.
 !> \param[in] ObsIndices
-!>   Observation indices.
+!>   Array of observation indices.
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
 !> \param[in] JediValueGroup
