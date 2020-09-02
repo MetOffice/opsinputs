@@ -30,7 +30,8 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
     opsinputs_fill_fillelementtypefromnormalvariable, &
-    opsinputs_fill_fillelementtype2dfromnormalvariable, &
+    opsinputs_fill_fillelementtype2dfrom1dnormalvariable, &
+    opsinputs_fill_fillelementtype2dfrom2dnormalvariable, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
@@ -929,11 +930,11 @@ do iVarField = 1, nVarFields
        if (GPSRO_TPD) then
          ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
          ! once it is known.
-         call opsinputs_fill_fillelementtype2dfromnormalvariable( &
+         call opsinputs_fill_fillelementtype2dfrom2dnormalvariable( &
            Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll, &
            ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
        else
-         call opsinputs_fill_fillelementtype2dfromnormalvariable( &
+         call opsinputs_fill_fillelementtype2dfrom2dnormalvariable( &
            Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam, &
            ObsSpace, Channels, "impact_parameter", "MetaData")
        end if

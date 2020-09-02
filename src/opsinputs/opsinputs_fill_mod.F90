@@ -52,7 +52,8 @@ implicit none
 public :: opsinputs_fill_fillelementtypefromsimulatedvariable, &
           opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
           opsinputs_fill_fillelementtypefromnormalvariable, &
-          opsinputs_fill_fillelementtype2dfromnormalvariable, &
+          opsinputs_fill_fillelementtype2dfrom1dnormalvariable, &
+          opsinputs_fill_fillelementtype2dfrom2dnormalvariable, &
           opsinputs_fill_fillreal, &
           opsinputs_fill_fillreal2d, &
           opsinputs_fill_fillrealfromgeoval, &
@@ -374,14 +375,146 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 
 ! ------------------------------------------------------------------------------
 
-!> Populate a 2D array of Element_type objects and its header from an arbitrary JEDI variable
+!> Populate a 2D array of Element_type objects and its header from an arbitrary 1D JEDI variable
 !> (not included in the list passed to the 'simulate' option of the JEDI ObsSpace) containing
-!> obsevation values and optionally another variable containing observation errors.
+!> obsevation values and optionally another 1D variable containing observation errors.
+!> In OPS terminology, an 'observation' can refer to a set of measurements taken by an instrument
+!> at different levels, e.g. a sonde profile.
+!> This routine is designed to deal with a set of observations whose levels have been
+!> concatenated into a 1D array.
+!> The observations are distinguished by indices which must have been determined prior to calling
+!> this routine.
 !>
 !> \param[inout] Hdr
 !>   Header to be populated.
 !> \param[in] OpsVarName
-!>   Name of the OB_type field to which El1 corresponds.
+!>   Name of the OB_type field to which El2 corresponds.
+!> \param[in] NumGroupedObs
+!>   Number of grouped observations held by this process.
+!> \param[inout] El2
+!>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables.
+!> \param[in] ObsIndices
+!>   Observation indices.
+!> \param[in] JediValueVarName
+!>   Name of the JEDI variable containing observation values.
+!> \param[in] JediValueGroup
+!>   Group of the JEDI variable containing observation values.
+!> \param[in] JediErrorVarName
+!>   (Optional) Name of the JEDI variable containing observation errors.
+!> \param[in] JediErrorGroup
+!>   (Optional) Group of the JEDI variable containing observation errors.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
+subroutine opsinputs_fill_fillelementtype2dfrom1dnormalvariable( &
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, ObsIndices, &
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(integer64), intent(in)                  :: NumObs
+type(Element_type), pointer                     :: El2(:,:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
+integer(integer64), intent(in)                  :: ObsIndices(:)
+character(len=*), intent(in)                    :: JediValueVarName
+character(len=*), intent(in)                    :: JediValueGroup
+character(len=*), optional, intent(in)          :: JediErrorVarName
+character(len=*), optional, intent(in)          :: JediErrorGroup
+
+! Local declarations:
+real(kind=c_double)                             :: ObsValue(size(ObsIndices))
+real(kind=c_float)                              :: ObsError(size(ObsIndices))
+real(kind=c_double)                             :: MissingDouble
+real(kind=c_float)                              :: MissingFloat
+integer                                         :: iInd
+integer                                         :: MaxNumLev, CurrentNumLev, CurrentObsIndex
+character(len=*), parameter                     :: &
+  RoutineName = "opsinputs_fill_fillelementtype2dfrom1dnormalvariable"
+character(len=256)                              :: ErrorMessage
+
+! Body:
+
+if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
+  write (ErrorMessage, '(A)') &
+    "JediErrorVarName and JediErrorGroup must be either both absent or both present"
+  call gen_warn(RoutineName, ErrorMessage)
+end if
+
+if (size(ObsIndices) == 0) then
+  write (ErrorMessage, '(A)') &
+    "ObsIndices is empty"
+   call gen_warn(RoutineName, ErrorMessage)
+end if
+
+MissingDouble = missing_value(0.0_c_double)
+
+! Determine maximum number levels in an individual observation.
+MaxNumLev = 0
+CurrentObsIndex = -1
+do iInd = 1, size(ObsIndices)
+   if (ObsIndices(iInd) /= CurrentObsIndex) then
+      CurrentObsIndex = ObsIndices(iInd)
+      CurrentNumLev = 1
+   else
+      CurrentNumLev = CurrentNumLev + 1
+   end if
+   if (CurrentNumLev > MaxNumLev) then
+      MaxNumLev = CurrentNumLev
+   end if
+end do
+
+if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
+   ! Allocate OPS data structure
+   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
+        num_levels=int(MaxNumLev, kind=integer64))
+   ! Retrieve data from JEDI:
+   ! - observation value
+   call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarName, &
+        ObsValue)
+   ! - observation error
+   if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
+      call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarName, &
+           ObsError)
+   else
+     write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
+          JediErrorVarName, JediErrorGroup
+     call gen_warn(RoutineName, ErrorMessage)
+     ObsError = MissingDouble
+   end if
+   ! Fill the OPS data structure.
+   CurrentObsIndex = -1
+   do iInd = 1, size(ObsIndices)
+      if (ObsIndices(iInd) /= CurrentObsIndex) then
+         CurrentObsIndex = ObsIndices(iInd)
+         CurrentNumLev = 1
+      else
+         CurrentNumLev = CurrentNumLev + 1
+      end if
+      if (ObsValue(iInd) /= MissingDouble) El2(CurrentObsIndex, CurrentNumLev) % Value = ObsValue(iInd)
+      if (ObsError(iInd) /= MissingDouble) El2(CurrentObsIndex, CurrentNumLev) % ObErr = ObsError(iInd)
+      ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
+      ! variables. At present, however, we don't even have a use case where there is a separate
+      ! variable storing the observation error.
+   end do
+end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
+
+end subroutine opsinputs_fill_fillelementtype2dfrom1dnormalvariable
+
+! ------------------------------------------------------------------------------
+
+!> Populate a 2D array of Element_type objects and its header from an arbitrary 2D JEDI variable
+!> (not included in the list passed to the 'simulate' option of the JEDI ObsSpace) containing
+!> obsevation values and optionally another variable containing 2D observation errors.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which El2 corresponds.
 !> \param[in] NumObs
 !>   Number of observations held by this process.
 !> \param[inout] El2
@@ -403,7 +536,7 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
-subroutine opsinputs_fill_fillelementtype2dfromnormalvariable( &
+subroutine opsinputs_fill_fillelementtype2dfrom2dnormalvariable( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
   JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
 implicit none
@@ -430,7 +563,7 @@ character(len=max_varname_with_channel_length)  :: &
   JediErrorVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel, iObs
 character(len=*), parameter                     :: &
-  RoutineName = "opsinputs_fill_fillelementtype2dfromnormalvariable"
+  RoutineName = "opsinputs_fill_fillelementtype2dfrom2dnormalvariable"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
@@ -486,7 +619,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 
-end subroutine opsinputs_fill_fillelementtype2dfromnormalvariable
+end subroutine opsinputs_fill_fillelementtype2dfrom2dnormalvariable
 
 ! ------------------------------------------------------------------------------
 
