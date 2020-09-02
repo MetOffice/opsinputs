@@ -28,8 +28,8 @@
 namespace opsinputs {
 
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
-                           boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                           boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
+                           std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                           std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
 {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;

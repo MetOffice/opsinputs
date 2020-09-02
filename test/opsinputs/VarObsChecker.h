@@ -9,10 +9,9 @@
 #define TEST_OPSINPUTS_VAROBSCHECKER_H_
 
 #include <map>
+#include <memory>
 #include <ostream>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
 
 #include "../opsinputs/VarObsCheckerParameters.h"
 #include "ioda/ObsDataVector.h"
@@ -53,8 +52,8 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   static const std::string classname() {return "opsinputs::test::VarObsChecker";}
 
   VarObsChecker(ioda::ObsSpace &, const eckit::Configuration &,
-                boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
+                std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~VarObsChecker();
 
   void preProcess() const {}
@@ -81,8 +80,8 @@ class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObs
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::Variables extradiagvars_;
-  boost::shared_ptr<ioda::ObsDataVector<int>> flags_;
-  boost::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
+  std::shared_ptr<ioda::ObsDataVector<int>> flags_;
+  std::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
 
   VarObsCheckerParameters parameters_;
 };
