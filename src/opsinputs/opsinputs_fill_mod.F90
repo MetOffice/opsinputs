@@ -18,7 +18,10 @@ use kinds, only: kind_real
 use missing_values_mod, only: missing_value
 use obsspace_mod, only: &
     obsspace_has,         &
-    obsspace_get_db
+    obsspace_get_db,      &
+    obsspace_get_nlocs,   &
+    obsspace_get_nrecs,   &
+    obsspace_get_recnum
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
     ufo_geovals,           &
@@ -382,8 +385,6 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> at different levels, e.g. a sonde profile.
 !> This routine is designed to deal with a set of observations whose levels have been
 !> concatenated into a 1D array.
-!> The observations are distinguished by indices which must have been determined prior to calling
-!> this routine.
 !>
 !> \param[inout] Hdr
 !>   Header to be populated.
@@ -395,8 +396,6 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variables.
-!> \param[in] ObsIndices
-!>   Array of observation indices.
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
 !> \param[in] JediValueGroup
@@ -410,7 +409,7 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfrom1dnormalvariable( &
-  Hdr, OpsVarName, NumObs, El2, ObsSpace, ObsIndices, &
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, &
   JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
 implicit none
 
@@ -420,19 +419,20 @@ character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
 type(Element_type), pointer                     :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(integer64), intent(in)                  :: ObsIndices(:)
 character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
 
 ! Local declarations:
-real(kind=c_double)                             :: ObsValue(size(ObsIndices))
-real(kind=c_float)                              :: ObsError(size(ObsIndices))
+integer                                         :: NumLocs
+integer(kind=c_int64_t), allocatable            :: RecNums(:)
+real(kind=c_double), allocatable                :: ObsValue(:)
+real(kind=c_float), allocatable                 :: ObsError(:)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
-integer                                         :: iInd
-integer                                         :: MaxNumLev, CurrentNumLev, CurrentObsIndex
+integer                                         :: iLoc
+integer                                         :: MaxNumLev, CurrentNumLev, CurrentRecnum
 character(len=*), parameter                     :: &
   RoutineName = "opsinputs_fill_fillelementtype2dfrom1dnormalvariable"
 character(len=256)                              :: ErrorMessage
@@ -445,30 +445,34 @@ if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
   call gen_warn(RoutineName, ErrorMessage)
 end if
 
-if (size(ObsIndices) == 0) then
-  write (ErrorMessage, '(A)') &
-    "ObsIndices is empty"
-   call gen_warn(RoutineName, ErrorMessage)
-end if
-
 MissingDouble = missing_value(0.0_c_double)
 
-! Determine maximum number levels in an individual observation.
-MaxNumLev = 0
-CurrentObsIndex = -1
-do iInd = 1, size(ObsIndices)
-   if (ObsIndices(iInd) /= CurrentObsIndex) then
-      CurrentObsIndex = ObsIndices(iInd)
-      CurrentNumLev = 1
-   else
-      CurrentNumLev = CurrentNumLev + 1
-   end if
-   if (CurrentNumLev > MaxNumLev) then
-      MaxNumLev = CurrentNumLev
-   end if
-end do
+if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName) .and. &
+     obsspace_get_nrecs(ObsSpace) > 0) then
+   ! Get number of locations
+   NumLocs = obsspace_get_nlocs(ObsSpace)
+   ! Allocate arrays
+   allocate(RecNums(NumLocs))
+   allocate(ObsValue(NumLocs))
+   allocate(ObsError(NumLocs))
+   ! Get record numbers
+   call obsspace_get_recnum(ObsSpace, RecNums)
 
-if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
+   ! Determine maximum number levels in an individual observation.
+   MaxNumLev = 0
+   CurrentRecnum = -1
+   do iLoc = 1, NumLocs
+      if (RecNums(iLoc) /= CurrentRecnum) then
+         CurrentRecnum = RecNums(iLoc)
+         CurrentNumLev = 1
+      else
+         CurrentNumLev = CurrentNumLev + 1
+      end if
+      if (CurrentNumLev > MaxNumLev) then
+         MaxNumLev = CurrentNumLev
+      end if
+   end do
+
    ! Allocate OPS data structure
    call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
         num_levels=int(MaxNumLev, kind=integer64))
@@ -487,16 +491,16 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
      ObsError = MissingDouble
    end if
    ! Fill the OPS data structure.
-   CurrentObsIndex = -1
-   do iInd = 1, size(ObsIndices)
-      if (ObsIndices(iInd) /= CurrentObsIndex) then
-         CurrentObsIndex = ObsIndices(iInd)
+   CurrentRecnum = -1
+   do iLoc = 1, NumLocs
+      if (RecNums(iLoc) /= CurrentRecnum) then
+         CurrentRecnum = RecNums(iLoc)
          CurrentNumLev = 1
       else
          CurrentNumLev = CurrentNumLev + 1
       end if
-      if (ObsValue(iInd) /= MissingDouble) El2(CurrentObsIndex, CurrentNumLev) % Value = ObsValue(iInd)
-      if (ObsError(iInd) /= MissingDouble) El2(CurrentObsIndex, CurrentNumLev) % ObErr = ObsError(iInd)
+      if (ObsValue(iLoc) /= MissingDouble) El2(CurrentRecnum, CurrentNumLev) % Value = ObsValue(iLoc)
+      if (ObsError(iLoc) /= MissingDouble) El2(CurrentRecnum, CurrentNumLev) % ObErr = ObsError(iLoc)
       ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
       ! variables. At present, however, we don't even have a use case where there is a separate
       ! variable storing the observation error.
