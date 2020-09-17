@@ -17,6 +17,8 @@ namespace opsinputs {
 
 /// \brief ResetFlagsToPass filter's options.
 class ResetFlagsToPassParameters : public oops::Parameters {
+  OOPS_CONCRETE_PARAMETERS(ResetFlagsToPassParameters, Parameters)
+
  public:
   /// \brief List of QC flags (elements of ufo::QCflags) to be replaced with "pass".
   oops::Parameter<std::vector<int>> flagsToReset{"flags_to_reset", {}, this};

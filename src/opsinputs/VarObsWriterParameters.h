@@ -20,6 +20,8 @@ namespace opsinputs {
 
 /// \brief VarObsWriter options.
 class VarObsWriterParameters : public oops::Parameters {
+  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, Parameters)
+
  public:
   /// Determines OPS verbosity.
   ///

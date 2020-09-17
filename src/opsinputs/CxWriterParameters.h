@@ -19,6 +19,8 @@ namespace opsinputs {
 
 /// \brief CxWriter options.
 class CxWriterParameters : public oops::Parameters {
+  OOPS_CONCRETE_PARAMETERS(CxWriterParameters, Parameters)
+
  public:
   /// Determines OPS verbosity.
   ///
