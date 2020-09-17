@@ -8,11 +8,6 @@
 #ifndef OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
 #define OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
 
-#include <exception>
-
-#include "oops/parallel/mpi/mpi.h"
-#include "oops/util/Logger.h"
-
 namespace opsinputs {
 
 /// \brief Prevents deadlocks in MPI code throwing exceptions.

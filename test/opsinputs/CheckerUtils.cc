@@ -18,7 +18,7 @@
 
 #include "opsinputs/MPIExceptionSynchronizer.h"
 
-#include "oops/parallel/mpi/mpi.h"
+#include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
 namespace opsinputs {
@@ -80,16 +80,16 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
 
   char tempFileName[L_tmpnam];
   std::unique_ptr<TempFile> tempFile;
-  if (oops::mpi::comm().rank() == rootProcessRank) {
+  if (oops::mpi::world().rank() == rootProcessRank) {
     std::tmpnam(tempFileName);
     tempFile.reset(new TempFile(tempFileName));
   }
   exceptionSynchronizer.throwIfAnyProcessHasThrown();
-  oops::mpi::comm().broadcast(tempFileName, L_tmpnam, rootProcessRank);
+  oops::mpi::world().broadcast(tempFileName, L_tmpnam, rootProcessRank);
 
   // Run the OPS tool
 
-  if (oops::mpi::comm().rank() == rootProcessRank) {
+  if (oops::mpi::world().rank() == rootProcessRank) {
     const eckit::PathName inputFilePathName(inputFilePath);
     if (!inputFilePathName.exists())
       throw std::runtime_error("File '" + inputFilePathName + "' not found");
@@ -104,7 +104,7 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
 
     const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + inputFilePathName +
         "\" --all --outfile=\"" + tempFile->name() + "\"";
-    if (oops::mpi::comm().rank() == 0) {
+    if (oops::mpi::world().rank() == 0) {
       oops::Log::info() << "Running " << cmd << "\n";
       const int exitCode = std::system(cmd.c_str());
       if (exitCode != 0)
@@ -115,7 +115,7 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
 
   exceptionSynchronizer.throwIfAnyProcessHasThrown();
   // Ensure rootProcessRank has written the file
-  oops::mpi::comm().barrier();
+  oops::mpi::world().barrier();
 
   // Read the temporary file into a string.
 
@@ -124,7 +124,7 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
   exceptionSynchronizer.throwIfAnyProcessHasThrown();
   // Ensure all processes have read the file before rootProcessRank deletes it
   // as TempFile goes out of scope
-  oops::mpi::comm().barrier();
+  oops::mpi::world().barrier();
 
   return result;
 }

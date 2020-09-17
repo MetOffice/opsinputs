@@ -19,7 +19,7 @@
 #include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
-#include "oops/parallel/mpi/mpi.h"
+#include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 #include "opsinputs/LocalEnvironment.h"
 #include "opsinputs/VarObsWriterParameters.h"

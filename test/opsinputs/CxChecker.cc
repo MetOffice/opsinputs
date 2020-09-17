@@ -25,7 +25,7 @@
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
-#include "oops/parallel/mpi/mpi.h"
+#include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
 #include "ufo/filters/Variables.h"
