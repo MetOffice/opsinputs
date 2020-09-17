@@ -22,6 +22,8 @@ namespace opsinputs {
 
 /// \brief VarObsChecker options.
 class VarObsCheckerParameters : public oops::Parameters {
+  OOPS_CONCRETE_PARAMETERS(VarObsCheckerParameters, Parameters)
+
  public:
   /// Directory containing the VarObs files.
   ///

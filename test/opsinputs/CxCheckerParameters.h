@@ -21,6 +21,8 @@ namespace opsinputs {
 
 /// \brief CxChecker options.
 class CxCheckerParameters : public oops::Parameters {
+    OOPS_CONCRETE_PARAMETERS(CxCheckerParameters, Parameters)
+
  public:
   /// Output directory for Cx files.
   ///
