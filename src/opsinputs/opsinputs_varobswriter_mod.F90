@@ -1,7 +1,6 @@
-! (C) Copyright 2020 Met Office UK
+! (C) Crown Copyright 2020, the Met Office. All rights reserved.
 !
-! This software is licensed under the terms of the Apache Licence Version 2.0
-! which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+! Refer to COPYRIGHT.txt of this distribution for details.
 
 !> Fortran part of VarObsWriter. It collects data from JEDI and uses the functions from the OPS
 !> OpsMod_Varobs module to output them to a VarObs file.

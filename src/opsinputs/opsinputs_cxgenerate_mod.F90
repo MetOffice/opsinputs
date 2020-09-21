@@ -1,7 +1,6 @@
-! (C) Copyright 2020 Met Office UK
+! (C) Crown Copyright 2020, the Met Office. All rights reserved.
 !
-! This software is licensed under the terms of the Apache Licence Version 2.0
-! which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+! Refer to COPYRIGHT.txt of this distribution for details.
 
 !> Subset of the OpsMod_CxGenerate module from OPS. That module can't be used directly because it
 !> depends on libodb (via the OpsMod_Extract module), which in turn is linked to a different
