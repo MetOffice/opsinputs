@@ -14,45 +14,35 @@ Dependencies
 
 1. The `ufo` JEDI project and its dependencies, e.g. `oops` and `ioda`.
 
-2. The Observation Processing System (OPS) and its dependencies.
+2. Unified Model Shared Library (SHUMlib).
 
 Note that both of the above need to be built with the same compiler and use the same libraries (e.g. MPI, HDF5, NetCDF).
 
 Building
 ========
 
-1. Build OPS as described at https://code.metoffice.gov.uk/trac/ops/wiki/WorkingPractices. Select the `ifort` or `gfortran` compiler. Alternatively, you can use an existing build from the `~opsrc` folder.
-
-2. Find the OPS build folder. It should have a sibling called `build.tgz` containing `include` and `o` directories with Fortran module files and object files. Unzip that archive into the `build` folder. The latter should now contain `include` and `o` subdirectories at the same level as `bin` and `installs`.
-
-3. Clone the `ufo-bundle` into a folder of your choice. Consider using the `feature/wsmigaj` branch, which contains some Met Office-specific adjustments and includes the ropp-ufo package implementing operators for GNSSRO:
+1. Clone the `ufo-bundle` into a folder of your choice. Consider using the `feature/wsmigaj` branch, which contains some Met Office-specific adjustments and includes the ropp-ufo package implementing operators for GNSSRO:
 
        git clone https://github.com/JCSDA/ufo-bundle.git -b feature/wsmigaj
        cd ufo-bundle
        cp -a /project/SatImagery/utils/jedi_repos/ufo-bundle/ropp-ufo .
 
-4. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
+2. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
 
        ecbuild_bundle( PROJECT opsinputs GIT "https://github.com/MetOffice/opsinputs.git" BRANCH develop UPDATE)
 
-5. Run the following commands to set up your build environment:
+3. Run the following commands to set up your build environment:
 
        module use /data/users/wsmigaj/Projects/JediModules/modulefiles
-       module unload R/3.6.1
+       module load jedi/ufo-bundle-dev-stack
 
-   and, depending on whether you are using a `gfortran` or an `ifort` build of OPS, either
+   (Alternatively, load jedi/ufo-bundle-dev-stack/intel if you want to use the Intel compiler or jedi/ufo-bundle-dev-stack/gnu/7.2.0 to use the GNU 7.2.0 compiler suite.)
 
-       module load jedi/ufo-bundle-dev-stack/gnu/7.2.0
+4. Create a build directory next to the `ufo-bundle` directory, enter it and run ecbuild to configure a build:
 
-   or 
+       ecbuild ../ufo-bundle
 
-       module load jedi/ufo-bundle-dev-stack/intel/17.0.64
-
-6. Create a build directory next to the `ufo-bundle` directory, enter it and run ecbuild to configure a build, passing the path to the OPS build folder to the OPS_ROOT variable:
-
-       ecbuild -DOPS_ROOT=/path/to/OPS/build ../ufo-bundle
-
-7. Run make to build the the bundle:
+5. Run make to build the the bundle:
 
        make -j4
 

@@ -89,8 +89,9 @@ endfunction()
 set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
 set( OPSINPUTS_OPSPROG_RUNNER ${CMAKE_CURRENT_BINARY_DIR}/opsprog_runner.sh)
 
-# Shell script running OPS programs with PATH and LD_LIBRARY_PATH set appropriately
-configure_file(opsprog_runner.sh.in ${OPSINPUTS_OPSPROG_RUNNER} @ONLY)
+# Shell script running OPS programs with PATH set appropriately
+get_target_property( OPSPROG_BIN_DIR OpsProg_PrintVarobs RUNTIME_OUTPUT_DIRECTORY )
+configure_file( opsprog_runner.sh.in ${OPSINPUTS_OPSPROG_RUNNER} @ONLY )
 
 ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                         SOURCES opsinputs/instantiateObsFilterFactory.h

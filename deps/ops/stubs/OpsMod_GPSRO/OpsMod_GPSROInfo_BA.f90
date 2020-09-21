@@ -1,0 +1,19 @@
+!-------------------------------------------------------------------------------
+! (C) Crown copyright Met Office. All rights reserved.
+!     Refer to COPYRIGHT.txt of this distribution for details.
+!-------------------------------------------------------------------------------
+! Contains parameters for global access in Ops_GPSRO_Process
+!-------------------------------------------------------------------------------
+
+MODULE OpsMod_GPSROInfo_BA
+
+IMPLICIT NONE
+
+SAVE
+
+! Public declarations:
+
+LOGICAL              :: GPSRO_pseudo_ops = .FALSE.  ! .TRUE. is pseudo-levels turned on.
+LOGICAL              :: GPSRO_vert_interp_ops = .FALSE.  ! .TRUE. is interp of ln(P) instead of Exner.
+
+END MODULE OpsMod_GPSROInfo_BA

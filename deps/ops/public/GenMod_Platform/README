@@ -1,0 +1,13 @@
+For the majority of platforms, to call a C function from Fortran, it must be
+declared with a lower case name with a trailing underscore in C. E.g.:
+
+! In Fortran
+CALL symbol()
+
+/* In C */
+void symbol_() {
+    /* do something ... */
+}
+
+This problem will become obsolete as we move to Fortran 2003 or above, when we
+can use its "Interoperability with C" feature.
