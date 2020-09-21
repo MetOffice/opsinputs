@@ -1,8 +1,7 @@
 /*
- * (C) Copyright 2020 Met Office UK
- * 
- * This software is licensed under the terms of the Apache Licence Version 2.0
- * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0. 
+ * (C) Crown Copyright 2020, the Met Office. All rights reserved.
+ *
+ * Refer to COPYRIGHT.txt of this distribution for details. 
  */
 
 #include <cstdio>
@@ -25,7 +24,7 @@
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilter.h"
-#include "oops/parallel/mpi/mpi.h"
+#include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
 #include "ufo/filters/Variables.h"
@@ -56,8 +55,8 @@ struct CxChecker::PrintCxFileOutput {
 
 
 CxChecker::CxChecker(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
-                             boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                             boost::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
+                             std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                             std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
 {
   oops::Log::trace() << "CxChecker constructor starting" << std::endl;

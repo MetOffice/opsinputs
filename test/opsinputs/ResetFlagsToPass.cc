@@ -1,8 +1,7 @@
 /*
- * (C) Copyright 2020 Met Office UK
+ * (C) Crown Copyright 2020, the Met Office. All rights reserved.
  *
- * This software is licensed under the terms of the Apache Licence Version 2.0
- * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+ * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #include "../../test/opsinputs/ResetFlagsToPass.h"
@@ -21,8 +20,8 @@ namespace opsinputs {
 namespace test {
 
 ResetFlagsToPass::ResetFlagsToPass(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
-                                   boost::shared_ptr<ioda::ObsDataVector<int> > flags,
-                                   boost::shared_ptr<ioda::ObsDataVector<float> > /*obsErrors*/)
+                                   std::shared_ptr<ioda::ObsDataVector<int> > flags,
+                                   std::shared_ptr<ioda::ObsDataVector<float> > /*obsErrors*/)
   : obsdb_(obsdb), geovars_(), flags_(std::move(flags))
 {
   oops::Log::trace() << "ResetFlagsToPass constructor starting" << std::endl;

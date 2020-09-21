@@ -1,17 +1,11 @@
 /*
- * (C) Copyright 2020 Met Office UK
+ * (C) Crown Copyright 2020, the Met Office. All rights reserved.
  *
- * This software is licensed under the terms of the Apache Licence Version 2.0
- * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+ * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #ifndef OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
 #define OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
-
-#include <exception>
-
-#include "oops/parallel/mpi/mpi.h"
-#include "oops/util/Logger.h"
 
 namespace opsinputs {
 

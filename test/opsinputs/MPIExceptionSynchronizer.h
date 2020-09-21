@@ -1,8 +1,7 @@
 /*
- * (C) Copyright 2020 Met Office UK
+ * (C) Crown Copyright 2020, the Met Office. All rights reserved.
  *
- * This software is licensed under the terms of the Apache Licence Version 2.0
- * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+ * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #ifndef TEST_OPSINPUTS_MPIEXCEPTIONSYNCHRONIZER_H_
@@ -12,7 +11,7 @@
 
 #include "eckit/testing/Test.h"
 #include "oops/../test/TestEnvironment.h"
-#include "oops/parallel/mpi/mpi.h"
+#include "oops/mpi/mpi.h"
 #include "oops/runs/Test.h"
 #include "oops/util/Expect.h"
 #include "opsinputs/MPIExceptionSynchronizer.h"
@@ -27,13 +26,13 @@ void noException() {
   int sum;
 
   synchronizer.throwIfAnyProcessHasThrown();
-  oops::mpi::comm().allReduce(term, sum, eckit::mpi::Operation::SUM);
+  oops::mpi::world().allReduce(term, sum, eckit::mpi::Operation::SUM);
 
-  EXPECT_EQUAL(sum, oops::mpi::comm().size());
+  EXPECT_EQUAL(sum, oops::mpi::world().size());
 
   synchronizer.throwIfAnyProcessHasThrown();
   int product;
-  oops::mpi::comm().allReduce(term, product, eckit::mpi::Operation::PROD);
+  oops::mpi::world().allReduce(term, product, eckit::mpi::Operation::PROD);
 
   EXPECT_EQUAL(product, 1);
 }
@@ -43,18 +42,18 @@ void exceptionBeforeFirstMPICall() {
 
   int term = 1;
 
-  if (oops::mpi::comm().rank() == 0)
+  if (oops::mpi::world().rank() == 0)
     throw std::runtime_error("An exception in one process only");
 
   synchronizer.throwIfAnyProcessHasThrown();
   int sum;
-  oops::mpi::comm().allReduce(term, sum, eckit::mpi::Operation::SUM);
+  oops::mpi::world().allReduce(term, sum, eckit::mpi::Operation::SUM);
 
-  EXPECT_EQUAL(sum, oops::mpi::comm().size());
+  EXPECT_EQUAL(sum, oops::mpi::world().size());
 
   synchronizer.throwIfAnyProcessHasThrown();
   int product;
-  oops::mpi::comm().allReduce(term, product, eckit::mpi::Operation::PROD);
+  oops::mpi::world().allReduce(term, product, eckit::mpi::Operation::PROD);
 
   EXPECT_EQUAL(product, 1);
 }
@@ -66,16 +65,16 @@ void exceptionBeforeSecondMPICall() {
 
   synchronizer.throwIfAnyProcessHasThrown();
   int sum;
-  oops::mpi::comm().allReduce(term, sum, eckit::mpi::Operation::SUM);
+  oops::mpi::world().allReduce(term, sum, eckit::mpi::Operation::SUM);
 
-  EXPECT_EQUAL(sum, oops::mpi::comm().size());
+  EXPECT_EQUAL(sum, oops::mpi::world().size());
 
-  if (oops::mpi::comm().rank() == 0)
+  if (oops::mpi::world().rank() == 0)
     throw std::runtime_error("An exception in one process only");
 
   synchronizer.throwIfAnyProcessHasThrown();
   int product;
-  oops::mpi::comm().allReduce(term, product, eckit::mpi::Operation::PROD);
+  oops::mpi::world().allReduce(term, product, eckit::mpi::Operation::PROD);
 
   EXPECT_EQUAL(product, 1);
 }
@@ -97,6 +96,8 @@ class MPIExceptionSynchronizer : public oops::Test {
   std::string testid() const override {return "opsinputs::test::MPIExceptionSynchronizer";}
 
   void register_tests() const override {}
+
+  void clear() const override {}
 };
 
 }  // namespace test
