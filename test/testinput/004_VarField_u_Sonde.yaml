@@ -12,7 +12,6 @@ observations:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
-      variables: eastward_wind
       action:
         name: inflate error
         inflation factor: 2.0
