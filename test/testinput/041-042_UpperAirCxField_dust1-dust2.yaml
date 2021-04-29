@@ -16,13 +16,13 @@ observations:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the Cx file.
     - filter: Reset Flags to Pass
-      flags_to_reset: [1, 6]  # missing, Hfailed
+      flags_to_reset: [10, 15]  # missing, Hfailed
     # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
     - filter: Domain Check
       where:
       - variable:
           name: latitude@MetaData
-        minvalue: 0.
+        minvalue: 0.0
     - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_041-042_UpperAirCxField_dust1-dust2
       reject_obs_with_any_variable_failing_qc: true

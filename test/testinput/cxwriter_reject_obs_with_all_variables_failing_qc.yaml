@@ -21,10 +21,10 @@ observations:
       where:
       - variable:
           name: latitude@MetaData
-        minvalue: 0.
+        minvalue: 0.0
     # Set the flag of observations with missing values to "pass".
     - filter: Reset Flags to Pass
-      flags_to_reset: [1, 6]  # missing, Hfailed
+      flags_to_reset: [10, 15]  # missing, Hfailed
     - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       reject_obs_with_all_variables_failing_qc: true
