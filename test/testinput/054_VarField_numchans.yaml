@@ -22,7 +22,7 @@ observations:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
     - filter: Reset Flags to Pass
-      flags_to_reset: [1, 6]  # missing, Hfailed
+      flags_to_reset: [10, 15]  # missing, Hfailed
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_054_VarField_numchans
       general_mode: debug

@@ -19,13 +19,13 @@ observations:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
     - filter: Reset Flags to Pass
-      flags_to_reset: [1, 6]  # missing, Hfailed
+      flags_to_reset: [10, 15]  # missing, Hfailed
     # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
     - filter: Domain Check
       where:
       - variable:
           name: latitude@MetaData
-        minvalue: 0.
+        minvalue: 0.0
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
       namelist_directory: testinput/VarObsWriterNamelists_023_VarField_modelsurface
