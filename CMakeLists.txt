@@ -29,7 +29,8 @@ ecbuild_requires_macro_version( 2.7 )
 ecbuild_declare_project()
 
 ecbuild_enable_fortran( REQUIRED )
-ecbuild_add_cxx11_flags()
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set( OPSINPUTS_LINKER_LANGUAGE CXX )
 
@@ -46,23 +47,23 @@ find_package( NetCDF REQUIRED )
 include_directories( ${NETCDF_INCLUDE_DIRS} )
 
 # eckit
-ecbuild_use_package( PROJECT eckit VERSION 0.18.0 REQUIRED )
+find_package( eckit REQUIRED )
 include_directories( ${ECKIT_INCLUDE_DIRS} )
 
 # fckit
-ecbuild_use_package( PROJECT fckit VERSION 0.4.1 REQUIRED )
+find_package( fckit REQUIRED )
 include_directories( ${FCKIT_INCLUDE_DIRS} )
 
 # ufo
-ecbuild_use_package( PROJECT ufo VERSION 0.1.0 REQUIRED )
+find_package( ufo REQUIRED )
 include_directories( ${UFO_INCLUDE_DIRS} )
 
 # ioda
-ecbuild_use_package( PROJECT ioda VERSION 0.1.0 REQUIRED )
+find_package( ioda REQUIRED )
 include_directories( ${IODA_INCLUDE_DIRS} )
 
 # oops
-ecbuild_use_package( PROJECT oops VERSION 0.2.1 REQUIRED )
+find_package( oops REQUIRED )
 include_directories( ${OOPS_INCLUDE_DIRS} )
 
 ################################################################################
