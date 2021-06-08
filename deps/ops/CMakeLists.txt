@@ -123,7 +123,7 @@ target_link_libraries(ops
   ${SHUM_BYTESWAP_LIBRARY}
   ${SHUM_STRING_CONV_LIBRARY}
   ${SHUM_WGDOS_PACKING_LIBRARY}
-  ${NETCDF_LIBRARIES}
+  NetCDF::NetCDF_Fortran
 )
 
 get_target_property(OPS_Fortran_MODULE_DIRECTORY ops Fortran_MODULE_DIRECTORY)
