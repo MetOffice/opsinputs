@@ -987,25 +987,17 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors)
     case (VarField_LevelTime)
-      ! IF (PRESENT (RepObs)) THEN
-      !   ObHdrVrbl = RepObs % Header % model_level_time
-      ! ELSE
-      !   CALL Ops_Alloc(Ob % Header % level_time, "level_time", Ob % Header % NumObsLocal, Ob % level_time)
-      ! END IF
+      call opsinputs_fill_filltimeoffsets2d( &
+        Ob % Header % level_time, "level_time", JediOpsObs, Ob % level_time, &
+        ObsSpace, Channels, "datetime", "MetaData", self % validitytime)
     case (VarField_LevelLat)
-      ! TODO(someone): the OPS code had "if (present(RepObs))...else...end if" here. Is that needed
-      ! and what is RepObs?
-      ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
-      ! once it is known.
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Ob % Header % level_lat, "level_lat", Ob % Header % NumObsLocal, Ob % level_lat, &
-        self % GeoVals, "PLACEHOLDER_VARIABLE_NAME")
+      call opsinputs_fill_fillreal2d( &
+        Ob % Header % level_lat, "level_lat", JediOpsObs, Ob % level_lat, &
+        ObsSpace, Channels, "latitude", "MetaData")
     case (VarField_LevelLon)
-      ! IF (PRESENT (RepObs)) THEN
-      !   ObHdrVrbl = RepObs % Header % model_level_lon
-      ! ELSE
-      !   CALL Ops_Alloc(Ob % Header % level_lon, "level_lon", Ob % Header % NumObsLocal, Ob % level_lon)
-      ! END IF
+      call opsinputs_fill_fillreal2d( &
+        Ob % Header % level_lon, "level_lon", JediOpsObs, Ob % level_lon, &
+        ObsSpace, Channels, "longitude", "MetaData")
     case (VarField_RainAccum)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RainAccum, "RainAccum", Ob % Header % NumObsLocal, Ob % RainAccum)
