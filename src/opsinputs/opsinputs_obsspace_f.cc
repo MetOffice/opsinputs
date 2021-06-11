@@ -61,4 +61,24 @@ void opsinputs_obsspace_get_db_string_f(
   }
 }
 
+void opsinputs_obsspace_get_locs_ordered_by_record_f(
+    const ioda::ObsSpace &obsspace,
+    const int32_t &/*num_locs_ordered*/,
+    int32_t *locs_ordered,
+    const int32_t &/*num_record_starts*/,
+    int32_t *record_starts) {
+  size_t iloc = 0;
+  size_t irec = 0;
+  for (ioda::ObsSpace::RecIdxIter it = obsspace.recidx_begin(), end = obsspace.recidx_end();
+       it != end; ++it) {
+    const std::vector<size_t> & locsInRec = it->second;
+    record_starts[irec++] = iloc + 1;  // +1 produces a 1-based index
+    for (size_t loc : locsInRec) {
+      locs_ordered[iloc++] = loc + 1;  // same
+    }
+  }
+  record_starts[irec++] = iloc + 1;
+}
+
+
 }  // namespace opsinputs

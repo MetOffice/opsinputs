@@ -33,4 +33,16 @@ subroutine c_opsinputs_obsspace_get_db_string( &
   character(kind=c_char, len=1), intent(inout) :: characters(string_length * num_strings)
 end subroutine c_opsinputs_obsspace_get_db_string
 
+subroutine c_opsinputs_obsspace_get_locs_ordered_by_record( &
+    obss, NumLocations, LocationsOrderedByRecord, NumRecordStarts, RecordStarts) &
+    bind(C,name='opsinputs_obsspace_get_locs_ordered_by_record_f')
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_int32_t
+  implicit none
+  type(c_ptr), value :: obss
+  integer(c_int32_t), intent(in) :: NumLocations
+  integer(c_int32_t), intent(inout) :: LocationsOrderedByRecord(NumLocations)
+  integer(c_int32_t), intent(in) :: NumRecordStarts
+  integer(c_int32_t), intent(inout) :: RecordStarts(NumRecordStarts)
+end subroutine c_opsinputs_obsspace_get_locs_ordered_by_record
+
 end interface

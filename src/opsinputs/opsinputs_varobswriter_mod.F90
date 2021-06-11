@@ -26,27 +26,31 @@ use obsspace_mod, only:  &
     obsspace_has
 use oops_variables_mod, only: oops_variables
 use opsinputs_fill_mod, only: &
-    opsinputs_fill_fillelementtypefromsimulatedvariable, &
-    opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
+    opsinputs_fill_fillcoord2d, &
     opsinputs_fill_fillelementtypefromnormalvariable, &
     opsinputs_fill_fillelementtype2dfromnormalvariable, &
+    opsinputs_fill_fillelementtypefromsimulatedvariable, &
+    opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
+    opsinputs_fill_fillinteger, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
     opsinputs_fill_fillreal2dfromgeoval, &
-    opsinputs_fill_fillinteger, &
-    opsinputs_fill_fillcoord2d
+    opsinputs_fill_fillstring, &
+    opsinputs_fill_filltimeoffsets, &
+    opsinputs_fill_filltimeoffsets2d
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_has,      &
     opsinputs_obsdatavector_int_get,      &
     opsinputs_obsdatavector_int_varnames, &
     opsinputs_obsdatavector_float_has,    &
     opsinputs_obsdatavector_float_get
-use opsinputs_obsspace_mod, only:                        &
-    opsinputs_obsspace_get_db_string,                    &
-    opsinputs_obsspace_get_db_datetime_offset_in_seconds
-use opsinputs_utils_mod, only:      &
-    max_varname_length,             &
+use opsinputs_jediopsobs_mod, only:              &
+    opsinputs_jediopsobs,                        &
+    opsinputs_jediopsobs_create,                 &
+    opsinputs_jediopsobs_clear_rejected_records
+use opsinputs_utils_mod, only:                         &
+    max_varname_length,                                &
     opsinputs_utils_fillreportflags
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
@@ -83,6 +87,7 @@ use OpsMod_CharUtils, only: ops_to_lower_case
 use OpsMod_Constants, only: PPF ! PGE packing factor
 use OpsMod_Control, only:   &
     DefaultDocURL,          &
+    mpi_group,              &
     Ops_InitMPI
 use OpsMod_DateTime, only: &
     DateTime_type,         &
@@ -92,9 +97,10 @@ use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
     ObsGroupGPSRO,             &
-    ObsGroupSurface,           &
     ObsGroupSatwind,           &
-    ObsGroupScatwind
+    ObsGroupScatwind,          &
+    ObsGroupSonde,             &
+    ObsGroupSurface
 use OpsMod_ObsInfo, only: &
     FinalRejectReport,    &
     LenCallsign,          &
@@ -132,6 +138,7 @@ private
 
   logical            :: AccountForGPSROTangentPointDrift
   logical            :: UseRadarFamily
+
 
   integer(integer64) :: FH_VertCoord
   integer(integer64) :: FH_HorizGrid
@@ -492,21 +499,31 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(c_ptr), value, intent(in) :: ObsSpace
-integer,            intent(in) :: nchannels
-integer,            intent(in) :: Channels(nchannels)
-type(c_ptr), value, intent(in) :: Flags, ObsErrors
-integer,            intent(in) :: nvars, nlocs
-real(c_double),     intent(in) :: hofx(nvars, nlocs)
+type(c_ptr), value, intent(in)           :: ObsSpace
+integer,            intent(in)           :: nchannels
+integer,            intent(in)           :: Channels(nchannels)
+type(c_ptr), value, intent(in)           :: Flags, ObsErrors
+integer,            intent(in)           :: nvars, nlocs
+real(c_double),     intent(in)           :: hofx(nvars, nlocs)
 
 ! Local declarations:
-type(OB_type)                  :: Ob
-type(UM_header_type)           :: CxHeader
-integer(integer64)             :: NumVarObsTotal
+logical                                  :: ConvertRecordsToMultilevelObs
+type(opsinputs_jediopsobs)               :: JediOpsObs
+type(OB_type)                            :: Ob
+type(UM_header_type)                     :: CxHeader
+integer(integer64)                       :: NumVarObsTotal
 
 ! Body:
-call opsinputs_varobswriter_allocateobservations(self, ObsSpace, Ob)
-call opsinputs_varobswriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, Ob)
+
+! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
+! it should be treated as a single (multi-level) ob in the OPS data structures.
+! There may be other obs groups requiring similar treatment -- if so, edit the line below.
+ConvertRecordsToMultilevelObs = (self % ObsGroup == ObsGroupSonde)
+
+JediOpsObs = opsinputs_jediopsobs_create(ObsSpace, ConvertRecordsToMultilevelObs)
+call opsinputs_varobswriter_allocateobservations(self, ObsSpace, JediOpsObs, Ob)
+call opsinputs_varobswriter_populateobservations(self, ObsSpace, JediOpsObs, Channels, &
+                                                 Flags, ObsErrors, Ob)
 call opsinputs_varobswriter_populatecxheader(self, CxHeader)
 
 call Ops_CreateVarobs (Ob,                  & ! in
@@ -550,21 +567,32 @@ end subroutine opsinputs_varobswriter_addrequiredgeovars
 ! ------------------------------------------------------------------------------
 
 !> Prepare Ob to hold the required number of observations.
-subroutine opsinputs_varobswriter_allocateobservations(self, ObsSpace, Ob)
+subroutine opsinputs_varobswriter_allocateobservations(self, ObsSpace, JediOpsObs, Ob)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_varobswriter), intent(in) :: self
-type(c_ptr), value, intent(in)          :: ObsSpace
-type(OB_type), intent(inout)            :: Ob
+type(opsinputs_varobswriter), intent(in)     :: self
+type(c_ptr), value, intent(in)               :: ObsSpace
+type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
+type(OB_type), intent(inout)                 :: Ob
+
+! Local declarations:
+integer(kind=gc_int_kind)                    :: istat
 
 ! Body:
 Ob % Header % obsgroup = self % obsgroup
 
 call Ops_SetupObType(Ob)
 
-Ob % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
-Ob % Header % numobslocal = obsspace_get_nlocs(ObsSpace)
+Ob % Header % numobslocal = JediOpsObs % NumOpsObs
+if (JediOpsObs % ConvertRecordsToMultilevelObs) then
+  Ob % Header % numobstotal = Ob % Header % numobslocal
+  call gcg_isum (1_gc_int_kind, mpi_group, istat, Ob % Header % numobstotal)
+else
+  ! The number of OPS obs is equal to that of JEDI obs, and the number of global JEDI obs
+  ! can be obtained from the ObsSpace without any extra MPI communication.
+  Ob % Header % numobstotal = obsspace_get_gnlocs(ObsSpace)
+end if
 
 Ob % Header % NumCXBatches = 1
 allocate(Ob % Header % ObsPerBatchPerPE(Ob % Header % NumCXBatches, 0:nproc - 1))
@@ -576,28 +604,27 @@ end subroutine opsinputs_varobswriter_allocateobservations
 
 !> Populate Ob fields needed to output the requested varfields.
 subroutine opsinputs_varobswriter_populateobservations( &
-  self, ObsSpace, Channels, Flags, ObsErrors, Ob)
+  self, ObsSpace, JediOpsObs, Channels, Flags, ObsErrors, Ob)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_varobswriter), intent(in) :: self
-type(c_ptr), value, intent(in)          :: ObsSpace
-integer(c_int), intent(in)              :: Channels(:)
-type(c_ptr), value, intent(in)          :: Flags, ObsErrors
-type(OB_type), intent(inout)            :: Ob
+type(opsinputs_varobswriter), intent(in)        :: self
+type(c_ptr), value, intent(in)                  :: ObsSpace
+type(opsinputs_jediopsobs), intent(inout)       :: JediOpsObs
+integer(c_int), intent(in)                      :: Channels(:)
+type(c_ptr), value, intent(in)                  :: Flags, ObsErrors
+type(OB_type), intent(inout)                    :: Ob
 
 ! Local declarations:
-character(len=*), parameter             :: RoutineName = "opsinputs_varobswriter_populateobservations"
-character(len=80)                       :: ErrorMessage
+character(len=*), parameter                     :: RoutineName = "opsinputs_varobswriter_populateobservations"
+character(len=80)                               :: ErrorMessage
 
-integer(integer64)                      :: VarFields(ActualMaxVarfield)
-integer                                 :: nVarFields
-integer                                 :: iVarField
+integer(integer64)                              :: VarFields(ActualMaxVarfield)
+integer                                         :: nVarFields
+integer                                         :: iVarField
 
-integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
-
-logical                                 :: FillChanNum = .false.
-logical                                 :: FillNumChans = .false.
+logical                                         :: FillChanNum = .false.
+logical                                         :: FillNumChans = .false.
 
 ! Body:
 
@@ -606,21 +633,19 @@ logical                                 :: FillNumChans = .false.
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 nVarFields = size(VarFields)
 
-! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
-
-call Ops_Alloc(Ob % Header % Latitude, "Latitude", Ob % Header % NumObsLocal, Ob % Latitude)
-call obsspace_get_db(ObsSpace, "MetaData", "latitude", Ob % Latitude)
-
-call Ops_Alloc(Ob % Header % Longitude, "Longitude", Ob % Header % NumObsLocal, Ob % Longitude)
-call obsspace_get_db(ObsSpace, "MetaData", "longitude", Ob % Longitude)
-
-call Ops_Alloc(Ob % Header % Time, "Time", Ob % Header % NumObsLocal, Ob % Time)
-call opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
-  ObsSpace, "MetaData", "datetime", self % validitytime, TimeOffsetsInSeconds)
-Ob % Time = TimeOffsetsInSeconds
-
-call opsinputs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
+call opsinputs_varobswriter_fillreportflags(Ob, JediOpsObs, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
+if (JediOpsObs % ConvertRecordsToMultilevelObs) then
+  call opsinputs_jediopsobs_clear_rejected_records(Ob % ReportFlags, JediOpsObs)
+end if
+
+! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
+call opsinputs_fill_fillreal(Ob % Header % Latitude, "Latitude", JediOpsObs, &
+  Ob % Latitude, ObsSpace, "latitude", "MetaData")
+call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", JediOpsObs, &
+  Ob % Longitude, ObsSpace, "longitude", "MetaData")
+call opsinputs_fill_filltimeoffsets(Ob % Header % Time, "Time", JediOpsObs, &
+  Ob % Time, ObsSpace, "datetime", "MetaData", self % validitytime)
 
 ! TODO(someone): The following call to Ops_Alloc() will need to be replaced by
 ! call opsinputs_varobswriter_fillinteger( &
@@ -632,25 +657,24 @@ call opsinputs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
-  call Ops_Alloc(Ob % Header % Callsign, "Callsign", Ob % Header % NumObsLocal, Ob % Callsign)
-  call opsinputs_obsspace_get_db_string( &
-    ObsSpace, "MetaData", "station_id", int(LenCallSign, kind=4), Ob % Callsign)
+  call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediOpsObs, &
+    LenCallSign, Ob % Callsign, ObsSpace, "station_id", "MetaData")
 end if
 
 call opsinputs_fill_fillcoord2d( &
-  Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA, &
-   ObsSpace, Channels, "air_pressure", "MetaData")
+  Ob % Header % PlevelsA, "PlevelsA", JediOpsObs, Ob % PlevelsA, &
+  ObsSpace, Channels, "air_pressure", "MetaData")
 
 GPSRO_TPD = self % AccountForGPSROTangentPointDrift
 if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
-  call opsinputs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
+  call opsinputs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace, JediOpsObs)
 end if
 
 ! TODO(wsmigaj): it may be possible to derive RadFamily directly from the observation group.
 RadFamily = self % UseRadarFamily
 if (RadFamily) then
   call opsinputs_fill_fillinteger( &
-    Ob % Header % Family, "Family", Ob % Header % NumObsLocal, Ob % Family, &
+    Ob % Header % Family, "Family", JediOpsObs, Ob % Family, &
     ObsSpace, "radar_family", "MetaData")
 end if
 
@@ -668,7 +692,7 @@ do iVarField = 1, nVarFields
       ! TODO(wsmigaj): check if air_potential_temperature is the correct variable name
       ! (it isn't used in JEDI, but virtual_temperature is)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-        Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta, &
+        Ob % Header % theta, "theta", JediOpsObs, Ob % theta, &
         ObsSpace, Channels, Flags, ObsErrors, "air_potential_temperature")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -677,7 +701,7 @@ do iVarField = 1, nVarFields
           ObsSpace, Flags, ObsErrors, "air_temperature")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-          Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
+          Ob % Header % t, "t", JediOpsObs, Ob % t, &
           ObsSpace, Channels, Flags, ObsErrors, "air_temperature")
       end if
     case (VarField_rh)
@@ -687,7 +711,7 @@ do iVarField = 1, nVarFields
           ObsSpace, Flags, ObsErrors, "relative_humidity")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-          Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
+          Ob % Header % rh, "rh", JediOpsObs, Ob % rh, &
           ObsSpace, Channels, Flags, ObsErrors, "relative_humidity")
       end if
     case (VarField_u)
@@ -698,7 +722,7 @@ do iVarField = 1, nVarFields
           ObsSpace, Flags, ObsErrors, "eastward_wind")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-          Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
+          Ob % Header % u, "u", JediOpsObs, Ob % u, &
           ObsSpace, Channels, Flags, ObsErrors, "eastward_wind")
       end if
     case (VarField_v)
@@ -709,7 +733,7 @@ do iVarField = 1, nVarFields
           ObsSpace, Flags, ObsErrors, "northward_wind")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-          Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
+          Ob % Header % v, "v", JediOpsObs, Ob % v, &
           ObsSpace, Channels, Flags, ObsErrors, "northward_wind")
       end if
     case (VarField_logvis)
@@ -743,17 +767,17 @@ do iVarField = 1, nVarFields
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillreal2d( &
-        Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss, &
+        Ob % Header % MwEmiss, "MwEmiss", JediOpsObs, Ob % MwEmiss, &
         ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_TCozone)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillreal( &
-        Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone, &
+        Ob % Header % TCozone, "TCozone", JediOpsObs, Ob % TCozone, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_satzenith)
       call opsinputs_fill_fillreal( &
-        Ob % Header % SatZenithAngle, "SatZenithAngle", Ob % Header % NumObsLocal, Ob % SatZenithAngle, &
+        Ob % Header % SatZenithAngle, "SatZenithAngle", JediOpsObs, Ob % SatZenithAngle, &
         ObsSpace, "sensor_zenith_angle", "MetaData")
     case (VarField_scanpos)
       ! TODO(someone): handle this varfield
@@ -762,7 +786,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillinteger( &
-        Ob % Header % surface, "surface", Ob % Header % NumObsLocal, Ob % surface, &
+        Ob % Header % surface, "surface", JediOpsObs, Ob % surface, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_elevation)
       ! TODO(someone): handle this varfield
@@ -785,7 +809,7 @@ do iVarField = 1, nVarFields
       ! NumLevs = nlevels_strat_varobs
       ! call Ops_Alloc(Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t)
     case (VarField_satid)
-      call opsinputs_varobswriter_fillsatid(Ob, ObsSpace)
+      call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediOpsObs)
     case (VarField_satazimth)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % SatAzimth, "SatAzimth", Ob % Header % NumObsLocal, Ob % SatAzimth)
@@ -794,7 +818,7 @@ do iVarField = 1, nVarFields
       ! call Ops_Alloc(Ob % Header % LocalAzimuth, "LocalAzimuth", Ob % Header % NumObsLocal, Ob % LocalAzimuth)
     case (VarField_solzenith)
       call opsinputs_fill_fillreal( &
-        Ob % Header % SolarZenith, "SolarZenith", Ob % Header % NumObsLocal, Ob % SolarZenith, &
+        Ob % Header % SolarZenith, "SolarZenith", JediOpsObs, Ob % SolarZenith, &
         ObsSpace, "solar_zenith_angle", "MetaData")
     case (VarField_solazimth)
       ! TODO(someone): handle this varfield
@@ -803,7 +827,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillreal( &
-        Ob % Header % IREmiss, "IREmiss", Ob % Header % NumObsLocal, Ob % IREmiss, &
+        Ob % Header % IREmiss, "IREmiss", JediOpsObs, Ob % IREmiss, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_cloudtopp)
       ! TODO(someone): handle this varfield
@@ -858,13 +882,13 @@ do iVarField = 1, nVarFields
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillreal2d( &
-        Ob % Header % Emissivity, "Emissivity", Ob % Header % NumObsLocal, Ob % Emissivity, &
+        Ob % Header % Emissivity, "Emissivity", JediOpsObs, Ob % Emissivity, &
         ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_QCinfo)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillinteger( &
-        Ob % Header % QCinfo, "QCinfo", Ob % Header % NumObsLocal, Ob % QCinfo, &
+        Ob % Header % QCinfo, "QCinfo", JediOpsObs, Ob % QCinfo, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_SBUVozone)
       ! TODO(someone): handle this varfield
@@ -889,7 +913,7 @@ do iVarField = 1, nVarFields
       ! call Ops_Alloc(Ob % Header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
     case (VarField_RadarObAzim)
       call opsinputs_fill_fillreal2d( &
-        Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim, &
+        Ob % Header % RadarObAzim, "RadarObAzim", JediOpsObs, Ob % RadarObAzim, &
         ObsSpace, Channels, "radar_azimuth", "MetaData")
     case (VarField_RadIdent)
       ! TODO(someone): handle this varfield
@@ -917,11 +941,11 @@ do iVarField = 1, nVarFields
         ! TODO(someone): Replace the placeholder in the call with an appropriate variable name,
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-          Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll, &
+          Ob % Header % BendingAngleAll, "BendingAngleAll", JediOpsObs, Ob % BendingAngleAll, &
           ObsSpace, Channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-          Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle, &
+          Ob % Header % BendingAngle, "BendingAngle", JediOpsObs, Ob % BendingAngle, &
           ObsSpace, Channels, Flags, ObsErrors, "bending_angle")
       end if
     case (VarField_ImpactParam)
@@ -946,7 +970,7 @@ do iVarField = 1, nVarFields
         ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData")
     case (VarField_AOD)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-        Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
+        Ob % Header % AOD, "AOD", JediOpsObs, Ob % AOD, &
         ObsSpace, Channels, Flags, ObsErrors, "aerosol_optical_depth")
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
@@ -1046,22 +1070,24 @@ end subroutine opsinputs_varobswriter_populateobservations
 !> Observations are marked as rejected if the JEDI QC flags of any or all (depending on the
 !> specified options) simulated variables are set to anything different from "pass".
 subroutine opsinputs_varobswriter_fillreportflags( &
-  Ob, ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
+  Ob, JediOpsObs, ObsSpace, Flags, &
+  RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
 implicit none
 
 ! Subroutine arguments:
-type(OB_type), intent(inout)             :: Ob
-type(c_ptr), value, intent(in)           :: ObsSpace, Flags
-logical, intent(in)                      :: RejectObsWithAnyVariableFailingQC
-logical, intent(in)                      :: RejectObsWithAllVariablesFailingQC
+type(OB_type), intent(inout)                 :: Ob
+type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
+type(c_ptr), value, intent(in)               :: ObsSpace, Flags
+logical, intent(in)                          :: RejectObsWithAnyVariableFailingQC
+logical, intent(in)                          :: RejectObsWithAllVariablesFailingQC
 
 ! Body:
 call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
                Ob % Header % NumObsLocal, Ob % ReportFlags)
-call opsinputs_utils_fillreportflags(ObsSpace, Flags, &
-                                   RejectObsWithAnyVariableFailingQC, &
-                                   RejectObsWithAllVariablesFailingQC, &
-                                   Ob % ReportFlags)
+call opsinputs_utils_fillreportflags(JediOpsObs, ObsSpace, Flags, &
+                                     RejectObsWithAnyVariableFailingQC, &
+                                     RejectObsWithAllVariablesFailingQC, &
+                                     Ob % ReportFlags)
 
 end subroutine opsinputs_varobswriter_fillreportflags
 
@@ -1172,28 +1198,29 @@ end subroutine opsinputs_varobswriter_findchannelspassingqc
 ! ------------------------------------------------------------------------------
 
 !> Fill the members of OB_type required to take the GPSRO point drift into account.
-subroutine opsinputs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace)
+subroutine opsinputs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace, JediOpsObs)
 implicit none
 ! Subroutine arguments:
-type(OB_type), intent(inout)             :: Ob
-type(c_ptr), value, intent(in)           :: ObsSpace
+type(OB_type), intent(inout)                 :: Ob
+type(c_ptr), value, intent(in)               :: ObsSpace
+type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
 
 ! Body:
 
-call opsinputs_varobswriter_fillsatid(Ob, ObsSpace)
+call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediOpsObs)
 ! TODO(someone): Replace the placeholder in the call below with an appropriate variable name
 ! and group, once they're known.
 call opsinputs_fill_fillinteger( &
-  Ob % Header % RO_quality, "RO_quality", Ob % Header % NumObsLocal, Ob % RO_quality, &
+  Ob % Header % RO_quality, "RO_quality", JediOpsObs, Ob % RO_quality, &
   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
 ! TODO(someone): Replace "latitude" and "longitude" variable names in the two calls below with
 ! appropriate GPSRO-specific variable names, once they're known. The group name may need to be
 ! adjusted as well.
 call opsinputs_fill_fillreal( &
-  Ob % Header % ro_occ_lat, "ro_occ_lat", Ob % Header % NumObsLocal, Ob % ro_occ_lat, &
+  Ob % Header % ro_occ_lat, "ro_occ_lat", JediOpsObs, Ob % ro_occ_lat, &
   ObsSpace, "latitude", "MetaData")
 call opsinputs_fill_fillreal( &
-  Ob % Header % ro_occ_lon, "ro_occ_lon", Ob % Header % NumObsLocal, Ob % ro_occ_lon, &
+  Ob % Header % ro_occ_lon, "ro_occ_lon", JediOpsObs, Ob % ro_occ_lon, &
   ObsSpace, "longitude", "MetaData")
 
 end subroutine opsinputs_varobswriter_fillgpsrotpddependentfields
@@ -1203,15 +1230,16 @@ end subroutine opsinputs_varobswriter_fillgpsrotpddependentfields
 !> Fill the Ob % SatId field.
 !>
 !> This is done in a separate routine because this field is filled from two places in the code.
-subroutine opsinputs_varobswriter_fillsatid(Ob, ObsSpace)
+subroutine opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediOpsObs)
 implicit none
 ! Subroutine arguments:
-type(OB_type), intent(inout)             :: Ob
-type(c_ptr), value, intent(in)           :: ObsSpace
+type(OB_type), intent(inout)                 :: Ob
+type(c_ptr), value, intent(in)               :: ObsSpace
+type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
 
 ! Body:
 call opsinputs_fill_fillinteger( &
-  Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
+  Ob % Header % SatId, "SatId", JediOpsObs, Ob % SatId, &
   ObsSpace, "satellite_id", "MetaData")
 
 end subroutine opsinputs_varobswriter_fillsatid
