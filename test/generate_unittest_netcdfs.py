@@ -327,7 +327,7 @@ def output_2d_geovals_to_netcdf(var_names, file_name):
 
 if __name__ == "__main__":
     # VarObs
-    output_1d_simulated_var_to_netcdf('surface_pressure',           'testinput/001_VarField_pstar.nc4') # Surface
+    output_1d_simulated_var_to_netcdf('air_pressure_at_two_meters_above_surface', 'testinput/001_VarField_pstar.nc4') # Surface
     output_1d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_Surface.nc4')
     output_2d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_RadarZ.nc4')
     output_1d_simulated_var_to_netcdf('relative_humidity',          'testinput/003_VarField_rh_Surface.nc4')
@@ -354,7 +354,7 @@ if __name__ == "__main__":
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
-    output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/002_SurfaceCxField_pstar.nc4')
+    output_1d_geoval_to_netcdf       ('',           'testinput/002_SurfaceCxField_pstar.nc4')
     output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
