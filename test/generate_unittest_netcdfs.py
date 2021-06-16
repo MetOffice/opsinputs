@@ -327,7 +327,7 @@ def output_2d_geovals_to_netcdf(var_names, file_name):
 
 if __name__ == "__main__":
     # VarObs
-    output_1d_simulated_var_to_netcdf('air_pressure_at_two_meters_above_surface', 'testinput/001_VarField_pstar.nc4') # Surface
+    output_1d_simulated_var_to_netcdf('surface_pressure',           'testinput/001_VarField_pstar.nc4') # Surface
     output_1d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_Surface.nc4')
     output_2d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_RadarZ.nc4')
     output_1d_simulated_var_to_netcdf('relative_humidity',          'testinput/003_VarField_rh_Surface.nc4')
@@ -348,14 +348,14 @@ if __name__ == "__main__":
     output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
     output_1d_normal_var_to_netcdf('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
     output_2d_simulated_var_to_netcdf('aerosol_optical_depth', 'testinput/077_VarField_aod.nc4')
-    output_2d_simulated_var_to_netcdf('air_potential_temperature',  'testinput/078_VarField_theta.nc4') # Sonde
-    output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind', 
+    output_2d_simulated_var_to_netcdf('air_potential_temperature', 'testinput/078_VarField_theta.nc4') # Sonde
+    output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
-    output_1d_geoval_to_netcdf       ('',           'testinput/002_SurfaceCxField_pstar.nc4')
-    output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
+    output_1d_geoval_to_netcdf       ('air_pressure_at_two_meters_above_surface', 'testinput/002_SurfaceCxField_pstar.nc4')
+    output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
     output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
