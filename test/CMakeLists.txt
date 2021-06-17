@@ -147,10 +147,26 @@ ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Surface
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Sonde
                 YAML     005_VarField_v_Sonde.yaml
                 DATA     005_VarField_v_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_010_VarField_britemp
+                YAML     010_VarField_britemp.yaml
+                NAMELIST VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
+                DATA     010_VarField_britemp.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
+                YAML     011_VarField_tskin.yaml
+                NAMELIST VarObsWriterNamelists_011_VarField_tskin/AMSUB.nl
+                DATA     011_VarField_tskin.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
+                YAML     017_VarField_mwemiss.yaml
+                NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
+                DATA     017_VarField_mwemiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
                 DATA     019_VarField_satzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_021_VarField_surface
+                YAML     021_VarField_surface.yaml
+                NAMELIST VarObsWriterNamelists_021_VarField_surface/AMSUB.nl
+                DATA     021_VarField_surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_023_VarField_modelsurface_geoval
                 YAML     023_VarField_modelsurface_geoval.yaml
                 NAMELIST VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
@@ -234,10 +250,42 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
 ### CxWriter tests
 
 # Tests of individual surface varfields
+ADD_WRITER_TEST(NAME     cxwriter_001_SurfaceCxField_Orog
+                YAML     001_SurfaceCxField_Orog.yaml
+                NAMELIST CxWriterNamelists_001_SurfaceCxField_Orog/AMSUB.nl
+                DATA     001_SurfaceCxField_Orog.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_002_SurfaceCxField_pstar
                 YAML     002_SurfaceCxField_pstar.yaml
                 NAMELIST CxWriterNamelists_002_SurfaceCxField_pstar/HLOSwind.nl
                 DATA     002_SurfaceCxField_pstar.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_003_SurfaceCxField_t2
+                YAML     003_SurfaceCxField_t2.yaml
+                NAMELIST CxWriterNamelists_003_SurfaceCxField_t2/AMSUB.nl
+                DATA     003_SurfaceCxField_t2.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_004_SurfaceCxField_rh2
+                YAML     004_SurfaceCxField_rh2.yaml
+                NAMELIST CxWriterNamelists_004_SurfaceCxField_rh2/AMSUB.nl
+                DATA     004_SurfaceCxField_rh2.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_005_SurfaceCxField_u10
+                YAML     005_SurfaceCxField_u10.yaml
+                NAMELIST CxWriterNamelists_005_SurfaceCxField_u10/AMSUB.nl
+                DATA     005_SurfaceCxField_u10.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_006_SurfaceCxField_v10
+                YAML     006_SurfaceCxField_v10.yaml
+                NAMELIST CxWriterNamelists_006_SurfaceCxField_v10/AMSUB.nl
+                DATA     006_SurfaceCxField_v10.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_013_SurfaceCxField_TskinSea
+                YAML     013_SurfaceCxField_TskinSea.yaml
+                NAMELIST CxWriterNamelists_013_SurfaceCxField_TskinSea/AMSUB.nl
+                DATA     013_SurfaceCxField_TskinSea.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_016_SurfaceCxField_pmsl
+                YAML     016_SurfaceCxField_pmsl.yaml
+                NAMELIST CxWriterNamelists_016_SurfaceCxField_pmsl/AMSUB.nl
+                DATA     016_SurfaceCxField_pmsl.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_017_SurfaceCxField_SeaIce
+                YAML     017_SurfaceCxField_SeaIce.yaml
+                NAMELIST CxWriterNamelists_017_SurfaceCxField_SeaIce/AMSUB.nl
+                DATA     017_SurfaceCxField_SeaIce.nc4 dummy.nc4)
 
 # Tests of individual upper-air varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
@@ -252,6 +300,26 @@ ADD_WRITER_TEST(NAME     cxwriter_004_UpperAirCxField_v
                 YAML     004_UpperAirCxField_v.yaml
                 NAMELIST CxWriterNamelists_004_UpperAirCxField_v/HLOSwind.nl
                 DATA     004_UpperAirCxField_v.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_005_UpperAirCxField_q
+                YAML     005_UpperAirCxField_q.yaml
+                NAMELIST CxWriterNamelists_005_UpperAirCxField_q/AMSUB.nl
+                DATA     005_UpperAirCxField_q.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_011_UpperAirCxField_P
+                YAML     011_UpperAirCxField_P.yaml
+                NAMELIST CxWriterNamelists_011_UpperAirCxField_P/AMSUB.nl
+                DATA     011_UpperAirCxField_P.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_029_UpperAirCxField_qcf
+                YAML     029_UpperAirCxField_qcf.yaml
+                NAMELIST CxWriterNamelists_029_UpperAirCxField_qcf/AMSUB.nl
+                DATA     029_UpperAirCxField_qcf.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_030_UpperAirCxField_qcl
+                YAML     030_UpperAirCxField_qcl.yaml
+                NAMELIST CxWriterNamelists_030_UpperAirCxField_qcl/AMSUB.nl
+                DATA     030_UpperAirCxField_qcl.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_033_UpperAirCxField_p_bar
+                YAML     033_UpperAirCxField_p_bar.yaml
+                NAMELIST CxWriterNamelists_033_UpperAirCxField_p_bar/AMSUB.nl
+                DATA     033_UpperAirCxField_p_bar.nc4 dummy.nc4)
 
 ADD_WRITER_TEST(NAME     cxwriter_041-042_UpperAirCxField_dust1-dust2
                 YAML     041-042_UpperAirCxField_dust1-dust2.yaml

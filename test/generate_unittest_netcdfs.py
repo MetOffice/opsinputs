@@ -6,14 +6,14 @@ In principle we could define these files as outputs of a custom CMake target;
 this script would then be run automatically as part of the build process whenever it changed."""
 
 import numpy as np
-from scipy.io import netcdf
+import netCDF4 as nc4
 
 # Defined as in oops/util/missingValues.cc 
 missing_float = np.finfo(np.float32).min * 0.99
 missing_int = np.iinfo(np.int32).min + 5
 
 def output_1d_simulated_var_to_netcdf(var_name, file_name):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -46,7 +46,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     f.close()
 
 def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -88,7 +88,7 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     f.close()
 
 def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -125,7 +125,7 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
     f.close()
 
 def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -162,7 +162,7 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
     f.close()
 
 def output_1d_geoval_to_netcdf(var_name, file_name):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -175,7 +175,7 @@ def output_1d_geoval_to_netcdf(var_name, file_name):
     f.close()
 
 def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with_radar_family=False):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -208,6 +208,9 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
     if with_bias:
         var = f.createVariable(var_name + '_1@ObsBias', 'f', ('nlocs',))
         var[:] = [-0.1, -0.2, -0.3, -0.4]
+        # BiasCorrObsValue = ObsValue - ObsBias
+        var = f.createVariable(var_name + '_1@BiasCorrObsValue', 'f', ('nlocs',))
+        var[:] = [1.2, missing_float, 1.5, 1.8]
 
     var = f.createVariable(var_name + '_2@ObsValue', 'f', ('nlocs',))
     var[:] = [2.1, 2.2, 2.3, 2.4]
@@ -220,6 +223,9 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
     if with_bias:
         var = f.createVariable(var_name + '_2@ObsBias', 'f', ('nlocs',))
         var[:] = [-0.5, -0.6, -0.7, -0.8]
+        # BiasCorrObsValue = ObsValue - ObsBias
+        var = f.createVariable(var_name + '_2@BiasCorrObsValue', 'f', ('nlocs',))
+        var[:] = [2.6, 2.8, 3.0, 3.2]
 
     var = f.createVariable(var_name + '_3@ObsValue', 'f', ('nlocs',))
     var[:] = [3.1, 3.2, 3.3, 3.4]
@@ -232,13 +238,16 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
     if with_bias:
         var = f.createVariable(var_name + '_3@ObsBias', 'f', ('nlocs',))
         var[:] = [-0.01, -0.02, -0.03, -0.04]
+        # BiasCorrObsValue = ObsValue - ObsBias
+        var = f.createVariable(var_name + '_3@BiasCorrObsValue', 'f', ('nlocs',))
+        var[:] = [3.11, 3.22, 3.33, 3.44]
 
     f.date_time = 2018010100
 
     f.close()
 
 def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_family=False):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
@@ -306,7 +315,7 @@ def output_2d_geoval_to_netcdf(var_name, file_name):
     return output_2d_geovals_to_netcdf([var_name], file_name)
 
 def output_2d_geovals_to_netcdf(var_names, file_name):
-    f = netcdf.netcdf_file(file_name, 'w')
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     nlevs = 3
@@ -327,17 +336,20 @@ def output_2d_geovals_to_netcdf(var_names, file_name):
 
 if __name__ == "__main__":
     # VarObs
-    output_1d_simulated_var_to_netcdf('surface_pressure',           'testinput/001_VarField_pstar.nc4') # Surface
-    output_1d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('air_temperature',            'testinput/002_VarField_temperature_RadarZ.nc4')
-    output_1d_simulated_var_to_netcdf('relative_humidity',          'testinput/003_VarField_rh_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('relative_humidity',          'testinput/003_VarField_rh_Sonde.nc4')
-    output_1d_simulated_var_to_netcdf('eastward_wind',              'testinput/004_VarField_u_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('eastward_wind',              'testinput/004_VarField_u_Sonde.nc4')
-    output_1d_simulated_var_to_netcdf('northward_wind',             'testinput/005_VarField_v_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('northward_wind',             'testinput/005_VarField_v_Sonde.nc4')
-    output_2d_simulated_var_to_netcdf('brightness_temperature',     'testinput/010_VarField_britemp.nc4', with_bias=True)
+    output_1d_simulated_var_to_netcdf('surface_pressure',            'testinput/001_VarField_pstar.nc4') # Surface
+    output_1d_simulated_var_to_netcdf('air_temperature',             'testinput/002_VarField_temperature_Surface.nc4')
+    output_2d_simulated_var_to_netcdf('air_temperature',             'testinput/002_VarField_temperature_RadarZ.nc4')
+    output_1d_simulated_var_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Surface.nc4')
+    output_2d_simulated_var_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Sonde.nc4')
+    output_1d_simulated_var_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Surface.nc4')
+    output_2d_simulated_var_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Sonde.nc4')
+    output_1d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Surface.nc4')
+    output_2d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
+    output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
+    output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
+    output_2d_normal_var_to_netcdf   ('surface_emissivity', 'ObsDiagnostics', 'testinput/017_VarField_mwemiss.nc4')
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
+    output_1d_normal_int_var_to_netcdf('surface_type', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
     output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
@@ -354,8 +366,21 @@ if __name__ == "__main__":
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
+    output_1d_geoval_to_netcdf       ('surface_altitude',           'testinput/001_SurfaceCxField_Orog.nc4')
     output_1d_geoval_to_netcdf       ('air_pressure_at_two_meters_above_surface', 'testinput/002_SurfaceCxField_pstar.nc4')
+    output_1d_geoval_to_netcdf       ('surface_temperature',        'testinput/003_SurfaceCxField_t2.nc4')
+    output_1d_geoval_to_netcdf       ('relative_humidity_2m',       'testinput/004_SurfaceCxField_rh2.nc4')
+    output_1d_geoval_to_netcdf       ('uwind_at_10m',               'testinput/005_SurfaceCxField_u10.nc4')
+    output_1d_geoval_to_netcdf       ('vwind_at_10m',               'testinput/006_SurfaceCxField_v10.nc4')
+    output_1d_geoval_to_netcdf       ('skin_temperature',           'testinput/013_SurfaceCxField_TskinSea.nc4')
+    output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/016_SurfaceCxField_pmsl.nc4')
+    output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
     output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
+    output_2d_geoval_to_netcdf       ('specific_humidity',          'testinput/005_UpperAirCxField_q.nc4')
+    output_2d_geoval_to_netcdf       ('air_pressure',               'testinput/033_UpperAirCxField_p_bar.nc4')
+    output_2d_geoval_to_netcdf       ('air_pressure_levels',        'testinput/011_UpperAirCxField_P.nc4')
+    output_2d_geoval_to_netcdf       ('mass_content_of_cloud_ice_in_atmosphere_layer', 'testinput/029_UpperAirCxField_qcf.nc4')
+    output_2d_geoval_to_netcdf       ('mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'testinput/030_UpperAirCxField_qcl.nc4')
     output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
