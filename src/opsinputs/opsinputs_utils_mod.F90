@@ -96,7 +96,7 @@ do iVar = 1, NumObsVariables
     end if
 
     if (RejectObsWithAnyVariableFailingQC) then
-      ! Set the FinalRejectReport bit in ReportFlags for observations with at with a non-zero QC flag
+      ! Set the FinalRejectReport bit in ReportFlags for observations with a non-zero QC flag
       ! in at least one variable.
       if (AllJediObsRejected) then
         ReportFlags(iOpsObs) = ibset(ReportFlags(iOpsObs), FinalRejectReport)
