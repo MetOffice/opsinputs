@@ -1,54 +1,58 @@
-window begin: 2018-01-01T00:00:00Z
-window end: 2018-01-01T01:00:00Z
+window begin: 2019-12-29T21:00:00Z
+window end: 2019-12-30T03:00:00Z
 
 observations:
-  - obs space:
-      name: AMSUB
+  - obs operator:
+       name: RTTOV
+       GeoVal_type: MetO # default
+       Debug: false # default
+       Absorbers: [Water_vapour]
+       linear obs operator:
+         Absorbers: [Water_vapour]
+       obs options:
+         RTTOV_default_opts: UKMO_PS43 # non-default
+         RTTOV_apply_reg_limits: true # for compatibility with previous
+                                      # version of this test
+         SatRad_compatibility: true # default
+         InspectProfileNumber: 1
+         Sensor_ID: noaa_20_atms
+         CoefficientPath: Data/rttov7pred54L/
+         UseRHwaterForQC: true # default
+         UseColdSurfaceCheck: true # default
+         prof_by_prof: false # default
+    obs space:
+      name: ATMS
       obsdatain:
-        obsfile: Data/017_VarField_mwemiss.nc4
-      simulated variables: [dummy]
-      channels: 1, 3
+        obsfile: Data/atms_n20_obs_20191230T0000_017_VarField_mwemiss.nc4
+      simulated variables: [brightness_temperature]
+      channels: 1-5
+    geovals:
+      filename: Data/geovals_atms_20191230T0000Z_017_VarField_mwemiss.nc4
     obs filters:
-    # Set the flag of observations with missing values to "pass": we want to check if these
-    # values are encoded correctly in the VarObsFile.
-    - filter: Reset Flags to Pass
-      flags_to_reset: [10, 15]  # missing, Hfailed
-    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
-    - filter: Domain Check
+    - filter: BlackList
+      filter variables:
+      - name: brightness_temperature
+        channels: 1-2
+    - filter: BlackList
+      filter variables:
+      - name: brightness_temperature
+        channels: 1-5
       where:
       - variable:
-          name: latitude@MetaData
-        minvalue: 0.0
+          name: sequence_number@MetaData
+        minvalue: 4.0
     - filter: VarObs Writer
-      reject_obs_with_any_variable_failing_qc: true
+      reject_obs_with_all_variables_failing_qc: true
       namelist_directory: testinput/VarObsWriterNamelists_017_VarField_mwemiss
       general_mode: debug
     - filter: VarObs Checker
       expected_main_table_columns:
-        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check.
-        # Only levels 1 and 3 are simulated and hence written to the VarObs file.
-        # In the arrays below, rows denote locations and columns levels.
-        field:    ["17", "17",
-                   "17", "17",
-                   "17", "17"]
-        level:    ["1", "2",
-                   "1", "2",
-                   "1", "2"]
-        ob value: ["4.10000", "6.10000",
-                   "-1073741824.00000", "6.20000",
-                   "4.40000", "6.40000"]
-        lat:      ["21.00000", "21.00000",
-                   "22.00000", "22.00000",
-                   "24.00000", "24.00000"]
-        lon:      ["31.00000", "31.00000",
-                   "32.00000", "32.00000",
-                   "34.00000", "34.00000"]
-        time:     ["-1740.00000", "-1740.00000",
-                   "-1680.00000", "-1680.00000",
-                   "-1560.00000", "-1560.00000"]
-        Callsign: ["station_1", "station_1",
-                   "station_2", "station_2",
-                   "station_4", "station_4"]
-    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+      # In arrays below, rows denote locations and columns channels
+        field:    ["17", "17", "17", "17", "17", 
+                   "17", "17", "17", "17", "17"]
+        ob value: ["0.95000", "0.95000", "0.95000", "0.95000", "0.95000", 
+                   "0.95000", "0.95000", "0.95000", "0.95000", "0.95000"]
+        lat:      ["61.10410", "61.10410", "61.10410", "61.10410", "61.10410", 
+                   "61.81990", "61.81990", "61.81990", "61.81990", "61.81990"]
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

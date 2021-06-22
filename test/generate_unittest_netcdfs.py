@@ -210,7 +210,7 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
         var[:] = [-0.1, -0.2, -0.3, -0.4]
         # BiasCorrObsValue = ObsValue - ObsBias
         var = f.createVariable(var_name + '_1@BiasCorrObsValue', 'f', ('nlocs',))
-        var[:] = [1.2, missing_float, 1.5, 1.8]
+        var[:] = [1.2, missing_float, 1.6, 1.8]
 
     var = f.createVariable(var_name + '_2@ObsValue', 'f', ('nlocs',))
     var[:] = [2.1, 2.2, 2.3, 2.4]

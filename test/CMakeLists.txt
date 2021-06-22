@@ -157,8 +157,8 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
                 DATA     011_VarField_tskin.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
                 YAML     017_VarField_mwemiss.yaml
-                NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
-                DATA     017_VarField_mwemiss.nc4)
+                NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/ATMS.nl
+                DATA     atms_n20_obs_20191230T0000_017_VarField_mwemiss.nc4 geovals_atms_20191230T0000Z_017_VarField_mwemiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
@@ -173,6 +173,7 @@ ADD_WRITER_TEST(NAME     varobswriter_023_VarField_modelsurface_geoval
                 DATA     023_VarField_modelsurface_geoval.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_028_VarField_satid
                 YAML     028_VarField_satid.yaml
+                NAMELIST VarObsWriterNamelists_028_VarField_satid/AMSUB.nl
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
                 YAML     031_VarField_solzenith.yaml
@@ -416,3 +417,15 @@ list( TRANSFORM opsinputs_test_input PREPEND testinput/ )
 ecbuild_add_resources( TARGET opsinputs_test_scripts
                        SOURCES_PACK
                        ${opsinputs_test_input} )
+
+# Files for RTTOV tests
+if( ${rttov_FOUND} )
+list( APPEND rttov_test_input
+rttov7pred54L/rtcoef_noaa_20_atms.dat
+)
+# Symlink all RTTOV files
+CREATE_SYMLINKs( ${rttov_SOURCE_DIR}/rtcoef_rttov12
+                 ${CMAKE_CURRENT_BINARY_DIR}/Data
+                 ${rttov_test_input} )
+endif( ${rttov_FOUND} )
+

@@ -34,6 +34,7 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
     opsinputs_fill_fillreal2dfromgeoval, &
+    opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
     opsinputs_fill_fillinteger, &
     opsinputs_fill_fillcoord2d
 use opsinputs_obsdatavector_mod, only:    &
@@ -155,7 +156,10 @@ private
   real(real64)       :: RC_PoleLat
   real(real64)       :: RC_PoleLong
 
+  integer, allocatable       :: channels(:)
+
   type(ufo_geovals), pointer :: GeoVals
+  type(ufo_geovals), pointer :: ObsDiags
 end type opsinputs_varobswriter
 
 ! ------------------------------------------------------------------------------
@@ -163,15 +167,17 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Set up an instance of opsinputs_varobswriter. Returns .true. on success and .false. on failure.
-function opsinputs_varobswriter_create(self, f_conf, comm, geovars)
+function opsinputs_varobswriter_create(self, f_conf, comm, channels, geovars, diagvars)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(inout) :: self
-type(fckit_configuration), intent(in)      :: f_conf  ! Configuration
-integer(gc_int_kind)                       :: comm    ! MPI communicator standing for the processes
-                                                      ! holding the data to be written to VarObs
-type(oops_variables), intent(inout)        :: geovars ! GeoVaLs required by the VarObsWriter.
+type(fckit_configuration), intent(in)      :: f_conf   ! Configuration
+integer(gc_int_kind)                       :: comm     ! MPI communicator standing for the processes
+                                                       ! holding the data to be written to VarObs
+integer                                    :: channels(:)
+type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
+type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
@@ -186,6 +192,8 @@ character(len=200)          :: ErrorMessage
 ! Body:
 
 opsinputs_varobswriter_create = .true.
+allocate(self % channels(size(channels)))
+self % channels(:) = channels(:)
 
 ! Setup OPS
 
@@ -443,9 +451,9 @@ if (.not. f_conf % get("RC_PoleLong", DoubleValue)) then
 end if
 self % RC_PoleLong = DoubleValue
 
-! Fill in the list of GeoVaLs that will be needed to populate the requested varfields.
-
+! Fill in the list of variables that will be needed to populate the requested varfields.
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
+call opsinputs_varobswriter_addrequireddiagvars(self, diagvars, self % channels)
 
 end function opsinputs_varobswriter_create
 
@@ -460,6 +468,7 @@ type(opsinputs_varobswriter), intent(inout) :: self
 
 ! Body:
 call datetime_delete(self % validitytime)
+if (allocated(self % channels)) deallocate(self % channels)
 
 end subroutine opsinputs_varobswriter_delete
 
@@ -487,17 +496,16 @@ end subroutine opsinputs_varobswriter_prior
 !>
 !> Write out a VarObs file containing varfields derived from JEDI variables.
 subroutine opsinputs_varobswriter_post( &
-  self, ObsSpace, nchannels, Channels, Flags, ObsErrors, nvars, nlocs, hofx)
+  self, ObsSpace, Flags, ObsErrors, nvars, nlocs, hofx, obsdiags)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_varobswriter), intent(in) :: self
+type(opsinputs_varobswriter), intent(inout) :: self
 type(c_ptr), value, intent(in) :: ObsSpace
-integer,            intent(in) :: nchannels
-integer,            intent(in) :: Channels(nchannels)
 type(c_ptr), value, intent(in) :: Flags, ObsErrors
 integer,            intent(in) :: nvars, nlocs
 real(c_double),     intent(in) :: hofx(nvars, nlocs)
+type(ufo_geovals),  intent(in), pointer  :: obsdiags
 
 ! Local declarations:
 type(OB_type)                  :: Ob
@@ -505,8 +513,9 @@ type(UM_header_type)           :: CxHeader
 integer(integer64)             :: NumVarObsTotal
 
 ! Body:
+self % ObsDiags => obsdiags
 call opsinputs_varobswriter_allocateobservations(self, ObsSpace, Ob)
-call opsinputs_varobswriter_populateobservations(self, ObsSpace, Channels, Flags, ObsErrors, Ob)
+call opsinputs_varobswriter_populateobservations(self, ObsSpace, self % channels, Flags, ObsErrors, Ob)
 call opsinputs_varobswriter_populatecxheader(self, CxHeader)
 
 call Ops_CreateVarobs (Ob,                  & ! in
@@ -546,6 +555,37 @@ do i = 1, size(VarFields)
 end do
 
 end subroutine opsinputs_varobswriter_addrequiredgeovars
+
+! ------------------------------------------------------------------------------
+
+!> Populate the list of HofXDiags needed to fill in any requested varfields.
+subroutine opsinputs_varobswriter_addrequireddiagvars(self, diagvars, channels)
+implicit none
+
+! Subroutine arguments:
+type(opsinputs_varobswriter), intent(in) :: self
+type(oops_variables), intent(inout)      :: diagvars
+integer, intent(in)                      :: channels(:)
+
+! Local declarations:
+integer(integer64)                       :: VarFields(ActualMaxVarfield)
+integer                                  :: i, ichan
+character(len=200)                       :: varname
+
+! Body:
+call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
+
+do i = 1, size(VarFields)
+  select case (VarFields(i))
+  case (VarField_mwemiss)
+    do ichan = 1, size(channels)
+      write(varname,"(A19,I0)") "surface_emissivity_",channels(ichan)
+      call diagvars % push_back(trim(varname))
+    end do
+  end select
+end do
+
+end subroutine opsinputs_varobswriter_addrequireddiagvars
 
 ! ------------------------------------------------------------------------------
 
@@ -739,9 +779,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
     case (VarField_mwemiss)
-      call opsinputs_fill_fillreal2d( &
+      call opsinputs_fill_fillreal2dfrom1dgeovalwithchans( &
         Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss, &
-        ObsSpace, Channels, "surface_emissivity", "ObsDiagnostics")
+        self % ObsDiags, "surface_emissivity", Channels)
     case (VarField_TCozone)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.

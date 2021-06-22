@@ -14,7 +14,7 @@
 | 12 | `VarField_gpstzdelay` | | | | Implement |
 | 15 | `VarField_cloud` | | | | Implement |
 | 16 | `VarField_rainrate` | | | | Implement |
-| 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `surface_emissivity@ObsDiagnostics` |  |
+| 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `surface_emissivity from ObsDiagnostics` |  |
 | 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) (satellite 1dvar) | From an ObsFunction | Specify variable name |
 | 19 | `VarField_satzenith` | `SatZenithAngle(:)` | sat zenith angle | `sensor_zenith_angle@MetaData` | |
 | 20 | `VarField_scanpos` | | | | Implement |

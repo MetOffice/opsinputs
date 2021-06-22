@@ -9,6 +9,7 @@ observations:
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
+      namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       expected_header_fields:
         Grid staggering type: 6
@@ -23,6 +24,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_GridStagger: ArakawaB
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Grid staggering type: 2
@@ -37,6 +39,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_GridStagger: ArakawaC
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Grid staggering type: 3
@@ -51,6 +54,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_GridStagger: EndGame
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Grid staggering type: 6

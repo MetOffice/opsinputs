@@ -9,6 +9,7 @@ observations:
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
+      namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       expected_header_fields:
         Number EW points: "0"
@@ -29,6 +30,7 @@ observations:
       IC_YLen: 2
       IC_PLevels: 3
       IC_WetLevels: 4
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Number EW points: "1"

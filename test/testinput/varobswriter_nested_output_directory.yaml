@@ -16,6 +16,7 @@ observations:
       RC_FirstLong: 2.50
       RC_PoleLat: 3.50
       RC_PoleLong: 4.50
+      namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       output_directory: testoutput/nested/path/varobs
       expected_header_fields:

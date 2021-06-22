@@ -39,27 +39,34 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Creates an opsinputs_varobswriter object. Returns 1 if the creation succeeds and 0 if it fails.
-function opsinputs_varobswriter_create_c(c_self, c_conf, c_comm, c_varlist) &
+function opsinputs_varobswriter_create_c(c_self, c_conf, c_comm, c_nchannels, c_channels, &
+                                         c_varlist, c_varlist_diags) &
   bind(c,name='opsinputs_varobswriter_create_f90')
 use oops_variables_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
 integer(c_size_t), intent(in)  :: c_comm ! MPI communicator to be used by OPS
+integer(c_int), intent(in)     :: c_nchannels
+integer(c_int), intent(in)     :: c_channels(c_nchannels)
 type(c_ptr), intent(in), value :: c_varlist ! list of geovals variables to be requested
+type(c_ptr), intent(in), value :: c_varlist_diags ! list of hofxdiag variables to be requested
 integer(c_int)                 :: opsinputs_varobswriter_create_c
 
 type(opsinputs_varobswriter), pointer :: self
 type(fckit_configuration) :: f_conf
 integer(gc_int_kind) :: f_comm
 type(oops_variables) :: f_varlist
+type(oops_variables) :: f_varlist_diags
 
 call opsinputs_varobswriter_registry%setup(c_self, self)
 
 f_conf = fckit_configuration(c_conf)
 f_comm = c_comm
 f_varlist = oops_variables(c_varlist)
-if (opsinputs_varobswriter_create(self, f_conf, f_comm, f_varlist)) then
+f_varlist_diags = oops_variables(c_varlist_diags)
+if (opsinputs_varobswriter_create(self, f_conf, f_comm, c_channels, &
+                                  f_varlist, f_varlist_diags)) then
   opsinputs_varobswriter_create_c = 1
 else
   opsinputs_varobswriter_create_c = 0
@@ -103,24 +110,25 @@ end subroutine opsinputs_varobswriter_prior_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine opsinputs_varobswriter_post_c(c_self, c_obspace, c_nchannels, c_channels, &
-                                        c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx) &
+subroutine opsinputs_varobswriter_post_c(c_self, c_obspace, c_flags, c_obserrors, &
+                                         c_nvars, c_nlocs, c_hofx, c_obsdiags) &
   bind(c,name='opsinputs_varobswriter_post_f90')
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
-integer(c_int), intent(in) :: c_nchannels
-integer(c_int), intent(in) :: c_channels(c_nchannels)
 type(c_ptr), value, intent(in) :: c_flags, c_obserrors
 integer(c_int), intent(in) :: c_nvars, c_nlocs
 real(c_double), intent(in) :: c_hofx(c_nvars, c_nlocs)
+integer(c_int), intent(in) :: c_obsdiags
 
 type(opsinputs_varobswriter), pointer :: self
+type(ufo_geovals), pointer :: obsdiags
 
 call opsinputs_varobswriter_registry%get(c_self, self)
+call ufo_geovals_registry%get(c_obsdiags, obsdiags)
 
-call opsinputs_varobswriter_post(self, c_obspace, c_nchannels, c_channels, &
-                                c_flags, c_obserrors, c_nvars, c_nlocs, c_hofx)
+call opsinputs_varobswriter_post(self, c_obspace, c_flags, c_obserrors, &
+                                 c_nvars, c_nlocs, c_hofx, obsdiags)
 
 end subroutine opsinputs_varobswriter_post_c
 

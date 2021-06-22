@@ -9,6 +9,7 @@ observations:
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
+      namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       expected_header_fields:
         # Currently set to the year, month, day and hour of window end
