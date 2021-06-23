@@ -24,9 +24,8 @@ observations:
       general_mode: debug
     - filter: VarObs Checker
       expected_main_table_columns:
-        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check.
         # Only levels 1 and 3 are simulated and hence written to the VarObs file.
-        # In the arrays below, rows denote locations and columns levels.
+        # In the arrays below, rows denote locations and columns channels.
         field:    ["10", "10",
                    "10", "10",
                    "10", "10",

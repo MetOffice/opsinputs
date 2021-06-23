@@ -156,7 +156,7 @@ private
   real(real64)       :: RC_PoleLat
   real(real64)       :: RC_PoleLong
 
-  integer, allocatable       :: channels(:)
+  integer(c_int), allocatable :: channels(:)
 
   type(ufo_geovals), pointer :: GeoVals
   type(ufo_geovals), pointer :: ObsDiags
@@ -175,7 +175,7 @@ type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf   ! Configuration
 integer(gc_int_kind)                       :: comm     ! MPI communicator standing for the processes
                                                        ! holding the data to be written to VarObs
-integer                                    :: channels(:)
+integer(c_int)                             :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
 type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
@@ -453,7 +453,7 @@ self % RC_PoleLong = DoubleValue
 
 ! Fill in the list of variables that will be needed to populate the requested varfields.
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
-call opsinputs_varobswriter_addrequireddiagvars(self, diagvars, self % channels)
+call opsinputs_varobswriter_addrequireddiagvars(self, diagvars)
 
 end function opsinputs_varobswriter_create
 
@@ -515,7 +515,7 @@ integer(integer64)             :: NumVarObsTotal
 ! Body:
 self % ObsDiags => obsdiags
 call opsinputs_varobswriter_allocateobservations(self, ObsSpace, Ob)
-call opsinputs_varobswriter_populateobservations(self, ObsSpace, self % channels, Flags, ObsErrors, Ob)
+call opsinputs_varobswriter_populateobservations(self, ObsSpace, Flags, ObsErrors, Ob)
 call opsinputs_varobswriter_populatecxheader(self, CxHeader)
 
 call Ops_CreateVarobs (Ob,                  & ! in
@@ -559,13 +559,12 @@ end subroutine opsinputs_varobswriter_addrequiredgeovars
 ! ------------------------------------------------------------------------------
 
 !> Populate the list of HofXDiags needed to fill in any requested varfields.
-subroutine opsinputs_varobswriter_addrequireddiagvars(self, diagvars, channels)
+subroutine opsinputs_varobswriter_addrequireddiagvars(self, diagvars)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
 type(oops_variables), intent(inout)      :: diagvars
-integer, intent(in)                      :: channels(:)
 
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
@@ -578,8 +577,8 @@ call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 do i = 1, size(VarFields)
   select case (VarFields(i))
   case (VarField_mwemiss)
-    do ichan = 1, size(channels)
-      write(varname,"(A19,I0)") "surface_emissivity_",channels(ichan)
+    do ichan = 1, size(self % channels)
+      write(varname,"(A19,I0)") "surface_emissivity_",self % channels(ichan)
       call diagvars % push_back(trim(varname))
     end do
   end select
@@ -616,13 +615,12 @@ end subroutine opsinputs_varobswriter_allocateobservations
 
 !> Populate Ob fields needed to output the requested varfields.
 subroutine opsinputs_varobswriter_populateobservations( &
-  self, ObsSpace, Channels, Flags, ObsErrors, Ob)
+  self, ObsSpace, Flags, ObsErrors, Ob)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
-integer(c_int), intent(in)              :: Channels(:)
 type(c_ptr), value, intent(in)          :: Flags, ObsErrors
 type(OB_type), intent(inout)            :: Ob
 
@@ -679,7 +677,7 @@ end if
 
 call opsinputs_fill_fillcoord2d( &
   Ob % Header % PlevelsA, "PlevelsA", Ob % Header % NumObsLocal, Ob % PlevelsA, &
-   ObsSpace, Channels, "air_pressure", "MetaData")
+   ObsSpace, self % channels, "air_pressure", "MetaData")
 
 GPSRO_TPD = self % AccountForGPSROTangentPointDrift
 if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
@@ -709,7 +707,7 @@ do iVarField = 1, nVarFields
       ! (it isn't used in JEDI, but virtual_temperature is)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", Ob % Header % NumObsLocal, Ob % theta, &
-        ObsSpace, Channels, Flags, ObsErrors, "air_potential_temperature")
+        ObsSpace, self % channels, Flags, ObsErrors, "air_potential_temperature")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
@@ -718,7 +716,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", Ob % Header % NumObsLocal, Ob % t, &
-          ObsSpace, Channels, Flags, ObsErrors, "air_temperature")
+          ObsSpace, self % channels, Flags, ObsErrors, "air_temperature")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -728,7 +726,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", Ob % Header % NumObsLocal, Ob % rh, &
-          ObsSpace, Channels, Flags, ObsErrors, "relative_humidity")
+          ObsSpace, self % channels, Flags, ObsErrors, "relative_humidity")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -739,7 +737,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", Ob % Header % NumObsLocal, Ob % u, &
-          ObsSpace, Channels, Flags, ObsErrors, "eastward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, "eastward_wind")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -750,7 +748,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", Ob % Header % NumObsLocal, Ob % v, &
-          ObsSpace, Channels, Flags, ObsErrors, "northward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, "northward_wind")
       end if
     case (VarField_logvis)
       ! TODO(someone): handle this varfield
@@ -767,7 +765,7 @@ do iVarField = 1, nVarFields
     case (VarField_britemp)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % CorBriTemp, "CorBriTemp", Ob % Header % NumObsLocal, Ob % CorBriTemp, &
-        ObsSpace, Channels, "brightness_temperature", "BiasCorrObsValue")
+        ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue")
     case (VarField_tskin)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
@@ -781,7 +779,7 @@ do iVarField = 1, nVarFields
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2dfrom1dgeovalwithchans( &
         Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss, &
-        self % ObsDiags, "surface_emissivity", Channels)
+        self % ObsDiags, "surface_emissivity", self % channels)
     case (VarField_TCozone)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
@@ -894,7 +892,7 @@ do iVarField = 1, nVarFields
       ! group are not known yet. Once they are, replace the placeholders in the call below.
       call opsinputs_fill_fillreal2d( &
         Ob % Header % Emissivity, "Emissivity", Ob % Header % NumObsLocal, Ob % Emissivity, &
-        ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
+        ObsSpace, self % channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_QCinfo)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
@@ -925,7 +923,7 @@ do iVarField = 1, nVarFields
     case (VarField_RadarObAzim)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % RadarObAzim, "RadarObAzim", Ob % Header % NumObsLocal, Ob % RadarObAzim, &
-        ObsSpace, Channels, "radar_azimuth", "MetaData")
+        ObsSpace, self % channels, "radar_azimuth", "MetaData")
     case (VarField_RadIdent)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
@@ -953,11 +951,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", Ob % Header % NumObsLocal, Ob % BendingAngleAll, &
-          ObsSpace, Channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
+          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", Ob % Header % NumObsLocal, Ob % BendingAngle, &
-          ObsSpace, Channels, Flags, ObsErrors, "bending_angle")
+          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle")
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -965,11 +963,11 @@ do iVarField = 1, nVarFields
          ! once it is known.
          call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll, &
-           ObsSpace, Channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
+           ObsSpace, self % channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
        else
          call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam, &
-           ObsSpace, Channels, "impact_parameter", "MetaData")
+           ObsSpace, self % channels, "impact_parameter", "MetaData")
        end if
     case (VarField_RO_Rad_Curv)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
@@ -982,7 +980,7 @@ do iVarField = 1, nVarFields
     case (VarField_AOD)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", Ob % Header % NumObsLocal, Ob % AOD, &
-        ObsSpace, Channels, Flags, ObsErrors, "aerosol_optical_depth")
+        ObsSpace, self % channels, Flags, ObsErrors, "aerosol_optical_depth")
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
@@ -1067,7 +1065,7 @@ do iVarField = 1, nVarFields
 
   if (FillChanNum .or. FillNumChans) then
     call opsinputs_varobswriter_fillchannumandnumchans( &
-      Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans)
+      Ob, ObsSpace, self % channels, Flags, FillChanNum, FillNumChans)
   end if
 
 end do

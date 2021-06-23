@@ -686,7 +686,7 @@ end subroutine opsinputs_fill_fillrealfromgeoval
 !> \param[inout] Hdr
 !>   Header to be populated.
 !> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
+!>   Name of the OB_type field to which \p Real2 corresponds.
 !> \param[in] NumObs
 !>   Number of observations held by this process.
 !> \param[inout] Real2
@@ -733,13 +733,13 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
-!> Populate a 2D array of real numbers and its header with a 1D GeoVaL and 
-!> channels.
+!> Stach a series of 1D GeoVaLs, each corresponding to a separate channel, in the
+!> columns of a 2D array of real numbers. Output array will be size (iobs, ichans).
 !>
 !> \param[inout] Hdr
 !>   Header to be populated.
 !> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
+!>   Name of the OB_type field to which \p Real2 corresponds.
 !> \param[in] NumObs
 !>   Number of observations held by this process.
 !> \param[inout] Real2
@@ -751,9 +751,10 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !> \param[in] Channels
 !>    Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !>
-!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
-!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
-!> are not found.
+!> \note This function returns early (without a warning) if the specified GeoVaL for the first
+!> channel is not found.  We rely on warnings printed by the OPS code whenever data needed
+!> to output a requested varfield are not found.  If the specified GeoVaL for the first channel
+!> is found and any of the subsequent GeoVaL for a channel are not found an abort is thrown.
 subroutine opsinputs_fill_fillreal2dfrom1dgeovalwithchans( &
   Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName, Channels)
 implicit none
@@ -777,23 +778,25 @@ character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(
 MissingReal = missing_value(0.0_c_float)
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
-do iChannel = 1, size(JediVarNamesWithChannels)
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarNamesWithChannels(iChannel), GeoVal)
+if (ufo_vars_getindex(GeoVals % variables, JediVarNamesWithChannels(1)) > 0) then
+  do iChannel = 1, size(JediVarNamesWithChannels)
+    ! Retrieve GeoVal
+    call ufo_geovals_get_var(GeoVals, JediVarNamesWithChannels(iChannel), GeoVal)
 
-  if (GeoVal % nval == 1) then
-    if (iChannel == 1) then
-      ! Allocate OPS data structures
-      call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                     num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
+    if (GeoVal % nval == 1) then
+      if (iChannel == 1) then
+        ! Allocate OPS data structures
+        call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
+                       num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
+      end if
+
+      ! Fill the OPS data structures
+      where (GeoVal % vals(1,:) /= MissingReal)
+        Real2(:, iChannel) = GeoVal % vals(1,:)
+      end where
     end if
-
-    ! Fill the OPS data structures
-    where (GeoVal % vals(1,:) /= MissingReal)
-      Real2(:, iChannel) = GeoVal % vals(1,:)
-    end where
-  end if
-end do
+  end do
+end if
 
 end subroutine opsinputs_fill_fillreal2dfrom1dgeovalwithchans
 
