@@ -9,6 +9,7 @@ observations:
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
+      namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 1
@@ -23,6 +24,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_VertCoord: Hybrid
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 1
@@ -37,6 +39,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_VertCoord: Sigma
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 2
@@ -51,6 +54,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_VertCoord: Pressure
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 3
@@ -65,6 +69,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_VertCoord: Depth
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 4
@@ -79,6 +84,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_VertCoord: CP
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 5
@@ -93,6 +99,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_VertCoord: Wave
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Vertical coordinate type: 6

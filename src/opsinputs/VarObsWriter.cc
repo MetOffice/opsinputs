@@ -23,13 +23,15 @@
 #include "opsinputs/LocalEnvironment.h"
 #include "opsinputs/VarObsWriterParameters.h"
 #include "ufo/GeoVaLs.h"
+#include "ufo/ObsDiagnostics.h"
 
 namespace opsinputs {
 
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
                            std::shared_ptr<ioda::ObsDataVector<int> > flags,
                            std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
+  : obsdb_(obsdb), geovars_(), extradiagvars_(), flags_(std::move(flags)),
+    obsErrors_(std::move(obsErrors))
 {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
 
@@ -51,7 +53,12 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
     mpiComm = parallelComm->MPIComm();
   }
 
-  if (!opsinputs_varobswriter_create_f90(key_, &conf, mpiComm, geovars_))
+  // We need to pass the list of channels in a separate parameter because the Fortran interface to
+  // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
+  // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
+  const std::vector<int> &channels = obsdb_.obsvariables().channels();
+  if (!opsinputs_varobswriter_create_f90(key_, &conf, mpiComm, channels.size(), channels.data(),
+                                         geovars_, extradiagvars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
   oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;
@@ -76,19 +83,15 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 }
 
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
-                              const ufo::ObsDiagnostics &) const {
+                              const ufo::ObsDiagnostics & obsdiags) const {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  // We need to pass the list of channels in a separate parameter because the Fortran interface to
-  // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
-  // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
-  const std::vector<int> &channels = obsdb_.obsvariables().channels();
-  opsinputs_varobswriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
-                                 *flags_, *obsErrors_,
-                                 hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
+  opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
+                                 hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran(),
+                                 obsdiags.toFortran());
 }
 
 void VarObsWriter::print(std::ostream & os) const {

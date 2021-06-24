@@ -20,6 +20,7 @@ observations:
         minvalue: 0.0
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
+      namelist_directory: testinput/VarObsWriterNamelists_028_VarField_satid
       general_mode: debug
     - filter: VarObs Checker
       expected_main_table_columns:
