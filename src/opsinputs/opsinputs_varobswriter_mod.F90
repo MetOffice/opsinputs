@@ -19,6 +19,7 @@ use datetime_mod, only:        &
     datetime_create,           &
     datetime_delete,           &
     datetime_to_YYYYMMDDhhmmss
+use missing_values_mod, only: missing_value
 use obsspace_mod, only:  &
     obsspace_get_db,     &
     obsspace_get_gnlocs, &
@@ -36,7 +37,8 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillreal2dfromgeoval, &
     opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
     opsinputs_fill_fillinteger, &
-    opsinputs_fill_fillcoord2d
+    opsinputs_fill_fillcoord2d, &
+    opsinputs_fill_varnames_with_channels
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_has,      &
     opsinputs_obsdatavector_int_get,      &
@@ -46,9 +48,10 @@ use opsinputs_obsdatavector_mod, only:    &
 use opsinputs_obsspace_mod, only:                        &
     opsinputs_obsspace_get_db_string,                    &
     opsinputs_obsspace_get_db_datetime_offset_in_seconds
-use opsinputs_utils_mod, only:      &
-    max_varname_length,             &
-    opsinputs_utils_fillreportflags
+use opsinputs_utils_mod, only:       &
+    max_varname_length,              &
+    opsinputs_utils_fillreportflags, &
+    max_varname_with_channel_length
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
     ufo_geovals,           &
@@ -993,8 +996,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTBias, "CloudRTBias", Ob % Header % NumObsLocal, Ob % CloudRTBias)
     case (VarField_BiasPredictors)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors)
+      call opsinputs_varobswriter_fillpredictors( &
+        Ob % Header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors, &
+        ObsSpace, self % channels, "brightness_temperature")
     case (VarField_LevelTime)
       ! IF (PRESENT (RepObs)) THEN
       !   ObHdrVrbl = RepObs % Header % model_level_time
@@ -1248,6 +1252,89 @@ call opsinputs_fill_fillinteger( &
   ObsSpace, "satellite_id", "MetaData")
 
 end subroutine opsinputs_varobswriter_fillsatid
+
+! ------------------------------------------------------------------------------
+
+!> Fill the Ob % BiasPredictor field.
+!>
+!> This is done in a separate routine because this field is filled from 
+!> several arrays in the Obs Space and there is some data manipulation
+subroutine opsinputs_varobswriter_fillpredictors( &
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName)
+implicit none
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real2(:,:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
+integer(c_int), intent(in)                      :: Channels(:)
+character(len=*), intent(in)                    :: JediVarName
+
+! Local arguments:
+character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+real(kind=c_double)         :: VarValue(NumObs)
+real(kind=c_double)         :: MissingDouble
+integer                     :: ii
+integer, parameter          :: maxpred = 31
+character(len=*), parameter :: JediVarGroup(1:maxpred) = (/ &
+              "constantPredictor            ", &
+              "thickness_850_300hPaPredictor", &
+              "thickness_200_50hPaPredictor ", &
+              "Tskin_Predictor              ", & ! name is guess as not used yet
+              "total_column_waterPredictor  ", &
+              "Legendre_1Predictor          ", &
+              "Legendre_2Predictor          ", &
+              "Legendre_3Predictor          ", &
+              "Legendre_4Predictor          ", &
+              "Legendre_5Predictor          ", & ! name is guess as not used yet
+              "Legendre_6Predictor          ", & ! name is guess as not used yet
+              "Orbital_Angle_1aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_1bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_2aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_1bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_3aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_3bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_4aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_4bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_5aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_5bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_6aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_6bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_7aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_7bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_8aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_8bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_9aPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_9bPredictor    ", & ! name is guess as not used yet
+              "Orbital_Angle_10aPredictor   ", & ! name is guess as not used yet
+              "Orbital_Angle_10bPredictor   " /) ! name is guess as not used yet
+
+! Body:
+MissingDouble = missing_value(0.0_c_double)
+if (size(Channels) == 0) write(*,*) "opsinputs_varobswriter_fillpredictors channels empty => segfault"
+JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
+
+! Get data for each predictor - all the current predictors are channel
+! independant so just use the first channel in the channel vector
+do ii = 1, maxpred
+  if (obsspace_has(ObsSpace, JediVarGroup(ii), JediVarNamesWithChannels(1))) then
+    if (.not. associated(Real2)) then
+      call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
+                     num_levels = int(maxpred, kind=integer64))
+      Real2(:,:) = 0.0
+    end if
+
+    ! Retrieve data from JEDI
+    call obsspace_get_db(ObsSpace, JediVarGroup(ii), JediVarNamesWithChannels(1), VarValue)
+
+    ! Fill the OPS data structures
+    where (VarValue /= MissingDouble)
+      Real2(:, ii) = VarValue
+    end where
+  end if
+end do
+end subroutine opsinputs_varobswriter_fillpredictors
 
 ! ------------------------------------------------------------------------------
 

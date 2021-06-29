@@ -208,6 +208,10 @@ ADD_WRITER_TEST(NAME     varobswriter_077_VarField_aod
 ADD_WRITER_TEST(NAME     varobswriter_078_VarField_theta
                 YAML     078_VarField_theta.yaml
                 DATA     078_VarField_theta.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_080_VarField_biaspredictors
+                YAML     080_VarField_biaspredictors.yaml
+                NAMELIST VarObsWriterNamelists_080_VarField_biaspredictors/ATMS.nl
+                DATA     080_VarField_biaspredictors.nc4)
 
 # MPI tests
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_1

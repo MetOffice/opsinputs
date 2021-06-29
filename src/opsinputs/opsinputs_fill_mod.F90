@@ -58,7 +58,8 @@ public :: opsinputs_fill_fillelementtypefromsimulatedvariable, &
           opsinputs_fill_fillreal2dfromgeoval, &
           opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
           opsinputs_fill_fillinteger, &
-          opsinputs_fill_fillcoord2d
+          opsinputs_fill_fillcoord2d, &
+          opsinputs_fill_varnames_with_channels
 private
 
 ! ------------------------------------------------------------------------------
@@ -784,7 +785,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarNamesWithChannels(1)) > 0) the
     call ufo_geovals_get_var(GeoVals, JediVarNamesWithChannels(iChannel), GeoVal)
 
     if (GeoVal % nval == 1) then
-      if (iChannel == 1) then
+      if (.not. associated(Real2)) then
         ! Allocate OPS data structures
         call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                        num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
