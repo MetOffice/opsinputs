@@ -311,24 +311,16 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_fa
     var = f.createVariable('dummy_3@PreQC', 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
-    if type(var_group) == list:
-        for grp in var_group:
-            var = f.createVariable(var_name + '_1@' + grp, 'f', ('nlocs',))
-            var[:] = [4.1, missing_float, 4.3, 4.4]
-
-            var = f.createVariable(var_name + '_2@' + grp, 'f', ('nlocs',))
-            var[:] = [5.1, 5.2, 5.3, 5.4]
-
-            var = f.createVariable(var_name + '_3@' + grp, 'f', ('nlocs',))
-            var[:] = [6.1, 6.2, 6.3, 6.4]
-    else:
-        var = f.createVariable(var_name + '_1@' + var_group, 'f', ('nlocs',))
+    if type(var_group) != list:
+        var_group = [var_group]
+    for grp in var_group:
+        var = f.createVariable(var_name + '_1@' + grp, 'f', ('nlocs',))
         var[:] = [4.1, missing_float, 4.3, 4.4]
 
-        var = f.createVariable(var_name + '_2@' + var_group, 'f', ('nlocs',))
+        var = f.createVariable(var_name + '_2@' + grp, 'f', ('nlocs',))
         var[:] = [5.1, 5.2, 5.3, 5.4]
 
-        var = f.createVariable(var_name + '_3@' + var_group, 'f', ('nlocs',))
+        var = f.createVariable(var_name + '_3@' + grp, 'f', ('nlocs',))
         var[:] = [6.1, 6.2, 6.3, 6.4]
 
     f.date_time = 2018010100
