@@ -1429,9 +1429,9 @@ end subroutine opsinputs_varobswriter_populatecxheader
 subroutine unique_values(input, output, positive)
 implicit none
 
-integer(kind=4), intent(in) :: input(:)
+integer(kind=4), intent(in)               :: input(:)
 integer(kind=4), allocatable, intent(out) :: output(:)
-logical, optional           :: positive
+logical, optional, intent(in)             :: positive
 
 integer(kind=4), allocatable :: unique(:)
 integer :: i, j, k
@@ -1440,7 +1440,7 @@ allocate(unique(size(input)))
 k = 1
 unique(1) = input(1)
 do i = 2, size(input)
-  if ( any(unique == input(i)) ) cycle
+  if (any(unique == input(i))) cycle
   if (present(positive)) then
     if (positive .and. input(i) <= 0) cycle  ! only positive values to be output
   end if
@@ -1448,13 +1448,13 @@ do i = 2, size(input)
   unique(k) = input(i)
 end do
 
-write(*,*) "unique(1:k) = ",unique(1:k)
-
 allocate(output(k))
 output = unique(1:k)
 
 deallocate(unique)
 
 end subroutine unique_values
+
+! ------------------------------------------------------------------------------
 
 end module opsinputs_varobswriter_mod
