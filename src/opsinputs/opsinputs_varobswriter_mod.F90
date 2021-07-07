@@ -1273,67 +1273,83 @@ character(len=*), intent(in)                    :: JediVarName
 
 ! Local arguments:
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
-real(kind=c_double)         :: VarValue(NumObs)
-real(kind=c_double)         :: MissingDouble
-integer                     :: ii
-integer, parameter          :: maxpred = 31
-character(len=*), parameter :: JediVarGroup(1:maxpred) = (/ &
-              "constantPredictor            ", &
-              "thickness_850_300hPaPredictor", &
-              "thickness_200_50hPaPredictor ", &
-              "Tskin_Predictor              ", & ! name is guess as not used yet
-              "total_column_waterPredictor  ", &
-              "Legendre_1Predictor          ", &
-              "Legendre_2Predictor          ", &
-              "Legendre_3Predictor          ", &
-              "Legendre_4Predictor          ", &
-              "Legendre_5Predictor          ", & ! name is guess as not used yet
-              "Legendre_6Predictor          ", & ! name is guess as not used yet
-              "Orbital_Angle_1aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_1bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_2aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_1bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_3aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_3bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_4aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_4bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_5aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_5bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_6aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_6bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_7aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_7bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_8aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_8bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_9aPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_9bPredictor    ", & ! name is guess as not used yet
-              "Orbital_Angle_10aPredictor   ", & ! name is guess as not used yet
-              "Orbital_Angle_10bPredictor   " /) ! name is guess as not used yet
+real(kind=c_double)             :: VarValue(NumObs)
+real(kind=c_double)             :: MissingDouble
+integer(kind=4)                 :: SatIdValue(NumObs)
+integer(kind=4), allocatable    :: UniqueSatIds(:)
+integer                         :: ii, jj
+integer, parameter              :: maxpred = 31
+character(len=*), parameter     :: PredictorBaseName(1:maxpred) = (/ &
+              "constant                  ", &
+              "thickness_850_300hPa      ", &
+              "thickness_200_50hPa       ", &
+              "Tskin                     ", &
+              "total_column_water        ", &
+              "Legendre_order_1          ", &
+              "Legendre_order_2          ", &
+              "Legendre_order_3          ", &
+              "Legendre_order_4          ", &
+              "Legendre_order_5          ", &
+              "Legendre_order_6          ", &
+              "orbital_angle_order_1_cos ", &
+              "orbital_angle_order_1_sin ", &
+              "orbital_angle_order_2_cos ", &
+              "orbital_angle_order_2_sin ", &
+              "orbital_angle_order_3_cos ", &
+              "orbital_angle_order_3_sin ", &
+              "orbital_angle_order_4_cos ", &
+              "orbital_angle_order_4_sin ", &
+              "orbital_angle_order_5_cos ", &
+              "orbital_angle_order_5_sin ", &
+              "orbital_angle_order_6_cos ", &
+              "orbital_angle_order_6_sin ", &
+              "orbital_angle_order_7_cos ", &
+              "orbital_angle_order_7_sin ", &
+              "orbital_angle_order_8_cos ", &
+              "orbital_angle_order_8_sin ", &
+              "orbital_angle_order_9_cos ", &
+              "orbital_angle_order_9_sin ", &
+              "orbital_angle_order_10_cos", &
+              "orbital_angle_order_10_sin" /)
+character(len=150) :: JediVarGroupWithSatId
 
 ! Body:
 MissingDouble = missing_value(0.0_c_double)
 if (size(Channels) == 0) write(*,*) "opsinputs_varobswriter_fillpredictors channels empty => segfault"
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
+! Return unique sat ids for obs space
+call obsspace_get_db(ObsSpace, "MetaData", "satellite_id", SatIdValue)
+call unique_values(SatIdValue, UniqueSatIds, positive = .true.)
+
 ! Get data for each predictor - all the current predictors are channel
 ! independant so just use the first channel in the channel vector
-do ii = 1, maxpred
-  if (obsspace_has(ObsSpace, JediVarGroup(ii), JediVarNamesWithChannels(1))) then
-    if (.not. associated(Real2)) then
-      call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                     num_levels = int(maxpred, kind=integer64))
-      Real2(:,:) = 0.0
+do jj = 1, size(UniqueSatIds)
+  do ii = 1, maxpred
+    write(JediVarGroupWithSatId,"(2A,I0,A)") &
+          trim(PredictorBaseName(ii)), "_satid_", UniqueSatIds(jj), "Predictor"
+    if (obsspace_has(ObsSpace, JediVarGroupWithSatId, JediVarNamesWithChannels(1))) then
+
+      ! Initialize output if not previously done
+      if (.not. associated(Real2)) then
+        call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
+                       num_levels = int(maxpred, kind=integer64))
+        Real2(:,:) = 0.0
+      end if
+
+      ! Retrieve data from JEDI
+      call obsspace_get_db(ObsSpace, JediVarGroupWithSatId, JediVarNamesWithChannels(1), VarValue)
+
+      ! Fill the OPS data structure
+      where (VarValue /= MissingDouble)
+        Real2(:, ii) = Real2(:, ii) + VarValue(:)
+      end where
     end if
-
-    ! Retrieve data from JEDI
-    call obsspace_get_db(ObsSpace, JediVarGroup(ii), JediVarNamesWithChannels(1), VarValue)
-
-    ! Fill the OPS data structures
-    where (VarValue /= MissingDouble)
-      Real2(:, ii) = VarValue
-    end where
-  end if
+  end do
 end do
+
+if (allocated(UniqueSatIds)) deallocate(UniqueSatIds)
+
 end subroutine opsinputs_varobswriter_fillpredictors
 
 ! ------------------------------------------------------------------------------
@@ -1407,5 +1423,38 @@ CxHeader % RealC(RC_PoleLat) = self % RC_PoleLat
 CxHeader % RealC(RC_PoleLong) = self % RC_PoleLong
 
 end subroutine opsinputs_varobswriter_populatecxheader
+
+! ------------------------------------------------------------------------------
+!> Return unique value from an array
+subroutine unique_values(input, output, positive)
+implicit none
+
+integer(kind=4), intent(in) :: input(:)
+integer(kind=4), allocatable, intent(out) :: output(:)
+logical, optional           :: positive
+
+integer(kind=4), allocatable :: unique(:)
+integer :: i, j, k
+
+allocate(unique(size(input)))
+k = 1
+unique(1) = input(1)
+do i = 2, size(input)
+  if ( any(unique == input(i)) ) cycle
+  if (present(positive)) then
+    if (positive .and. input(i) <= 0) cycle  ! only positive values to be output
+  end if
+  k = k + 1
+  unique(k) = input(i)
+end do
+
+write(*,*) "unique(1:k) = ",unique(1:k)
+
+allocate(output(k))
+output = unique(1:k)
+
+deallocate(unique)
+
+end subroutine unique_values
 
 end module opsinputs_varobswriter_mod
