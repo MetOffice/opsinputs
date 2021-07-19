@@ -117,6 +117,8 @@ use OpsMod_Varobs, only: &
     AssimDataFormat_VAR, &
     Ops_CreateVarobs,    &
     Ops_ReadVarobsControlNL
+use OpsMod_SatRad_SetUp, only: &
+    VarBC
 
 implicit none
 external gc_init_final
@@ -200,10 +202,7 @@ self % channels(:) = channels(:)
 
 ! Setup OPS
 
-if (.not. f_conf % get("general_mode", StringValue)) then
-  ! fall back to the default value
-  StringValue = "normal"
-end if
+call f_conf % get_or_die("general_mode", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("operational")
   GeneralMode = OperationalMode
@@ -249,33 +248,22 @@ if (.not. f_conf % get("validity_time", StringValue)) then
 end if
 call datetime_create(StringValue, self % validitytime)
 
-if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
-                       self % RejectObsWithAnyVariableFailingQC)) then
-  ! fall back to the default value
-  self % RejectObsWithAnyVariableFailingQC = .false.
-end if
+call f_conf % get_or_die("reject_obs_with_any_variable_failing_qc", &
+                         self % RejectObsWithAnyVariableFailingQC)
 
-if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
-                       self % RejectObsWithAllVariablesFailingQC)) then
-  ! fall back to the default value
-  self % RejectObsWithAllVariablesFailingQC = .false.
-end if
+call f_conf % get_or_die("reject_obs_with_all_variables_failing_qc", &
+                         self % RejectObsWithAllVariablesFailingQC)
 
-if (.not. f_conf % get("account_for_gpsro_tangent_point_drift", &
-                       self % AccountForGPSROTangentPointDrift)) then
-  ! fall back to the default value
-  self % AccountForGPSROTangentPointDrift = .false.
-end if
+call f_conf % get_or_die("account_for_gpsro_tangent_point_drift", &
+                         self % AccountForGPSROTangentPointDrift)
 
-if (.not. f_conf % get("use_radar_family", self % UseRadarFamily)) then
-  ! fall back to the default value
-  self % UseRadarFamily = .false.
-end if
+call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
 
-if (.not. f_conf % get("FH_VertCoord", StringValue)) then
-  ! fall back to the default value
-  StringValue = "hybrid"  ! TODO(wsmigaj): is this a good default?
-end if
+! Updates the varbc flag passedaround by a module in OPS
+call f_conf % get_or_die("output_varbc_predictors", BoolValue)
+VarBC = BoolValue
+
+call f_conf % get_or_die("FH_VertCoord", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -296,10 +284,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_HorizGrid", StringValue)) then
-  ! fall back to the default value
-  StringValue = "global"
-end if
+call f_conf % get_or_die("FH_HorizGrid", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -324,10 +309,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_GridStagger", StringValue)) then
-  ! fall back to the default value
-  StringValue = "endgame"
-end if
+call f_conf % get_or_die("FH_GridStagger", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -342,26 +324,17 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_ModelVersion", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("FH_ModelVersion", IntValue)
 self % FH_ModelVersion = IntValue
 
-if (.not. f_conf % get("IC_ShipWind", BoolValue)) then
-  ! fall back to the default value
-  BoolValue = .false.
-end if
+call f_conf % get_or_die("IC_ShipWind", BoolValue)
 if (BoolValue) then
   self % IC_ShipWind = IC_ShipWind_10m
 else
   self % IC_ShipWind = 0
 end if
 
-if (.not. f_conf % get("IC_GroundGPSOperator", StringValue)) then
-  ! fall back to the default value
-  StringValue = "choice"
-end if
+call f_conf % get_or_die("IC_GroundGPSOperator", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
@@ -374,84 +347,48 @@ case default
   return
 end select
 
-if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", BoolValue)) then
-  ! fall back to the default value
-  BoolValue = .false.
-end if
+call f_conf % get_or_die("IC_GPSRO_Operator_pseudo", BoolValue)
 if (BoolValue) then
   self % IC_GPSRO_Operator_pseudo = IC_GPSRO_Operator_pseudo_choice
 else
   self % IC_GPSRO_Operator_pseudo = 0
 end if
 
-if (.not. f_conf % get("IC_GPSRO_Operator_press", BoolValue)) then
-  ! fall back to the default value
-  BoolValue = .false.
-end if
+call f_conf % get_or_die("IC_GPSRO_Operator_press", BoolValue)
 if (BoolValue) then
   self % IC_GPSRO_Operator_press = IC_GPSRO_Operator_press_choice
 else
   self % IC_GPSRO_Operator_press = 0
 end if
 
-if (.not. f_conf % get("IC_XLen", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_XLen", IntValue)
 self % IC_XLen = IntValue
 
-if (.not. f_conf % get("IC_YLen", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_YLen", IntValue)
 self % IC_YLen = IntValue
 
-if (.not. f_conf % get("IC_PLevels", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_PLevels", IntValue)
 self % IC_PLevels = IntValue
 
-if (.not. f_conf % get("IC_WetLevels", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_WetLevels", IntValue)
 self % IC_WetLevels = IntValue
 
-if (.not. f_conf % get("RC_LongSpacing", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_LongSpacing", DoubleValue)
 self % RC_LongSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_LatSpacing", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_LatSpacing", DoubleValue)
 self % RC_LatSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLat", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_FirstLat", DoubleValue)
 self % RC_FirstLat = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLong", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_FirstLong", DoubleValue)
 self % RC_FirstLong = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLat", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_PoleLat", DoubleValue)
 self % RC_PoleLat = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLong", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_PoleLong", DoubleValue)
 self % RC_PoleLong = DoubleValue
 
 ! Fill in the list of variables that will be needed to populate the requested varfields.
@@ -1243,13 +1180,19 @@ end subroutine opsinputs_varobswriter_fillgpsrotpddependentfields
 subroutine opsinputs_varobswriter_fillsatid(Ob, ObsSpace)
 implicit none
 ! Subroutine arguments:
-type(OB_type), intent(inout)             :: Ob
-type(c_ptr), value, intent(in)           :: ObsSpace
+type(OB_type), intent(inout)   :: Ob
+type(c_ptr), value, intent(in) :: ObsSpace
+
+! Local variables
+character(len=MAXVARLEN)       :: satidname
 
 ! Body:
+satidname = "satellite_id"
+if (obsspace_has(ObsSpace, "MetaData", "satellite_identifier")) satidname = "satellite_identifier"
+
 call opsinputs_fill_fillinteger( &
   Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
-  ObsSpace, "satellite_id", "MetaData")
+  ObsSpace, trim(satidname), "MetaData")
 
 end subroutine opsinputs_varobswriter_fillsatid
 
@@ -1272,7 +1215,8 @@ integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
 
 ! Local arguments:
-character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=max_varname_with_channel_length) :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=MAXVARLEN)        :: satidname
 real(kind=c_double)             :: VarValue(NumObs)
 real(kind=c_double)             :: MissingDouble
 integer(kind=4)                 :: SatIdValue(NumObs)
@@ -1319,7 +1263,9 @@ if (size(Channels) == 0) write(*,*) "opsinputs_varobswriter_fillpredictors chann
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
 ! Return unique sat ids for obs space
-call obsspace_get_db(ObsSpace, "MetaData", "satellite_id", SatIdValue)
+satidname = "satellite_id"
+if (obsspace_has(ObsSpace, "MetaData", "satellite_identifier")) satidname = "satellite_identifier"
+call obsspace_get_db(ObsSpace, "MetaData", trim(satidname), SatIdValue)
 call unique_values(SatIdValue, UniqueSatIds, positive = .true.)
 
 ! Get data for each predictor - all the current predictors are channel

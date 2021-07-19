@@ -30,13 +30,13 @@ CxWriter::CxWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
 {
   oops::Log::trace() << "CxWriter constructor starting" << std::endl;
 
-  parameters_.deserialize(config);
+  parameters_.validateAndDeserialize(config);
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
   createOutputDirectory();
 
-  eckit::LocalConfiguration conf(config);
+  eckit::LocalConfiguration conf(parameters_.toConfiguration());
   // Validity time is set to the midpoint of the assimilation window
   const util::DateTime validityTime =
       obsdb.windowStart() + (obsdb.windowEnd() - obsdb.windowStart()) / 2;

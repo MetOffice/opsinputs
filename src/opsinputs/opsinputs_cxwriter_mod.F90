@@ -188,10 +188,7 @@ opsinputs_cxwriter_create = .true.
 
 ! Setup OPS
 
-if (.not. f_conf % get("general_mode", StringValue)) then
-  ! fall back to the default value
-  StringValue = "normal"
-end if
+call f_conf % get_or_die("general_mode", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("operational")
   GeneralMode = OperationalMode
@@ -234,22 +231,13 @@ if (.not. f_conf % get("validity_time", StringValue)) then
 end if
 call datetime_create(StringValue, self % validitytime)
 
-if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
-                       self % RejectObsWithAnyVariableFailingQC)) then
-  ! fall back to the default value
-  self % RejectObsWithAnyVariableFailingQC = .false.
-end if
+call f_conf % get_or_die("reject_obs_with_any_variable_failing_qc", &
+                         self % RejectObsWithAnyVariableFailingQC)
 
-if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
-                     self % RejectObsWithAllVariablesFailingQC)) then
-  ! fall back to the default value
-  self % RejectObsWithAllVariablesFailingQC = .false.
-end if
+call f_conf % get_or_die("reject_obs_with_all_variables_failing_qc", &
+                         self % RejectObsWithAllVariablesFailingQC)
 
-if (.not. f_conf % get("FH_VertCoord", StringValue)) then
-  ! fall back to the default value
-  StringValue = "hybrid"  ! TODO(wsmigaj): is this a good default?
-end if
+call f_conf % get_or_die("FH_VertCoord", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -270,10 +258,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_HorizGrid", StringValue)) then
-  ! fall back to the default value
-  StringValue = "global"
-end if
+call f_conf % get_or_die("FH_HorizGrid", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -298,10 +283,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_GridStagger", StringValue)) then
-  ! fall back to the default value
-  StringValue = "endgame"
-end if
+call f_conf % get_or_die("FH_GridStagger", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -316,10 +298,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_ObsFileType", StringValue)) then
-  ! fall back to the default value
-  StringValue = "atmos"
-end if
+call f_conf % get_or_die("FH_ObsFileType", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("atmos")
   self % FH_ObsFileType = FH_ObsFileType_Atmos
@@ -336,82 +315,43 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_ModelVersion", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("FH_ModelVersion", IntValue)
 self % FH_ModelVersion = IntValue
 
-if (.not. f_conf % get("IC_XLen", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_XLen", IntValue)
 self % IC_XLen = IntValue
 
-if (.not. f_conf % get("IC_YLen", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_YLen", IntValue)
 self % IC_YLen = IntValue
 
-if (.not. f_conf % get("IC_PLevels", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_PLevels", IntValue)
 self % IC_PLevels = IntValue
 
-if (.not. f_conf % get("IC_WetLevels", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_WetLevels", IntValue)
 self % IC_WetLevels = IntValue
 
-if (.not. f_conf % get("IC_FirstConstantRhoLevel", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_FirstConstantRhoLevel", IntValue)
 self % IC_FirstConstantRhoLevel = IntValue
 
-if (.not. f_conf % get("RC_LongSpacing", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_LongSpacing", DoubleValue)
 self % RC_LongSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_LatSpacing", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_LatSpacing", DoubleValue)
 self % RC_LatSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLat", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_FirstLat", DoubleValue)
 self % RC_FirstLat = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLong", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_FirstLong", DoubleValue)
 self % RC_FirstLong = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLat", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_PoleLat", DoubleValue)
 self % RC_PoleLat = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLong", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_PoleLong", DoubleValue)
 self % RC_PoleLong = DoubleValue
 
-if (.not. f_conf % get("RC_z_ModelTop", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_z_ModelTop", DoubleValue)
 self % RC_z_ModelTop = DoubleValue
 
 if (f_conf % get("eta_theta_levels", self % EtaTheta)) then
@@ -427,7 +367,7 @@ end if
 
 if (f_conf % get("eta_rho_levels", self % EtaRho)) then
   if (size(self % EtaRho) /= self % IC_PLevels) then
-    call gen_warn(RoutineName, "eta_theta_levels should be a vector of length (IC_PLevels + 1)")
+    call gen_warn(RoutineName, "eta_rho_levels should be a vector of length (IC_PLevels + 1)")
     opsinputs_cxwriter_create = .false.
     return
   end if
@@ -436,22 +376,13 @@ else
   self % EtaRho = RMDI
 end if
 
-if (.not. f_conf % get("time_indicator", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("time_indicator", IntValue)
 self % TimeIndicator = IntValue
 
-if (.not. f_conf % get("forecast_period", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("forecast_period", IntValue)
 self % ForecastPeriod = IntValue
 
-if (.not. f_conf % get("model_type", StringValue)) then
-  ! fall back to the default value
-  StringValue = "atmos"
-end if
+call f_conf % get_or_die("model_type", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("atmos")
   ModelType = ModelType_Atmos
@@ -466,10 +397,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("num_dust_bins", IntValue)) then
-  ! fall back to the default value
-  IntValue = 2
-end if
+call f_conf % get_or_die("num_dust_bins", IntValue)
 if (IntValue /= 2 .and. IntValue /= 6) then
   write (ErrorMessage, '("num_dust_bins is ",I0," but must be either 2 or 6")') IntValue
   call gen_warn(RoutineName, ErrorMessage)
