@@ -10,17 +10,16 @@
 #include <string>
 
 #include "eckit/exception/Exceptions.h"
+#include "oops/base/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
-#include "oops/util/parameters/Parameters.h"
 #include "oops/util/parameters/RequiredParameter.h"
-#include "ufo/filters/FilterParametersBase.h"
 
 namespace opsinputs {
 
 /// \brief VarObsWriter options.
-class VarObsWriterParameters : public ufo::FilterParametersBase {
-  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, ufo::FilterParametersBase)
+class VarObsWriterParameters : public oops::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, oops::ObsFilterParametersBase)
 
  public:
   /// Determines OPS verbosity.

@@ -381,7 +381,7 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
-    output_1d_geoval_to_netcdf       ('surface_emissivity', 'testinput/017_VarField_mwemiss_obsdiag.nc4', with_channels=True)
+    output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4')
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_normal_int_var_to_netcdf('surface_type', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')

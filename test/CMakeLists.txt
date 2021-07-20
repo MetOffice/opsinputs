@@ -156,9 +156,9 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
                 NAMELIST VarObsWriterNamelists_011_VarField_tskin/AMSUB.nl
                 DATA     011_VarField_tskin.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
-                YAML     017_VarField_mwemiss_obsdiag.yaml
+                YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
-                DATA     017_VarField_mwemiss_obsdiag.nc4)
+                DATA     017_VarField_mwemiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
