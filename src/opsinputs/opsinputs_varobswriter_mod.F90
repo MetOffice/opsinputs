@@ -1397,18 +1397,16 @@ allocate(unique(size(input)))
 k = 1
 unique(1) = input(1)
 do i = 2, size(input)
-  if (any(unique == input(i))) cycle
   if (present(positive)) then
     if (positive .and. input(i) <= 0) cycle  ! only positive values to be output
   end if
+  if (any(unique(1:k) == input(i))) cycle
   k = k + 1
   unique(k) = input(i)
 end do
 
 allocate(output(k))
 output = unique(1:k)
-
-deallocate(unique)
 
 end subroutine unique_values
 
