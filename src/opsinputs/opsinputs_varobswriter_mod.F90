@@ -119,6 +119,8 @@ use OpsMod_Varobs, only: &
     Ops_ReadVarobsControlNL
 use OpsMod_SatRad_SetUp, only: &
     VarBC
+use OpsMod_ObsTypes, only: &
+    Ops_SubTypeNameToNum
 
 implicit none
 external gc_init_final
@@ -130,6 +132,7 @@ private
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_varobswriter
 private
+  character(len=100) :: ObsGroupName
   integer(integer64) :: ObsGroup
   type(datetime)     :: ValidityTime  ! Corresponds to OPS validity time
 
@@ -239,6 +242,7 @@ if (.not. f_conf % get("obs_group", StringValue)) then
   opsinputs_varobswriter_create = .false.
   return
 end if
+self % ObsGroupName = StringValue
 self % ObsGroup = OpsFn_ObsGroupNameToNum(StringValue)
 
 if (.not. f_conf % get("validity_time", StringValue)) then
@@ -573,11 +577,14 @@ character(len=80)                       :: ErrorMessage
 integer(integer64)                      :: VarFields(ActualMaxVarfield)
 integer                                 :: nVarFields
 integer                                 :: iVarField
+integer                                 :: iobs
 
 integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
 
 logical                                 :: FillChanNum = .false.
 logical                                 :: FillNumChans = .false.
+
+integer, allocatable                    :: satellite_identifier_int(:)
 
 ! Body:
 
@@ -602,19 +609,21 @@ Ob % Time = TimeOffsetsInSeconds
 call opsinputs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
-! TODO(someone): The following call to Ops_Alloc() will need to be replaced by
-! call opsinputs_varobswriter_fillinteger( &
-!   Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType, &
-!   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
-! with the placeholders replaced by an appropriate variable name and group.
-! We call Ops_Alloc() because the Ops_CreateVarobs terminates prematurely if the ObsType array
-! doesn't exist.
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", Ob % Header % NumObsLocal, Ob % Callsign)
   call opsinputs_obsspace_get_db_string( &
     ObsSpace, "MetaData", "station_id", int(LenCallSign, kind=4), Ob % Callsign)
+else if (obsspace_has(ObsSpace, "MetaData", "satellite_identifier")) then
+  call Ops_Alloc(Ob % Header % Callsign, "Callsign", Ob % Header % NumObsLocal, Ob % Callsign)
+  allocate(satellite_identifier_int(Ob % Header % NumObsLocal))
+  call obsspace_get_db(ObsSpace, "MetaData", "satellite_identifier", satellite_identifier_int)
+  do iobs = 1, Ob % Header % NumObsLocal
+    write(Ob % Callsign(iobs),"(I0.4)") satellite_identifier_int(iobs)
+  end do
+  deallocate(satellite_identifier_int)
 end if
 
 call opsinputs_fill_fillcoord2d( &
