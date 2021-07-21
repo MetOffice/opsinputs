@@ -19,6 +19,7 @@ use datetime_mod, only:        &
     datetime_create,           &
     datetime_delete,           &
     datetime_to_YYYYMMDDhhmmss
+use missing_values_mod, only: missing_value
 use obsspace_mod, only:  &
     obsspace_get_db,     &
     obsspace_get_gnlocs, &
@@ -36,7 +37,8 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillreal2dfromgeoval, &
     opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
     opsinputs_fill_fillinteger, &
-    opsinputs_fill_fillcoord2d
+    opsinputs_fill_fillcoord2d, &
+    opsinputs_fill_varnames_with_channels
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_has,      &
     opsinputs_obsdatavector_int_get,      &
@@ -46,9 +48,10 @@ use opsinputs_obsdatavector_mod, only:    &
 use opsinputs_obsspace_mod, only:                        &
     opsinputs_obsspace_get_db_string,                    &
     opsinputs_obsspace_get_db_datetime_offset_in_seconds
-use opsinputs_utils_mod, only:      &
-    max_varname_length,             &
-    opsinputs_utils_fillreportflags
+use opsinputs_utils_mod, only:       &
+    max_varname_length,              &
+    opsinputs_utils_fillreportflags, &
+    max_varname_with_channel_length
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
     ufo_geovals,           &
@@ -114,6 +117,10 @@ use OpsMod_Varobs, only: &
     AssimDataFormat_VAR, &
     Ops_CreateVarobs,    &
     Ops_ReadVarobsControlNL
+use OpsMod_SatRad_SetUp, only: &
+    VarBC
+use OpsMod_ObsTypes, only: &
+    Ops_SubTypeNameToNum
 
 implicit none
 external gc_init_final
@@ -125,6 +132,7 @@ private
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_varobswriter
 private
+  character(len=100) :: ObsGroupName
   integer(integer64) :: ObsGroup
   type(datetime)     :: ValidityTime  ! Corresponds to OPS validity time
 
@@ -197,10 +205,7 @@ self % channels(:) = channels(:)
 
 ! Setup OPS
 
-if (.not. f_conf % get("general_mode", StringValue)) then
-  ! fall back to the default value
-  StringValue = "normal"
-end if
+call f_conf % get_or_die("general_mode", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("operational")
   GeneralMode = OperationalMode
@@ -237,6 +242,7 @@ if (.not. f_conf % get("obs_group", StringValue)) then
   opsinputs_varobswriter_create = .false.
   return
 end if
+self % ObsGroupName = StringValue
 self % ObsGroup = OpsFn_ObsGroupNameToNum(StringValue)
 
 if (.not. f_conf % get("validity_time", StringValue)) then
@@ -246,33 +252,22 @@ if (.not. f_conf % get("validity_time", StringValue)) then
 end if
 call datetime_create(StringValue, self % validitytime)
 
-if (.not. f_conf % get("reject_obs_with_any_variable_failing_qc", &
-                       self % RejectObsWithAnyVariableFailingQC)) then
-  ! fall back to the default value
-  self % RejectObsWithAnyVariableFailingQC = .false.
-end if
+call f_conf % get_or_die("reject_obs_with_any_variable_failing_qc", &
+                         self % RejectObsWithAnyVariableFailingQC)
 
-if (.not. f_conf % get("reject_obs_with_all_variables_failing_qc", &
-                       self % RejectObsWithAllVariablesFailingQC)) then
-  ! fall back to the default value
-  self % RejectObsWithAllVariablesFailingQC = .false.
-end if
+call f_conf % get_or_die("reject_obs_with_all_variables_failing_qc", &
+                         self % RejectObsWithAllVariablesFailingQC)
 
-if (.not. f_conf % get("account_for_gpsro_tangent_point_drift", &
-                       self % AccountForGPSROTangentPointDrift)) then
-  ! fall back to the default value
-  self % AccountForGPSROTangentPointDrift = .false.
-end if
+call f_conf % get_or_die("account_for_gpsro_tangent_point_drift", &
+                         self % AccountForGPSROTangentPointDrift)
 
-if (.not. f_conf % get("use_radar_family", self % UseRadarFamily)) then
-  ! fall back to the default value
-  self % UseRadarFamily = .false.
-end if
+call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
 
-if (.not. f_conf % get("FH_VertCoord", StringValue)) then
-  ! fall back to the default value
-  StringValue = "hybrid"  ! TODO(wsmigaj): is this a good default?
-end if
+! Updates the varbc flag passedaround by a module in OPS
+call f_conf % get_or_die("output_varbc_predictors", BoolValue)
+VarBC = BoolValue
+
+call f_conf % get_or_die("FH_VertCoord", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("hybrid")
   self % FH_VertCoord = FH_VertCoord_Hybrid
@@ -293,10 +288,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_HorizGrid", StringValue)) then
-  ! fall back to the default value
-  StringValue = "global"
-end if
+call f_conf % get_or_die("FH_HorizGrid", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("global")
   self % FH_HorizGrid = FH_HorizGrid_Global
@@ -321,10 +313,7 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_GridStagger", StringValue)) then
-  ! fall back to the default value
-  StringValue = "endgame"
-end if
+call f_conf % get_or_die("FH_GridStagger", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("arakawab")
   self % FH_GridStagger = FH_GridStagger_ArakawaB
@@ -339,26 +328,17 @@ case default
   return
 end select
 
-if (.not. f_conf % get("FH_ModelVersion", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("FH_ModelVersion", IntValue)
 self % FH_ModelVersion = IntValue
 
-if (.not. f_conf % get("IC_ShipWind", BoolValue)) then
-  ! fall back to the default value
-  BoolValue = .false.
-end if
+call f_conf % get_or_die("IC_ShipWind", BoolValue)
 if (BoolValue) then
   self % IC_ShipWind = IC_ShipWind_10m
 else
   self % IC_ShipWind = 0
 end if
 
-if (.not. f_conf % get("IC_GroundGPSOperator", StringValue)) then
-  ! fall back to the default value
-  StringValue = "choice"
-end if
+call f_conf % get_or_die("IC_GroundGPSOperator", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
@@ -371,84 +351,48 @@ case default
   return
 end select
 
-if (.not. f_conf % get("IC_GPSRO_Operator_pseudo", BoolValue)) then
-  ! fall back to the default value
-  BoolValue = .false.
-end if
+call f_conf % get_or_die("IC_GPSRO_Operator_pseudo", BoolValue)
 if (BoolValue) then
   self % IC_GPSRO_Operator_pseudo = IC_GPSRO_Operator_pseudo_choice
 else
   self % IC_GPSRO_Operator_pseudo = 0
 end if
 
-if (.not. f_conf % get("IC_GPSRO_Operator_press", BoolValue)) then
-  ! fall back to the default value
-  BoolValue = .false.
-end if
+call f_conf % get_or_die("IC_GPSRO_Operator_press", BoolValue)
 if (BoolValue) then
   self % IC_GPSRO_Operator_press = IC_GPSRO_Operator_press_choice
 else
   self % IC_GPSRO_Operator_press = 0
 end if
 
-if (.not. f_conf % get("IC_XLen", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_XLen", IntValue)
 self % IC_XLen = IntValue
 
-if (.not. f_conf % get("IC_YLen", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_YLen", IntValue)
 self % IC_YLen = IntValue
 
-if (.not. f_conf % get("IC_PLevels", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_PLevels", IntValue)
 self % IC_PLevels = IntValue
 
-if (.not. f_conf % get("IC_WetLevels", IntValue)) then
-  ! fall back to the default value
-  IntValue = 0
-end if
+call f_conf % get_or_die("IC_WetLevels", IntValue)
 self % IC_WetLevels = IntValue
 
-if (.not. f_conf % get("RC_LongSpacing", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_LongSpacing", DoubleValue)
 self % RC_LongSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_LatSpacing", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_LatSpacing", DoubleValue)
 self % RC_LatSpacing = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLat", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_FirstLat", DoubleValue)
 self % RC_FirstLat = DoubleValue
 
-if (.not. f_conf % get("RC_FirstLong", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_FirstLong", DoubleValue)
 self % RC_FirstLong = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLat", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_PoleLat", DoubleValue)
 self % RC_PoleLat = DoubleValue
 
-if (.not. f_conf % get("RC_PoleLong", DoubleValue)) then
-  ! fall back to the default value
-  DoubleValue = 0.0
-end if
+call f_conf % get_or_die("RC_PoleLong", DoubleValue)
 self % RC_PoleLong = DoubleValue
 
 ! Fill in the list of variables that will be needed to populate the requested varfields.
@@ -574,15 +518,17 @@ character(len=200)                       :: varname
 ! Body:
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 
-do i = 1, size(VarFields)
-  select case (VarFields(i))
-  case (VarField_mwemiss)
-    do ichan = 1, size(self % channels)
-      write(varname,"(A19,I0)") "surface_emissivity_",self % channels(ichan)
-      call diagvars % push_back(trim(varname))
-    end do
-  end select
-end do
+! Example below for mwemiss but we will be getting this from
+! surface_emissivity@Emiss to begin with
+!do i = 1, size(VarFields)
+!  select case (VarFields(i))
+!  case (VarField_mwemiss)
+!    do ichan = 1, size(self % channels)
+!      write(varname,"(A19,I0)") "surface_emissivity_",self % channels(ichan)
+!      call diagvars % push_back(trim(varname))
+!    end do
+!  end select
+!end do
 
 end subroutine opsinputs_varobswriter_addrequireddiagvars
 
@@ -631,11 +577,14 @@ character(len=80)                       :: ErrorMessage
 integer(integer64)                      :: VarFields(ActualMaxVarfield)
 integer                                 :: nVarFields
 integer                                 :: iVarField
+integer                                 :: iobs
 
 integer(c_int64_t)                      :: TimeOffsetsInSeconds(Ob % Header % NumObsLocal)
 
 logical                                 :: FillChanNum = .false.
 logical                                 :: FillNumChans = .false.
+
+integer, allocatable                    :: satellite_identifier_int(:)
 
 ! Body:
 
@@ -660,19 +609,21 @@ Ob % Time = TimeOffsetsInSeconds
 call opsinputs_varobswriter_fillreportflags(Ob, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 
-! TODO(someone): The following call to Ops_Alloc() will need to be replaced by
-! call opsinputs_varobswriter_fillinteger( &
-!   Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType, &
-!   ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
-! with the placeholders replaced by an appropriate variable name and group.
-! We call Ops_Alloc() because the Ops_CreateVarobs terminates prematurely if the ObsType array
-! doesn't exist.
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", Ob % Header % NumObsLocal, Ob % Callsign)
   call opsinputs_obsspace_get_db_string( &
     ObsSpace, "MetaData", "station_id", int(LenCallSign, kind=4), Ob % Callsign)
+else if (obsspace_has(ObsSpace, "MetaData", "satellite_identifier")) then
+  call Ops_Alloc(Ob % Header % Callsign, "Callsign", Ob % Header % NumObsLocal, Ob % Callsign)
+  allocate(satellite_identifier_int(Ob % Header % NumObsLocal))
+  call obsspace_get_db(ObsSpace, "MetaData", "satellite_identifier", satellite_identifier_int)
+  do iobs = 1, Ob % Header % NumObsLocal
+    write(Ob % Callsign(iobs),"(I0.4)") satellite_identifier_int(iobs)
+  end do
+  deallocate(satellite_identifier_int)
 end if
 
 call opsinputs_fill_fillcoord2d( &
@@ -777,9 +728,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
     case (VarField_mwemiss)
-      call opsinputs_fill_fillreal2dfrom1dgeovalwithchans( &
+      call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", Ob % Header % NumObsLocal, Ob % MwEmiss, &
-        self % ObsDiags, "surface_emissivity", self % channels)
+        ObsSpace, self % channels, "surface_emissivity", "Emiss")
     case (VarField_TCozone)
       ! TODO(someone): This will come from an ObsFunction or a variable generated by a filter. Its
       ! name and group are not known yet. Once they are, replace the placeholders in the call below.
@@ -993,8 +944,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTBias, "CloudRTBias", Ob % Header % NumObsLocal, Ob % CloudRTBias)
     case (VarField_BiasPredictors)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors)
+      call opsinputs_varobswriter_fillpredictors( &
+        Ob % Header % BiasPredictors, "BiasPredictors", Ob % Header % NumObsLocal, Ob % BiasPredictors, &
+        ObsSpace, self % channels, "brightness_temperature")
     case (VarField_LevelTime)
       ! IF (PRESENT (RepObs)) THEN
       !   ObHdrVrbl = RepObs % Header % model_level_time
@@ -1239,15 +1191,123 @@ end subroutine opsinputs_varobswriter_fillgpsrotpddependentfields
 subroutine opsinputs_varobswriter_fillsatid(Ob, ObsSpace)
 implicit none
 ! Subroutine arguments:
-type(OB_type), intent(inout)             :: Ob
-type(c_ptr), value, intent(in)           :: ObsSpace
+type(OB_type), intent(inout)   :: Ob
+type(c_ptr), value, intent(in) :: ObsSpace
+
+! Local variables
+character(len=MAXVARLEN)       :: satidname
 
 ! Body:
+satidname = "satellite_id"
+if (obsspace_has(ObsSpace, "MetaData", "satellite_identifier")) satidname = "satellite_identifier"
+
 call opsinputs_fill_fillinteger( &
   Ob % Header % SatId, "SatId", Ob % Header % NumObsLocal, Ob % SatId, &
-  ObsSpace, "satellite_id", "MetaData")
+  ObsSpace, trim(satidname), "MetaData")
 
 end subroutine opsinputs_varobswriter_fillsatid
+
+! ------------------------------------------------------------------------------
+
+!> Fill the Ob % BiasPredictor field.
+!>
+!> This is done in a separate routine because this field is filled from 
+!> several arrays in the Obs Space and there is some data manipulation
+subroutine opsinputs_varobswriter_fillpredictors( &
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName)
+implicit none
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(integer64), intent(in)                  :: NumObs
+real(real64), pointer                           :: Real2(:,:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
+integer(c_int), intent(in)                      :: Channels(:)
+character(len=*), intent(in)                    :: JediVarName
+
+! Local arguments:
+character(len=max_varname_with_channel_length) :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=MAXVARLEN)        :: satidname
+real(kind=c_double)             :: VarValue(NumObs)
+real(kind=c_double)             :: MissingDouble
+integer(kind=4)                 :: SatIdValue(NumObs)
+integer(kind=4), allocatable    :: UniqueSatIds(:)
+integer                         :: ii, jj
+integer, parameter              :: maxpred = 31
+character(len=*), parameter     :: PredictorBaseName(1:maxpred) = (/ &
+              "constant                  ", &
+              "thickness_850_300hPa      ", &
+              "thickness_200_50hPa       ", &
+              "Tskin                     ", &
+              "total_column_water        ", &
+              "Legendre_order_1          ", &
+              "Legendre_order_2          ", &
+              "Legendre_order_3          ", &
+              "Legendre_order_4          ", &
+              "Legendre_order_5          ", &
+              "Legendre_order_6          ", &
+              "orbital_angle_order_1_cos ", &
+              "orbital_angle_order_1_sin ", &
+              "orbital_angle_order_2_cos ", &
+              "orbital_angle_order_2_sin ", &
+              "orbital_angle_order_3_cos ", &
+              "orbital_angle_order_3_sin ", &
+              "orbital_angle_order_4_cos ", &
+              "orbital_angle_order_4_sin ", &
+              "orbital_angle_order_5_cos ", &
+              "orbital_angle_order_5_sin ", &
+              "orbital_angle_order_6_cos ", &
+              "orbital_angle_order_6_sin ", &
+              "orbital_angle_order_7_cos ", &
+              "orbital_angle_order_7_sin ", &
+              "orbital_angle_order_8_cos ", &
+              "orbital_angle_order_8_sin ", &
+              "orbital_angle_order_9_cos ", &
+              "orbital_angle_order_9_sin ", &
+              "orbital_angle_order_10_cos", &
+              "orbital_angle_order_10_sin" /)
+character(len=150) :: JediVarGroupWithSatId
+
+! Body:
+MissingDouble = missing_value(0.0_c_double)
+if (size(Channels) == 0) write(*,*) "opsinputs_varobswriter_fillpredictors channels empty => segfault"
+JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
+
+! Return unique sat ids for obs space
+satidname = "satellite_id"
+if (obsspace_has(ObsSpace, "MetaData", "satellite_identifier")) satidname = "satellite_identifier"
+call obsspace_get_db(ObsSpace, "MetaData", trim(satidname), SatIdValue)
+call unique_values(SatIdValue, UniqueSatIds, positive = .true.)
+
+! Get data for each predictor - all the current predictors are channel
+! independant so just use the first channel in the channel vector
+do jj = 1, size(UniqueSatIds)
+  do ii = 1, maxpred
+    write(JediVarGroupWithSatId,"(2A,I0,A)") &
+          trim(PredictorBaseName(ii)), "_satid_", UniqueSatIds(jj), "Predictor"
+    if (obsspace_has(ObsSpace, JediVarGroupWithSatId, JediVarNamesWithChannels(1))) then
+
+      ! Initialize output if not previously done
+      if (.not. associated(Real2)) then
+        call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
+                       num_levels = int(maxpred, kind=integer64))
+        Real2(:,:) = 0.0
+      end if
+
+      ! Retrieve data from JEDI
+      call obsspace_get_db(ObsSpace, JediVarGroupWithSatId, JediVarNamesWithChannels(1), VarValue)
+
+      ! Fill the OPS data structure
+      where (VarValue /= MissingDouble)
+        Real2(:, ii) = Real2(:, ii) + VarValue(:)
+      end where
+    end if
+  end do
+end do
+
+if (allocated(UniqueSatIds)) deallocate(UniqueSatIds)
+
+end subroutine opsinputs_varobswriter_fillpredictors
 
 ! ------------------------------------------------------------------------------
 
@@ -1320,5 +1380,39 @@ CxHeader % RealC(RC_PoleLat) = self % RC_PoleLat
 CxHeader % RealC(RC_PoleLong) = self % RC_PoleLong
 
 end subroutine opsinputs_varobswriter_populatecxheader
+
+! ------------------------------------------------------------------------------
+!> Return unique value from an array
+subroutine unique_values(input, output, positive)
+implicit none
+
+integer(kind=4), intent(in)               :: input(:)
+integer(kind=4), allocatable, intent(out) :: output(:)
+logical, optional, intent(in)             :: positive
+
+integer(kind=4), allocatable :: unique(:)
+integer :: i, j, k
+
+if (size(input) > 0) then
+  allocate(unique(size(input)))
+  k = 1
+  unique(1) = input(1)
+  do i = 2, size(input)
+    if (present(positive)) then
+      if (positive .and. input(i) <= 0) cycle  ! only positive values to be output
+    end if
+    if (any(unique(1:k) == input(i))) cycle
+    k = k + 1
+    unique(k) = input(i)
+  end do
+  allocate(output(k))
+  output = unique(1:k)
+else
+  allocate(output(0))
+end if
+
+end subroutine unique_values
+
+! ------------------------------------------------------------------------------
 
 end module opsinputs_varobswriter_mod

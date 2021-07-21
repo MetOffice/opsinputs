@@ -259,7 +259,8 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
 
     f.close()
 
-def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_family=False):
+def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, 
+                                   with_radar_family=False, predictors=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
@@ -311,14 +312,34 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, with_radar_fa
     var = f.createVariable('dummy_3@PreQC', 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
-    var = f.createVariable(var_name + '_1@' + var_group, 'f', ('nlocs',))
-    var[:] = [4.1, missing_float, 4.3, 4.4]
+    if type(var_group) != list:
+        var_group = [var_group]
+    for grp in var_group:
+        var = f.createVariable(var_name + '_1@' + grp, 'f', ('nlocs',))
+        var[:] = [4.1, missing_float, 4.3, 4.4]
+        if "5Predictor" in grp:
+            var[:] = [4.1, missing_float, 4.3, 0.0]
+        if "8Predictor" in grp:
+            var[:] = [0.0, 0.0, 0.0, 4.4]
 
-    var = f.createVariable(var_name + '_2@' + var_group, 'f', ('nlocs',))
-    var[:] = [5.1, 5.2, 5.3, 5.4]
+        var2 = f.createVariable(var_name + '_2@' + grp, 'f', ('nlocs',))
+        var2[:] = [5.1, 5.2, 5.3, 5.4]
+        if "5Predictor" in grp:
+            var2[:] = [5.1, 5.2, 5.3, 0.0]
+        if "8Predictor" in grp:
+            var2[:] = [0.0, 0.0, 0.0, 5.4]
 
-    var = f.createVariable(var_name + '_3@' + var_group, 'f', ('nlocs',))
-    var[:] = [6.1, 6.2, 6.3, 6.4]
+        var3 = f.createVariable(var_name + '_3@' + grp, 'f', ('nlocs',))
+        var3[:] = [6.1, 6.2, 6.3, 6.4]
+        if "5Predictor" in grp:
+            var3[:] = [6.1, 6.2, 6.3, 0.0]
+        if "8Predictor" in grp:
+            var3[:] = [0.0, 0.0, 0.0, 6.4]
+
+
+    if predictors:
+        var = f.createVariable('satellite_id@MetaData', 'i', ('nlocs',))
+        var[:] = [5, 5, 5, 8]
 
     f.date_time = 2018010100
 
@@ -360,7 +381,7 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
-    output_1d_geoval_to_netcdf       ('surface_emissivity', 'testinput/017_VarField_mwemiss_obsdiag.nc4', with_channels=True)
+    output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4')
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_normal_int_var_to_netcdf('surface_type', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
@@ -368,6 +389,11 @@ if __name__ == "__main__":
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
+    output_2d_normal_var_to_netcdf   ('brightness_temperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
+                                                                 'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor', 
+                                                                 'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
+                                                                 'Legendre_order_1_satid_5Predictor',    'Legendre_order_1_satid_8Predictor'],
+                                      'testinput/080_VarField_biaspredictors.nc4', predictors=True)
     output_2d_simulated_var_to_netcdf('bending_angle',              'testinput/071_VarField_bendingangle.nc4')
     output_2d_normal_var_to_netcdf('impact_parameter', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
     output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')

@@ -10,16 +10,16 @@
 #include <string>
 
 #include "eckit/exception/Exceptions.h"
+#include "oops/base/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
-#include "oops/util/parameters/Parameters.h"
 #include "oops/util/parameters/RequiredParameter.h"
 
 namespace opsinputs {
 
 /// \brief VarObsWriter options.
-class VarObsWriterParameters : public oops::Parameters {
-  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, Parameters)
+class VarObsWriterParameters : public oops::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, oops::ObsFilterParametersBase)
 
  public:
   /// Determines OPS verbosity.
@@ -57,6 +57,9 @@ class VarObsWriterParameters : public oops::Parameters {
     "account_for_gpsro_tangent_point_drift", false, this};
   /// Output the Family field (taken from the radar_family variable). Used for radar observations.
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
+
+  /// Update OPS flag to output the varbc predictors
+  oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.

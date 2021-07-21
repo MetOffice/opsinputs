@@ -10,15 +10,15 @@
 #include <string>
 #include <vector>
 
+#include "oops/base/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
-#include "oops/util/parameters/Parameters.h"
 
 namespace opsinputs {
 
 /// \brief CxWriter options.
-class CxWriterParameters : public oops::Parameters {
-  OOPS_CONCRETE_PARAMETERS(CxWriterParameters, Parameters)
+class CxWriterParameters : public oops::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(CxWriterParameters, oops::ObsFilterParametersBase)
 
  public:
   /// Determines OPS verbosity.
@@ -111,9 +111,9 @@ class CxWriterParameters : public oops::Parameters {
   // Can these parameters be given names understandable to a layman (without Greek letters)?
   /// New dynamics vertical coordinate theta. Should have length IC_PLevels + 1 (with the
   /// first element denoting the value at the surface).
-  oops::Parameter<std::vector<double>> etaThetaLevels{"eta_theta_levels", {}, this};
+  oops::OptionalParameter<std::vector<double>> etaThetaLevels{"eta_theta_levels", this};
   /// New dynamics vertical coordinate rho. Should have length IC_PLevels.
-  oops::Parameter<std::vector<double>> etaRhoLevels{"eta_rho_levels", {}, this};
+  oops::OptionalParameter<std::vector<double>> etaRhoLevels{"eta_rho_levels", this};
 
   // Parameters corresponding to certain global variables in the OPS.
 

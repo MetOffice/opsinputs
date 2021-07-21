@@ -156,9 +156,9 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
                 NAMELIST VarObsWriterNamelists_011_VarField_tskin/AMSUB.nl
                 DATA     011_VarField_tskin.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
-                YAML     017_VarField_mwemiss_obsdiag.yaml
+                YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
-                DATA     017_VarField_mwemiss_obsdiag.nc4)
+                DATA     017_VarField_mwemiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
@@ -208,6 +208,10 @@ ADD_WRITER_TEST(NAME     varobswriter_077_VarField_aod
 ADD_WRITER_TEST(NAME     varobswriter_078_VarField_theta
                 YAML     078_VarField_theta.yaml
                 DATA     078_VarField_theta.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_080_VarField_biaspredictors
+                YAML     080_VarField_biaspredictors.yaml
+                NAMELIST VarObsWriterNamelists_080_VarField_biaspredictors/ATMS.nl
+                DATA     080_VarField_biaspredictors.nc4)
 
 # MPI tests
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_1
