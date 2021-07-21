@@ -1393,20 +1393,23 @@ logical, optional, intent(in)             :: positive
 integer(kind=4), allocatable :: unique(:)
 integer :: i, j, k
 
-allocate(unique(size(input)))
-k = 1
-unique(1) = input(1)
-do i = 2, size(input)
-  if (present(positive)) then
-    if (positive .and. input(i) <= 0) cycle  ! only positive values to be output
-  end if
-  if (any(unique(1:k) == input(i))) cycle
-  k = k + 1
-  unique(k) = input(i)
-end do
-
-allocate(output(k))
-output = unique(1:k)
+if (size(input) > 0) then
+  allocate(unique(size(input)))
+  k = 1
+  unique(1) = input(1)
+  do i = 2, size(input)
+    if (present(positive)) then
+      if (positive .and. input(i) <= 0) cycle  ! only positive values to be output
+    end if
+    if (any(unique(1:k) == input(i))) cycle
+    k = k + 1
+    unique(k) = input(i)
+  end do
+  allocate(output(k))
+  output = unique(1:k)
+else
+  allocate(output(0))
+end if
 
 end subroutine unique_values
 
