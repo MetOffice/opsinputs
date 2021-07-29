@@ -323,10 +323,6 @@ call f_conf % get_or_die("FH_SubModel", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("atmos")
   self % FH_SubModel = FH_SubModel_Atmos
-case ("ocean")
-  self % FH_SubModel = FH_SubModel_Ocean
-case ("wave")
-  self % FH_SubModel = FH_SubModel_Wave
 case default
   write (ErrorMessage, '("FH_SubModel code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)

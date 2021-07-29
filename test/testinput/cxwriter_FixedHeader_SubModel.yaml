@@ -32,23 +32,3 @@ observations:
     - filter: Cx Checker
       expected_header_fields:
         Submodel type: 1
-  - <<: *default
-    obs filters:
-    - filter: Cx Writer
-      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
-      general_mode: debug
-      IC_PLevels: 5
-      FH_SubModel: Ocean
-    - filter: Cx Checker
-      expected_header_fields:
-        Submodel type: 2
-  - <<: *default
-    obs filters:
-    - filter: Cx Writer
-      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
-      general_mode: debug
-      IC_PLevels: 5
-      FH_SubModel: Wave
-    - filter: Cx Checker
-      expected_header_fields:
-        Submodel type: 4
