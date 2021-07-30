@@ -236,6 +236,9 @@ ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_GridStagger
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_Times
                 YAML     varobswriter_FixedHeader_Times.yaml
                 DATA     028_VarField_satid.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_SubModel
+                YAML     varobswriter_FixedHeader_SubModel.yaml
+                DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_IntegerConstants_LensAndLevels
                 YAML     varobswriter_IntegerConstants_LensAndLevels.yaml
                 DATA     028_VarField_satid.nc4)
@@ -354,6 +357,10 @@ ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_ObsFileType
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Times
                 YAML     cxwriter_FixedHeader_Times.yaml
+                NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
+                DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_SubModel
+                YAML     cxwriter_FixedHeader_SubModel.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_IntegerConstants_PLevels

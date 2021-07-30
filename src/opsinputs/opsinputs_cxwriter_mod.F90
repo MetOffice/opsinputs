@@ -134,6 +134,7 @@ private
   integer(integer64)         :: FH_GridStagger
   integer(integer64)         :: FH_ObsFileType
   integer(integer64)         :: FH_ModelVersion
+  integer(integer64)         :: FH_SubModel
 
   integer(integer64)         :: IC_XLen
   integer(integer64)         :: IC_YLen
@@ -317,6 +318,17 @@ end select
 
 call f_conf % get_or_die("FH_ModelVersion", IntValue)
 self % FH_ModelVersion = IntValue
+
+call f_conf % get_or_die("FH_SubModel", StringValue)
+select case (ops_to_lower_case(StringValue))
+case ("atmos")
+  self % FH_SubModel = FH_SubModel_Atmos
+case default
+  write (ErrorMessage, '("FH_SubModel code not recognised: ",A)') StringValue
+  call gen_warn(RoutineName, ErrorMessage)
+  opsinputs_cxwriter_create = .false.
+  return
+end select
 
 call f_conf % get_or_die("IC_XLen", IntValue)
 self % IC_XLen = IntValue
@@ -778,7 +790,7 @@ call Cx % init
 Cx % Header % NumLocal = Ob % Header % NumObsLocal
 Cx % Header % NumTotal = Ob % Header % NumObsTotal
 Cx % Header % ModelVersion = self % FH_ModelVersion
-Cx % Header % SubModel = FH_SubModel_Atmos
+Cx % Header % SubModel = self % FH_SubModel
 Cx % Header % NewDynamics = self % FH_ModelVersion >= 500 .and. ModelType /= ModelType_Ocean
 
 if (Cx % Header % NewDynamics .and. ModelType /= ModelType_SST) then
@@ -1180,7 +1192,7 @@ UmHeader % FixHd(FH_LookupSize2) = 1
 
 call UmHeader % alloc
 
-UmHeader % FixHd(FH_SubModel) = FH_SubModel_Atmos
+UmHeader % FixHd(FH_SubModel) = self % FH_SubModel
 UmHeader % FixHd(FH_VertCoord) = self % FH_VertCoord
 UmHeader % FixHd(FH_HorizGrid) = self % FH_HorizGrid
 UmHeader % FixHd(FH_GridStagger) = self % FH_GridStagger

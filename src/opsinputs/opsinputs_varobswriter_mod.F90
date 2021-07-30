@@ -146,6 +146,7 @@ private
   integer(integer64) :: FH_HorizGrid
   integer(integer64) :: FH_GridStagger
   integer(integer64) :: FH_ModelVersion
+  integer(integer64) :: FH_SubModel
 
   integer(integer64) :: IC_ShipWind
   integer(integer64) :: IC_GroundGPSOperator
@@ -330,6 +331,21 @@ end select
 
 call f_conf % get_or_die("FH_ModelVersion", IntValue)
 self % FH_ModelVersion = IntValue
+
+call f_conf % get_or_die("FH_SubModel", StringValue)
+select case (ops_to_lower_case(StringValue))
+case ("atmos")
+  self % FH_SubModel = FH_SubModel_Atmos
+case ("ocean")
+  self % FH_SubModel = FH_SubModel_Ocean
+case ("wave")
+  self % FH_SubModel = FH_SubModel_Wave
+case default
+  write (ErrorMessage, '("FH_SubModel code not recognised: ",A)') StringValue
+  call gen_warn(RoutineName, ErrorMessage)
+  opsinputs_varobswriter_create = .false.
+  return
+end select
 
 call f_conf % get_or_die("IC_ShipWind", BoolValue)
 if (BoolValue) then
@@ -1331,6 +1347,7 @@ CxHeader % FixHd(FH_RealCStart) = CxHeader % FixHd(FH_IntCStart) + CxHeader % Fi
 CxHeader % FixHd(FH_RealCSize) = 34
 call CxHeader % alloc
 
+CxHeader % FixHd(FH_SubModel) = self % FH_SubModel
 CxHeader % FixHd(FH_VertCoord) = self % FH_VertCoord
 CxHeader % FixHd(FH_HorizGrid) = self % FH_HorizGrid
 CxHeader % FixHd(FH_GridStagger) = self % FH_GridStagger

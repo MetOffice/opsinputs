@@ -75,6 +75,8 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   oops::Parameter<std::string> FH_ObsFileType{"FH_ObsFileType", "Atmos", this};
   /// Model version number x 100 + release number.
   oops::Parameter<int> FH_ModelVersion{"FH_ModelVersion", 0, this};
+  /// Valid values (case-insensitive): Atmos, Ocean, Wave
+  oops::Parameter<std::string> FH_SubModel{"FH_SubModel", "Atmos", this};
 
   /// Number of points E-W.
   oops::Parameter<int> IC_XLen{"IC_XLen", 0, this};
