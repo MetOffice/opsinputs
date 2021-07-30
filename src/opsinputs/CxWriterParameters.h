@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "oops/base/ObsFilterParametersBase.h"
+#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
 

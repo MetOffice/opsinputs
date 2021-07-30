@@ -15,8 +15,9 @@
 #include "../opsinputs/VarObsCheckerParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
+#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
-#include "oops/util/Printable.h"
+#include "ufo/ObsTraits.h"
 
 namespace eckit {
   class Configuration;
@@ -46,27 +47,32 @@ namespace test {
 /// from that output.
 ///
 /// See VarObsCheckerParameters for a list of available options.
-class VarObsChecker : public util::Printable, private util::ObjectCounter<VarObsChecker> {
+class VarObsChecker : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+                      private util::ObjectCounter<VarObsChecker> {
  public:
   static const std::string classname() {return "opsinputs::test::VarObsChecker";}
 
-  VarObsChecker(ioda::ObsSpace &, const eckit::Configuration &,
+  /// The type of parameters accepted by the constructor of this filter.
+  /// This typedef is used by the FilterFactory.
+  typedef VarObsCheckerParameters Parameters_;
+
+  VarObsChecker(ioda::ObsSpace &, const Parameters_ &,
                 std::shared_ptr<ioda::ObsDataVector<int> > flags,
                 std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~VarObsChecker();
 
-  void preProcess() const {}
-  void priorFilter(const ufo::GeoVaLs &) const {}
-  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const;
+  void preProcess() override {}
+  void priorFilter(const ufo::GeoVaLs &) override {}
+  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) override;
 
-  const oops::Variables & requiredVars() const {return geovars_;}
-  const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
+  oops::Variables requiredVars() const override {return geovars_;}
+  oops::Variables requiredHdiagnostics() const override {return extradiagvars_;}
 
  private:
-  class PrintVarObsOutput;
+  struct PrintVarObsOutput;
   class MainTable;
 
-  void print(std::ostream &) const;
+  void print(std::ostream &) const override;
 
   void setupEnvironment(opsinputs::LocalEnvironment &localEnvironment) const;
 
