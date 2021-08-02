@@ -15,8 +15,9 @@
 #include "../opsinputs/ResetFlagsToPassParameters.h"
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
+#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
-#include "oops/util/Printable.h"
+#include "ufo/ObsTraits.h"
 
 namespace eckit {
   class Configuration;
@@ -39,29 +40,36 @@ namespace test {
 /// \brief Resets observation QC flags to 'pass'.
 ///
 /// See ResetFlagsToPassParameters for the available options.
-class ResetFlagsToPass : public util::Printable, private util::ObjectCounter<ResetFlagsToPass> {
+class ResetFlagsToPass : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+                         private util::ObjectCounter<ResetFlagsToPass> {
  public:
   static const std::string classname() {return "opsinputs::test::ResetFlagsToPass";}
 
-  ResetFlagsToPass(ioda::ObsSpace &, const eckit::Configuration &,
+  /// The type of parameters accepted by the constructor of this filter.
+  /// This typedef is used by the FilterFactory.
+  typedef ResetFlagsToPassParameters Parameters_;
+
+  ResetFlagsToPass(ioda::ObsSpace &, const Parameters_ &,
                    std::shared_ptr<ioda::ObsDataVector<int> > flags,
                    std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~ResetFlagsToPass();
 
-  void preProcess() const {}
-  void priorFilter(const ufo::GeoVaLs &) const {}
-  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const;
+  void preProcess() override {}
+  void priorFilter(const ufo::GeoVaLs &) override {}
+  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) override;
 
-  const oops::Variables & requiredVars() const {return geovars_;}
-  const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
+  oops::Variables requiredVars() const override {return geovars_;}
+  oops::Variables requiredHdiagnostics() const override {return extradiagvars_;}
 
  private:
-  void print(std::ostream &) const;
+  void print(std::ostream &) const override;
 
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::Variables extradiagvars_;
   std::shared_ptr<ioda::ObsDataVector<int>> flags_;
+
+  ResetFlagsToPassParameters parameters_;
 
   std::set<int> flagsToReset_;
 };

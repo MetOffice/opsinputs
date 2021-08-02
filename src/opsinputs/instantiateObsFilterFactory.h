@@ -7,17 +7,17 @@
 #ifndef OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 #define OPSINPUTS_INSTANTIATEOBSFILTERFACTORY_H_
 
-#include "oops/interface/ObsFilter.h"
+#include "oops/interface/ObsFilterBase.h"
 #include "opsinputs/CxWriter.h"
 #include "opsinputs/VarObsWriter.h"
 
 namespace opsinputs {
 
-template<typename MODEL>
+template<typename OBS>
 void instantiateObsFilterFactory() {
-  static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, VarObsWriter> >
+  static oops::interface::FilterMaker<OBS, VarObsWriter>
     makerVarObsWriter_("VarObs Writer");
-  static oops::FilterMaker<MODEL, oops::ObsFilter<MODEL, CxWriter> >
+  static oops::interface::FilterMaker<OBS, CxWriter>
     makerCxWriter_("Cx Writer");
 }
 

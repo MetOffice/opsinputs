@@ -17,7 +17,6 @@
 #include "ioda/ObsSpace.h"
 #include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilter.h"
 #include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 #include "opsinputs/LocalEnvironment.h"
@@ -27,15 +26,13 @@
 
 namespace opsinputs {
 
-VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
+VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
                            std::shared_ptr<ioda::ObsDataVector<int> > flags,
                            std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
   : obsdb_(obsdb), geovars_(), extradiagvars_(), flags_(std::move(flags)),
-    obsErrors_(std::move(obsErrors))
+    obsErrors_(std::move(obsErrors)), parameters_(params)
 {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
-
-  parameters_.validateAndDeserialize(config);
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
@@ -73,7 +70,7 @@ VarObsWriter::~VarObsWriter() {
   opsinputs_varobswriter_delete_f90(key_);
 }
 
-void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
+void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) {
   oops::Log::trace() << "VarObsWriter priorFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
@@ -83,7 +80,7 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 }
 
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
-                              const ufo::ObsDiagnostics & obsdiags) const {
+                              const ufo::ObsDiagnostics & obsdiags) {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
@@ -95,7 +92,7 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
 }
 
 void VarObsWriter::print(std::ostream & os) const {
-  os << "VarObsWriter::print not yet implemented " << key_;
+  os << "VarObsWriter: config = " << parameters_ << std::endl;
 }
 
 void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {

@@ -21,7 +21,6 @@
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilter.h"
 #include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
@@ -77,13 +76,13 @@ struct VarObsChecker::PrintVarObsOutput {
 };
 
 
-VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
+VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const Parameters_ & params,
                              std::shared_ptr<ioda::ObsDataVector<int> > flags,
                              std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
+  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)),
+    parameters_(params)
 {
   oops::Log::trace() << "VarObsChecker constructor starting" << std::endl;
-  parameters_.deserialize(config);
   ASSERT_MSG(!parameters_.expectedHeaderFields.value().empty() ||
              !parameters_.expectedMainTableColumns.value().empty(),
              "No VarObs file components to check have been specified");
@@ -93,7 +92,7 @@ VarObsChecker::~VarObsChecker() {
   oops::Log::trace() << "VarObsChecker destructor starting" << std::endl;
 }
 
-void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
+void VarObsChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
 
   opsinputs::LocalEnvironment localEnvironment;
@@ -198,7 +197,7 @@ void VarObsChecker::checkMainTable(const MainTable &mainTable) const {
 }
 
 void VarObsChecker::print(std::ostream & os) const {
-  os << "VarObsChecker::print not yet implemented";
+  os << "VarObsChecker: config = " << parameters_ << std::endl;
 }
 
 }  // namespace test
