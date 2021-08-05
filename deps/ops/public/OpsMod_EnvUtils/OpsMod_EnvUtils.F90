@@ -21,12 +21,12 @@ END INTERFACE ops_set_env
 
 CONTAINS
 
-#include "ops_get_env_character.inc"
-#include "ops_get_env_character_array.inc"
-#include "ops_get_env_int.inc"
-#include "ops_env_is_false.inc"
-#include "ops_env_is_set.inc"
-#include "ops_env_is_true.inc"
-#include "ops_set_env_character.inc"
+include "ops_get_env_character.inc"
+include "ops_get_env_character_array.inc"
+include "ops_get_env_int.inc"
+include "ops_env_is_false.inc"
+include "ops_env_is_set.inc"
+include "ops_env_is_true.inc"
+include "ops_set_env_character.inc"
 
 END MODULE OpsMod_EnvUtils
