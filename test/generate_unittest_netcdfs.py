@@ -345,6 +345,52 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
 
     f.close()
 
+def output_simulated_var_profiles_to_netcdf(var_name, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 14
+    f.createDimension('nlocs', nlocs)
+
+    # Observations taken by four stations. They are in "random" order (not sorted either by stations
+    # or by datetimes); this makes it possible to verify that the record ordering specified in the
+    # YAML file is respected by the filters writing VarObs and Cx files.
+
+    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var[:] = [-11, -23, -12, -22, -13, -21, -14, -31, -42, -32, -41, -33, -51, -52]
+    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var[:] = [11, 23, 12, 22, 13, 21, 14, 31, 42, 32, 41, 33, 51, 52]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [100100, 80200, 90100, 90200, 80100, 100200, 70100,
+              100300, 90400, 90200, 100400, 80300, 100500, 90500]
+    var = f.createVariable('datetime@MetaData', str, ('nlocs'))
+    # The NetCDF4 module doesn't support assigning values to variable-length string variables
+    # using the `var[:] = ...` syntax, so we do it using a loop
+    for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
+                           "2018-01-01T00:01:02Z", "2018-01-01T00:02:02Z", "2018-01-01T00:01:03Z",
+                           "2018-01-01T00:02:01Z", "2018-01-01T00:01:04Z", "2018-01-01T00:03:01Z",
+                           "2018-01-01T00:04:02Z", "2018-01-01T00:03:02Z", "2018-01-01T00:04:01Z",
+                           "2018-01-01T00:03:03Z", "2018-01-01T00:05:01Z", "2018-01-01T00:05:02Z"]):
+        var[i] = s
+    var = f.createVariable('station_id@MetaData', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_1", "station_2",
+                           "station_1", "station_2", "station_1",
+                           "station_3", "station_4", "station_3", "station_4",
+                           "station_3", "station_5", "station_5"]):
+        var[i] = s
+    var = f.createVariable(var_name + '@ObsValue', 'f', ('nlocs',))
+    var[:] = [0.11, 0.23, 0.12, 0.22, 0.13, 0.21, 0.14,
+              0.31, 0.42, 0.32, missing_float, 0.33, 0.51, 0.52]
+    var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
+    var[:] = [0.011, 0.023, 0.012, 0.022, 0.013, missing_float, 0.014,
+             0.031, 0.042, 0.032, 0.041, 0.033, 0.051, 0.052]
+    var = f.createVariable(var_name + '@GrossErrorProbability', 'f', ('nlocs',))
+    var[:] = [0.111, 0.123, 0.112, 0.122, 0.113, 0.121, 0.114,
+              0.131, 0.142, 0.132, 0.141, 0.133, 0.151, 0.152]
+    var = f.createVariable(var_name + '@PreQC', 'i', ('nlocs',))
+    var[:] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    f.close()
+
 def output_2d_geoval_to_netcdf(var_name, file_name):
     return output_2d_geovals_to_netcdf([var_name], file_name)
 
@@ -374,11 +420,11 @@ if __name__ == "__main__":
     output_1d_simulated_var_to_netcdf('air_temperature',             'testinput/002_VarField_temperature_Surface.nc4')
     output_2d_simulated_var_to_netcdf('air_temperature',             'testinput/002_VarField_temperature_RadarZ.nc4')
     output_1d_simulated_var_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Sonde.nc4')
+    output_simulated_var_profiles_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Sonde.nc4')
+    output_simulated_var_profiles_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Surface.nc4')
-    output_2d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
+    output_simulated_var_profiles_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4')
@@ -390,7 +436,7 @@ if __name__ == "__main__":
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
     output_2d_normal_var_to_netcdf   ('brightness_temperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
-                                                                 'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor', 
+                                                                 'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor',
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
                                                                  'Legendre_order_1_satid_5Predictor',    'Legendre_order_1_satid_8Predictor'],
                                       'testinput/080_VarField_biaspredictors.nc4', predictors=True)
@@ -399,7 +445,7 @@ if __name__ == "__main__":
     output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
     output_1d_normal_var_to_netcdf('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
     output_2d_simulated_var_to_netcdf('aerosol_optical_depth', 'testinput/077_VarField_aod.nc4')
-    output_2d_simulated_var_to_netcdf('air_potential_temperature', 'testinput/078_VarField_theta.nc4') # Sonde
+    output_simulated_var_profiles_to_netcdf('air_potential_temperature', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
 
