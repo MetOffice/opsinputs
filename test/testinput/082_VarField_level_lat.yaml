@@ -15,6 +15,10 @@ observations:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
+      where:
+      - variable:
+          name: air_potential_temperature@ObsErrorData
+        is_defined:
       action:
         name: inflate error
         inflation factor: 2.0
