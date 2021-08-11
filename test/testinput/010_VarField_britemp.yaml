@@ -1,0 +1,59 @@
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T01:00:00Z
+
+observations:
+  - obs space:
+      name: AMSUB
+      obsdatain:
+        obsfile: Data/010_VarField_britemp.nc4
+      simulated variables: [brightness_temperature]
+      channels: 1, 3
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.0
+    - filter: VarObs Writer
+      namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
+      general_mode: debug
+    - filter: VarObs Checker
+      expected_main_table_columns:
+        # Only levels 1 and 3 are simulated and hence written to the VarObs file.
+        # In the arrays below, rows denote locations and columns channels.
+        field:    ["10", "10",
+                   "10", "10",
+                   "10", "10",
+                   "10", "10"]
+        level:    ["1", "2",
+                   "1", "2",
+                   "1", "2",
+                   "1", "2"]
+        ob value: ["1.20000",           "3.11000",
+                   "-1073741824.00000", "3.22000",
+                   "1.60000",           "3.33000",
+                   "1.80000",           "3.44000"]
+        lat:      ["21.00000", "21.00000",
+                   "22.00000", "22.00000",
+                   "-23.00000", "-23.00000",
+                   "24.00000", "24.00000"]
+        lon:      ["31.00000", "31.00000",
+                   "32.00000", "32.00000",
+                   "33.00000", "33.00000",
+                   "34.00000", "34.00000"]
+        time:     ["-1740.00000", "-1740.00000",
+                   "-1680.00000", "-1680.00000",
+                   "-1620.00000", "-1620.00000",
+                   "-1560.00000", "-1560.00000"]
+        Callsign: ["station_1", "station_1",
+                   "station_2", "station_2",
+                   "station_3", "station_3",
+                   "station_4", "station_4"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

@@ -12,15 +12,15 @@
 #include <vector>
 
 #include "eckit/exception/Exceptions.h"
+#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
-#include "oops/util/parameters/Parameters.h"
 
 namespace opsinputs {
 
 /// \brief CxChecker options.
-class CxCheckerParameters : public oops::Parameters {
-    OOPS_CONCRETE_PARAMETERS(CxCheckerParameters, Parameters)
+class CxCheckerParameters : public oops::ObsFilterParametersBase {
+    OOPS_CONCRETE_PARAMETERS(CxCheckerParameters, ObsFilterParametersBase)
 
  public:
   /// Output directory for Cx files.

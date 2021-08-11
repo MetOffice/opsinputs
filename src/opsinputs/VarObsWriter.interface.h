@@ -30,17 +30,18 @@ typedef int F90check;
 extern "C" {
   int opsinputs_varobswriter_create_f90(F90check &, const eckit::Configuration *,
                                         const size_t &comm,
-                                        oops::Variables &);
+                                        const int &nchannels,
+                                        const int *channels,
+                                        oops::Variables &, oops::Variables &);
   void opsinputs_varobswriter_delete_f90(F90check &);
   void opsinputs_varobswriter_prior_f90(const F90check &, const ioda::ObsSpace &,
                                        const ufo::F90goms &);
   void opsinputs_varobswriter_post_f90(const F90check &self,
                                       const ioda::ObsSpace &obsSpace,
-                                      const int &nchannels,
-                                      const int *channels,
                                       const ioda::ObsDataVector<int> &flags,
                                       const ioda::ObsDataVector<float> &obsErrors,
-                                      const int &nvars, const int &nlocs, const double &hofx);
+                                      const int &nvars, const int &nlocs, const double &hofx,
+                                      const ufo::F90goms &);
 }  // extern C
 
 }  // namespace opsinputs

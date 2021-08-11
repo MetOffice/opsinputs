@@ -12,16 +12,16 @@
 #include <vector>
 
 #include "eckit/exception/Exceptions.h"
+#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
-#include "oops/util/parameters/Parameters.h"
 #include "oops/util/parameters/RequiredParameter.h"
 
 namespace opsinputs {
 
 /// \brief VarObsChecker options.
-class VarObsCheckerParameters : public oops::Parameters {
-  OOPS_CONCRETE_PARAMETERS(VarObsCheckerParameters, Parameters)
+class VarObsCheckerParameters : public oops::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(VarObsCheckerParameters, ObsFilterParametersBase)
 
  public:
   /// Directory containing the VarObs files.

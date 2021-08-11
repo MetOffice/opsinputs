@@ -15,7 +15,6 @@
 #include "ioda/ObsSpace.h"
 #include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilter.h"
 #include "oops/util/Logger.h"
 #include "opsinputs/CxWriterParameters.h"
 #include "opsinputs/LocalEnvironment.h"
@@ -23,20 +22,19 @@
 
 namespace opsinputs {
 
-CxWriter::CxWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
+CxWriter::CxWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
                    std::shared_ptr<ioda::ObsDataVector<int> > flags,
                    std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
+  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)),
+    parameters_(params)
 {
   oops::Log::trace() << "CxWriter constructor starting" << std::endl;
-
-  parameters_.deserialize(config);
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
   createOutputDirectory();
 
-  eckit::LocalConfiguration conf(config);
+  eckit::LocalConfiguration conf(parameters_.toConfiguration());
   // Validity time is set to the midpoint of the assimilation window
   const util::DateTime validityTime =
       obsdb.windowStart() + (obsdb.windowEnd() - obsdb.windowStart()) / 2;
@@ -58,7 +56,7 @@ CxWriter::~CxWriter() {
   opsinputs_cxwriter_delete_f90(key_);
 }
 
-void CxWriter::priorFilter(const ufo::GeoVaLs & gv) const {
+void CxWriter::priorFilter(const ufo::GeoVaLs & gv) {
   oops::Log::trace() << "CxWriter priorFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
@@ -67,7 +65,7 @@ void CxWriter::priorFilter(const ufo::GeoVaLs & gv) const {
   opsinputs_cxwriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
-void CxWriter::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
+void CxWriter::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "CxWriter postFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
@@ -77,9 +75,7 @@ void CxWriter::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) 
 }
 
 void CxWriter::print(std::ostream & os) const {
-  // To implement this, it would be best to add a print method or equivalent to Parameters.
-  // Something to think of in future.
-  os << "CxWriter::print not yet implemented " << key_;
+  os << "CxWriter: config = " << parameters_ << std::endl;
 }
 
 void CxWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {

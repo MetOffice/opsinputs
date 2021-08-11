@@ -283,8 +283,8 @@ SELECT CASE (Observations % header % ObsGroup)
 
   CASE (ObsGroupATMS)
 
-    ObsLevelType = 3.0
-    NumLevelLevs = NumObLev
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
 
   CASE (ObsGroupSurfaceCloud)
 

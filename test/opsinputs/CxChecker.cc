@@ -23,7 +23,6 @@
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilter.h"
 #include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
@@ -54,13 +53,13 @@ struct CxChecker::PrintCxFileOutput {
 };
 
 
-CxChecker::CxChecker(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
+CxChecker::CxChecker(ioda::ObsSpace & obsdb, const Parameters_ & params,
                              std::shared_ptr<ioda::ObsDataVector<int> > flags,
                              std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
+  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)),
+    parameters_(params)
 {
   oops::Log::trace() << "CxChecker constructor starting" << std::endl;
-  parameters_.deserialize(config);
   ASSERT_MSG(!parameters_.expectedHeaderFields.value().empty() ||
              parameters_.expectedEtaThetaLevels.value() != boost::none ||
              parameters_.expectedEtaRhoLevels.value() != boost::none ||
@@ -75,7 +74,7 @@ CxChecker::~CxChecker() {
   oops::Log::trace() << "CxChecker destructor starting" << std::endl;
 }
 
-void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) const {
+void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "CxChecker postFilter" << std::endl;
 
   opsinputs::LocalEnvironment localEnvironment;
@@ -329,7 +328,7 @@ void CxChecker::checkMainTable(
 }
 
 void CxChecker::print(std::ostream & os) const {
-  os << "CxChecker::print not yet implemented";
+  os << "CxChecker: config = " << parameters_ << std::endl;
 }
 
 }  // namespace test

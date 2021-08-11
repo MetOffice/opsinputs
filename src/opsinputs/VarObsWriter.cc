@@ -17,29 +17,28 @@
 #include "ioda/ObsSpace.h"
 #include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilter.h"
 #include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 #include "opsinputs/LocalEnvironment.h"
 #include "opsinputs/VarObsWriterParameters.h"
 #include "ufo/GeoVaLs.h"
+#include "ufo/ObsDiagnostics.h"
 
 namespace opsinputs {
 
-VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & config,
+VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
                            std::shared_ptr<ioda::ObsDataVector<int> > flags,
                            std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors))
+  : obsdb_(obsdb), geovars_(), extradiagvars_(), flags_(std::move(flags)),
+    obsErrors_(std::move(obsErrors)), parameters_(params)
 {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
-
-  parameters_.deserialize(config);
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
   createOutputDirectory();
 
-  eckit::LocalConfiguration conf(config);
+  eckit::LocalConfiguration conf(parameters_.toConfiguration());
   // Validity time is set to the midpoint of the assimilation window
   const util::DateTime validityTime =
       obsdb.windowStart() + (obsdb.windowEnd() - obsdb.windowStart()) / 2;
@@ -51,7 +50,12 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const eckit::Configuration & 
     mpiComm = parallelComm->MPIComm();
   }
 
-  if (!opsinputs_varobswriter_create_f90(key_, &conf, mpiComm, geovars_))
+  // We need to pass the list of channels in a separate parameter because the Fortran interface to
+  // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
+  // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
+  const std::vector<int> &channels = obsdb_.obsvariables().channels();
+  if (!opsinputs_varobswriter_create_f90(key_, &conf, mpiComm, channels.size(), channels.data(),
+                                         geovars_, extradiagvars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
   oops::Log::debug() << "VarObsWriter constructor key = " << key_ << std::endl;
@@ -66,7 +70,7 @@ VarObsWriter::~VarObsWriter() {
   opsinputs_varobswriter_delete_f90(key_);
 }
 
-void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
+void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) {
   oops::Log::trace() << "VarObsWriter priorFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
@@ -76,23 +80,19 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) const {
 }
 
 void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
-                              const ufo::ObsDiagnostics &) const {
+                              const ufo::ObsDiagnostics & obsdiags) {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  // We need to pass the list of channels in a separate parameter because the Fortran interface to
-  // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
-  // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
-  const std::vector<int> &channels = obsdb_.obsvariables().channels();
-  opsinputs_varobswriter_post_f90(key_, obsdb_, channels.size(), channels.data(),
-                                 *flags_, *obsErrors_,
-                                 hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran());
+  opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
+                                 hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran(),
+                                 obsdiags.toFortran());
 }
 
 void VarObsWriter::print(std::ostream & os) const {
-  os << "VarObsWriter::print not yet implemented " << key_;
+  os << "VarObsWriter: config = " << parameters_ << std::endl;
 }
 
 void VarObsWriter::setupEnvironment(LocalEnvironment &localEnvironment) const {

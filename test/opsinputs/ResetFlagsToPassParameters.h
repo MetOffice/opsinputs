@@ -9,14 +9,14 @@
 
 #include <vector>
 
+#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/Parameter.h"
-#include "oops/util/parameters/Parameters.h"
 
 namespace opsinputs {
 
 /// \brief ResetFlagsToPass filter's options.
-class ResetFlagsToPassParameters : public oops::Parameters {
-  OOPS_CONCRETE_PARAMETERS(ResetFlagsToPassParameters, Parameters)
+class ResetFlagsToPassParameters : public oops::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(ResetFlagsToPassParameters, ObsFilterParametersBase)
 
  public:
   /// \brief List of QC flags (elements of ufo::QCflags) to be replaced with "pass".

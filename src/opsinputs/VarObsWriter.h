@@ -13,10 +13,12 @@
 
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
+#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
 #include "opsinputs/VarObsWriter.interface.h"
 #include "opsinputs/VarObsWriterParameters.h"
+#include "ufo/ObsTraits.h"
 
 namespace eckit {
   class Configuration;
@@ -47,24 +49,29 @@ class LocalEnvironment;
 /// Ops_WriteVarobs).
 ///
 /// \see VarObsWriterParameters for the list of accepted configuration parameters.
-class VarObsWriter : public util::Printable, private util::ObjectCounter<VarObsWriter> {
+class VarObsWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+                     private util::ObjectCounter<VarObsWriter> {
  public:
   static const std::string classname() {return "opsinputs::VarObsWriter";}
 
-  VarObsWriter(ioda::ObsSpace &, const eckit::Configuration &,
+  /// The type of parameters accepted by the constructor of this filter.
+  /// This typedef is used by the FilterFactory.
+  typedef VarObsWriterParameters Parameters_;
+
+  VarObsWriter(ioda::ObsSpace &, const Parameters_ &,
                std::shared_ptr<ioda::ObsDataVector<int> > flags,
                std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
   ~VarObsWriter();
 
-  void preProcess() const {}
-  void priorFilter(const ufo::GeoVaLs &) const;
-  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics & diags) const;
+  void preProcess() override {}
+  void priorFilter(const ufo::GeoVaLs &) override;
+  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics & diags) override;
 
-  const oops::Variables & requiredVars() const {return geovars_;}
-  const oops::Variables & requiredHdiagnostics() const {return extradiagvars_;}
+  oops::Variables requiredVars() const override {return geovars_;}
+  oops::Variables requiredHdiagnostics() const override {return extradiagvars_;}
 
  private:
-  void print(std::ostream &) const;
+  void print(std::ostream &) const override;
 
   void setupEnvironment(LocalEnvironment &localEnvironment) const;
 

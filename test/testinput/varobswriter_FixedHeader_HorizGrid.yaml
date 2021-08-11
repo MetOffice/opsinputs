@@ -9,6 +9,7 @@ observations:
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
+      namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 0
@@ -23,6 +24,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: Global
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 0
@@ -37,6 +39,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: NH
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 1
@@ -51,6 +54,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: SH
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 2
@@ -65,6 +69,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: LamNoWrap
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 3
@@ -79,6 +84,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: LamWrap
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 4
@@ -93,6 +99,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: Eq
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 100
@@ -107,6 +114,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: LamNoWrapEq
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 103
@@ -121,6 +129,7 @@ observations:
     obs filters:
     - filter: VarObs Writer
       FH_HorizGrid: LamWrapEq
+      namelist_directory: *namelist
     - filter: VarObs Checker
       expected_header_fields:
         Horizontal grid type: 104
