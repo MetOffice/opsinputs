@@ -631,8 +631,6 @@ integer                                   :: iobs
 logical                                   :: FillChanNum = .false.
 logical                                   :: FillNumChans = .false.
 
-integer, allocatable                      :: satellite_identifier_int(:)
-
 ! Body:
 
 ! Get the list of varfields to populate
