@@ -65,7 +65,9 @@ class VarObsWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
 
   void preProcess() override {}
   void priorFilter(const ufo::GeoVaLs &) override;
-  void postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics & diags) override;
+  void postFilter(const ioda::ObsVector &hofx,
+                  const ioda::ObsVector &bias,
+                  const ufo::ObsDiagnostics &diags) override;
 
   oops::Variables requiredVars() const override {return geovars_;}
   oops::Variables requiredHdiagnostics() const override {return extradiagvars_;}

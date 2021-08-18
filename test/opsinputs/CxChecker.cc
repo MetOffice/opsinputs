@@ -74,7 +74,9 @@ CxChecker::~CxChecker() {
   oops::Log::trace() << "CxChecker destructor starting" << std::endl;
 }
 
-void CxChecker::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) {
+void CxChecker::postFilter(const ioda::ObsVector &/*hofx*/,
+                           const ioda::ObsVector &/*bias*/,
+                           const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "CxChecker postFilter" << std::endl;
 
   opsinputs::LocalEnvironment localEnvironment;
