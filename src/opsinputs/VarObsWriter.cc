@@ -79,7 +79,8 @@ void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) {
   opsinputs_varobswriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
-void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
+void VarObsWriter::postFilter(const ioda::ObsVector &hofx,
+                              const ioda::ObsVector &/*bias*/,
                               const ufo::ObsDiagnostics & obsdiags) {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
 
@@ -87,8 +88,8 @@ void VarObsWriter::postFilter(const ioda::ObsVector & hofxb,
   setupEnvironment(localEnvironment);
 
   opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
-                                 hofxb.nvars(), hofxb.nlocs(), hofxb.toFortran(),
-                                 obsdiags.toFortran());
+                                  hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
+                                  obsdiags.toFortran());
 }
 
 void VarObsWriter::print(std::ostream & os) const {
