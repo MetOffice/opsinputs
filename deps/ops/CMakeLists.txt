@@ -84,12 +84,14 @@ set(OPS_SOURCE_FILES
   stubs/Ops_SatRad_SetUp/OpsMod_SatRad_SetUp.f90
 )
 
-set_source_files_properties(public/GenMod_Platform/GenMod_Platform.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
-set_source_files_properties(public/GenMod_Core/GenMod_Core.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
-set_source_files_properties(public/GenMod_Control/GenMod_Setup.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
-set_source_files_properties(code/GenMod_ModelIO/GenMod_ModelIO.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
-set_source_files_properties(code/OpsMod_GatherSpread/OpsMod_GatherSpread.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
-set_source_files_properties(code/OpsProg_Utils/OpsProg_PrintCXFile.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+  set_source_files_properties(public/GenMod_Platform/GenMod_Platform.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+  set_source_files_properties(public/GenMod_Core/GenMod_Core.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+  set_source_files_properties(public/GenMod_Control/GenMod_Setup.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+  set_source_files_properties(code/GenMod_ModelIO/GenMod_ModelIO.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+  set_source_files_properties(code/OpsMod_GatherSpread/OpsMod_GatherSpread.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+  set_source_files_properties(code/OpsProg_Utils/OpsProg_PrintCXFile.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
+endif()
 
 # Collect the list of source directories (which will be added to the include path).
 foreach (file ${OPS_SOURCE_FILES})
