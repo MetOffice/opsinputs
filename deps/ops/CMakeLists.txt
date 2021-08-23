@@ -84,6 +84,10 @@ set(OPS_SOURCE_FILES
   stubs/Ops_SatRad_SetUp/OpsMod_SatRad_SetUp.f90
 )
 
+# Intel inserts lines in the source during pre-processing that contain the source file path, if the pathname
+# is long enough it can take the source line to more than 132 characters and trigger a compile warning.
+# If -warn errors is on this creates an invalid compile failure, so suppress this warning for these files to allow
+# compilation to proceed.
 if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set_source_files_properties(public/GenMod_Platform/GenMod_Platform.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
   set_source_files_properties(public/GenMod_Core/GenMod_Core.F90 PROPERTIES COMPILE_FLAGS "-warn noerrors")
