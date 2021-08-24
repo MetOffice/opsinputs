@@ -12,7 +12,7 @@ use ufo_vars_mod, only: MAXVARLEN
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_varnames, &
     opsinputs_obsdatavector_int_get
-use opsinputs_jediopsobs_mod, only: opsinputs_jediopsobs
+use opsinputs_jeditoopslayoutmapping_mod, only: opsinputs_jeditoopslayoutmapping
 
 use OpsMod_Kinds, only: integer64
 use OpsMod_ObsInfo, only: FinalRejectReport
@@ -39,13 +39,13 @@ contains
 !> Observations are marked as rejected if the JEDI QC flags of any or all (depending on the
 !> specified options) simulated variables are set to anything different from "pass".
 subroutine opsinputs_utils_fillreportflags( &
-  JediOpsObs, ObsSpace, Flags, &
+  JediToOpsLayoutMapping, ObsSpace, Flags, &
   RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC, ReportFlags)
 use, intrinsic :: iso_c_binding, only: c_int, c_ptr
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
+type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
 type(c_ptr), value, intent(in)               :: ObsSpace, Flags
 logical, intent(in)                          :: RejectObsWithAnyVariableFailingQC
 logical, intent(in)                          :: RejectObsWithAllVariablesFailingQC
@@ -57,7 +57,7 @@ character(max_varname_length)                :: VarName
 integer                                      :: NumObsVariables
 integer                                      :: iVar, iOpsObs, iJediObsInRecord, iJediObs
 integer                                      :: NumJediObsInRecord
-integer(c_int)                               :: VarFlags(JediOpsObs % NumJediObs)
+integer(c_int)                               :: VarFlags(JediToOpsLayoutMapping % NumJediObs)
 logical                                      :: AllJediObsRejected
 
 ! Body:
@@ -77,15 +77,15 @@ do iVar = 1, NumObsVariables
   VarName = ObsVariables % variable(iVar)
   call opsinputs_obsdatavector_int_get(Flags, VarName, VarFlags)
   ! Iterate over (OPS) observations
-  do iOpsObs = 1, JediOpsObs % NumOpsObs
-    if (JediOpsObs % ConvertRecordsToMultilevelObs) then
+  do iOpsObs = 1, JediToOpsLayoutMapping % NumOpsObs
+    if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       ! Check if all JEDI observations in this record are rejected
       AllJediObsRejected = .true.
-      NumJediObsInRecord = JediOpsObs % RecordStarts(iOpsObs + 1) - &
-                           JediOpsObs % RecordStarts(iOpsObs)
+      NumJediObsInRecord = JediToOpsLayoutMapping % RecordStarts(iOpsObs + 1) - &
+                           JediToOpsLayoutMapping % RecordStarts(iOpsObs)
       do iJediObsInRecord = 1, NumJediObsInRecord
-        iJediObs = JediOpsObs % LocationsOrderedByRecord( &
-          JediOpsObs % RecordStarts(iOpsObs) + (iJediObsInRecord - 1))
+        iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+          JediToOpsLayoutMapping % RecordStarts(iOpsObs) + (iJediObsInRecord - 1))
         if (VarFlags(iJediObs) == 0) then
           AllJediObsRejected = .false.
           exit

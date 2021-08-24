@@ -14,7 +14,7 @@ list( APPEND opsinputs_src_files
     opsinputs_varobswriter_mod.F90
     opsinputs_cxgenerate_mod.F90
     opsinputs_cxwriter_mod.F90
-    opsinputs_jediopsobs_mod.F90
+    opsinputs_jeditoopslayoutmapping_mod.F90
     opsinputs_utils_mod.F90
     CxWriter.cc
     CxWriter.h

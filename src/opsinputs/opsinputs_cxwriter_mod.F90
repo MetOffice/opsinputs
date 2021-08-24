@@ -33,9 +33,9 @@ use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_s
 use opsinputs_utils_mod, only: &
     max_varname_length,        &
     opsinputs_utils_fillreportflags
-use opsinputs_jediopsobs_mod, only: &
-    opsinputs_jediopsobs,     &
-    opsinputs_jediopsobs_create
+use opsinputs_jeditoopslayoutmapping_mod, only: &
+    opsinputs_jeditoopslayoutmapping,     &
+    opsinputs_jeditoopslayoutmapping_create
 
 use ufo_geovals_mod, only: &
     ufo_geovals
@@ -474,7 +474,7 @@ type(c_ptr), value, intent(in)       :: Flags
 
 ! Local declarations:
 logical                              :: ConvertRecordsToMultilevelObs
-type(opsinputs_jediopsobs)           :: JediOpsObs
+type(opsinputs_jeditoopslayoutmapping)           :: JediToOpsLayoutMapping
 
 ! Body:
 
@@ -482,8 +482,8 @@ type(opsinputs_jediopsobs)           :: JediOpsObs
 ! take slanted model columns from.
 ConvertRecordsToMultilevelObs = .false.
 
-JediOpsObs = opsinputs_jediopsobs_create(ObsSpace, ConvertRecordsToMultilevelObs)
-call opsinputs_cxwriter_post_internal(self, JediOpsObs, ObsSpace, Flags)
+JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create(ObsSpace, ConvertRecordsToMultilevelObs)
+call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
 
 end subroutine opsinputs_cxwriter_post
 
@@ -493,14 +493,14 @@ end subroutine opsinputs_cxwriter_post
 !>
 !> This code has been extracted to a separate subroutine to make it possible to declare Retained as
 !> an automatic array (since the number of observations is now known).
-subroutine opsinputs_cxwriter_post_internal(self, JediOpsObs, ObsSpace, Flags)
+subroutine opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)         :: self
-type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
+type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
 type(c_ptr), value, intent(in)               :: ObsSpace
 type(c_ptr), value, intent(in)               :: Flags
 
@@ -509,20 +509,20 @@ type(OB_type)                                :: Ob
 type(CX_type)                                :: Cx
 type(UM_header_type)                         :: UMHeader
 integer(integer64)                           :: NumObsOnEachRank(nproc)
-logical(logical64)                           :: Retained(JediOpsObs % NumOpsObs)
+logical(logical64)                           :: Retained(JediToOpsLayoutMapping % NumOpsObs)
 integer(kind=gc_int_kind)                    :: istat
 
 ! Body:
 
-call opsinputs_cxwriter_initialiseobservations(self, JediOpsObs % NumOpsObs, Ob)
+call opsinputs_cxwriter_initialiseobservations(self, JediToOpsLayoutMapping % NumOpsObs, Ob)
 call opsinputs_cxwriter_initialisecx(self, Ob, Cx)
 call opsinputs_cxwriter_populatecx(self, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
-Retained = opsinputs_cxwriter_retainflag(JediOpsObs, ObsSpace, Flags, &
+Retained = opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping, ObsSpace, Flags, &
                                          self % RejectObsWithAnyVariableFailingQC, &
                                          self % RejectObsWithAllVariablesFailingQC)
-call opsinputs_mpl_allgather_integer([JediOpsObs % NumOpsObs], 1_gc_int_kind, mpl_integer, &
+call opsinputs_mpl_allgather_integer([JediToOpsLayoutMapping % NumOpsObs], 1_gc_int_kind, mpl_integer, &
                                      NumObsOnEachRank, 1_gc_int_kind, mpl_integer, &
                                      mpi_group, istat)
 call Ops_WriteOutVarCx(Ob, Cx, NumObsOnEachRank, UMheader % IntC(IC_Plevels), UMheader, Retained)
@@ -1276,27 +1276,27 @@ end subroutine opsinputs_cxwriter_populateumheader
 !> Return an array with elements corresponding to retained observations set to .true. and the
 !> remaining ones set to .false.
 function opsinputs_cxwriter_retainflag( &
-  JediOpsObs, ObsSpace, Flags, &
+  JediToOpsLayoutMapping, ObsSpace, Flags, &
   RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
 implicit none
 
 ! Function arguments:
 
-type(opsinputs_jediopsobs), intent(in)       :: JediOpsObs
+type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
 type(c_ptr), value, intent(in)               :: ObsSpace
 type(c_ptr), value, intent(in)               :: Flags
 logical                                      :: RejectObsWithAnyVariableFailingQC
 logical                                      :: RejectObsWithAllVariablesFailingQC
 
 ! Return value:
-logical(logical64)                           :: opsinputs_cxwriter_retainflag(JediOpsObs % NumOpsObs)
+logical(logical64)                           :: opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping % NumOpsObs)
 
 ! Local declarations:
-integer(integer64)                           :: ReportFlags(JediOpsObs % NumOpsObs)
+integer(integer64)                           :: ReportFlags(JediToOpsLayoutMapping % NumOpsObs)
 
 ! Body
 
-call opsinputs_utils_fillreportflags(JediOpsObs, ObsSpace, Flags, &
+call opsinputs_utils_fillreportflags(JediToOpsLayoutMapping, ObsSpace, Flags, &
                                      RejectObsWithAnyVariableFailingQC, &
                                      RejectObsWithAllVariablesFailingQC, ReportFlags)
 
