@@ -331,26 +331,26 @@ subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-type(Element_type), pointer                     :: El2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-type(c_ptr), value, intent(in)                  :: Flags
-type(c_ptr), value, intent(in)                  :: ObsErrors
-character(len=*), intent(in)                    :: JediVarName
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(Element_type), pointer                        :: El2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+type(c_ptr), value, intent(in)                     :: Flags
+type(c_ptr), value, intent(in)                     :: ObsErrors
+character(len=*), intent(in)                       :: JediVarName
 
 ! Local declarations:
-real(kind=c_double)                             :: ObsValue(JediToOpsLayoutMapping % NumJediObs)
-integer(kind=c_int)                             :: Flag(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_float)                              :: ObsError(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_double)                             :: PGE(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_double)                             :: MissingDouble
-real(kind=c_float)                              :: MissingFloat
-integer                                         :: iObs, iLevel, iJediObs, numLevels
-character(len=*), parameter                     :: &
+real(kind=c_double)                                :: ObsValue(JediToOpsLayoutMapping % NumJediObs)
+integer(kind=c_int)                                :: Flag(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_float)                                 :: ObsError(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_double)                                :: PGE(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_double)                                :: MissingDouble
+real(kind=c_float)                                 :: MissingFloat
+integer                                            :: iObs, iLevel, iJediObs, numLevels
+character(len=*), parameter                        :: &
   RoutineName = "opsinputs_fill_fillelementtype2dfromsimulatedvariable_records"
-character(len=256)                              :: ErrorMessage
+character(len=256)                                 :: ErrorMessage
 
 ! Body:
 
@@ -399,7 +399,8 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
 
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
+    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+                JediToOpsLayoutMapping % RecordStarts(iObs)
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -416,7 +417,8 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
         El2(iObs, iLevel) % Flags = ibset(0, FinalRejectFlag)
       end if
     end do
-    El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = ibset(0, FinalRejectFlag)
+    El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = &
+      ibset(0, FinalRejectFlag)
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
@@ -455,15 +457,15 @@ subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-type(Element_type), pointer                     :: El2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-type(c_ptr), value, intent(in)                  :: Flags
-type(c_ptr), value, intent(in)                  :: ObsErrors
-character(len=*), intent(in)                    :: JediVarName
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(Element_type), pointer                        :: El2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(c_int), intent(in)                         :: Channels(:)
+type(c_ptr), value, intent(in)                     :: Flags
+type(c_ptr), value, intent(in)                     :: ObsErrors
+character(len=*), intent(in)                       :: JediVarName
 
 ! Body:
 
@@ -472,7 +474,8 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
     Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName)
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName)
+    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
+    ObsErrors, JediVarName)
 end if
 
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
@@ -714,19 +717,19 @@ subroutine opsinputs_fill_fillreal( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-real(real64), pointer                           :: Real1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(real64), pointer                              :: Real1(:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Local declarations:
-real(kind=c_double)                             :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_double)                             :: CurrentVarValue
-real(kind=c_double)                             :: MissingDouble
-integer                                         :: i
+real(kind=c_double)                                :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_double)                                :: CurrentVarValue
+real(kind=c_double)                                :: MissingDouble
+integer                                            :: i
 
 ! Body:
 
@@ -742,7 +745,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
         ! This record is non-empty. Use the first location from that record.
-        CurrentVarValue = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord(JediToOpsLayoutMapping % RecordStarts(i)))
+        CurrentVarValue = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+                                     JediToOpsLayoutMapping % RecordStarts(i)))
       else
         ! This record is empty
         CurrentVarValue = MissingDouble
@@ -861,18 +865,18 @@ subroutine opsinputs_fill_fillreal2d_records( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-real(real64), pointer                           :: Real2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(real64), pointer                              :: Real2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Local declarations:
-real(kind=c_double)                             :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_double)                             :: MissingDouble
-integer                                         :: iObs, iLevel, iJediObs, numLevels
+real(kind=c_double)                                :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_double)                                :: MissingDouble
+integer                                            :: iObs, iLevel, iJediObs, numLevels
 
 ! Body:
 
@@ -887,7 +891,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
 
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
+    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+                JediToOpsLayoutMapping % RecordStarts(iObs)
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -933,14 +938,14 @@ subroutine opsinputs_fill_fillreal2d( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-real(real64), pointer                           :: Real2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(real64), pointer                              :: Real2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(c_int), intent(in)                         :: Channels(:)
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Body:
 
@@ -949,7 +954,8 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
 else
   call opsinputs_fill_fillreal2d_norecords( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup)
+    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+    JediVarName, JediVarGroup)
 end if
 
 end subroutine opsinputs_fill_fillreal2d
@@ -1171,19 +1177,19 @@ subroutine opsinputs_fill_fillinteger( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-integer(integer64), pointer                     :: Int1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+integer(integer64), pointer                        :: Int1(:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Local declarations:
-integer(kind=4)                                 :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-integer(kind=4)                                 :: CurrentVarValue
-integer(kind=4)                                 :: MissingInt
-integer                                         :: i
+integer(kind=4)                                    :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+integer(kind=4)                                    :: CurrentVarValue
+integer(kind=4)                                    :: MissingInt
+integer                                            :: i
 
 ! Body:
 
@@ -1199,7 +1205,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
         ! This record is non-empty. Use the first location from that record.
-        CurrentVarValue = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord(JediToOpsLayoutMapping % RecordStarts(i)))
+        CurrentVarValue = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+                                     JediToOpsLayoutMapping % RecordStarts(i)))
       else
         ! This record is empty
         CurrentVarValue = MissingInt
@@ -1243,18 +1250,18 @@ subroutine opsinputs_fill_fillstring( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-integer(integer64), intent(in)                  :: StringLen
-character(len=StringLen), pointer               :: String1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+integer(integer64), intent(in)                     :: StringLen
+character(len=StringLen), pointer                  :: String1(:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Local declarations:
-character(len=StringLen)                        :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-integer                                         :: i
+character(len=StringLen)                           :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+integer                                            :: i
 
 ! Body:
 
@@ -1269,7 +1276,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
         ! This record is non-empty. Use the first location from that record.
-        String1(i) = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord(JediToOpsLayoutMapping % RecordStarts(i)))
+        String1(i) = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+                                JediToOpsLayoutMapping % RecordStarts(i)))
       end if
     else
       String1(i) = VarValue(i)
@@ -1312,18 +1320,18 @@ use datetime_mod, only: datetime
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-real(real64), pointer                           :: Real1(:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-type(datetime), intent(in)                      :: ReferenceTime
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(real64), pointer                              :: Real1(:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
+type(datetime), intent(in)                         :: ReferenceTime
 
 ! Local declarations:
-integer(c_int64_t)                              :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-integer                                         :: i
+integer(c_int64_t)                                 :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+integer                                            :: i
 
 ! Body:
 
@@ -1338,7 +1346,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
         ! This record is non-empty. Use the first location from that record.
-        Real1(i) = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord(JediToOpsLayoutMapping % RecordStarts(i)))
+        Real1(i) = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+                              JediToOpsLayoutMapping % RecordStarts(i)))
       end if
     else
       Real1(i) = VarValue(i)
@@ -1460,19 +1469,19 @@ use datetime_mod, only: datetime
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-real(real64), pointer                           :: Real2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-type(datetime), intent(in)                      :: ReferenceTime
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(real64), pointer                              :: Real2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
+type(datetime), intent(in)                         :: ReferenceTime
 
 ! Local declarations:
-integer(c_int64_t)                              :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_double)                             :: MissingDouble
-integer                                         :: iObs, iLevel, iJediObs, numLevels
+integer(c_int64_t)                                 :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_double)                                :: MissingDouble
+integer                                            :: iObs, iLevel, iJediObs, numLevels
 
 ! Body:
 
@@ -1488,7 +1497,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
                  num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
+    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+                JediToOpsLayoutMapping % RecordStarts(iObs)
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1532,29 +1542,32 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, ReferenceTime)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, &
+  ReferenceTime)
 use datetime_mod, only: datetime
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-real(real64), pointer                           :: Real2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-type(datetime), intent(in)                      :: ReferenceTime
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(real64), pointer                              :: Real2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(c_int), intent(in)                         :: Channels(:)
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
+type(datetime), intent(in)                         :: ReferenceTime
 
 ! Body:
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
-  call opsinputs_fill_filltimeoffsets2d_records(Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, &
+  call opsinputs_fill_filltimeoffsets2d_records(Hdr, OpsVarName, &
+                                                JediToOpsLayoutMapping, Real2, &
                                                 ObsSpace, JediVarName, JediVarGroup, &
                                                 ReferenceTime)
 else
-  call opsinputs_fill_filltimeoffsets2d_norecords(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+  call opsinputs_fill_filltimeoffsets2d_norecords(Hdr, OpsVarName, &
+                                                  JediToOpsLayoutMapping % NumOpsObs, Real2, &
                                                   ObsSpace, Channels, JediVarName, JediVarGroup, &
                                                   ReferenceTime)
 end if
@@ -1667,18 +1680,18 @@ subroutine opsinputs_fill_fillcoord2d_records( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-type(coord_type), pointer                       :: Coord2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(coord_type), pointer                          :: Coord2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Local declarations:
-real(kind=c_double)                             :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-real(kind=c_double)                             :: MissingDouble
-integer                                         :: iObs, iLevel, iJediObs, numLevels
+real(kind=c_double)                                :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+real(kind=c_double)                                :: MissingDouble
+integer                                            :: iObs, iLevel, iJediObs, numLevels
 
 ! Body:
 
@@ -1694,7 +1707,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
 
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
+    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+                JediToOpsLayoutMapping % RecordStarts(iObs)
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1738,14 +1752,14 @@ subroutine opsinputs_fill_fillcoord2d( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in)          :: JediToOpsLayoutMapping
-type(coord_type), pointer                       :: Coord2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(coord_type), pointer                          :: Coord2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(c_int), intent(in)                         :: Channels(:)
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
 
 ! Body:
 
@@ -1754,7 +1768,8 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
     Hdr, OpsVarName, JediToOpsLayoutMapping, Coord2, ObsSpace, JediVarName, JediVarGroup)
 else
   call opsinputs_fill_fillcoord2d_norecords( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup)
+    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Coord2, ObsSpace, Channels, &
+    JediVarName, JediVarGroup)
 end if
 
 end subroutine opsinputs_fill_fillcoord2d

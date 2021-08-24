@@ -468,13 +468,13 @@ subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in) :: self
-type(c_ptr), value, intent(in)       :: ObsSpace
-type(c_ptr), value, intent(in)       :: Flags
+type(opsinputs_cxwriter), intent(in)   :: self
+type(c_ptr), value, intent(in)         :: ObsSpace
+type(c_ptr), value, intent(in)         :: Flags
 
 ! Local declarations:
-logical                              :: ConvertRecordsToMultilevelObs
-type(opsinputs_jeditoopslayoutmapping)           :: JediToOpsLayoutMapping
+logical                                :: ConvertRecordsToMultilevelObs
+type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
 
@@ -482,7 +482,8 @@ type(opsinputs_jeditoopslayoutmapping)           :: JediToOpsLayoutMapping
 ! take slanted model columns from.
 ConvertRecordsToMultilevelObs = .false.
 
-JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create(ObsSpace, ConvertRecordsToMultilevelObs)
+JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
+  ObsSpace, ConvertRecordsToMultilevelObs)
 call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
 
 end subroutine opsinputs_cxwriter_post
@@ -499,18 +500,18 @@ USE mpl, ONLY: &
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)         :: self
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in)               :: ObsSpace
-type(c_ptr), value, intent(in)               :: Flags
+type(opsinputs_cxwriter), intent(in)               :: self
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(c_ptr), value, intent(in)                     :: ObsSpace
+type(c_ptr), value, intent(in)                     :: Flags
 
 ! Local declarations:
-type(OB_type)                                :: Ob
-type(CX_type)                                :: Cx
-type(UM_header_type)                         :: UMHeader
-integer(integer64)                           :: NumObsOnEachRank(nproc)
-logical(logical64)                           :: Retained(JediToOpsLayoutMapping % NumOpsObs)
-integer(kind=gc_int_kind)                    :: istat
+type(OB_type)                                      :: Ob
+type(CX_type)                                      :: Cx
+type(UM_header_type)                               :: UMHeader
+integer(integer64)                                 :: NumObsOnEachRank(nproc)
+logical(logical64)                                 :: Retained(JediToOpsLayoutMapping % NumOpsObs)
+integer(kind=gc_int_kind)                          :: istat
 
 ! Body:
 
@@ -1282,17 +1283,17 @@ implicit none
 
 ! Function arguments:
 
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in)               :: ObsSpace
-type(c_ptr), value, intent(in)               :: Flags
-logical                                      :: RejectObsWithAnyVariableFailingQC
-logical                                      :: RejectObsWithAllVariablesFailingQC
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(c_ptr), value, intent(in) :: ObsSpace
+type(c_ptr), value, intent(in) :: Flags
+logical                        :: RejectObsWithAnyVariableFailingQC
+logical                        :: RejectObsWithAllVariablesFailingQC
 
 ! Return value:
-logical(logical64)                           :: opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping % NumOpsObs)
+logical(logical64)             :: opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping % NumOpsObs)
 
 ! Local declarations:
-integer(integer64)                           :: ReportFlags(JediToOpsLayoutMapping % NumOpsObs)
+integer(integer64)             :: ReportFlags(JediToOpsLayoutMapping % NumOpsObs)
 
 ! Body
 

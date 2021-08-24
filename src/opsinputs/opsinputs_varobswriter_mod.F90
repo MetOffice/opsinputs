@@ -493,7 +493,8 @@ self % ObsDiags => obsdiags
 ! There may be other obs groups requiring similar treatment -- if so, edit the line below.
 ConvertRecordsToMultilevelObs = (self % ObsGroup == ObsGroupSonde)
 
-JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create(ObsSpace, ConvertRecordsToMultilevelObs)
+JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
+  ObsSpace, ConvertRecordsToMultilevelObs)
 call opsinputs_varobswriter_allocateobservations(self, ObsSpace, JediToOpsLayoutMapping, Ob)
 call opsinputs_varobswriter_populateobservations(self, ObsSpace, JediToOpsLayoutMapping, &
                                                  Flags, ObsErrors, Ob)
@@ -576,13 +577,13 @@ subroutine opsinputs_varobswriter_allocateobservations(self, ObsSpace, JediToOps
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_varobswriter), intent(in)     :: self
-type(c_ptr), value, intent(in)               :: ObsSpace
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
-type(OB_type), intent(inout)                 :: Ob
+type(opsinputs_varobswriter), intent(in)           :: self
+type(c_ptr), value, intent(in)                     :: ObsSpace
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(OB_type), intent(inout)                       :: Ob
 
 ! Local declarations:
-integer(kind=gc_int_kind)                    :: istat
+integer(kind=gc_int_kind)                          :: istat
 
 ! Body:
 Ob % Header % obsgroup = self % obsgroup
@@ -613,23 +614,24 @@ subroutine opsinputs_varobswriter_populateobservations( &
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_varobswriter), intent(in)  :: self
-type(c_ptr), value, intent(in)            :: ObsSpace
+type(opsinputs_varobswriter), intent(in)              :: self
+type(c_ptr), value, intent(in)                        :: ObsSpace
 type(opsinputs_jeditoopslayoutmapping), intent(inout) :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in)            :: Flags, ObsErrors
-type(OB_type), intent(inout)              :: Ob
+type(c_ptr), value, intent(in)                        :: Flags, ObsErrors
+type(OB_type), intent(inout)                          :: Ob
 
 ! Local declarations:
-character(len=*), parameter               :: RoutineName = "opsinputs_varobswriter_populateobservations"
-character(len=80)                         :: ErrorMessage
+character(len=*), parameter                           :: RoutineName = &
+  "opsinputs_varobswriter_populateobservations"
+character(len=80)                                     :: ErrorMessage
 
-integer(integer64)                        :: VarFields(ActualMaxVarfield)
-integer                                   :: nVarFields
-integer                                   :: iVarField
-integer                                   :: iobs
+integer(integer64)                                    :: VarFields(ActualMaxVarfield)
+integer                                               :: nVarFields
+integer                                               :: iVarField
+integer                                               :: iobs
 
-logical                                   :: FillChanNum = .false.
-logical                                   :: FillNumChans = .false.
+logical                                               :: FillChanNum = .false.
+logical                                               :: FillNumChans = .false.
 
 ! Body:
 
@@ -641,7 +643,8 @@ nVarFields = size(VarFields)
 call opsinputs_varobswriter_fillreportflags(Ob, JediToOpsLayoutMapping, ObsSpace, Flags, &
   self % RejectObsWithAnyVariableFailingQC, self % RejectObsWithAllVariablesFailingQC)
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
-  call opsinputs_jeditoopslayoutmapping_clear_rejected_records(Ob % ReportFlags, JediToOpsLayoutMapping)
+  call opsinputs_jeditoopslayoutmapping_clear_rejected_records( &
+    Ob % ReportFlags, JediToOpsLayoutMapping)
 end if
 
 ! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
@@ -1069,11 +1072,11 @@ subroutine opsinputs_varobswriter_fillreportflags( &
 implicit none
 
 ! Subroutine arguments:
-type(OB_type), intent(inout)                 :: Ob
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in)               :: ObsSpace, Flags
-logical, intent(in)                          :: RejectObsWithAnyVariableFailingQC
-logical, intent(in)                          :: RejectObsWithAllVariablesFailingQC
+type(OB_type), intent(inout)                       :: Ob
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(c_ptr), value, intent(in)                     :: ObsSpace, Flags
+logical, intent(in)                                :: RejectObsWithAnyVariableFailingQC
+logical, intent(in)                                :: RejectObsWithAllVariablesFailingQC
 
 ! Body:
 call Ops_Alloc(Ob % Header % ReportFlags, "ReportFlags", &
@@ -1195,9 +1198,9 @@ end subroutine opsinputs_varobswriter_findchannelspassingqc
 subroutine opsinputs_varobswriter_fillgpsrotpddependentfields(Ob, ObsSpace, JediToOpsLayoutMapping)
 implicit none
 ! Subroutine arguments:
-type(OB_type), intent(inout)                 :: Ob
-type(c_ptr), value, intent(in)               :: ObsSpace
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
+type(OB_type), intent(inout)                       :: Ob
+type(c_ptr), value, intent(in)                     :: ObsSpace
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 
 ! Body:
 
@@ -1227,12 +1230,12 @@ end subroutine opsinputs_varobswriter_fillgpsrotpddependentfields
 subroutine opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediToOpsLayoutMapping)
 implicit none
 ! Subroutine arguments:
-type(OB_type), intent(inout)                 :: Ob
-type(c_ptr), value, intent(in)               :: ObsSpace
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
+type(OB_type), intent(inout)                       :: Ob
+type(c_ptr), value, intent(in)                     :: ObsSpace
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 
 ! Local variables
-character(len=MAXVARLEN)       :: satidname
+character(len=MAXVARLEN)                           :: satidname
 
 ! Body:
 satidname = "satellite_id"

@@ -45,20 +45,20 @@ use, intrinsic :: iso_c_binding, only: c_int, c_ptr
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_jeditoopslayoutmapping), intent(in)       :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in)               :: ObsSpace, Flags
-logical, intent(in)                          :: RejectObsWithAnyVariableFailingQC
-logical, intent(in)                          :: RejectObsWithAllVariablesFailingQC
-integer(kind=integer64), intent(out)         :: ReportFlags(:)
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(c_ptr), value, intent(in)                     :: ObsSpace, Flags
+logical, intent(in)                                :: RejectObsWithAnyVariableFailingQC
+logical, intent(in)                                :: RejectObsWithAllVariablesFailingQC
+integer(kind=integer64), intent(out)               :: ReportFlags(:)
 
 ! Local declarations:
-type(oops_variables)                         :: ObsVariables
-character(max_varname_length)                :: VarName
-integer                                      :: NumObsVariables
-integer                                      :: iVar, iOpsObs, iJediObsInRecord, iJediObs
-integer                                      :: NumJediObsInRecord
-integer(c_int)                               :: VarFlags(JediToOpsLayoutMapping % NumJediObs)
-logical                                      :: AllJediObsRejected
+type(oops_variables)                               :: ObsVariables
+character(max_varname_length)                      :: VarName
+integer                                            :: NumObsVariables
+integer                                            :: iVar, iOpsObs, iJediObsInRecord, iJediObs
+integer                                            :: NumJediObsInRecord
+integer(c_int)                                     :: VarFlags(JediToOpsLayoutMapping % NumJediObs)
+logical                                            :: AllJediObsRejected
 
 ! Body:
 

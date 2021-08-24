@@ -59,12 +59,12 @@ use, intrinsic :: iso_c_binding, only: &
 implicit none
 
 ! Function arguments:
-type(c_ptr), value, intent(in)  :: ObsSpace
-logical, intent(in)             :: ConvertRecordsToMultilevelObs
+type(c_ptr), value, intent(in)         :: ObsSpace
+logical, intent(in)                    :: ConvertRecordsToMultilevelObs
 
 ! Local declarations:
-type(opsinputs_jeditoopslayoutmapping)      :: JediToOpsLayoutMapping
-integer                         :: nlocs, nrecs, i
+type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
+integer                                :: nlocs, nrecs, i
 
 ! Body:
 
@@ -101,7 +101,7 @@ subroutine opsinputs_jeditoopslayoutmapping_clear_rejected_records(ReportFlags, 
 implicit none
 
 ! Subroutine arguments:
-integer(integer64), intent(in)            :: ReportFlags(:)
+integer(integer64), intent(in)                        :: ReportFlags(:)
 type(opsinputs_jeditoopslayoutmapping), intent(inout) :: JediToOpsLayoutMapping
 
 ! Local declarations:
