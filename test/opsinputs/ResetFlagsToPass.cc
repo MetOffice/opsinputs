@@ -33,7 +33,9 @@ ResetFlagsToPass::~ResetFlagsToPass() {
   oops::Log::trace() << "ResetFlagsToPass destructor starting" << std::endl;
 }
 
-void ResetFlagsToPass::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) {
+void ResetFlagsToPass::postFilter(const ioda::ObsVector &/*hofx*/,
+                                  const ioda::ObsVector &/*bias*/,
+                                  const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "ResetFlagsToPass postFilter" << std::endl;
   for (size_t v = 0; v < flags_->nvars(); ++v) {
     ioda::ObsDataRow<int> &varflags = (*flags_)[v];

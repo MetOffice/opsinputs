@@ -65,7 +65,9 @@ void CxWriter::priorFilter(const ufo::GeoVaLs & gv) {
   opsinputs_cxwriter_prior_f90(key_, obsdb_, gv.toFortran());
 }
 
-void CxWriter::postFilter(const ioda::ObsVector &, const ufo::ObsDiagnostics &) {
+void CxWriter::postFilter(const ioda::ObsVector &/*hofx*/,
+                          const ioda::ObsVector &/*bias*/,
+                          const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "CxWriter postFilter" << std::endl;
 
   LocalEnvironment localEnvironment;
