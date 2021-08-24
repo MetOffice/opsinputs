@@ -146,7 +146,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   else
     write (ErrorMessage, '(A,A)') "QC flags not found for variable ", JediVarName
     call gen_warn(RoutineName, ErrorMessage)
-    Flag = 0 ! assume all observations passed QC
+    Flag(:) = 0 ! assume all observations passed QC
   end if
   ! - observation error
   if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
@@ -154,13 +154,13 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   else
     write (ErrorMessage, '(A,A,A)') "Variable ", JediVarName, "@ObsError not found"
     call gen_warn(RoutineName, ErrorMessage)
-    ObsError = MissingFloat
+    ObsError(:) = MissingFloat
   end if
   ! - gross error probability
   if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarName)) then
     call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarName, PGE)
   else
-    PGE = MissingDouble
+    PGE(:) = MissingDouble
   end if
 
   ! Fill the OPS data structures
@@ -266,7 +266,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
       write (ErrorMessage, '(A,A,A)') &
         "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
       call gen_warn(RoutineName, ErrorMessage)
-      Flag = 0 ! assume all observations passed QC
+      Flag(:) = 0 ! assume all observations passed QC
     end if
     ! - observation error
     if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarNamesWithChannels(iChannel))) then
@@ -275,14 +275,14 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
       write (ErrorMessage, '(A,A,A)') &
         "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
       call gen_warn(RoutineName, ErrorMessage)
-      ObsError = MissingFloat
+      ObsError(:) = MissingFloat
     end if
     ! - gross error probability
     if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarNamesWithChannels(iChannel))) then
       call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarNamesWithChannels(iChannel), &
                            PGE)
     else
-      PGE = MissingDouble
+      PGE(:) = MissingDouble
     end if
 
     ! Fill the OPS data structures
@@ -378,7 +378,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     write (ErrorMessage, '(A,A,A)') &
       "Warning: variable ", JediVarName, "@ObsError not found"
     call gen_warn(RoutineName, ErrorMessage)
-    Flag = 0 ! assume all observations passed QC
+    Flag(:) = 0 ! assume all observations passed QC
   end if
   ! - observation error
   if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
@@ -387,14 +387,14 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     write (ErrorMessage, '(A,A,A)') &
       "Warning: variable ", JediVarName, "@ObsError not found"
     call gen_warn(RoutineName, ErrorMessage)
-    ObsError = MissingFloat
+    ObsError(:) = MissingFloat
   end if
   ! - gross error probability
   if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarName)) then
     call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarName, &
                          PGE)
   else
-    PGE = MissingDouble
+    PGE(:) = MissingDouble
   end if
 
   ! Fill the OPS data structures
@@ -550,10 +550,10 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     else
       write (ErrorMessage, '("Variable ",A,"@",A," not found")') JediErrorVarName, JediErrorGroup
       call gen_warn(RoutineName, ErrorMessage)
-      ObsError = MissingDouble
+      ObsError(:) = MissingDouble
     end if
   else
-    ObsError = MissingDouble
+    ObsError(:) = MissingDouble
   end if
 
   ! Fill the OPS data structures
@@ -665,10 +665,10 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
         write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
           JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
         call gen_warn(RoutineName, ErrorMessage)
-        ObsError = MissingDouble
+        ObsError(:) = MissingDouble
       end if
     else
-      ObsError = MissingDouble
+      ObsError(:) = MissingDouble
     end if
 
     ! Fill the OPS data structures
