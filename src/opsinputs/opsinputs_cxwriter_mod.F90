@@ -30,9 +30,13 @@ use opsinputs_fill_mod, only:            &
     opsinputs_fill_fillreal2dfromgeoval
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
 use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_seconds
-use opsinputs_utils_mod, only:      &
-    max_varname_length,             &
+use opsinputs_utils_mod, only: &
+    max_varname_length,        &
     opsinputs_utils_fillreportflags
+use opsinputs_jeditoopslayoutmapping_mod, only: &
+    opsinputs_jeditoopslayoutmapping,     &
+    opsinputs_jeditoopslayoutmapping_create
+
 use ufo_geovals_mod, only: &
     ufo_geovals
 
@@ -464,17 +468,23 @@ subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in) :: self
-type(c_ptr), value, intent(in)       :: ObsSpace
-type(c_ptr), value, intent(in)       :: Flags
+type(opsinputs_cxwriter), intent(in)   :: self
+type(c_ptr), value, intent(in)         :: ObsSpace
+type(c_ptr), value, intent(in)         :: Flags
 
 ! Local declarations:
-integer(integer64)                   :: NumObsLocal
+logical                                :: ConvertRecordsToMultilevelObs
+type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
 
-NumObsLocal = obsspace_get_nlocs(ObsSpace)
-call opsinputs_cxwriter_post_internal(self, NumObsLocal, ObsSpace, Flags)
+! TODO(wsmigaj): Set this variable to true for radiosondes when we have a better idea of where to
+! take slanted model columns from.
+ConvertRecordsToMultilevelObs = .false.
+
+JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
+  ObsSpace, ConvertRecordsToMultilevelObs)
+call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
 
 end subroutine opsinputs_cxwriter_post
 
@@ -484,36 +494,36 @@ end subroutine opsinputs_cxwriter_post
 !>
 !> This code has been extracted to a separate subroutine to make it possible to declare Retained as
 !> an automatic array (since the number of observations is now known).
-subroutine opsinputs_cxwriter_post_internal(self, NumObsLocal, ObsSpace, Flags)
+subroutine opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in) :: self
-integer(integer64)                   :: NumObsLocal
-type(c_ptr), value, intent(in)       :: ObsSpace
-type(c_ptr), value, intent(in)       :: Flags
+type(opsinputs_cxwriter), intent(in)               :: self
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+type(c_ptr), value, intent(in)                     :: ObsSpace
+type(c_ptr), value, intent(in)                     :: Flags
 
 ! Local declarations:
-type(OB_type)                        :: Ob
-type(CX_type)                        :: Cx
-type(UM_header_type)                 :: UMHeader
-integer(integer64)                   :: NumObsOnEachRank(nproc)
-logical(logical64)                   :: Retained(NumObsLocal)
-integer(kind=gc_int_kind)            :: istat
+type(OB_type)                                      :: Ob
+type(CX_type)                                      :: Cx
+type(UM_header_type)                               :: UMHeader
+integer(integer64)                                 :: NumObsOnEachRank(nproc)
+logical(logical64)                                 :: Retained(JediToOpsLayoutMapping % NumOpsObs)
+integer(kind=gc_int_kind)                          :: istat
 
 ! Body:
 
-call opsinputs_cxwriter_initialiseobservations(self, NumObsLocal, Ob)
+call opsinputs_cxwriter_initialiseobservations(self, JediToOpsLayoutMapping % NumOpsObs, Ob)
 call opsinputs_cxwriter_initialisecx(self, Ob, Cx)
 call opsinputs_cxwriter_populatecx(self, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
-Retained = opsinputs_cxwriter_retainflag(NumObsLocal, ObsSpace, Flags, &
+Retained = opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping, ObsSpace, Flags, &
                                          self % RejectObsWithAnyVariableFailingQC, &
                                          self % RejectObsWithAllVariablesFailingQC)
-call opsinputs_mpl_allgather_integer([NumObsLocal], 1_gc_int_kind, mpl_integer, &
+call opsinputs_mpl_allgather_integer([JediToOpsLayoutMapping % NumOpsObs], 1_gc_int_kind, mpl_integer, &
                                      NumObsOnEachRank, 1_gc_int_kind, mpl_integer, &
                                      mpi_group, istat)
 call Ops_WriteOutVarCx(Ob, Cx, NumObsOnEachRank, UMheader % IntC(IC_Plevels), UMheader, Retained)
@@ -1267,26 +1277,28 @@ end subroutine opsinputs_cxwriter_populateumheader
 !> Return an array with elements corresponding to retained observations set to .true. and the
 !> remaining ones set to .false.
 function opsinputs_cxwriter_retainflag( &
-  NumObsLocal, ObsSpace, Flags, &
+  JediToOpsLayoutMapping, ObsSpace, Flags, &
   RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
 implicit none
 
 ! Function arguments:
-integer(integer64), intent(in) :: NumObsLocal
+
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 type(c_ptr), value, intent(in) :: ObsSpace
 type(c_ptr), value, intent(in) :: Flags
 logical                        :: RejectObsWithAnyVariableFailingQC
 logical                        :: RejectObsWithAllVariablesFailingQC
 
 ! Return value:
-logical(logical64)             :: opsinputs_cxwriter_retainflag(NumObsLocal)
+logical(logical64)             :: opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping % NumOpsObs)
 
 ! Local declarations:
-integer(integer64)             :: ReportFlags(NumObsLocal)
+integer(integer64)             :: ReportFlags(JediToOpsLayoutMapping % NumOpsObs)
 
 ! Body
 
-call opsinputs_utils_fillreportflags(ObsSpace, Flags, RejectObsWithAnyVariableFailingQC, &
+call opsinputs_utils_fillreportflags(JediToOpsLayoutMapping, ObsSpace, Flags, &
+                                     RejectObsWithAnyVariableFailingQC, &
                                      RejectObsWithAllVariablesFailingQC, ReportFlags)
 
 opsinputs_cxwriter_retainflag = .not. btest(ReportFlags, FinalRejectFlag)

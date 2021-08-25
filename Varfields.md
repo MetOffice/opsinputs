@@ -69,9 +69,9 @@
 | 78 | `VarField_Theta` | `theta(:,:)` | potential temperature (?) | `air_potential_temperature@ObsValue` (?) | |
 | 79 | `VarField_RadNoiseLvl` | | | | Implement |
 | 80 | `VarField_BiasPredictors` | | | | Implement |
-| 81 | `VarField_LevelTime` | | | | Implement |
-| 82 | `VarField_LevelLat` | | | | Implement |
-| 83 | `VarField_LevelLon` | | | | Implement |
+| 81 | `VarField_LevelTime` | `level_time(:,:)` | Time of observation averaged onto given model level | `datetime@MetaData` | |
+| 82 | `VarField_LevelLat` | `level_lat(:,:)` | Latitude of observation averaged onto given model level | `latitude@MetaData` | |
+| 83 | `VarField_LevelLon` | `level_lon(:,:)` | Longitude of observation averaged onto given model level | `longitude@MetaData` | |
 | 84 | `VarField_RainAccum` | | | | Implement |
 | 85 | `VarField_CloudRTError` | | | | Implement |
 | 86 | `VarField_CloudRTBias` | | | | Implement |

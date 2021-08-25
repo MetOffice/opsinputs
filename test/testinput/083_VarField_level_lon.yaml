@@ -5,19 +5,19 @@ observations:
   - obs space:
       name: Sonde
       obsdatain:
-        obsfile: Data/004_VarField_u_Sonde.nc4
+        obsfile: Data/078_VarField_theta.nc4
         obsgrouping:
           group variables: [ "station_id" ]
           sort variable: "air_pressure"
           sort order: "descending"
-      simulated variables: [eastward_wind]
+      simulated variables: [air_potential_temperature]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
       where:
       - variable:
-          name: eastward_wind@ObsErrorData
+          name: air_potential_temperature@ObsErrorData
         is_defined:
       action:
         name: inflate error
@@ -34,6 +34,7 @@ observations:
           name: station_id@MetaData
         is_in: [station_1, station_3, station_5]
     - filter: VarObs Writer
+      namelist_directory: testinput/VarObsWriterNamelists_083_VarField_level_lon
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
     - filter: VarObs Checker
@@ -41,20 +42,15 @@ observations:
         # Only records 2 and 4 are passed; the others are rejected by the
         # RejectList filter above.
         # In the arrays below, rows denote locations and columns levels.
-        field:    ["4", "4", "4",
-                   "4", "4", "4"]
+        field:    ["83", "83", "83",
+                   "83", "83", "83"]
         level:    ["1", "2", "3",
                    "1", "2", "3"]
         # Record 2 (first row) contains 3 levels, whereas record 4 (second row) contains only 2.
         # But in the VarObs file all observations need to have the same number of levels, so the
-        # observation corresponding to record 4 is padded with missing values. In addition, the
-        # input file contains a missing ObsValue at the first location from record 4 (this is
-        # "propagated" to the ObsError by the VarObs writer) and a missing ObsError at the first
-        # location from record 2.
-        ob value: ["0.21000",           "0.22000",           "0.23000",
-                   "-1073741824.00000", "0.42000", "-1073741824.00000" ]
-        ob error: ["-1073741824.00000", "0.04400",           "0.04600",
-                   "-1073741824.00000", "0.08400", "-1073741824.00000" ]
+        # observation corresponding to record 4 is padded with missing values.
+        ob value: ["21.00000", "22.00000", "23.00000",
+                   "41.00000", "42.00000", "-1073741824.00000" ]
         lat:      ["-21.00000", "-21.00000", "-21.00000",
                    "-41.00000", "-41.00000", "-41.00000" ]
         lon:      ["21.00000", "21.00000", "21.00000",

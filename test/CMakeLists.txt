@@ -212,6 +212,18 @@ ADD_WRITER_TEST(NAME     varobswriter_080_VarField_biaspredictors
                 YAML     080_VarField_biaspredictors.yaml
                 NAMELIST VarObsWriterNamelists_080_VarField_biaspredictors/ATMS.nl
                 DATA     080_VarField_biaspredictors.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_081_VarField_level_time
+                YAML     081_VarField_level_time.yaml
+                NAMELIST VarObsWriterNamelists_081_VarField_level_time/Sonde.nl
+                DATA     078_VarField_theta.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_082_VarField_level_lat
+                YAML     082_VarField_level_lat.yaml
+                NAMELIST VarObsWriterNamelists_082_VarField_level_lat/Sonde.nl
+                DATA     078_VarField_theta.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_083_VarField_level_lon
+                YAML     083_VarField_level_lon.yaml
+                NAMELIST VarObsWriterNamelists_083_VarField_level_lon/Sonde.nl
+                DATA     078_VarField_theta.nc4)
 
 # MPI tests
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_1

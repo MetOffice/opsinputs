@@ -32,6 +32,28 @@ extern "C" {
       const ioda::ObsSpace &obsspace, const char *group, const char *vname,
       const size_t &string_length, const size_t &num_strings, char *characters);
 
+  /// Order location indices first by record index and then the sorting variable defined for the
+  /// ObsSpace
+  ///
+  /// \param[in] obsspace
+  ///   The ObsSpace.
+  /// \param[in] num_locs_ordered
+  ///   Length of the `locs_ordered` array. Should be equal to `obsspace.nlocs()`.
+  /// \param[inout] locs_ordered
+  ///   An array that will be filled with ordered (1-based) location indices.
+  /// \param[in] num_record_starts
+  ///   Length of the `record_starts` array. Should be equal to `obsspace.nrecs() + 1`.
+  /// \param[inout] record_starts
+  ///   An array that will be filled with (1-based) indices of the elements of `locs_ordered`
+  ///   storing the first location of each record. The last element will be set to
+  ///   `num_locs_ordered + 1`.
+  void opsinputs_obsspace_get_locs_ordered_by_record_f(
+      const ioda::ObsSpace &obsspace,
+      const int32_t &num_locs_ordered,
+      int32_t *locs_ordered,
+      const int32_t &num_record_starts,
+      int32_t *record_starts);
+
 }
 
 }  // namespace opsinputs

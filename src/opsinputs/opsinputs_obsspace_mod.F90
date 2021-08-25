@@ -12,7 +12,8 @@ use string_f_c_mod, only: f_c_string
 implicit none
 
 public opsinputs_obsspace_get_db_datetime_offset_in_seconds, &
-       opsinputs_obsspace_get_db_string
+       opsinputs_obsspace_get_db_string, &
+       opsinputs_obsspace_get_locs_ordered_by_record
 private
 
 #include "opsinputs_obsspace_interface.f90"
@@ -65,5 +66,31 @@ subroutine opsinputs_obsspace_get_db_string(obss, group, vname, string_length, s
   call c_opsinputs_obsspace_get_db_string(obss, c_group, c_vname, &
                                           int(string_length, kind=c_size_t), num_strings, strings)
 end subroutine opsinputs_obsspace_get_db_string
+
+!> Order location indices first by record index and then the sorting variable defined for the
+!> ObsSpace
+!>
+!> \param[in] obsspace
+!>   The ObsSpace.
+!> \param[inout] LocationsOrderedByRecord
+!>   A vector with `obss.nlocs()` elements that will be filled with ordered (1-based)
+!>   location indices.
+!> \param[inout] RecordStarts
+!>   A vector with `obss.nrecs() + 1` elements that will be filled with (1-based) indices of the
+!>   elements of `LocationsOrderedByRecord` storing the first location of each record.
+subroutine opsinputs_obsspace_get_locs_ordered_by_record(obss,  &
+                                                         LocationsOrderedByRecord, RecordStarts)
+  use, intrinsic :: iso_c_binding
+  implicit none
+  type(c_ptr), value, intent(in) :: obss
+  integer(c_int32_t), intent(inout) :: LocationsOrderedByRecord(:)
+  integer(c_int32_t), intent(inout) :: RecordStarts(:)
+
+  call c_opsinputs_obsspace_get_locs_ordered_by_record(obss, &
+    size(LocationsOrderedByRecord), &
+    LocationsOrderedByRecord, &
+    size(RecordStarts), &
+    RecordStarts)
+end subroutine opsinputs_obsspace_get_locs_ordered_by_record
 
 end module opsinputs_obsspace_mod

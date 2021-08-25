@@ -6,12 +6,19 @@ observations:
       name: Sonde
       obsdatain:
         obsfile: Data/003_VarField_rh_Sonde.nc4
+        obsgrouping:
+          group variables: [ "station_id" ]
+          sort variable: "air_pressure"
+          sort order: "descending"
       simulated variables: [relative_humidity]
-      channels: 1, 3
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
+      where:
+      - variable:
+          name: relative_humidity@ObsErrorData
+        is_defined:
       action:
         name: inflate error
         inflation factor: 2.0
@@ -19,44 +26,43 @@ observations:
     # values are encoded correctly in the VarObsFile.
     - filter: Reset Flags to Pass
       flags_to_reset: [10, 15]  # missing, Hfailed
-    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
-    - filter: Domain Check
+    # Reject records 1, 3 and 5: we want to check if they're omitted from the VarObs file,
+    # as expected.
+    - filter: RejectList
       where:
       - variable:
-          name: latitude@MetaData
-        minvalue: 0.0
+          name: station_id@MetaData
+        is_in: [station_1, station_3, station_5]
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
     - filter: VarObs Checker
       expected_main_table_columns:
-        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check.
-        # Only levels 1 and 3 are simulated and hence written to the VarObs file.
+        # Only records 2 and 4 are passed; the others are rejected by the
+        # RejectList filter above.
         # In the arrays below, rows denote locations and columns levels.
-        field:    ["3", "3",
-                   "3", "3",
-                   "3", "3"]
-        level:    ["1", "2",
-                   "1", "2",
-                   "1", "2"]
-        ob value: ["1.10000", "3.10000",
-                   "-1073741824.00000", "3.20000",
-                   "1.40000", "3.40000"]
-        ob error: ["0.20000", "4.20000",
-                   "-1073741824.00000", "4.40000",
-                   "0.80000", "4.80000"]
-        lat:      ["21.00000", "21.00000",
-                   "22.00000", "22.00000",
-                   "24.00000", "24.00000"]
-        lon:      ["31.00000", "31.00000",
-                   "32.00000", "32.00000",
-                   "34.00000", "34.00000"]
-        time:     ["-1740.00000", "-1740.00000",
-                   "-1680.00000", "-1680.00000",
-                   "-1560.00000", "-1560.00000"]
-        Callsign: ["station_1", "station_1",
-                   "station_2", "station_2",
-                   "station_4", "station_4"]
+        field:    ["3", "3", "3",
+                   "3", "3", "3"]
+        level:    ["1", "2", "3",
+                   "1", "2", "3"]
+        # Record 2 (first row) contains 3 levels, whereas record 4 (second row) contains only 2.
+        # But in the VarObs file all observations need to have the same number of levels, so the
+        # observation corresponding to record 4 is padded with missing values. In addition, the
+        # input file contains a missing ObsValue at the first location from record 4 (this is
+        # "propagated" to the ObsError by the VarObs writer) and a missing ObsError at the first
+        # location from record 2.
+        ob value: ["0.21000",           "0.22000",           "0.23000",
+                   "-1073741824.00000", "0.42000", "-1073741824.00000" ]
+        ob error: ["-1073741824.00000", "0.04400",           "0.04600",
+                   "-1073741824.00000", "0.08400", "-1073741824.00000" ]
+        lat:      ["-21.00000", "-21.00000", "-21.00000",
+                   "-41.00000", "-41.00000", "-41.00000" ]
+        lon:      ["21.00000", "21.00000", "21.00000",
+                   "41.00000", "41.00000", "41.00000"]
+        time:     ["-1679.00000", "-1679.00000", "-1679.00000",
+                   "-1559.00000", "-1559.00000", "-1559.00000"]
+        Callsign: ["station_2", "station_2", "station_2",
+                   "station_4", "station_4", "station_4"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
