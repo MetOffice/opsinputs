@@ -88,7 +88,6 @@ endforeach()
 ################################################################################
 
 include( opsinputs_compiler_flags )
-include_directories( ${OPSINPUTS_INCLUDE_DIRS} ${OPSINPUTS_EXTRA_INCLUDE_DIRS} )
 
 add_subdirectory( deps )
 add_subdirectory( src )

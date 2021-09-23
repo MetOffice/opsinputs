@@ -57,3 +57,15 @@ ecbuild_add_library( TARGET   opsinputs
                      LINKER_LANGUAGE ${OPSINPUTS_LINKER_LANGUAGE}
                      PRIVATE_INCLUDES ${OPS_INCLUDE_DIR} )
 target_link_libraries( opsinputs PUBLIC ufo ioda oops PRIVATE ops )
+
+## Include paths
+target_include_directories(opsinputs PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+                                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+## Fortran modules
+set(MODULE_DIR ${PROJECT_NAME}/module)
+set_target_properties(${PROJECT_NAME} PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/${MODULE_DIR})
+install(DIRECTORY ${CMAKE_BINARY_DIR}/${MODULE_DIR}/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/${MODULE_DIR})
+target_include_directories(${PROJECT_NAME} INTERFACE
+                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${MODULE_DIR}>
+                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/${MODULE_DIR}>)
