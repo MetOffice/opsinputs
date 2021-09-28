@@ -11,17 +11,17 @@
 #include "../opsinputs/ResetFlagsToPass.h"
 #include "../opsinputs/VarObsChecker.h"
 #include "oops/interface/ObsFilterBase.h"
+#include "ufo/ObsTraits.h"
 
 namespace opsinputs {
 namespace test {
 
-template<typename OBS>
-void instantiateObsFilterFactory() {
-  static oops::interface::FilterMaker<OBS, VarObsChecker>
+inline void instantiateObsFilterFactory() {
+  static oops::interface::FilterMaker<ufo::ObsTraits, VarObsChecker>
     varObsCheckerMaker("VarObs Checker");
-  static oops::interface::FilterMaker<OBS, CxChecker>
+  static oops::interface::FilterMaker<ufo::ObsTraits, CxChecker>
     cxCheckerMaker("Cx Checker");
-  static oops::interface::FilterMaker<OBS, ResetFlagsToPass>
+  static oops::interface::FilterMaker<ufo::ObsTraits, ResetFlagsToPass>
     resetFlagsToPassMaker("Reset Flags to Pass");
 }
 
