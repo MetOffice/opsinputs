@@ -22,6 +22,7 @@ list( APPEND opsinputs_src_files
     CxWriter.interface.F90
     CxWriterParameters.h
     opsinputs_mpl_mod.F90
+    instantiateObsFilterFactory.cc
     instantiateObsFilterFactory.h
     LocalEnvironment.cc
     LocalEnvironment.h
