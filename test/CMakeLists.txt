@@ -94,7 +94,8 @@ get_target_property( OPSPROG_BIN_DIR OpsProg_PrintVarobs RUNTIME_OUTPUT_DIRECTOR
 configure_file( opsprog_runner.sh.in ${OPSINPUTS_OPSPROG_RUNNER} @ONLY )
 
 ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
-                        SOURCES opsinputs/instantiateObsFilterFactory.h
+                        SOURCES opsinputs/instantiateObsFilterFactory.cc
+                                opsinputs/instantiateObsFilterFactory.h
                                 opsinputs/CheckerUtils.cc
                                 opsinputs/CheckerUtils.h
                                 opsinputs/CxChecker.cc
