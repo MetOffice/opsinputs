@@ -49,12 +49,14 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
   if (auto parallelComm = dynamic_cast<const eckit::mpi::Parallel*>(&obsdb.comm())) {
     mpiComm = parallelComm->MPIComm();
   }
+  const MPI_Fint fortranMpiComm = MPI_Comm_c2f(mpiComm);
 
   // We need to pass the list of channels in a separate parameter because the Fortran interface to
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
   const std::vector<int> &channels = obsdb_.obsvariables().channels();
-  if (!opsinputs_varobswriter_create_f90(key_, &conf, mpiComm, channels.size(), channels.data(),
+  if (!opsinputs_varobswriter_create_f90(key_, &conf, fortranMpiComm,
+                                         channels.size(), channels.data(),
                                          geovars_, extradiagvars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
