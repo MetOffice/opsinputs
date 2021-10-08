@@ -1,5 +1,21 @@
 #!/bin/bash
 #
-# Run an OPS utility from the appropriate directory.
+# Run an OPS utility from the appropriate directory
+# and output its exit code to a file.
+
 export PATH=@OPSPROG_BIN_DIR@:$PATH
+
+# Determine where to output the exit code
+EXIT_CODE_FILE=$1
+# Remove the first command-line argument from the $@ list
+shift
+# Pass the remaining arguments to the OPS utility
 $@
+# Retrieve its exit code
+EXIT_CODE=$?
+
+# Output the exit code
+echo $EXIT_CODE > "$EXIT_CODE_FILE.tmp"
+# We hope renaming a file is an atomic operation
+mv "$EXIT_CODE_FILE.tmp" "$EXIT_CODE_FILE"
+
