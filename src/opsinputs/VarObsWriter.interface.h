@@ -31,6 +31,7 @@ typedef int F90check;
 
 extern "C" {
   int opsinputs_varobswriter_create_f90(F90check &, const eckit::Configuration *,
+                                        const bool &commIsValid,
                                         const MPI_Fint &comm,
                                         const int &nchannels,
                                         const int *channels,
