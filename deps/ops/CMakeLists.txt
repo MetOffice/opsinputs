@@ -104,6 +104,13 @@ foreach (file ${OPS_SOURCE_FILES})
 endforeach()
 list(REMOVE_DUPLICATES OPS_SOURCE_DIRS)
 
+# Find extra dependencies
+
+find_package(SHUM REQUIRED)
+
+
+# Setup the parallel version of the ops library
+
 ecbuild_add_library(TARGET ops
   SOURCES ${OPS_SOURCE_FILES})
 
@@ -127,8 +134,6 @@ if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   )
 endif()
 
-find_package(SHUM REQUIRED)
-
 target_link_libraries(ops
   PUBLIC
   gcom
@@ -147,6 +152,56 @@ target_include_directories(ops
   INTERFACE $<BUILD_INTERFACE:${OPS_Fortran_MODULE_DIRECTORY}>
 )
 
+
+# Setup the serial version of the ops library, linked to gcom_serial
+
+ecbuild_add_library(TARGET ops_serial
+  SOURCES ${OPS_SOURCE_FILES})
+
+target_compile_definitions(ops_serial PRIVATE
+  EXTERNAL_GCOM
+  FORTRAN_VERSION=2003
+  FDBK_OUT
+  LITTLE_END
+  UNDERSCORE
+  LOWERCASE
+  C_LOW_U
+  C_LONG_LONG_INT
+  FRL8
+  _FILE_OFFSET_BITS=64 LFS
+  _LARGEFILE_SOURCE
+)
+
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+  target_compile_definitions(ops_serial PRIVATE
+    IFORT_ALLOCATABLE_CHARACTER_BUG
+  )
+endif()
+
+target_link_libraries(ops_serial
+  PUBLIC
+  gcom_serial
+  odb
+  ${SHUM_BYTESWAP_LIBRARY}
+  ${SHUM_STRING_CONV_LIBRARY}
+  ${SHUM_WGDOS_PACKING_LIBRARY}
+  NetCDF::NetCDF_Fortran
+)
+
+get_target_property(OPS_SERIAL_Fortran_MODULE_DIRECTORY ops_serial Fortran_MODULE_DIRECTORY)
+set(OPS_SERIAL_Fortran_MODULE_DIRECTORY ${OPS_SERIAL_Fortran_MODULE_DIRECTORY}/serial)
+set_target_properties(ops_serial PROPERTIES
+                      Fortran_MODULE_DIRECTORY ${OPS_SERIAL_Fortran_MODULE_DIRECTORY})
+
+target_include_directories(ops_serial
+  PRIVATE ${SHUM_INCLUDE_DIR}
+  PRIVATE ${OPS_SOURCE_DIRS}
+  INTERFACE $<BUILD_INTERFACE:${OPS_SERIAL_Fortran_MODULE_DIRECTORY}>
+)
+
+
+# Setup executable targets
+
 set(CMAKE_EXECUTABLE_SUFFIX .exe)
 
 ecbuild_add_executable(TARGET OpsProg_PrintCXFile
@@ -154,11 +209,11 @@ ecbuild_add_executable(TARGET OpsProg_PrintCXFile
   code/OpsProg_Utils/OpsMod_PrintCX.f90
   code/OpsProg_Utils/OpsProg_PrintCXFile.F90)
 target_link_libraries(OpsProg_PrintCXFile
-  PRIVATE ops)
+  PRIVATE ops_serial)
 
 ecbuild_add_executable(TARGET OpsProg_PrintVarobs
   SOURCES
   code/OpsProg_Utils/OpsMod_PrintVarobs.f90
   code/OpsProg_Utils/OpsProg_PrintVarobs.F90)
 target_link_libraries(OpsProg_PrintVarobs
-  PRIVATE ops)
+  PRIVATE ops_serial)
