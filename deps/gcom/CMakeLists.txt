@@ -152,8 +152,12 @@ set(GCOM_SOURCE_FILES
   mpl/mpl_isend.F90
   mpl/mpl_issend.F90
   mpl/mpl_op_create.F90
-  mpl/mpl_pack.F90
-  mpl/mpl_pack_size.F90
+  # These files are excluded, since they are unused and warnings are emitted during
+  # their compilation with ifort, which prevents us from enabling the "treat warnings
+  # as errors" mode.
+  # mpl/mpl_pack.F90
+  # mpl/mpl_pack_size.F90
+  # mpl/mpl_unpack.F90
   mpl/mpl_probe.F90
   mpl/mpl_put.F90
   mpl/mpl_query_thread.F90
@@ -175,7 +179,6 @@ set(GCOM_SOURCE_FILES
   mpl/mpl_type_get_extent.F90
   mpl/mpl_type_struct.F90
   mpl/mpl_type_vector.F90
-  mpl/mpl_unpack.F90
   mpl/mpl_wait.F90
   mpl/mpl_waitall.F90
   mpl/mpl_waitany.F90
