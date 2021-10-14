@@ -1,7 +1,7 @@
 /*
  * (C) Crown Copyright 2020, the Met Office. All rights reserved.
  *
- * Refer to COPYRIGHT.txt of this distribution for details. 
+ * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #include "opsinputs/VarObsWriter.h"
@@ -54,10 +54,13 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
   const std::vector<int> &channels = obsdb_.obsvariables().channels();
+  const int fallbackChannels = 0;
+  // Avoid passing a null pointer to Fortran.
+  const int *channelsData = channels.empty() ? &fallbackChannels : channels.data();
   if (!opsinputs_varobswriter_create_f90(key_, &conf,
                                          fortranMpiCommunicatorIsValid,
                                          fortranMpiCommunicator,
-                                         channels.size(), channels.data(),
+                                         channels.size(), channelsData,
                                          geovars_, extradiagvars_))
     throw std::runtime_error("VarObsWriter construction failed. "
                              "See earlier messages for more details");
