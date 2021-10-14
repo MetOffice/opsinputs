@@ -7,6 +7,7 @@ module opsinputs_cxwriter_mod_c
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding, only: &
+  c_double,                            &
   c_bool,                              &
   c_int,                               &
   c_ptr
@@ -98,18 +99,26 @@ end subroutine opsinputs_cxwriter_prior_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_flags) &
+subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_flags, &
+                                     c_nvars, c_nlocs, c_varnames, c_hofx) &
   bind(c,name='opsinputs_cxwriter_post_f90')
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
 type(c_ptr), value, intent(in) :: c_flags
+integer(c_int), intent(in) :: c_nvars, c_nlocs
+type(c_ptr) :: c_varnames
+real(c_double), intent(in) :: c_hofx(c_nvars, c_nlocs)
 
 type(opsinputs_cxwriter), pointer :: self
+type(oops_variables) :: f_varnames
 
 call opsinputs_cxwriter_registry%get(c_self, self)
 
-call opsinputs_cxwriter_post(self, c_obspace, c_flags)
+f_varnames = oops_variables(c_varnames)
+
+call opsinputs_cxwriter_post(self, c_obspace, c_flags, &
+                             c_nvars, c_nlocs, f_varnames, c_hofx)
 
 end subroutine opsinputs_cxwriter_post_c
 

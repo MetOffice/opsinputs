@@ -27,7 +27,8 @@ use oops_variables_mod, only: oops_variables
 use opsinputs_cxfields_mod
 use opsinputs_fill_mod, only:            &
     opsinputs_fill_fillrealfromgeoval,   &
-    opsinputs_fill_fillreal2dfromgeoval
+    opsinputs_fill_fillreal2dfromgeoval, &
+    opsinputs_fill_fillreal2dfromhofx
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
 use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_seconds
 use opsinputs_utils_mod, only: &
@@ -111,7 +112,8 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupGroundLidar,       &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
-    ObsGroupScatwind
+    ObsGroupScatwind,          &
+    ObsGroupSonde
 use OpsMod_ObsInfo, only: &
     FinalRejectFlag,      &
     OB_type,              &
@@ -464,13 +466,16 @@ end subroutine opsinputs_cxwriter_prior
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
-subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags)
+subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags, nvars, nlocs, varnames, hofx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)   :: self
 type(c_ptr), value, intent(in)         :: ObsSpace
 type(c_ptr), value, intent(in)         :: Flags
+integer,            intent(in)         :: nvars, nlocs
+type(oops_variables), intent(in)       :: varnames
+real(c_double),     intent(in)         :: hofx(nvars, nlocs)
 
 ! Local declarations:
 logical                                :: ConvertRecordsToMultilevelObs
@@ -478,13 +483,16 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
 
-! TODO(wsmigaj): Set this variable to true for radiosondes when we have a better idea of where to
-! take slanted model columns from.
-ConvertRecordsToMultilevelObs = .false.
+! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
+! it should be treated as a single (multi-level) ob in the OPS data structures.
+! There may be other obs groups requiring similar treatment -- if so, edit the line below.
+ConvertRecordsToMultilevelObs = (self % ObsGroup == ObsGroupSonde)
 
 JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
   ObsSpace, ConvertRecordsToMultilevelObs)
-call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
+call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ConvertRecordsToMultilevelObs, &
+                                      ObsSpace, Flags, &
+                                      nvars, nlocs, varnames, hofx)
 
 end subroutine opsinputs_cxwriter_post
 
@@ -494,7 +502,9 @@ end subroutine opsinputs_cxwriter_post
 !>
 !> This code has been extracted to a separate subroutine to make it possible to declare Retained as
 !> an automatic array (since the number of observations is now known).
-subroutine opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
+subroutine opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ConvertRecordsToMultilevelObs, &
+                                            ObsSpace, Flags, &
+                                            nvars, nlocs, varnames, hofx)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
@@ -502,8 +512,12 @@ implicit none
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)               :: self
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+logical, intent(in)                                :: ConvertRecordsToMultilevelObs
 type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
+integer,            intent(in)                     :: nvars, nlocs
+type(oops_variables), intent(in)                   :: varnames
+real(c_double),     intent(in)                     :: hofx(nvars, nlocs)
 
 ! Local declarations:
 type(OB_type)                                      :: Ob
@@ -517,7 +531,7 @@ integer(kind=gc_int_kind)                          :: istat
 
 call opsinputs_cxwriter_initialiseobservations(self, JediToOpsLayoutMapping % NumOpsObs, Ob)
 call opsinputs_cxwriter_initialisecx(self, Ob, Cx)
-call opsinputs_cxwriter_populatecx(self, Cx)
+call opsinputs_cxwriter_populatecx(self, JediToOpsLayoutMapping, ConvertRecordsToMultilevelObs, nvars, nlocs, varnames, hofx, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
 Retained = opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping, ObsSpace, Flags, &
@@ -814,11 +828,17 @@ end subroutine opsinputs_cxwriter_initialisecx
 ! ------------------------------------------------------------------------------
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
-subroutine opsinputs_cxwriter_populatecx(self, Cx)
+subroutine opsinputs_cxwriter_populatecx(self, JediToOpsLayoutMapping, ConvertRecordsToMultilevelObs, &
+     nvars, nlocs, varnames, hofx, Cx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)    :: self
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+logical, intent(in)                     :: ConvertRecordsToMultilevelObs
+integer, intent(in)                     :: nvars, nlocs
+real(c_double), intent(in)              :: hofx(nvars, nlocs)
+type(oops_variables), intent(in)        :: varnames
 type(CX_type), intent(inout)            :: Cx
 
 ! Local declarations:
@@ -829,6 +849,9 @@ integer(integer64)                      :: CxFields(MaxModelCodes), CxField
 integer                                 :: iCxField
 integer                                 :: DustBinIndex
 character                               :: DustBinIndexStr
+
+integer :: irh, ivar
+
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
@@ -1030,9 +1053,27 @@ do iCxField = 1, size(CxFields)
         Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
         self % GeoVals, opsinputs_cxfields_theta)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
-        self % GeoVals, opsinputs_cxfields_rh)
+      ! index of relative_humidity in hofx
+      irh = 0
+      do ivar = 1, nvars
+         if (varnames % variable(ivar) == "relative_humidity") then
+            irh = ivar
+         end if
+      end do
+
+      if (ConvertRecordsToMultiLevelObs) then
+         if (irh > 0) then
+            call opsinputs_fill_fillreal2dfromhofx( &
+                 Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
+                 JediToOpsLayoutMapping, nlocs, hofx(irh,:))
+         else
+            ! something bad happens if the variable was not simulated
+         end if
+      else
+         call opsinputs_fill_fillreal2dfromgeoval( &
+              Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
+              self % GeoVals, opsinputs_cxfields_rh)
+      end if
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
