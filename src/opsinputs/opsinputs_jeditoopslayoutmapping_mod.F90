@@ -67,7 +67,7 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 integer                                :: nlocs, nrecs, i
 integer(c_int32_t), allocatable        :: LocationsOrderedByRecord_all(:)
 integer(c_int32_t), allocatable        :: RecordStarts_all(:)
-integer                                :: nlocs_all, nrecs_all
+integer                                :: nlocs_all, nlocs_orig, nrecs_all
 
 ! Body:
 
@@ -86,17 +86,20 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
 
   ! Fill JediToOpsLayoutMapping with values with averaged profile information only.
 
+  ! The second half of the ObsSpace contains the averaged profiles.
   nrecs = nrecs_all / 2
   nlocs = RecordStarts_all(nrecs_all + 1) - RecordStarts_all(nrecs + 1)
+  nlocs_orig = nlocs_all - nlocs
   allocate(JediToOpsLayoutMapping % LocationsOrderedByRecord(nlocs))
   allocate(JediToOpsLayoutMapping % RecordStarts(nrecs + 1))
 
+  JediToOpsLayoutMapping % NumJediObs = nlocs_all
   JediToOpsLayoutMapping % NumOpsObs = nrecs
   JediToOpsLayoutMapping % LocationsOrderedByRecord(:) = &
-       LocationsOrderedByRecord_all(nlocs_all - nlocs + 1:nlocs_all)
+       LocationsOrderedByRecord_all(nlocs_orig + 1:nlocs_all)
   do i = 1, nrecs + 1
      JediToOpsLayoutMapping % RecordStarts(i) = &
-          RecordStarts_all(i + nrecs) - (nlocs_all - nlocs)
+          RecordStarts_all(i + nrecs) - nlocs_orig
   end do
   JediToOpsLayoutMapping % MaxNumLevelsPerObs = 0
   do i = 1, nrecs
