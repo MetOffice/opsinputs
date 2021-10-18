@@ -51,7 +51,7 @@ type(c_ptr), value, intent(in) :: c_conf
 ! If c_comm_is_valid, c_comm is the MPI communicator to be used by OPS.
 ! Otherwise OPS should use MPI_COMM_WORLD.
 logical(c_bool), intent(in)    :: c_comm_is_valid
-integer, intent(in)            :: c_comm
+integer(c_int), intent(in)     :: c_comm
 integer(c_int), intent(in)     :: c_nchannels
 integer(c_int), intent(in)     :: c_channels(c_nchannels)
 type(c_ptr), intent(in), value :: c_varlist ! list of geovals variables to be requested

@@ -196,9 +196,9 @@ type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf   ! Configuration
 ! If comm_is_valid, c_comm is the MPI communicator encompassing the processes holding the
 ! data to be written to VarObs. Otherwise assume that communicator to be MPI_COMM_WORLD.
-logical(c_bool)                            :: comm_is_valid
-integer(gc_int_kind)                       :: comm
-integer(c_int)                             :: channels(:)
+logical(c_bool), intent(in)                :: comm_is_valid
+integer(gc_int_kind), intent(in)           :: comm
+integer(c_int), intent(in)                 :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
 type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
