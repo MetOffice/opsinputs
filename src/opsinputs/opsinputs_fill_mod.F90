@@ -1102,13 +1102,13 @@ subroutine opsinputs_fill_fillreal2dfromhofx( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real2(:,:)
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+integer(integer64), intent(in)                     :: NumObs
+real(real64), pointer                              :: Real2(:,:)
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-integer, intent(in) :: nlocs
-real(c_double) :: hofx(nlocs)
+integer, intent(in)                                :: nlocs
+real(c_double)                                     :: hofx(nlocs)
 
 ! Local declarations:
 real(kind_real)                                 :: MissingReal
@@ -1123,6 +1123,7 @@ call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(JediToOpsLayoutM
 do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
    do iLevel = 1, numLevels
+      ! Location of current observation in the ObsSpace.
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
            JediToOpsLayoutMapping % RecordStarts(iObs) - 1 + iLevel)
       if (hofx(iJediObs) /= MissingReal) then

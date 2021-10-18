@@ -470,12 +470,12 @@ subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags, nvars, nlocs, varnames
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)   :: self
-type(c_ptr), value, intent(in)         :: ObsSpace
-type(c_ptr), value, intent(in)         :: Flags
-integer,            intent(in)         :: nvars, nlocs
-type(oops_variables), intent(in)       :: varnames
-real(c_double),     intent(in)         :: hofx(nvars, nlocs)
+type(opsinputs_cxwriter), intent(in) :: self
+type(c_ptr), value, intent(in)       :: ObsSpace
+type(c_ptr), value, intent(in)       :: Flags
+integer, intent(in)                  :: nvars, nlocs
+type(oops_variables), intent(in)     :: varnames
+real(c_double),     intent(in)       :: hofx(nvars, nlocs)
 
 ! Local declarations:
 logical                                :: ConvertRecordsToMultilevelObs
@@ -515,7 +515,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 logical, intent(in)                                :: ConvertRecordsToMultilevelObs
 type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
-integer,            intent(in)                     :: nvars, nlocs
+integer, intent(in)                                :: nvars, nlocs
 type(oops_variables), intent(in)                   :: varnames
 real(c_double),     intent(in)                     :: hofx(nvars, nlocs)
 
@@ -833,13 +833,13 @@ subroutine opsinputs_cxwriter_populatecx(self, JediToOpsLayoutMapping, ConvertRe
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)    :: self
+type(opsinputs_cxwriter), intent(in)               :: self
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-logical, intent(in)                     :: ConvertRecordsToMultilevelObs
-integer, intent(in)                     :: nvars, nlocs
-real(c_double), intent(in)              :: hofx(nvars, nlocs)
-type(oops_variables), intent(in)        :: varnames
-type(CX_type), intent(inout)            :: Cx
+logical, intent(in)                                :: ConvertRecordsToMultilevelObs
+integer, intent(in)                                :: nvars, nlocs
+real(c_double), intent(in)                         :: hofx(nvars, nlocs)
+type(oops_variables), intent(in)                   :: varnames
+type(CX_type), intent(inout)                       :: Cx
 
 ! Local declarations:
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_populatecx"
@@ -849,8 +849,7 @@ integer(integer64)                      :: CxFields(MaxModelCodes), CxField
 integer                                 :: iCxField
 integer                                 :: DustBinIndex
 character                               :: DustBinIndexStr
-
-integer :: irh, ivar
+integer                                 :: irh, ivar
 
 
 ! Body:
@@ -1053,7 +1052,7 @@ do iCxField = 1, size(CxFields)
         Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
         self % GeoVals, opsinputs_cxfields_theta)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
-      ! index of relative_humidity in hofx
+      ! Index of relative_humidity in hofx array.
       irh = 0
       do ivar = 1, nvars
          if (varnames % variable(ivar) == "relative_humidity") then

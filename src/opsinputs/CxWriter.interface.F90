@@ -103,18 +103,19 @@ subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_flags, &
                                      c_nvars, c_nlocs, c_varnames, c_hofx) &
   bind(c,name='opsinputs_cxwriter_post_f90')
 implicit none
-integer(c_int), intent(in) :: c_self
+integer(c_int), intent(in)     :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
 type(c_ptr), value, intent(in) :: c_flags
-integer(c_int), intent(in) :: c_nvars, c_nlocs
-type(c_ptr), intent(in), value :: c_varnames
-real(c_double), intent(in) :: c_hofx(c_nvars, c_nlocs)
+integer(c_int), intent(in)     :: c_nvars, c_nlocs
+type(c_ptr), value, intent(in) :: c_varnames
+real(c_double), intent(in)     :: c_hofx(c_nvars, c_nlocs)
 
 type(opsinputs_cxwriter), pointer :: self
 type(oops_variables) :: f_varnames
 
 call opsinputs_cxwriter_registry%get(c_self, self)
 
+! Obtain simulated variable names.
 f_varnames = oops_variables(c_varnames)
 
 call opsinputs_cxwriter_post(self, c_obspace, c_flags, &
