@@ -107,7 +107,7 @@ integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
 type(c_ptr), value, intent(in) :: c_flags
 integer(c_int), intent(in) :: c_nvars, c_nlocs
-type(c_ptr) :: c_varnames
+type(c_ptr), intent(in), value :: c_varnames
 real(c_double), intent(in) :: c_hofx(c_nvars, c_nlocs)
 
 type(opsinputs_cxwriter), pointer :: self
