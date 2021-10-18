@@ -9,6 +9,7 @@ module opsinputs_varobswriter_mod
 
 use fckit_configuration_module, only: fckit_configuration
 use, intrinsic :: iso_c_binding, only: &
+    c_bool,                            &
     c_double,                          &
     c_float,                           &
     c_int,                             &
@@ -187,15 +188,17 @@ contains
 ! ------------------------------------------------------------------------------
 
 !> Set up an instance of opsinputs_varobswriter. Returns .true. on success and .false. on failure.
-function opsinputs_varobswriter_create(self, f_conf, comm, channels, geovars, diagvars)
+function opsinputs_varobswriter_create(self, f_conf, comm_is_valid, comm, channels, geovars, diagvars)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(inout) :: self
 type(fckit_configuration), intent(in)      :: f_conf   ! Configuration
-integer(gc_int_kind)                       :: comm     ! MPI communicator standing for the processes
-                                                       ! holding the data to be written to VarObs
-integer(c_int)                             :: channels(:)
+! If comm_is_valid, c_comm is the MPI communicator encompassing the processes holding the
+! data to be written to VarObs. Otherwise assume that communicator to be MPI_COMM_WORLD.
+logical(c_bool), intent(in)                :: comm_is_valid
+integer(gc_int_kind), intent(in)           :: comm
+integer(c_int), intent(in)                 :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
 type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
@@ -240,7 +243,7 @@ case default
   return
 end select
 
-if (comm /= mpl_comm_world) then
+if (comm_is_valid .and. comm /= mpl_comm_world) then
   call gc_init_final(mype, nproc, comm)
 end if
 call Gen_SetupControl(DefaultDocURL)

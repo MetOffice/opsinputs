@@ -7,6 +7,8 @@
 #ifndef OPSINPUTS_VAROBSWRITER_INTERFACE_H_
 #define OPSINPUTS_VAROBSWRITER_INTERFACE_H_
 
+#include <mpi.h>
+
 #include "ioda/ObsSpace.h"
 #include "oops/base/Variables.h"
 #include "ufo/Fortran.h"
@@ -29,7 +31,8 @@ typedef int F90check;
 
 extern "C" {
   int opsinputs_varobswriter_create_f90(F90check &, const eckit::Configuration *,
-                                        const size_t &comm,
+                                        const bool &commIsValid,
+                                        const MPI_Fint &comm,
                                         const int &nchannels,
                                         const int *channels,
                                         oops::Variables &, oops::Variables &);
