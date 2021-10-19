@@ -37,7 +37,7 @@ extern "C" {
                                    const ioda::ObsSpace &obsSpace,
                                    const ioda::ObsDataVector<int> &flags,
                                    const int &nvars, const int &nlocs,
-                                   const oops::Variables &varnames, const double &hofx);
+                                   const oops::Variables &varnames, const double *hofx);
 }  // extern C
 
 }  // namespace opsinputs

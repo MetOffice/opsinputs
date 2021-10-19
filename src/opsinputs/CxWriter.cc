@@ -74,7 +74,7 @@ void CxWriter::postFilter(const ioda::ObsVector &hofx,
   setupEnvironment(localEnvironment);
 
   opsinputs_cxwriter_post_f90(key_, obsdb_, *flags_,
-                              hofx.nvars(), hofx.nlocs(), hofx.varnames(), hofx.toFortran());
+                              hofx.nvars(), hofx.nlocs(), hofx.varnames(), &hofx.toFortran());
 }
 
 void CxWriter::print(std::ostream & os) const {
