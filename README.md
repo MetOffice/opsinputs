@@ -33,7 +33,7 @@ Building
 
 3. Run the following commands to set up your build environment:
 
-       module use /data/users/wsmigaj/Projects/JediModules/modulefiles
+       module use /home/h03/jopa/modulefiles
        module load jedi/ufo-bundle-dev-stack
 
    (Alternatively, load jedi/ufo-bundle-dev-stack/intel if you want to use the Intel compiler or jedi/ufo-bundle-dev-stack/gnu/7.2.0 to use the GNU 7.2.0 compiler suite.)
