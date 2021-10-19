@@ -1108,7 +1108,7 @@ integer(integer64), intent(in)                     :: NumObs
 real(real64), pointer                              :: Real2(:,:)
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 integer, intent(in)                                :: nlocs
-real(c_double)                                     :: hofx(nlocs)
+real(c_double), intent(in)                         :: hofx(nlocs)
 
 ! Local declarations:
 real(kind_real)                                 :: MissingReal
@@ -1116,7 +1116,7 @@ integer                                         :: iObs, iLevel, iJediObs, numLe
 
 ! Body:
 
-MissingReal = missing_value(0.0_c_float)
+MissingReal = missing_value(0.0_c_double)
 
 ! Fill the OPS data structures
 call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = 8))
