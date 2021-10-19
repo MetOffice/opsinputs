@@ -65,42 +65,23 @@ logical, intent(in)                    :: ConvertRecordsToMultilevelObs
 ! Local declarations:
 type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 integer                                :: nlocs, nrecs, i
-integer(c_int32_t), allocatable        :: LocationsOrderedByRecord_all(:)
-integer(c_int32_t), allocatable        :: RecordStarts_all(:)
-integer                                :: nlocs_all, nlocs_orig, nrecs_all
 
 ! Body:
 
 JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs = ConvertRecordsToMultilevelObs
 
+nlocs = obsspace_get_nlocs(ObsSpace)
+JediToOpsLayoutMapping % NumJediObs = nlocs
+
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
-
-  ! Obtain location and record information for the entire ObsSpace.
-
-  nlocs_all = obsspace_get_nlocs(ObsSpace)
-  nrecs_all = obsspace_get_nrecs(ObsSpace)
-  allocate(LocationsOrderedByRecord_all(nlocs_all))
-  allocate(RecordStarts_all(nrecs_all + 1))
-  call opsinputs_obsspace_get_locs_ordered_by_record( &
-       ObsSpace, LocationsOrderedByRecord_all, RecordStarts_all)
-
-  ! Fill JediToOpsLayoutMapping with values with averaged profile information only.
-
-  ! The second half of the ObsSpace contains the averaged profiles.
-  nrecs = nrecs_all / 2
-  nlocs = RecordStarts_all(nrecs_all + 1) - RecordStarts_all(nrecs + 1)
-  nlocs_orig = nlocs_all - nlocs
+  nrecs = obsspace_get_nrecs(ObsSpace)
   allocate(JediToOpsLayoutMapping % LocationsOrderedByRecord(nlocs))
   allocate(JediToOpsLayoutMapping % RecordStarts(nrecs + 1))
+  call opsinputs_obsspace_get_locs_ordered_by_record( &
+    ObsSpace, JediToOpsLayoutMapping % LocationsOrderedByRecord, JediToOpsLayoutMapping % RecordStarts)
 
-  JediToOpsLayoutMapping % NumJediObs = nlocs_all
   JediToOpsLayoutMapping % NumOpsObs = nrecs
-  JediToOpsLayoutMapping % LocationsOrderedByRecord(:) = &
-       LocationsOrderedByRecord_all(nlocs_orig + 1:nlocs_all)
-  do i = 1, nrecs + 1
-     JediToOpsLayoutMapping % RecordStarts(i) = &
-          RecordStarts_all(i + nrecs) - nlocs_orig
-  end do
+
   JediToOpsLayoutMapping % MaxNumLevelsPerObs = 0
   do i = 1, nrecs
     JediToOpsLayoutMapping % MaxNumLevelsPerObs = max( &
@@ -108,8 +89,6 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       JediToOpsLayoutMapping % RecordStarts(i + 1) - JediToOpsLayoutMapping % RecordStarts(i))
   end do
 else
-  nlocs = obsspace_get_nlocs(ObsSpace)
-  JediToOpsLayoutMapping % NumJediObs = nlocs
   JediToOpsLayoutMapping % NumOpsObs = nlocs
   JediToOpsLayoutMapping % MaxNumLevelsPerObs = 1
 end if
