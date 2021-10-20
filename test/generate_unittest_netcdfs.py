@@ -461,6 +461,7 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
     output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
+    output_2d_geoval_to_netcdf       ('relative_humidity',          'testinput/002_UpperAirCxField_relative_humidity.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
     output_2d_geoval_to_netcdf       ('specific_humidity',          'testinput/005_UpperAirCxField_q.nc4')
