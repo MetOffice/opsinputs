@@ -320,7 +320,7 @@ ADD_WRITER_TEST(NAME     cxwriter_002_UpperAirCxField_rh_AMSUB
 ADD_WRITER_TEST(NAME     cxwriter_002_UpperAirCxField_rh_Sonde
                 YAML     002_UpperAirCxField_rh_Sonde.yaml
                 NAMELIST CxWriterNamelists_002_UpperAirCxField_rh/Sonde.nl
-                DATA     002_UpperAirCxField_rh_Sonde.nc4 relative_humidity_Sonde.nc4)
+                DATA     002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4 relative_humidity_Sonde.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_003_UpperAirCxField_u
                 YAML     003_UpperAirCxField_u.yaml
                 NAMELIST CxWriterNamelists_003_UpperAirCxField_u/HLOSwind.nl

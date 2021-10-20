@@ -14,7 +14,7 @@ observations:
       extension:
         average profiles onto model levels: 3
     geovals:
-      filename: Data/002_UpperAirCxField_rh_Sonde.nc4
+      filename: Data/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the Cx file.
