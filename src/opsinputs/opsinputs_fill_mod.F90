@@ -1093,12 +1093,10 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !>   Pointer to the array to be populated.
 !> \param[in] JediToOpsLayoutMapping
 !>   Mapping between indices of observations in the JEDI and OPS data structures.
-!> \param[in] nlocs
-!>   Number of observation locations.
 !> \param[in] hofx
 !>   The HofX vector to use.
 subroutine opsinputs_fill_fillreal2dfromhofx( &
-  Hdr, OpsVarName, NumObs, Real2, JediToOpsLayoutMapping, nlocs, hofx)
+  Hdr, OpsVarName, NumObs, Real2, JediToOpsLayoutMapping, hofx)
 implicit none
 
 ! Subroutine arguments:
@@ -1107,8 +1105,7 @@ character(len=*), intent(in)                       :: OpsVarName
 integer(integer64), intent(in)                     :: NumObs
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-integer, intent(in)                                :: nlocs
-real(c_double), intent(in)                         :: hofx(nlocs)
+real(c_double), intent(in)                         :: hofx(:)
 
 ! Local declarations:
 real(kind_real)                                 :: MissingReal

@@ -467,16 +467,15 @@ end subroutine opsinputs_cxwriter_prior
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
-subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags, nvars, nlocs, varnames, hofx)
+subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags, varnames, hofx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
 type(c_ptr), value, intent(in)       :: ObsSpace
 type(c_ptr), value, intent(in)       :: Flags
-integer, intent(in)                  :: nvars, nlocs
 type(oops_variables), intent(in)     :: varnames
-real(c_double),     intent(in)       :: hofx(nvars, nlocs)
+real(c_double),     intent(in)       :: hofx(:, :)
 
 ! Local declarations:
 logical                                :: ConvertRecordsToMultilevelObs
@@ -493,7 +492,7 @@ JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
   ObsSpace, ConvertRecordsToMultilevelObs)
 call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, &
                                       ObsSpace, Flags, &
-                                      nvars, nlocs, varnames, hofx)
+                                      varnames, hofx)
 
 end subroutine opsinputs_cxwriter_post
 
@@ -505,7 +504,7 @@ end subroutine opsinputs_cxwriter_post
 !> an automatic array (since the number of observations is now known).
 subroutine opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, &
                                             ObsSpace, Flags, &
-                                            nvars, nlocs, varnames, hofx)
+                                            varnames, hofx)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
@@ -515,9 +514,8 @@ type(opsinputs_cxwriter), intent(in)                  :: self
 type(opsinputs_jeditoopslayoutmapping), intent(inout) :: JediToOpsLayoutMapping
 type(c_ptr), value, intent(in)                        :: ObsSpace
 type(c_ptr), value, intent(in)                        :: Flags
-integer, intent(in)                                   :: nvars, nlocs
 type(oops_variables), intent(in)                      :: varnames
-real(c_double),     intent(in)                        :: hofx(nvars, nlocs)
+real(c_double),     intent(in)                        :: hofx(:, :)
 
 ! Local declarations:
 type(OB_type)                                         :: Ob
@@ -536,7 +534,7 @@ call opsinputs_utils_fillreportflags(JediToOpsLayoutMapping, ObsSpace, Flags, &
                                      self % RejectObsWithAnyVariableFailingQC, &
                                      self % RejectObsWithAllVariablesFailingQC, ReportFlags)
 call opsinputs_cxwriter_populatecx(self, JediToOpsLayoutMapping, &
-                                   ReportFlags, nvars, nlocs, varnames, hofx, Cx)
+                                   ReportFlags, varnames, hofx, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
 Retained = opsinputs_cxwriter_retainflag(ReportFlags, JediToOpsLayoutMapping % NumOpsObs)
@@ -832,15 +830,14 @@ end subroutine opsinputs_cxwriter_initialisecx
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
 subroutine opsinputs_cxwriter_populatecx(self, JediToOpsLayoutMapping, &
-                                         ReportFlags, nvars, nlocs, varnames, hofx, Cx)
+                                         ReportFlags, varnames, hofx, Cx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in)                  :: self
 type(opsinputs_jeditoopslayoutmapping), intent(inout) :: JediToOpsLayoutMapping
 integer(integer64), intent(in)                        :: ReportFlags(JediToOpsLayoutMapping % NumOpsObs)
-integer, intent(in)                                   :: nvars, nlocs
-real(c_double), intent(in)                            :: hofx(nvars, nlocs)
+real(c_double), intent(in)                            :: hofx(:, :)
 type(oops_variables), intent(in)                      :: varnames
 type(CX_type), intent(inout)                          :: Cx
 
@@ -1063,7 +1060,7 @@ do iCxField = 1, size(CxFields)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
       ! Index of relative_humidity in hofx array.
       irh = 0
-      do ivar = 1, nvars
+      do ivar = 1, size(hofx, 1)
          if (varnames % variable(ivar) == "relative_humidity") then
             irh = ivar
          end if
@@ -1073,7 +1070,7 @@ do iCxField = 1, size(CxFields)
          if (irh > 0) then
             call opsinputs_fill_fillreal2dfromhofx( &
                  Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
-                 JediToOpsLayoutMapping, nlocs, hofx(irh,:))
+                 JediToOpsLayoutMapping, hofx(irh,:))
          else
             ! something bad happens if the variable was not simulated
          end if

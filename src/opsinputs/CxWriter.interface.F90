@@ -119,7 +119,7 @@ call opsinputs_cxwriter_registry%get(c_self, self)
 f_varnames = oops_variables(c_varnames)
 
 call opsinputs_cxwriter_post(self, c_obspace, c_flags, &
-                             c_nvars, c_nlocs, f_varnames, c_hofx)
+                             f_varnames, c_hofx)
 
 end subroutine opsinputs_cxwriter_post_c
 
