@@ -316,7 +316,7 @@ ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
 ADD_WRITER_TEST(NAME     cxwriter_002_UpperAirCxField_rh_AMSUB
                 YAML     002_UpperAirCxField_rh_AMSUB.yaml
                 NAMELIST CxWriterNamelists_002_UpperAirCxField_rh/AMSUB.nl
-                DATA     002_UpperAirCxField_rh_AMSUB.nc4 relative_humidity_AMSUB.nc4)
+                DATA     002_UpperAirCxField_relative_humidity.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_002_UpperAirCxField_rh_Sonde
                 YAML     002_UpperAirCxField_rh_Sonde.yaml
                 NAMELIST CxWriterNamelists_002_UpperAirCxField_rh/Sonde.nl

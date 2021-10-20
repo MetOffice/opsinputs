@@ -5,10 +5,10 @@ observations:
   - obs space:
       name: AMSUB
       obsdatain:
-        obsfile: Data/relative_humidity_AMSUB.nc4
-      simulated variables: [relative_humidity]
+        obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
     geovals:
-      filename: Data/002_UpperAirCxField_rh_AMSUB.nc4
+      filename: Data/002_UpperAirCxField_relative_humidity.nc4
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the Cx file.
