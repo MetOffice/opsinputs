@@ -127,20 +127,8 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute, 5*minute, 6*minute]
-
-    # (1)
-    #var = f.createVariable('MetaData/station_id', 'c', ('nlocs','nstring'))
-    #var[:] = ['station_1', 'station_1', 'station_1', 'station_1', 'station_2', 'station_2']
-    # (2)
-    #var = f.createVariable('MetaData/station_id', 'S1', ('nlocs'))
-    #station_ids = ['station_1', 'station_1', 'station_1', 'station_1', 'station_2', 'station_2']
-    #var[:] = nc4.stringtochar(np.array(station_ids, 'S'))
-    # (3)
     var = f.createVariable('MetaData/station_id', str, ('nlocs'))
     var[:] = np.array(['station_1', 'station_1', 'station_1', 'station_1', 'station_2', 'station_2'], dtype=object)
-
-    #print(nc4.stringtochar(np.array(["test", "test"], 'S')))
-
     var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
     var[:] = [1.1, missing_float_nc, 1.3, 1.4, 1.5, 1.6]
     var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
