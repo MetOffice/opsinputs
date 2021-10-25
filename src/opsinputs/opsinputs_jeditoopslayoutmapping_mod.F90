@@ -43,7 +43,8 @@ end type opsinputs_jeditoopslayoutmapping
 ! ------------------------------------------------------------------------------
 
 public :: opsinputs_jeditoopslayoutmapping_create, &
-          opsinputs_jeditoopslayoutmapping_clear_rejected_records
+          opsinputs_jeditoopslayoutmapping_clear_rejected_records, &
+          opsinputs_jeditoopslayoutmapping_delete
 
 ! ------------------------------------------------------------------------------
 contains
@@ -148,4 +149,20 @@ end do
 
 end subroutine opsinputs_jeditoopslayoutmapping_clear_rejected_records
 
+! ------------------------------------------------------------------------------
+!> Deallocate arrays that were allocated in the opsinputs_jeditoopslayoutmapping_create routine.
+subroutine opsinputs_jeditoopslayoutmapping_delete(JediToOpsLayoutMapping)
+implicit none
+
+! Subroutine arguments:
+type(opsinputs_jeditoopslayoutmapping), intent(inout) :: JediToOpsLayoutMapping
+
+! Body:
+
+if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
+   deallocate(JediToOpsLayoutMapping % LocationsOrderedByRecord)
+   deallocate(JediToOpsLayoutMapping % RecordStarts)
+end if
+
+end subroutine opsinputs_jeditoopslayoutmapping_delete
 end module opsinputs_jeditoopslayoutmapping_mod

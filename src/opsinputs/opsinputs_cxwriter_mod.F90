@@ -34,10 +34,11 @@ use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_s
 use opsinputs_utils_mod, only: &
     max_varname_length,        &
     opsinputs_utils_fillreportflags
-use opsinputs_jeditoopslayoutmapping_mod, only:             &
-    opsinputs_jeditoopslayoutmapping,                       &
-    opsinputs_jeditoopslayoutmapping_create,                &
-    opsinputs_jeditoopslayoutmapping_clear_rejected_records
+use opsinputs_jeditoopslayoutmapping_mod, only:              &
+    opsinputs_jeditoopslayoutmapping,                        &
+    opsinputs_jeditoopslayoutmapping_create,                 &
+    opsinputs_jeditoopslayoutmapping_clear_rejected_records, &
+    opsinputs_jeditoopslayoutmapping_delete
 
 use ufo_geovals_mod, only: &
     ufo_geovals
@@ -166,7 +167,7 @@ private
   type(ufo_geovals), pointer             :: GeoVals
   type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
   type(oops_variables)                   :: varnames
-  real(c_double), allocatable            :: hofx(:, :)
+  real(c_double), pointer                :: hofx(:, :)
 end type opsinputs_cxwriter
 
 ! ------------------------------------------------------------------------------
@@ -478,7 +479,7 @@ type(opsinputs_cxwriter), intent(inout) :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 type(c_ptr), value, intent(in)          :: Flags
 type(oops_variables), intent(in)        :: varnames
-real(c_double),     intent(in)          :: hofx(:, :)
+real(c_double), intent(in), target      :: hofx(:, :)
 
 ! Local declarations:
 logical                                :: ConvertRecordsToMultilevelObs
@@ -487,8 +488,7 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 ! Body:
 
 self % varnames = varnames
-allocate(self % hofx(size(hofx, 1), size(hofx, 2)))
-self % hofx = hofx
+self % hofx => hofx
 
 ! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
 ! it should be treated as a single (multi-level) ob in the OPS data structures.
@@ -501,6 +501,8 @@ JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
 self % JediToOpsLayoutMapping = JediToOpsLayoutMapping
 
 call opsinputs_cxwriter_post_internal(self, ObsSpace, Flags)
+
+call opsinputs_jeditoopslayoutmapping_delete(self % JediToOpsLayoutMapping)
 
 end subroutine opsinputs_cxwriter_post
 
