@@ -27,15 +27,18 @@ use oops_variables_mod, only: oops_variables
 use opsinputs_cxfields_mod
 use opsinputs_fill_mod, only:            &
     opsinputs_fill_fillrealfromgeoval,   &
-    opsinputs_fill_fillreal2dfromgeoval
+    opsinputs_fill_fillreal2dfromgeoval, &
+    opsinputs_fill_fillreal2dfromhofx
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
 use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_seconds
 use opsinputs_utils_mod, only: &
     max_varname_length,        &
     opsinputs_utils_fillreportflags
-use opsinputs_jeditoopslayoutmapping_mod, only: &
-    opsinputs_jeditoopslayoutmapping,     &
-    opsinputs_jeditoopslayoutmapping_create
+use opsinputs_jeditoopslayoutmapping_mod, only:              &
+    opsinputs_jeditoopslayoutmapping,                        &
+    opsinputs_jeditoopslayoutmapping_create,                 &
+    opsinputs_jeditoopslayoutmapping_clear_rejected_records, &
+    opsinputs_jeditoopslayoutmapping_delete
 
 use ufo_geovals_mod, only: &
     ufo_geovals
@@ -111,7 +114,8 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupGroundLidar,       &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
-    ObsGroupScatwind
+    ObsGroupScatwind,          &
+    ObsGroupSonde
 use OpsMod_ObsInfo, only: &
     FinalRejectFlag,      &
     OB_type,              &
@@ -127,40 +131,43 @@ private
 ! ------------------------------------------------------------------------------
 type, public :: opsinputs_cxwriter
 private
-  integer(integer64)         :: ObsGroup
-  type(datetime)             :: ValidityTime  ! Corresponds to OPS validity time
+  integer(integer64)                     :: ObsGroup
+  type(datetime)                         :: ValidityTime  ! Corresponds to OPS validity time
 
-  logical                    :: RejectObsWithAnyVariableFailingQC
-  logical                    :: RejectObsWithAllVariablesFailingQC
+  logical                                :: RejectObsWithAnyVariableFailingQC
+  logical                                :: RejectObsWithAllVariablesFailingQC
 
-  integer(integer64)         :: FH_VertCoord
-  integer(integer64)         :: FH_HorizGrid
-  integer(integer64)         :: FH_GridStagger
-  integer(integer64)         :: FH_ObsFileType
-  integer(integer64)         :: FH_ModelVersion
-  integer(integer64)         :: FH_SubModel
+  integer(integer64)                     :: FH_VertCoord
+  integer(integer64)                     :: FH_HorizGrid
+  integer(integer64)                     :: FH_GridStagger
+  integer(integer64)                     :: FH_ObsFileType
+  integer(integer64)                     :: FH_ModelVersion
+  integer(integer64)                     :: FH_SubModel
 
-  integer(integer64)         :: IC_XLen
-  integer(integer64)         :: IC_YLen
-  integer(integer64)         :: IC_PLevels
-  integer(integer64)         :: IC_WetLevels
-  integer(integer64)         :: IC_FirstConstantRhoLevel
+  integer(integer64)                     :: IC_XLen
+  integer(integer64)                     :: IC_YLen
+  integer(integer64)                     :: IC_PLevels
+  integer(integer64)                     :: IC_WetLevels
+  integer(integer64)                     :: IC_FirstConstantRhoLevel
 
-  real(real64)               :: RC_LongSpacing
-  real(real64)               :: RC_LatSpacing
-  real(real64)               :: RC_FirstLat
-  real(real64)               :: RC_FirstLong
-  real(real64)               :: RC_PoleLat
-  real(real64)               :: RC_PoleLong
-  real(real64)               :: RC_z_ModelTop
+  real(real64)                           :: RC_LongSpacing
+  real(real64)                           :: RC_LatSpacing
+  real(real64)                           :: RC_FirstLat
+  real(real64)                           :: RC_FirstLong
+  real(real64)                           :: RC_PoleLat
+  real(real64)                           :: RC_PoleLong
+  real(real64)                           :: RC_z_ModelTop
 
-  integer(integer64)         :: TimeIndicator
-  integer(integer64)         :: ForecastPeriod
+  integer(integer64)                     :: TimeIndicator
+  integer(integer64)                     :: ForecastPeriod
 
-  real(real64), allocatable  :: EtaTheta(:)
-  real(real64), allocatable  :: EtaRho(:)
+  real(real64), allocatable              :: EtaTheta(:)
+  real(real64), allocatable              :: EtaRho(  :)
 
-  type(ufo_geovals), pointer :: GeoVals
+  type(ufo_geovals), pointer             :: GeoVals
+  type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
+  type(oops_variables)                   :: varnames
+  real(c_double), pointer                :: hofx(:, :)
 end type opsinputs_cxwriter
 
 ! ------------------------------------------------------------------------------
@@ -451,8 +458,8 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(inout) :: self
-type(c_ptr), value, intent(in)             :: ObsSpace
-type(ufo_geovals), intent(in), pointer     :: GeoVals
+type(c_ptr), value, intent(in)          :: ObsSpace
+type(ufo_geovals), intent(in), pointer  :: GeoVals
 
 ! Body:
 self % GeoVals => GeoVals
@@ -464,13 +471,15 @@ end subroutine opsinputs_cxwriter_prior
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
-subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags)
+subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags, varnames, hofx)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)   :: self
-type(c_ptr), value, intent(in)         :: ObsSpace
-type(c_ptr), value, intent(in)         :: Flags
+type(opsinputs_cxwriter), intent(inout) :: self
+type(c_ptr), value, intent(in)          :: ObsSpace
+type(c_ptr), value, intent(in)          :: Flags
+type(oops_variables), intent(in)        :: varnames
+real(c_double), intent(in), target      :: hofx(:, :)
 
 ! Local declarations:
 logical                                :: ConvertRecordsToMultilevelObs
@@ -478,13 +487,24 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
 
-! TODO(wsmigaj): Set this variable to true for radiosondes when we have a better idea of where to
-! take slanted model columns from.
-ConvertRecordsToMultilevelObs = .false.
+self % varnames = varnames
+self % hofx => hofx
+
+! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
+! it should be treated as a single (multi-level) ob in the OPS data structures.
+! There may be other obs groups requiring similar treatment -- if so, edit the line below.
+ConvertRecordsToMultilevelObs = (self % ObsGroup == ObsGroupSonde)
 
 JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
   ObsSpace, ConvertRecordsToMultilevelObs)
-call opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
+
+self % JediToOpsLayoutMapping = JediToOpsLayoutMapping
+
+call opsinputs_cxwriter_post_internal(self, ObsSpace, Flags)
+
+call opsinputs_jeditoopslayoutmapping_delete(self % JediToOpsLayoutMapping)
+
+self % hofx => null()
 
 end subroutine opsinputs_cxwriter_post
 
@@ -494,36 +514,37 @@ end subroutine opsinputs_cxwriter_post
 !>
 !> This code has been extracted to a separate subroutine to make it possible to declare Retained as
 !> an automatic array (since the number of observations is now known).
-subroutine opsinputs_cxwriter_post_internal(self, JediToOpsLayoutMapping, ObsSpace, Flags)
+subroutine opsinputs_cxwriter_post_internal(self, ObsSpace, Flags)
 USE mpl, ONLY: &
           gc_int_kind, mpl_integer
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)               :: self
-type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in)                     :: ObsSpace
-type(c_ptr), value, intent(in)                     :: Flags
+type(opsinputs_cxwriter), intent(inout)               :: self
+type(c_ptr), value, intent(in)                        :: ObsSpace
+type(c_ptr), value, intent(in)                        :: Flags
 
 ! Local declarations:
-type(OB_type)                                      :: Ob
-type(CX_type)                                      :: Cx
-type(UM_header_type)                               :: UMHeader
-integer(integer64)                                 :: NumObsOnEachRank(nproc)
-logical(logical64)                                 :: Retained(JediToOpsLayoutMapping % NumOpsObs)
-integer(kind=gc_int_kind)                          :: istat
+type(OB_type)                                         :: Ob
+type(CX_type)                                         :: Cx
+type(UM_header_type)                                  :: UMHeader
+integer(integer64)                                    :: NumObsOnEachRank(nproc)
+logical(logical64)                                    :: Retained(self % JediToOpsLayoutMapping % NumOpsObs)
+integer(kind=gc_int_kind)                             :: istat
+integer(integer64)                                    :: ReportFlags(self % JediToOpsLayoutMapping % NumOpsObs)
 
 ! Body:
 
-call opsinputs_cxwriter_initialiseobservations(self, JediToOpsLayoutMapping % NumOpsObs, Ob)
+call opsinputs_cxwriter_initialiseobservations(self, Ob)
 call opsinputs_cxwriter_initialisecx(self, Ob, Cx)
-call opsinputs_cxwriter_populatecx(self, Cx)
+call opsinputs_utils_fillreportflags(self % JediToOpsLayoutMapping, ObsSpace, Flags, &
+                                     self % RejectObsWithAnyVariableFailingQC, &
+                                     self % RejectObsWithAllVariablesFailingQC, ReportFlags)
+call opsinputs_cxwriter_populatecx(self, ReportFlags, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
-Retained = opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping, ObsSpace, Flags, &
-                                         self % RejectObsWithAnyVariableFailingQC, &
-                                         self % RejectObsWithAllVariablesFailingQC)
-call opsinputs_mpl_allgather_integer([JediToOpsLayoutMapping % NumOpsObs], 1_gc_int_kind, mpl_integer, &
+Retained = opsinputs_cxwriter_retainflag(self, ReportFlags)
+call opsinputs_mpl_allgather_integer([self % JediToOpsLayoutMapping % NumOpsObs], 1_gc_int_kind, mpl_integer, &
                                      NumObsOnEachRank, 1_gc_int_kind, mpl_integer, &
                                      mpi_group, istat)
 call Ops_WriteOutVarCx(Ob, Cx, NumObsOnEachRank, UMheader % IntC(IC_Plevels), UMheader, Retained)
@@ -739,13 +760,12 @@ end subroutine opsinputs_cxwriter_addrequiredgeovars
 !> Fill components of the Ob structure required by the OPS subroutine writing a Cx file.
 !>
 !> This includes the number of observations and the validity time.
-subroutine opsinputs_cxwriter_initialiseobservations(self, NumObsLocal, Ob)
+subroutine opsinputs_cxwriter_initialiseobservations(self, Ob)
 use mpl, ONLY: gc_int_kind
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
-integer(integer64), intent(in)       :: NumObsLocal
 type(OB_type), intent(inout)         :: Ob
 
 ! Local declarations:
@@ -757,7 +777,7 @@ Ob % Header % obsgroup = self % obsgroup
 
 call Ops_SetupObType(Ob)
 
-Ob % Header % NumObsLocal = NumObsLocal
+Ob % Header % NumObsLocal = self % JediToOpsLayoutMapping % NumOpsObs
 Ob % Header % NumObsTotal = Ob % Header % NumObsLocal
 ! Sum the number of local observations on each process into NumObsTotal
 call gcg_isum (1_gc_int_kind, mpi_group, istat, Ob % Header % NumObsTotal)
@@ -814,12 +834,13 @@ end subroutine opsinputs_cxwriter_initialisecx
 ! ------------------------------------------------------------------------------
 
 !> Populate Cx fields required by the OPS routine writing a Cx file.
-subroutine opsinputs_cxwriter_populatecx(self, Cx)
+subroutine opsinputs_cxwriter_populatecx(self, ReportFlags, Cx)
 implicit none
 
 ! Subroutine arguments:
-type(opsinputs_cxwriter), intent(in)    :: self
-type(CX_type), intent(inout)            :: Cx
+type(opsinputs_cxwriter), intent(inout)               :: self
+integer(integer64), intent(in)                        :: ReportFlags(self % JediToOpsLayoutMapping % NumOpsObs)
+type(CX_type), intent(inout)                          :: Cx
 
 ! Local declarations:
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_populatecx"
@@ -829,9 +850,17 @@ integer(integer64)                      :: CxFields(MaxModelCodes), CxField
 integer                                 :: iCxField
 integer                                 :: DustBinIndex
 character                               :: DustBinIndexStr
+integer                                 :: irh, ivar
+
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
+
+! Reject any observations that have been flagged.
+if (self % JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
+  call opsinputs_jeditoopslayoutmapping_clear_rejected_records( &
+    ReportFlags, self % JediToOpsLayoutMapping)
+end if
 
 do iCxField = 1, size(CxFields)
   CxField = CxFields(iCxField)
@@ -1030,9 +1059,27 @@ do iCxField = 1, size(CxFields)
         Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
         self % GeoVals, opsinputs_cxfields_theta)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
-        self % GeoVals, opsinputs_cxfields_rh)
+      ! Index of relative_humidity in hofx array.
+      irh = 0
+      do ivar = 1, size(self % hofx, 1)
+         if (self % varnames % variable(ivar) == "relative_humidity") then
+            irh = ivar
+         end if
+      end do
+
+      if (self % JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
+         if (irh > 0) then
+            call opsinputs_fill_fillreal2dfromhofx( &
+                 Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
+                 self % JediToOpsLayoutMapping, self % hofx(irh,:))
+         else
+            ! something bad happens if the variable was not simulated
+         end if
+      else
+         call opsinputs_fill_fillreal2dfromgeoval( &
+              Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
+              self % GeoVals, opsinputs_cxfields_rh)
+      end if
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
@@ -1276,30 +1323,18 @@ end subroutine opsinputs_cxwriter_populateumheader
 
 !> Return an array with elements corresponding to retained observations set to .true. and the
 !> remaining ones set to .false.
-function opsinputs_cxwriter_retainflag( &
-  JediToOpsLayoutMapping, ObsSpace, Flags, &
-  RejectObsWithAnyVariableFailingQC, RejectObsWithAllVariablesFailingQC)
+function opsinputs_cxwriter_retainflag(self, ReportFlags)
 implicit none
 
 ! Function arguments:
 
-type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(c_ptr), value, intent(in) :: ObsSpace
-type(c_ptr), value, intent(in) :: Flags
-logical                        :: RejectObsWithAnyVariableFailingQC
-logical                        :: RejectObsWithAllVariablesFailingQC
+type(opsinputs_cxwriter), intent(in) :: self
+integer(integer64), intent(in)       :: ReportFlags(:)
 
 ! Return value:
-logical(logical64)             :: opsinputs_cxwriter_retainflag(JediToOpsLayoutMapping % NumOpsObs)
-
-! Local declarations:
-integer(integer64)             :: ReportFlags(JediToOpsLayoutMapping % NumOpsObs)
+logical(logical64)             :: opsinputs_cxwriter_retainflag(self % JediToOpsLayoutMapping % NumOpsObs)
 
 ! Body
-
-call opsinputs_utils_fillreportflags(JediToOpsLayoutMapping, ObsSpace, Flags, &
-                                     RejectObsWithAnyVariableFailingQC, &
-                                     RejectObsWithAllVariablesFailingQC, ReportFlags)
 
 opsinputs_cxwriter_retainflag = .not. btest(ReportFlags, FinalRejectFlag)
 

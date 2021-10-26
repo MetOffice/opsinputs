@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Generate NetCDF files required by VarObsWriter tests.
+"""Generate NetCDF files required by VarObsWriter and CxWriter tests.
 
 This script must currently be run manually whenever these files need to be regenerated. 
 In principle we could define these files as outputs of a custom CMake target; 
@@ -11,6 +11,9 @@ import netCDF4 as nc4
 # Defined as in oops/util/missingValues.cc 
 missing_float = np.finfo(np.float32).min * 0.99
 missing_int = np.iinfo(np.int32).min + 5
+
+# NetCDF missing values
+missing_float_nc = 9.969209968386869e+36
 
 def output_1d_simulated_var_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
@@ -84,6 +87,67 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     var[:] = [1, 1, 1, 1]
 
     f.date_time = 2018010100
+
+    f.close()
+
+def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    # These synthethic obs represent two sonde profiles,
+    # one with four levels and one with two levels.
+    # The extended ObsSpace will be generated automatically when the
+    # test is run. However, the HofX values must be provided as if
+    # the ObsSpace has already been extended.
+
+    nlocs = 6
+    f.createDimension('nlocs', nlocs)
+    nlocs_extended = 12
+    f.createDimension('nlocs_extended', nlocs_extended)
+    nstring = 9
+    f.createDimension('nstring', nstring)
+
+    # Dimension variables
+    var = f.createVariable('nlocs', 'f', ('nlocs'))
+    var[:] = 0
+    var.suggested_chunk_dim = 100
+    var = f.createVariable('nlocs_extended', 'f', ('nlocs_extended'))
+    var[:] = 0
+    var.suggested_chunk_dim = 100
+    var = f.createVariable('nstring', 'f', ('nstring'))
+    var[:] = 0
+    var.suggested_chunk_dim = 100
+
+    # Values in the original ObsSpace.
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
+    var[:] = [21, 22, -23, 24, -25, 26]
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
+    var[:] = [31, 32, 33, 34, -35, -36]
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
+    var[:] = [100100, 100200, 100300, 100400, 100500, 100600]
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
+    minute = 1/60.
+    var[:] = [1*minute, 2*minute, 3*minute, 4*minute, 5*minute, 6*minute]
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    var[:] = np.array(['station_1', 'station_1', 'station_1', 'station_1', 'station_2', 'station_2'], dtype=object)
+    var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
+    var[:] = [1.1, missing_float_nc, 1.3, 1.4, 1.5, 1.6]
+    var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
+    var[:] = [0.1, missing_float_nc, 0.3, 0.4, 0.5, 0.6]
+    var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs',))
+    var[:] = [0.01, missing_float_nc, 0.03, 0.04, 0.05, 0.06]
+    var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs',))
+    var[:] = [1, 1, 1, 1, 1, 1]
+
+    # Values in the extended obs space.
+    var = f.createVariable('HofX/' + var_name, 'f', ('nlocs_extended',))
+    # The first six values correspond to the original profiles,
+    # and the second six correspond to the averaged profiles.
+    var[:] = [1.2, missing_float_nc, 1.4, 1.5, 1.6, 1.7,
+              1.25, 1.35, 1.45, 1.55, 1.65, 1.75]
+
+    f.date_time = 2018010100
+    f._ioda_layout = "ObsGroup"
+    f._ioda_layout_version = 0
 
     f.close()
 
@@ -414,6 +478,34 @@ def output_2d_geovals_to_netcdf(var_names, file_name):
 
     f.close()
 
+def output_2d_geoval_for_multi_level_obs_to_netcdf(var_name, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 12
+    nlevs = 3
+    f.createDimension('nlocs', nlocs)
+    f.createDimension('nlevs', nlevs)
+    var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+    # These synthethic GeoVaLs represent two sonde profiles,
+    # one with four levels and one with two levels.
+    # Each profile has been averaged onto three model levels.
+    var[:] = [[1.1, 1.2, 1.3],
+              [2.1, missing_float, 2.3],
+              [3.1, 3.2, 3.3],
+              [4.1, 4.2, 4.3],
+              [5.1, 5.2, 5.3],
+              [6.1, 6.2, 6.3],
+              [1.1, 1.2, 1.3],
+              [1.1, 1.2, 1.3],
+              [1.1, 1.2, 1.3],
+              [5.1, 5.2, 5.3],
+              [5.1, 5.2, 5.3],
+              [5.1, 5.2, 5.3]]
+
+    f.date_time = 2018010100
+
+    f.close()
+
 if __name__ == "__main__":
     # VarObs
     output_1d_simulated_var_to_netcdf('surface_pressure',            'testinput/001_VarField_pstar.nc4') # Surface
@@ -461,6 +553,7 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
     output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
+    output_2d_geoval_to_netcdf       ('relative_humidity',          'testinput/002_UpperAirCxField_relative_humidity.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
     output_2d_geoval_to_netcdf       ('specific_humidity',          'testinput/005_UpperAirCxField_q.nc4')
@@ -469,3 +562,6 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('mass_content_of_cloud_ice_in_atmosphere_layer', 'testinput/029_UpperAirCxField_qcf.nc4')
     output_2d_geoval_to_netcdf       ('mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'testinput/030_UpperAirCxField_qcl.nc4')
     output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
+
+    output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
+    output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
