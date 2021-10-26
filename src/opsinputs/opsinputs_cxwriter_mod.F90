@@ -849,6 +849,8 @@ integer(integer64)                      :: CxFields(MaxModelCodes), CxField
 integer                                 :: iCxField
 integer                                 :: DustBinIndex
 character                               :: DustBinIndexStr
+integer                                 :: irh, ivar
+
 
 
 ! Body:
