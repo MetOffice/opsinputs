@@ -18,6 +18,7 @@ use missing_values_mod, only: missing_value
 use obsspace_mod, only: &
     obsspace_has,         &
     obsspace_get_db
+use oops_variables_mod, only: oops_variables
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
     ufo_geovals,           &
@@ -64,6 +65,7 @@ public :: opsinputs_fill_fillcoord2d, &
           opsinputs_fill_fillreal2d, &
           opsinputs_fill_fillrealfromgeoval, &
           opsinputs_fill_fillreal2dfromgeoval, &
+          opsinputs_fill_fillreal2dfromgeovalorhofx, &
           opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
           opsinputs_fill_fillreal2dfromhofx, &
           opsinputs_fill_fillstring, &
@@ -1078,6 +1080,72 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   end where
 end if
 end subroutine opsinputs_fill_fillreal2dfromgeoval
+
+!> Populate a 2D array of real numbers and its header from either a GeoVaL or an HofX vector.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real2 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real2
+!>   Pointer to the array to be populated.
+!> \param[in] GeoVals
+!>   A container holding the specified GeoVaL.
+!> \param[in] JediVarName
+!>   Name of the input GeoVal.
+!> \param[in] JediToOpsLayoutMapping
+!>   Mapping between indices of observations in the JEDI and OPS data structures.
+!> \param[in] hofx
+!>   HofX data structure.
+!> \param[in] varnames
+!>   List of simulated variables.
+subroutine opsinputs_fill_fillreal2dfromgeovalorhofx( &
+  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName, JediToOpsLayoutMapping, hofx, varnames)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+integer(integer64), intent(in)                     :: NumObs
+real(real64), pointer, intent(inout)               :: Real2(:,:)
+type(ufo_geovals), intent(in)                      :: GeoVals
+character(len=*), intent(in)                       :: JediVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+real(c_double), intent(in)                         :: hofx(:, :)
+type(oops_variables), intent(in)                   :: varnames
+
+! Local declarations:
+integer :: i
+integer :: hofxIndex
+
+! Body:
+
+if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
+   ! Index of variable in hofx array.
+   hofxIndex = 0
+   do i = 1, size(hofx, 1)
+      if (varnames % variable(i) == JediVarName) then
+         hofxIndex = i
+         exit
+      end if
+   end do
+   if (hofxIndex > 0) then
+      call opsinputs_fill_fillreal2dfromhofx( &
+           Hdr, OpsVarName, NumObs, Real2, &
+           JediToOpsLayoutMapping, hofx(hofxIndex,:))
+   else
+      write(*, *) JediVarName, " does not appear in the list of simulated variables"
+      call abort()
+   end if
+else
+   call opsinputs_fill_fillreal2dfromgeoval( &
+        Hdr, OpsVarName, NumObs, Real2, &
+        GeoVals, JediVarName)
+end if
+
+end subroutine opsinputs_fill_fillreal2dfromgeovalorhofx
 
 ! ------------------------------------------------------------------------------
 
