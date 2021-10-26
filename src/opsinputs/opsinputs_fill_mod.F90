@@ -1201,58 +1201,6 @@ end subroutine opsinputs_fill_fillreal2dfromhofx
 
 ! ------------------------------------------------------------------------------
 
-!> Populate a 2D array of real numbers and its header from an HofX vector.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real2 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
-!> \param[inout] Real2
-!>   Pointer to the array to be populated.
-!> \param[in] JediToOpsLayoutMapping
-!>   Mapping between indices of observations in the JEDI and OPS data structures.
-!> \param[in] hofx
-!>   The HofX vector to use.
-subroutine opsinputs_fill_fillreal2dfromhofx( &
-  Hdr, OpsVarName, NumObs, Real2, JediToOpsLayoutMapping, hofx)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)            :: Hdr
-character(len=*), intent(in)                       :: OpsVarName
-integer(integer64), intent(in)                     :: NumObs
-real(real64), pointer, intent(out)                 :: Real2(:,:)
-type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(c_double), intent(in)                         :: hofx(:)
-
-! Local declarations:
-real(kind_real)                                 :: MissingReal
-integer                                         :: iObs, iLevel, iJediObs, numLevels
-
-! Body:
-
-MissingReal = missing_value(0.0_c_double)
-
-! Fill the OPS data structures
-call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = 8))
-do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-   numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
-   do iLevel = 1, numLevels
-      ! Location of current observation in the ObsSpace.
-      iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
-           JediToOpsLayoutMapping % RecordStarts(iObs) - 1 + iLevel)
-      if (hofx(iJediObs) /= MissingReal) then
-         Real2(iObs,iLevel) = hofx(iJediObs)
-      end if
-   end do
-end do
-
-end subroutine opsinputs_fill_fillreal2dfromhofx
-
-! ------------------------------------------------------------------------------
-
 !> Stach a series of 1D GeoVaLs, each corresponding to a separate channel, in the
 !> columns of a 2D array of real numbers. Output array will be size (iobs, ichans).
 !>
