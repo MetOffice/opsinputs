@@ -504,6 +504,8 @@ call opsinputs_cxwriter_post_internal(self, ObsSpace, Flags)
 
 call opsinputs_jeditoopslayoutmapping_delete(self % JediToOpsLayoutMapping)
 
+self % hofx => null()
+
 end subroutine opsinputs_cxwriter_post
 
 ! ------------------------------------------------------------------------------
