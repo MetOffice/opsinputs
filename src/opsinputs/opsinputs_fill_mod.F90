@@ -1087,8 +1087,6 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !>   Header to be populated.
 !> \param[in] OpsVarName
 !>   Name of the OB_type field to which \p Real2 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
 !> \param[inout] Real2
 !>   Pointer to the array to be populated.
 !> \param[in] GeoVals
@@ -1102,13 +1100,12 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !> \param[in] varnames
 !>   List of simulated variables.
 subroutine opsinputs_fill_fillreal2dfromgeovalorhofx( &
-  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName, JediToOpsLayoutMapping, hofx, varnames)
+  Hdr, OpsVarName, Real2, GeoVals, JediVarName, JediToOpsLayoutMapping, hofx, varnames)
 implicit none
 
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
-integer(integer64), intent(in)                     :: NumObs
 real(real64), pointer, intent(inout)               :: Real2(:,:)
 type(ufo_geovals), intent(in)                      :: GeoVals
 character(len=*), intent(in)                       :: JediVarName
@@ -1133,7 +1130,7 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
    end do
    if (hofxIndex > 0) then
       call opsinputs_fill_fillreal2dfromhofx( &
-           Hdr, OpsVarName, NumObs, Real2, &
+           Hdr, OpsVarName, Real2, &
            JediToOpsLayoutMapping, hofx(hofxIndex,:))
    else
       write(*, *) JediVarName, " does not appear in the list of simulated variables"
@@ -1141,7 +1138,7 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
    end if
 else
    call opsinputs_fill_fillreal2dfromgeoval( &
-        Hdr, OpsVarName, NumObs, Real2, &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
         GeoVals, JediVarName)
 end if
 
@@ -1155,8 +1152,6 @@ end subroutine opsinputs_fill_fillreal2dfromgeovalorhofx
 !>   Header to be populated.
 !> \param[in] OpsVarName
 !>   Name of the OB_type field to which \p Real2 corresponds.
-!> \param[in] NumObs
-!>   Number of observations held by this process.
 !> \param[inout] Real2
 !>   Pointer to the array to be populated.
 !> \param[in] JediToOpsLayoutMapping
@@ -1164,13 +1159,12 @@ end subroutine opsinputs_fill_fillreal2dfromgeovalorhofx
 !> \param[in] hofx
 !>   The HofX vector to use.
 subroutine opsinputs_fill_fillreal2dfromhofx( &
-  Hdr, OpsVarName, NumObs, Real2, JediToOpsLayoutMapping, hofx)
+  Hdr, OpsVarName, Real2, JediToOpsLayoutMapping, hofx)
 implicit none
 
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
-integer(integer64), intent(in)                     :: NumObs
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(c_double), intent(in)                         :: hofx(:)
@@ -1184,7 +1178,8 @@ integer                                         :: iObs, iLevel, iJediObs, numLe
 MissingReal = missing_value(0.0_c_double)
 
 ! Fill the OPS data structures
-call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = 8))
+call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+               num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = 8))
 do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
    do iLevel = 1, numLevels
