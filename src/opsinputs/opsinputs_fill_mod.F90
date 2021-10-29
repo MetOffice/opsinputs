@@ -98,12 +98,16 @@ contains
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate \p El1 and \p Hdr.
+!> \param[in] PackPGEs
+!>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
+!>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
+!>   but not all; the exceptions are mostly GNSSRO-related.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtypefromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName)
+  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -115,7 +119,7 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
-! logical, optional, intent(in)                   :: DontPackPGE
+logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -124,12 +128,19 @@ real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
+logical                                         :: DoPackPGEs
 integer                                         :: i
 character(len=*), parameter                     :: &
   RoutineName = "opsinputs_fill_fillelementtypefromsimulatedvariable"
 character(len=256)                              :: ErrorMessage
 
 ! Body:
+
+if (present(PackPGEs)) then
+  DoPackPGEs = PackPGEs
+else
+  DoPackPGEs = .true.
+end if
 
 ! The types of floating-point numbers used in this function are a bit confusing. OPS stores
 ! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
@@ -173,7 +184,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
     if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
-    call opsinputs_fill_setpgefinal(PGE(i), MissingDouble, El1(i))
+    call opsinputs_fill_setpgefinal(PGE(i), MissingDouble, DoPackPGEs, El1(i))
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
@@ -208,12 +219,16 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !>   used to populate El1 and Hdr. The variables can either have no channel suffix (in which case
 !>   \p El2 will have only a single row) or have suffixes representing the indices specified in
 !>   \p Channels.
+!> \param[in] PackPGEs
+!>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
+!>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
+!>   but not all; the exceptions are mostly GNSSRO-related.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
-  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName)
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -226,6 +241,7 @@ integer(c_int), intent(in)                      :: Channels(:)
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
+logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -235,6 +251,7 @@ real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+logical                                         :: DoPackPGEs
 
 integer                                         :: iChannel, iObs
 character(len=*), parameter                     :: &
@@ -242,6 +259,12 @@ character(len=*), parameter                     :: &
 character(len=256)                              :: ErrorMessage
 
 ! Body:
+
+if (present(PackPGEs)) then
+  DoPackPGEs = PackPGEs
+else
+  DoPackPGEs = .true.
+end if
 
 ! The types of floating-point numbers used in this function are a bit confusing. OPS stores
 ! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
@@ -294,7 +317,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
       if (Flag(iObs) /= 0)                 El2(iObs, iChannel) % Flags = ibset(0, FinalRejectFlag)
-      call opsinputs_fill_setpgefinal(PGE(iObs), MissingDouble, El2(iObs, iChannel))
+      call opsinputs_fill_setpgefinal(PGE(iObs), MissingDouble, DoPackPGEs, El2(iObs, iChannel))
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -331,7 +354,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -343,6 +366,7 @@ type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
 character(len=*), intent(in)                       :: JediVarName
+logical, optional, intent(in)                      :: PackPGEs
 
 ! Local declarations:
 real(kind=c_double)                                :: ObsValue(JediToOpsLayoutMapping % NumJediObs)
@@ -351,12 +375,19 @@ real(kind=c_float)                                 :: ObsError(JediToOpsLayoutMa
 real(kind=c_double)                                :: PGE(JediToOpsLayoutMapping % NumJediObs)
 real(kind=c_double)                                :: MissingDouble
 real(kind=c_float)                                 :: MissingFloat
+logical                                            :: DoPackPGEs
 integer                                            :: iObs, iLevel, iJediObs, numLevels
 character(len=*), parameter                        :: &
   RoutineName = "opsinputs_fill_fillelementtype2dfromsimulatedvariable_records"
 character(len=256)                                 :: ErrorMessage
 
 ! Body:
+
+if (present(PackPGEs)) then
+  DoPackPGEs = PackPGEs
+else
+  DoPackPGEs = .true.
+end if
 
 ! The types of floating-point numbers used in this function are a bit confusing. OPS stores
 ! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
@@ -417,7 +448,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
       if (Flag(iJediObs) /= 0) then
         El2(iObs, iLevel) % Flags = ibset(0, FinalRejectFlag)
       end if
-      call opsinputs_fill_setpgefinal(PGE(iJediObs), MissingDouble, El2(iObs, iLevel))
+      call opsinputs_fill_setpgefinal(PGE(iJediObs), MissingDouble, DoPackPGEs, El2(iObs, iLevel))
     end do
     El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = &
       ibset(0, FinalRejectFlag)
@@ -450,12 +481,17 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !>   to populate El1 and Hdr. If each JEDI location needs to be mapped to a separate OPS
 !>   observation, the variables can either have no channel suffix (in which case \p El2 will have
 !>   only a single row) or have suffixes representing the indices specified in \p Channels.
+!> \param[in] PackPGEs
+!>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
+!>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
+!>   but not all; the exceptions are mostly GNSSRO-related.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, &
+  PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -468,16 +504,17 @@ integer(c_int), intent(in)                         :: Channels(:)
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
 character(len=*), intent(in)                       :: JediVarName
+logical, optional, intent(in)                      :: PackPGEs
 
 ! Body:
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName)
+    Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
-    ObsErrors, JediVarName)
+    ObsErrors, JediVarName, PackPGEs)
 end if
 
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
@@ -1859,20 +1896,41 @@ end function opsinputs_fill_varnames_with_channels
 ! ------------------------------------------------------------------------------
 !> Set the PGEFinal member of an Element_Type variable.
 !>
-subroutine opsinputs_fill_setpgefinal(PGE, MissingDouble, El)
+!> \param[in] PGE
+!>   PGE value to set.
+!> \param[in] MissingDouble
+!>   JEDI missing value indicator for doubles.
+!> \param[in] PackPGEs
+!>   If true, the PGE will be stored in packed form.
+!> \param[inout] El
+!>   Variable whose PGEFinal member should be set.
+subroutine opsinputs_fill_setpgefinal(PGE, MissingDouble, PackPGEs, El)
 implicit none
 
 ! Subroutine arguments:
-
-real(kind=c_double), intent(in)   :: PGE            ! PGE value to set
-real(kind=c_double), intent(in)   :: MissingDouble  ! JEDI missing value indicator
-type(Element_type), intent(inout) :: El             ! Variable whose PGEFinal member should be set
+real(kind=c_double), intent(in)   :: PGE
+real(kind=c_double), intent(in)   :: MissingDouble
+logical, intent(in)               :: PackPGEs
+type(Element_type), intent(inout) :: El
 
 ! Body:
 if (PGE /= MissingDouble) then
-  El % PGEFinal = PGE * PPF
+  El % PGEFinal = PGE
 else
-  El % PGEFinal = PGEMDI * PPF
+  El % PGEFinal = PGEMDI
+end if
+
+! Pack the PGE
+El % PGEFinal = El % PGEFinal * PPF
+
+! Ops_VarobPGEs will chop off the fractional part. To reduce the error (and avoid having to take
+! the truncation error into account when preparing known good outputs for tests), round the number
+! first.
+El % PGEFinal = NINT(El % PGEFinal)
+
+if (.not. PackPGEs) then
+  ! Unpack the PGE
+  El % PGEFinal = El % PGEFinal / PPF
 end if
 
 end subroutine opsinputs_fill_setpgefinal
