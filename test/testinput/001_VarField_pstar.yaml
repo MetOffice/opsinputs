@@ -33,6 +33,7 @@ observations:
         field:    ["1", "1", "1"]
         ob value: ["1.10000", "-1073741824.00000", "1.40000"]
         ob error: ["0.20000", "-1073741824.00000", "0.80000"]
+        # 1.111 is the missing value indicator for PGEs. VarObs files store PGEs multiplied by 10000.
         pge:      ["100.00000", "11110.00000", "400.00000"]
         lat:      ["21.00000", "22.00000", "24.00000"]
         lon:      ["31.00000", "32.00000", "34.00000"]
