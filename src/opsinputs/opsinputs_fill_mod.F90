@@ -115,6 +115,7 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
+! logical, optional, intent(in)                   :: DontPackPGE
 
 ! Local declarations:
 real(kind=c_double)                             :: ObsValue(NumObs)
@@ -172,11 +173,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
     if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
-    if (PGE(i) /= MissingDouble) then
-      El1(i) % PGEFinal = PGE(i) * PPF
-    else
-      El1(i) % PGEFinal = PGEMDI * PPF
-    end if
+    call opsinputs_fill_setpgefinal(PGE(i), MissingDouble, El1(i))
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
@@ -297,11 +294,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
       if (Flag(iObs) /= 0)                 El2(iObs, iChannel) % Flags = ibset(0, FinalRejectFlag)
-      if (PGE(iObs) /= MissingDouble) then
-        El2(iObs, iChannel) % PGEFinal = PGE(iObs) * PPF
-      else
-        El2(iObs, iChannel) % PGEFinal = PGEMDI * PPF
-      end if
+      call opsinputs_fill_setpgefinal(PGE(iObs), MissingDouble, El2(iObs, iChannel))
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -424,11 +417,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
       if (Flag(iJediObs) /= 0) then
         El2(iObs, iLevel) % Flags = ibset(0, FinalRejectFlag)
       end if
-      if (PGE(iObs) /= MissingDouble) then
-        El2(iObs, iLevel) % PGEFinal = PGE(iJediObs) * PPF
-      else
-        El2(iObs, iLevel) % PGEFinal = PGEMDI * PPF
-      end if
+      call opsinputs_fill_setpgefinal(PGE(iJediObs), MissingDouble, El2(iObs, iLevel))
     end do
     El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = &
       ibset(0, FinalRejectFlag)
@@ -1865,5 +1854,27 @@ else
   end do
 end if
 end function opsinputs_fill_varnames_with_channels
+
+
+! ------------------------------------------------------------------------------
+!> Set the PGEFinal member of an Element_Type variable.
+!>
+subroutine opsinputs_fill_setpgefinal(PGE, MissingDouble, El)
+implicit none
+
+! Subroutine arguments:
+
+real(kind=c_double), intent(in)   :: PGE            ! PGE value to set
+real(kind=c_double), intent(in)   :: MissingDouble  ! JEDI missing value indicator
+type(Element_type), intent(inout) :: El             ! Variable whose PGEFinal member should be set
+
+! Body:
+if (PGE /= MissingDouble) then
+  El % PGEFinal = PGE * PPF
+else
+  El % PGEFinal = PGEMDI * PPF
+end if
+
+end subroutine opsinputs_fill_setpgefinal
 
 end module opsinputs_fill_mod
