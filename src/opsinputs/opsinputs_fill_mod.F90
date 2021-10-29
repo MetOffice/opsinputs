@@ -543,13 +543,21 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
 !>   (Optional) Name of the JEDI variable containing observation errors.
 !> \param[in] JediErrorGroup
 !>   (Optional) Group of the JEDI variable containing observation errors.
+!> \param[in] PackPGEs
+!>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
+!>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
+!>   but not all; the exceptions are mostly GNSSRO-related.
+!>   (At present, this routine sets all PGEs to missing values because it's not obvious whether
+!>   they are needed for non-simulated variables. If necessary, it could be modified to retrieve
+!>   them from the same group of JEDI variables, GrossErrorProbability, as
+!>   opsinputs_fill_fillelementtypefromnormalvariable).
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtypefromnormalvariable( &
   Hdr, OpsVarName, NumObs, El1, ObsSpace, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -562,8 +570,10 @@ character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
+logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
+logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
@@ -579,6 +589,12 @@ if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
   write (ErrorMessage, '(A)') &
     "JediErrorVarName and JediErrorGroup must be either both absent or both present"
   call gen_warn(RoutineName, ErrorMessage)
+end if
+
+if (present(PackPGEs)) then
+  DoPackPGEs = PackPGEs
+else
+  DoPackPGEs = .true.
 end if
 
 MissingDouble = missing_value(0.0_c_double)
@@ -606,7 +622,9 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
     ! variables. At present, however, we don't even have a use case where there is a separate
     ! variable storing the observation error.
-    El1(i) % PGEFinal = PGEMDI * PPF
+
+    ! Set El1(i) % PGEFinal to 'missing'
+    call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El1(i))
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromnormalvariable
@@ -638,13 +656,21 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !>   (Optional) Name of the JEDI variable containing observation errors.
 !> \param[in] JediErrorGroup
 !>   (Optional) Group of the JEDI variable containing observation errors.
+!> \param[in] PackPGEs
+!>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
+!>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
+!>   but not all; the exceptions are mostly GNSSRO-related.
+!>   (At present, this routine sets all PGEs to missing values because it's not obvious whether
+!>   they are needed for non-simulated variables. If necessary, it could be modified to retrieve
+!>   them from the same group of JEDI variables, GrossErrorProbability, as
+!>   opsinputs_fill_fillelementtype2dfromnormalvariable).
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromnormalvariable( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -658,8 +684,10 @@ character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
+logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
+logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
@@ -678,6 +706,12 @@ if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
   write (ErrorMessage, '(A)') &
     "JediErrorVarName and JediErrorGroup must be either both absent or both present"
   call gen_warn(RoutineName, ErrorMessage)
+end if
+
+if (present(PackPGEs)) then
+  DoPackPGEs = PackPGEs
+else
+  DoPackPGEs = .true.
 end if
 
 MissingDouble = missing_value(0.0_c_double)
@@ -721,7 +755,9 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
       ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
       ! variables. At present, however, we don't even have a use case where there is a separate
       ! variable storing the observation error.
-      El2(iObs, iChannel) % PGEFinal = PGEMDI * PPF
+
+      ! Set El1(i) % PGEFinal to 'missing'
+      call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El2(iObs, iChannel))
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
