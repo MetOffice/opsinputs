@@ -949,11 +949,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", JediToOpsLayoutMapping, Ob % BendingAngleAll, &
-          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
+          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", JediToOpsLayoutMapping, Ob % BendingAngle, &
-          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle")
+          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle", PackPGEs=.false.)
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
