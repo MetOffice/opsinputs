@@ -122,13 +122,13 @@ character(len=*), intent(in)                    :: JediVarName
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
+logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
 integer(kind=c_int)                             :: Flag(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
-logical                                         :: DoPackPGEs
 integer                                         :: i
 character(len=*), parameter                     :: &
   RoutineName = "opsinputs_fill_fillelementtypefromsimulatedvariable"
@@ -244,6 +244,7 @@ character(len=*), intent(in)                    :: JediVarName
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
+logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
 integer(kind=c_int)                             :: Flag(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
@@ -251,7 +252,6 @@ real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
-logical                                         :: DoPackPGEs
 
 integer                                         :: iChannel, iObs
 character(len=*), parameter                     :: &
@@ -369,13 +369,13 @@ character(len=*), intent(in)                       :: JediVarName
 logical, optional, intent(in)                      :: PackPGEs
 
 ! Local declarations:
+logical                                            :: DoPackPGEs
 real(kind=c_double)                                :: ObsValue(JediToOpsLayoutMapping % NumJediObs)
 integer(kind=c_int)                                :: Flag(JediToOpsLayoutMapping % NumJediObs)
 real(kind=c_float)                                 :: ObsError(JediToOpsLayoutMapping % NumJediObs)
 real(kind=c_double)                                :: PGE(JediToOpsLayoutMapping % NumJediObs)
 real(kind=c_double)                                :: MissingDouble
 real(kind=c_float)                                 :: MissingFloat
-logical                                            :: DoPackPGEs
 integer                                            :: iObs, iLevel, iJediObs, numLevels
 character(len=*), parameter                        :: &
   RoutineName = "opsinputs_fill_fillelementtype2dfromsimulatedvariable_records"
