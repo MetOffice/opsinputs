@@ -40,7 +40,9 @@ use GenMod_Core, only: &
     gen_warn,          &
     gen_fail
 
-use OpsMod_Constants, only: PPF ! PGE packing factor
+use OpsMod_Constants, only: &
+    PGEMDI,                 & ! missing value indicator for PGEs
+    PPF                       ! PGE packing factor
 use OpsMod_Kinds, only: &
     integer64,          &
     logical64,          &
@@ -169,8 +171,12 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
     if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
-    if (PGE(i) /= MissingDouble)      El1(i) % PGEFinal = PGE(i) * PPF
     if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
+    if (PGE(i) /= MissingDouble) then
+      El1(i) % PGEFinal = PGE(i) * PPF
+    else
+      El1(i) % PGEFinal = PGEMDI * PPF
+    end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
@@ -290,8 +296,12 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
     do iObs = 1, NumObs
       if (ObsValue(iObs) /= MissingDouble) El2(iObs, iChannel) % Value = ObsValue(iObs)
       if (ObsError(iObs) /= MissingFloat)  El2(iObs, iChannel) % OBErr = ObsError(iObs)
-      if (PGE(iObs) /= MissingDouble)      El2(iObs, iChannel) % PGEFinal = PGE(iObs) * PPF
       if (Flag(iObs) /= 0)                 El2(iObs, iChannel) % Flags = ibset(0, FinalRejectFlag)
+      if (PGE(iObs) /= MissingDouble) then
+        El2(iObs, iChannel) % PGEFinal = PGE(iObs) * PPF
+      else
+        El2(iObs, iChannel) % PGEFinal = PGEMDI * PPF
+      end if
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -411,11 +421,13 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
       if (ObsError(iJediObs) /= MissingFloat) then
         El2(iObs, iLevel) % OBErr = ObsError(iJediObs)
       end if
-      if (PGE(iJediObs) /= MissingDouble) then
-        El2(iObs, iLevel) % PGEFinal = PGE(iJediObs) * PPF
-      end if
       if (Flag(iJediObs) /= 0) then
         El2(iObs, iLevel) % Flags = ibset(0, FinalRejectFlag)
+      end if
+      if (PGE(iObs) /= MissingDouble) then
+        El2(iObs, iLevel) % PGEFinal = PGE(iJediObs) * PPF
+      else
+        El2(iObs, iLevel) % PGEFinal = PGEMDI * PPF
       end if
     end do
     El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = &
@@ -568,6 +580,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
     ! variables. At present, however, we don't even have a use case where there is a separate
     ! variable storing the observation error.
+    El1(i) % PGEFinal = PGEMDI * PPF
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromnormalvariable
@@ -682,6 +695,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
       ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
       ! variables. At present, however, we don't even have a use case where there is a separate
       ! variable storing the observation error.
+      El2(iObs, iChannel) % PGEFinal = PGEMDI * PPF
     end do
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
