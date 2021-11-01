@@ -1938,35 +1938,35 @@ end function opsinputs_fill_varnames_with_channels
 !>   JEDI missing value indicator for doubles.
 !> \param[in] PackPGEs
 !>   If true, the PGE will be stored in packed form.
-!> \param[inout] El
+!> \param[inout] Element
 !>   Variable whose PGEFinal member should be set.
-subroutine opsinputs_fill_setpgefinal(PGE, MissingDouble, PackPGEs, El)
+subroutine opsinputs_fill_setpgefinal(PGE, MissingDouble, PackPGEs, Element)
 implicit none
 
 ! Subroutine arguments:
 real(kind=c_double), intent(in)   :: PGE
 real(kind=c_double), intent(in)   :: MissingDouble
 logical, intent(in)               :: PackPGEs
-type(Element_type), intent(inout) :: El
+type(Element_type), intent(inout) :: Element
 
 ! Body:
 if (PGE /= MissingDouble) then
-  El % PGEFinal = PGE
+  Element % PGEFinal = PGE
 else
-  El % PGEFinal = PGEMDI
+  Element % PGEFinal = PGEMDI
 end if
 
 ! Pack the PGE
-El % PGEFinal = El % PGEFinal * PPF
+Element % PGEFinal = Element % PGEFinal * PPF
 
 ! Ops_VarobPGEs will chop off the fractional part. To reduce the error (and avoid having to take
 ! the truncation error into account when preparing known good outputs for tests), round the number
 ! first.
-El % PGEFinal = NINT(El % PGEFinal)
+Element % PGEFinal = NINT(Element % PGEFinal)
 
 if (.not. PackPGEs) then
   ! Unpack the PGE
-  El % PGEFinal = El % PGEFinal / PPF
+  Element % PGEFinal = Element % PGEFinal / PPF
 end if
 
 end subroutine opsinputs_fill_setpgefinal
