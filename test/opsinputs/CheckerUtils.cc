@@ -32,6 +32,10 @@ std::string readTextFile(const std::string &fileName) {
   return sstream.str();
 }
 
+std::string quoted(const std::string &s) {
+  return '"' + s + '"';
+}
+
 }  // namespace
 
 std::string getEnvVariableOrThrow(const char *variableName) {
@@ -93,23 +97,19 @@ std::string runOpsPrintUtil(const char *printUtilName, const std::string &inputF
     if (!inputFilePathName.exists())
       throw std::runtime_error("File '" + inputFilePathName + "' not found");
 
-    std::string exePath;
+    std::string cmd;
     if (char *runner = getenv("OPSINPUTS_OPSPROG_RUNNER")) {
-      exePath = "\"";
-      exePath += runner;
-      exePath += "\" ";
+      cmd += quoted(runner) + ' ';
     }
-    exePath += printUtilName;
-
-    const std::string cmd = "mpiexec -n 1 " + exePath + " \"" + inputFilePathName +
-        "\" --all --outfile=\"" + tempFile->name() + "\"";
-    if (oops::mpi::world().rank() == 0) {
-      oops::Log::info() << "Running " << cmd << "\n";
-      const int exitCode = std::system(cmd.c_str());
-      if (exitCode != 0)
-        throw std::runtime_error(std::string(printUtilName) + " failed with exit code " +
-                                 std::to_string(exitCode));
-    }
+    cmd += quoted(printUtilName) + ' ';
+    cmd += quoted(inputFilePathName);
+    cmd += " --all ";
+    cmd += quoted("--outfile=" + tempFile->name());
+    oops::Log::info() << "Running " << cmd << "\n";
+    const int exitCode = std::system(cmd.c_str());
+    if (exitCode != 0)
+      throw std::runtime_error(std::string(printUtilName) + " failed with exit code " +
+                               std::to_string(exitCode));
   }
 
   exceptionSynchronizer.throwIfAnyProcessHasThrown();

@@ -1,5 +1,9 @@
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
-  set(GCOM_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused")
+  if("${CMAKE_Fortran_COMPILER_VERSION}" VERSION_GREATER "10.1.0")
+    set(GCOM_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused -fallow-argument-mismatch")
+  else()
+    set(GCOM_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused")
+  endif()
 elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(GCOM_EXTRA_Fortran_FLAGS "-warn nounused")
 endif()
@@ -152,8 +156,12 @@ set(GCOM_SOURCE_FILES
   mpl/mpl_isend.F90
   mpl/mpl_issend.F90
   mpl/mpl_op_create.F90
-  mpl/mpl_pack.F90
-  mpl/mpl_pack_size.F90
+  # These files are excluded, since they are unused and warnings are emitted during
+  # their compilation with ifort, which prevents us from enabling the "treat warnings
+  # as errors" mode.
+  # mpl/mpl_pack.F90
+  # mpl/mpl_pack_size.F90
+  # mpl/mpl_unpack.F90
   mpl/mpl_probe.F90
   mpl/mpl_put.F90
   mpl/mpl_query_thread.F90
@@ -175,7 +183,6 @@ set(GCOM_SOURCE_FILES
   mpl/mpl_type_get_extent.F90
   mpl/mpl_type_struct.F90
   mpl/mpl_type_vector.F90
-  mpl/mpl_unpack.F90
   mpl/mpl_wait.F90
   mpl/mpl_waitall.F90
   mpl/mpl_waitany.F90
@@ -201,6 +208,8 @@ set(GCOM_SOURCE_DIRS
   gc gcg include mpl
 )
 
+# Setup the parallel version of the gcom library
+
 ecbuild_add_library(
   TARGET gcom
   SOURCES ${GCOM_SOURCE_FILES})
@@ -224,4 +233,34 @@ get_target_property(GCOM_Fortran_MODULE_DIRECTORY gcom Fortran_MODULE_DIRECTORY)
 target_include_directories(gcom
   PRIVATE ${GCOM_SOURCE_DIRS}
   INTERFACE $<BUILD_INTERFACE:${GCOM_Fortran_MODULE_DIRECTORY}>
+)
+
+# Setup the serial version of the gcom library
+
+ecbuild_add_library(
+  TARGET gcom_serial
+  SOURCES ${GCOM_SOURCE_FILES})
+
+# For the serial version, skip the MPI_SRC symbol...
+target_compile_definitions(gcom_serial PRIVATE
+  GC_VERSION="'7.2'"
+  GC_DESCRIP="'SERIAL'"
+  GC_BUILD_DATE="'927'"
+  MPILIB_32B
+  PREC_64B
+  GC__FORTERRUNIT=0
+  GC__FLUSHUNIT6
+#  USE_MPIF_INCLUDE
+)
+
+# ... and don't link to MPI::MPI_Fortran.
+
+get_target_property(GCOM_SERIAL_Fortran_MODULE_DIRECTORY gcom_serial Fortran_MODULE_DIRECTORY)
+set(GCOM_SERIAL_Fortran_MODULE_DIRECTORY ${GCOM_SERIAL_Fortran_MODULE_DIRECTORY}/serial)
+set_target_properties(gcom_serial PROPERTIES
+                      Fortran_MODULE_DIRECTORY ${GCOM_SERIAL_Fortran_MODULE_DIRECTORY})
+
+target_include_directories(gcom_serial
+  PRIVATE ${GCOM_SOURCE_DIRS}
+  INTERFACE $<BUILD_INTERFACE:${GCOM_SERIAL_Fortran_MODULE_DIRECTORY}>
 )
