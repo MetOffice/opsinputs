@@ -51,6 +51,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Output only observations that passed the quality check in at least one variable.
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
+  /// Increment "window begin" datetime by an integer number of seconds, for the purpose of
+  /// defining validity time and data time as the midpoint of start and end times.
+  oops::Parameter<int> incrementWindowBeginSeconds{"increment_window_begin_seconds", 0, this};
 
   /// Account for the GPSRO tangent point drift.
   oops::Parameter<bool> accountForGPSROTangentPointDrift{

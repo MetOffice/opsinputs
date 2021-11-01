@@ -1,0 +1,25 @@
+window begin: 2017-12-31T23:59:59Z
+window end: 2018-01-01T12:00:00Z
+
+observations:
+  - obs space:
+      name: AMSUB
+      obsdatain:
+        obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
+    geovals:
+      filename: Data/001_UpperAirCxField_theta.nc4
+    obs filters:
+    - filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
+      general_mode: debug
+      IC_PLevels: 5
+      increment_window_begin_seconds: 1 # window begin is offset back by 1 second
+    - filter: Cx Checker
+      expected_header_fields:
+        # Midpoint window begin--end: year, month, day, hour, minute, second
+        Data Time:     "2018      1      1      6      0      0 -32768"
+        Validity Time: "2018      1      1      6      0      0 -32768"
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
