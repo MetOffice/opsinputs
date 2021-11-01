@@ -10,7 +10,6 @@ observations:
     obs filters:
     - filter: VarObs Writer
       namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
-      increment_window_begin_seconds: 1 # window begin is offset back by 1 second
     - filter: VarObs Checker
       expected_header_fields:
         # Midpoint window begin--end: year, month, day, hour, minute, second

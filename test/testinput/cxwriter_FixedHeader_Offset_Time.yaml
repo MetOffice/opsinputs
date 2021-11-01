@@ -14,7 +14,6 @@ observations:
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       general_mode: debug
       IC_PLevels: 5
-      increment_window_begin_seconds: 1 # window begin is offset back by 1 second
     - filter: Cx Checker
       expected_header_fields:
         # Midpoint window begin--end: year, month, day, hour, minute, second
