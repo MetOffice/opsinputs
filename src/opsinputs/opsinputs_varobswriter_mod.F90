@@ -879,7 +879,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % v10AmbWind, "v10AmbWind", Ob % Header % NumObsLocal, Ob % v10AmbWind)
     case (VarField_pcorrect)
-      ! TODO(someone): handle this varfield
+      ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", Ob % Header % NumObsLocal, Ob % AWPriorPCorrect)
     case (VarField_NumChans)
       FillNumChans = .true.
@@ -938,7 +938,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % clw, "clw", Ob % Header % NumObsLocal, Ob % clw)
     case (VarField_refrac)
-      ! TODO(someone): handle this varfield
+      ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
     case (VarField_z)
       ! TODO(someone): handle this varfield
@@ -949,11 +949,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", JediToOpsLayoutMapping, Ob % BendingAngleAll, &
-          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME")
+          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", JediToOpsLayoutMapping, Ob % BendingAngle, &
-          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle")
+          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle", PackPGEs=.false.)
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -961,20 +961,20 @@ do iVarField = 1, nVarFields
          ! once it is known.
          call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParamAll, "ImpactParamAll", Ob % Header % NumObsLocal, Ob % ImpactParamAll, &
-           ObsSpace, self % channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
+           ObsSpace, self % channels, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP", PackPGEs = .false.)
        else
          call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam, &
-           ObsSpace, self % channels, "impact_parameter", "MetaData")
+           ObsSpace, self % channels, "impact_parameter", "MetaData", PackPGEs = .false.)
        end if
     case (VarField_RO_Rad_Curv)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % RO_Rad_Curv, "RO_Rad_Curv", Ob % Header % NumObsLocal, Ob % RO_Rad_Curv, &
-        ObsSpace, "earth_radius_of_curvature", "MetaData")
+        ObsSpace, "earth_radius_of_curvature", "MetaData", PackPGEs = .false.)
     case (VarField_RO_geoid_und)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
-        ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData")
+        ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData", PackPGEs = .false.)
     case (VarField_AOD)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
