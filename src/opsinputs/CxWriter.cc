@@ -41,7 +41,7 @@ CxWriter::CxWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
       obsdb.windowStart() + (obsdb.windowEnd() - obsdb.windowStart()) / 2;
   int year, month, day, hour, minute, second;
   exactValidityTime.toYYYYMMDDhhmmss(year, month, day, hour, minute, second);
-  int nearestHour = std::round(hour + minute/60.0f + second/60.0f/60.0f);
+  int nearestHour = std::round(hour + minute/60.0f + second/(60.0f*60.0f));
   util::DateTime validityTime;
   if (nearestHour == 24) {
     validityTime = util::DateTime(year, month, day, 0, 0, 0);
