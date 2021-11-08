@@ -36,8 +36,19 @@ CxWriter::CxWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
 
   eckit::LocalConfiguration conf(parameters_.toConfiguration());
   // Validity time is set to the midpoint of the assimilation window
-  const util::DateTime validityTime =
+  // (this is rounded to the nearest hour)
+  const util::DateTime exactValidityTime =
       obsdb.windowStart() + (obsdb.windowEnd() - obsdb.windowStart()) / 2;
+  int year, month, day, hour, minute, second;
+  exactValidityTime.toYYYYMMDDhhmmss(year, month, day, hour, minute, second);
+  int nearestHour = std::round(hour + minute/60.0f + second/(60.0f*60.0f));
+  util::DateTime validityTime;
+  if (nearestHour == 24) {
+    validityTime = util::DateTime(year, month, day, 0, 0, 0);
+    validityTime += util::Duration("P1D");
+  } else {
+    validityTime = util::DateTime(year, month, day, nearestHour, 0, 0);
+  }
   conf.set("validity_time", validityTime.toString());
   conf.set("obs_group", obsdb.obsname());
 
