@@ -81,6 +81,7 @@ function( ADD_WRITER_TEST )
                       COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
                       ARGS    "testinput/${_PAR_YAML}"
                       ENVIRONMENT "${environment}"
+                      MPI     1
                       DEPENDS test_OpsInputsFilters.x )
   endif()
   set_tests_properties( test_opsinputs_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
