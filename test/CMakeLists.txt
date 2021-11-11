@@ -39,8 +39,6 @@ endfunction()
 # - data: Paths to any data files (typically NetCDF files) required by the test, relative to the
 #   testinput folder. Symlinks to these files will be added to the Data subfolder of the build
 #   folder.
-# - num_tasks: Number of MPI tasks to spawn when running the test. If the MPI option is not present,
-#   the test will be run without MPI.
 # Options:
 # - DONT_SET_OPS_OUTPUT_DIR_ENV_VAR: if true, OPS environment variables specifying output folders
 #   won't be set, so the output folder needs to be defined in the YAML file.
@@ -69,21 +67,15 @@ function( ADD_WRITER_TEST )
       OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME} )
   endif()
 
-  if ( _PAR_MPI )
-    ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
-                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
-                      ARGS    "testinput/${_PAR_YAML}"
-                      ENVIRONMENT "${environment}"
-                      MPI     ${_PAR_MPI}
-                      DEPENDS test_OpsInputsFilters.x )
-  else()
-    ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
-                      COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
-                      ARGS    "testinput/${_PAR_YAML}"
-                      ENVIRONMENT "${environment}"
-                      MPI     1
-                      DEPENDS test_OpsInputsFilters.x )
+  if (NOT _PAR_MPI)
+     set(_PAR_MPI 1)
   endif()
+  ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
+                    COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
+                    ARGS    "testinput/${_PAR_YAML}"
+                    ENVIRONMENT "${environment}"
+                    MPI     ${_PAR_MPI}
+                    DEPENDS test_OpsInputsFilters.x )
   set_tests_properties( test_opsinputs_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
