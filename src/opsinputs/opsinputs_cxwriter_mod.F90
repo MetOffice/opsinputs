@@ -25,10 +25,9 @@ use obsspace_mod, only: &
     obsspace_get_nlocs
 use oops_variables_mod, only: oops_variables
 use opsinputs_cxfields_mod
-use opsinputs_fill_mod, only:            &
-    opsinputs_fill_fillrealfromgeoval,   &
-    opsinputs_fill_fillreal2dfromgeoval, &
-    opsinputs_fill_fillreal2dfromhofx
+use opsinputs_fill_mod, only:                 &
+    opsinputs_fill_fillrealfromgeoval,        &
+    opsinputs_fill_fillreal2dfromgeovalorhofx
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
 use opsinputs_obsspace_mod, only: opsinputs_obsspace_get_db_datetime_offset_in_seconds
 use opsinputs_utils_mod, only: &
@@ -853,6 +852,7 @@ character                               :: DustBinIndexStr
 integer                                 :: irh, ivar
 
 
+
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
 
@@ -1055,162 +1055,177 @@ do iCxField = 1, size(CxFields)
 
     ! Upper-air variables
     case (StashItem_theta) ! IndexCxtheta
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % theta, "theta", Cx % Header % NumLocal, Cx % theta, &
-        self % GeoVals, opsinputs_cxfields_theta)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % theta, "theta", Cx % theta, &
+        self % GeoVals, opsinputs_cxfields_theta, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
-      ! Index of relative_humidity in hofx array.
-      irh = 0
-      do ivar = 1, size(self % hofx, 1)
-         if (self % varnames % variable(ivar) == "relative_humidity") then
-            irh = ivar
-         end if
-      end do
-
-      if (self % JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
-         if (irh > 0) then
-            call opsinputs_fill_fillreal2dfromhofx( &
-                 Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
-                 self % JediToOpsLayoutMapping, self % hofx(irh,:))
-         else
-            ! something bad happens if the variable was not simulated
-         end if
-      else
-         call opsinputs_fill_fillreal2dfromgeoval( &
-              Cx % Header % rh, "rh", Cx % Header % NumLocal, Cx % rh, &
-              self % GeoVals, opsinputs_cxfields_rh)
-      end if
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % rh, "rh", Cx % rh, &
+        self % GeoVaLs, opsinputs_cxfields_rh, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % u, "u", Cx % Header % NumLocal, Cx % u, &
-        self % GeoVals, opsinputs_cxfields_u)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % u, "u", Cx % u, &
+        self % GeoVals, opsinputs_cxfields_u, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_v) ! IndexCxv
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % v, "v", Cx % Header % NumLocal, Cx % v, &
-        self % GeoVals, opsinputs_cxfields_v)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % v, "v", Cx % v, &
+        self % GeoVals, opsinputs_cxfields_v, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_w) ! IndexCxw
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % w, "w", Cx % Header % NumLocal, Cx % w, &
-        self % GeoVals, opsinputs_cxfields_w)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % w, "w", Cx % w, &
+        self % GeoVals, opsinputs_cxfields_w, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_q) ! IndexCxq
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % q, "q", Cx % Header % NumLocal, Cx % q, &
-        self % GeoVals, opsinputs_cxfields_q)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % q, "q", Cx % q, &
+        self % GeoVals, opsinputs_cxfields_q, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_qc) ! IndexCxqc
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % qc, "qc", Cx % Header % NumLocal, Cx % qc, &
-        self % GeoVals, opsinputs_cxfields_qc)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % qc, "qc", Cx % qc, &
+        self % GeoVals, opsinputs_cxfields_qc, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_p_bar) ! IndexCxp_bar
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % p_bar, "p_bar", Cx % Header % NumLocal, Cx % p_bar, &
-        self % GeoVals, opsinputs_cxfields_p_bar)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % p_bar, "p_bar", Cx % p_bar, &
+        self % GeoVals, opsinputs_cxfields_p_bar, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     ! wsmigaj: I haven't been able to identify the stash code associated with this field
     ! case (?) ! IndexCxcloud
-      !  call opsinputs_fill_fillreal2dfromgeoval( &
-      !    Cx % Header % cloud, "cloud", Cx % Header % NumLocal, Cx % cloud, &
-      !    self % GeoVals, opsinputs_cxfields_cloud)
+      !  call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+      !    Cx % Header % cloud, "cloud", Cx % cloud, &
+      !    self % GeoVals, opsinputs_cxfields_cloud, &
+      !    self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_ql_layer) ! IndexCxql_layer
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % ql_layer, "ql_layer", Cx % Header % NumLocal, Cx % ql_layer, &
-        self % GeoVals, opsinputs_cxfields_ql_layer)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % ql_layer, "ql_layer", Cx % ql_layer, &
+        self % GeoVals, opsinputs_cxfields_ql_layer, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_p) ! IndexCxP
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % PLevelsA, "PLevelsA", Cx % Header % NumLocal, Cx % PLevelsA, &
-        self % GeoVals, opsinputs_cxfields_PLevelsA)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % PLevelsA, "PLevelsA", Cx % PLevelsA, &
+        self % GeoVals, opsinputs_cxfields_PLevelsA, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (AncilCode_salt) ! IndexCxSalt
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % Salt, "Salt", Cx % Header % NumLocal, Cx % Salt, &
-        self % GeoVals, opsinputs_cxfields_Salt)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % Salt, "Salt", Cx % Salt, &
+        self % GeoVals, opsinputs_cxfields_Salt, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_t_p) ! IndexCxt
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % t, "t", Cx % Header % NumLocal, Cx % t, &
-        self % GeoVals, opsinputs_cxfields_t)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % t, "t", Cx % t, &
+        self % GeoVals, opsinputs_cxfields_t, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_qf_layer) ! IndexCxqf_layer
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % qf_layer, "qf_layer", Cx % Header % NumLocal, Cx % qf_layer, &
-        self % GeoVals, opsinputs_cxfields_qf_layer)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % qf_layer, "qf_layer", Cx % qf_layer, &
+        self % GeoVals, opsinputs_cxfields_qf_layer, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_RainRate_layer) ! IndexCxRainRate_layer
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % RainRate_layer, "RainRate_layer", Cx % Header % NumLocal, Cx % RainRate_layer, &
-        self % GeoVals, opsinputs_cxfields_RainRate_layer)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % RainRate_layer, "RainRate_layer", Cx % RainRate_layer, &
+        self % GeoVals, opsinputs_cxfields_RainRate_layer, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_cloud_conv) ! IndexCxcloud_conv
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % cloud_conv, "cloud_conv", Cx % Header % NumLocal, Cx % cloud_conv, &
-        self % GeoVals, opsinputs_cxfields_cloud_conv)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % cloud_conv, "cloud_conv", Cx % cloud_conv, &
+        self % GeoVals, opsinputs_cxfields_cloud_conv, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_qc_conv) ! IndexCxqc_conv
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % qc_conv, "qc_conv", Cx % Header % NumLocal, Cx % qc_conv, &
-        self % GeoVals, opsinputs_cxfields_qc_conv)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % qc_conv, "qc_conv", Cx % qc_conv, &
+        self % GeoVals, opsinputs_cxfields_qc_conv, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_cloud_layer) ! IndexCxcloud_layer
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % cloud_layer, "cloud_layer", Cx % Header % NumLocal, Cx % cloud_layer, &
-        self % GeoVals, opsinputs_cxfields_cloud_layer)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % cloud_layer, "cloud_layer", Cx % cloud_layer, &
+        self % GeoVals, opsinputs_cxfields_cloud_layer, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_ozone_new) ! IndexCxOzone
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % ozone, "ozone", Cx % Header % NumLocal, Cx % ozone, &
-        self % GeoVals, opsinputs_cxfields_ozone)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % ozone, "ozone", Cx % ozone, &
+        self % GeoVals, opsinputs_cxfields_ozone, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_qcf) ! IndexCxqcf
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % qcf, "qcf", Cx % Header % NumLocal, Cx % qcf, &
-        self % GeoVals, opsinputs_cxfields_qcf)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % qcf, "qcf", Cx % qcf, &
+        self % GeoVals, opsinputs_cxfields_qcf, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_qcl) ! IndexCxqcl
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % qcl, "qcl", Cx % Header % NumLocal, Cx % qcl, &
-        self % GeoVals, opsinputs_cxfields_qcl)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % qcl, "qcl", Cx % qcl, &
+        self % GeoVals, opsinputs_cxfields_qcl, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_cloud_bulk) ! IndexCxcloud_bulk
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % cloud_bulk, "cloud_bulk", Cx % Header % NumLocal, Cx % cloud_bulk, &
-        self % GeoVals, opsinputs_cxfields_cloud_bulk)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % cloud_bulk, "cloud_bulk", Cx % cloud_bulk, &
+        self % GeoVals, opsinputs_cxfields_cloud_bulk, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     ! wsmigaj: I haven't been able to identify the stash code associated with this field
     ! case (?)
       ! if (Cx % Header % ObsGroup == ObsGroupGroundLidar) then
-      !   call opsinputs_fill_fillreal2dfromgeoval( &
-      !     Cx % Header % aerosol_p, "aerosol_p", Cx % Header % NumLocal, Cx % aerosol_p, &
-      !     self % GeoVals, opsinputs_cxfields_aerosol_p)
+      !   call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+      !     Cx % Header % aerosol_p, "aerosol_p", Cx % aerosol_p, &
+      !     self % GeoVals, opsinputs_cxfields_aerosol_p, &
+      !     self % JediToOpsLayoutMapping, self % hofx, self % varnames)
       ! end if
     case (StashCode_CDNC) ! IndexCxCDNC
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % CDNC, "CDNC", Cx % Header % NumLocal, Cx % CDNC, &
-        self % GeoVals, opsinputs_cxfields_CDNC)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % CDNC, "CDNC", Cx % CDNC, &
+        self % GeoVals, opsinputs_cxfields_CDNC, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_RH_AfterMainCloud) ! IndexCxRH_AMC
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % RH_AMC, "RH_AMC", Cx % Header % NumLocal, Cx % RH_AMC, &
-        self % GeoVals, opsinputs_cxfields_RH_AMC)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % RH_AMC, "RH_AMC", Cx % RH_AMC, &
+        self % GeoVals, opsinputs_cxfields_RH_AMC, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_Cl) ! IndexCxCl
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % Cl, "Cl", Cx % Header % NumLocal, Cx % Cl, &
-        self % GeoVals, opsinputs_cxfields_Cl)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % Cl, "Cl", Cx % Cl, &
+        self % GeoVals, opsinputs_cxfields_Cl, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_Cf) ! IndexCxCf
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % Cf, "Cf", Cx % Header % NumLocal, Cx % Cf, &
-        self % GeoVals, opsinputs_cxfields_Cf)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % Cf, "Cf", Cx % Cf, &
+        self % GeoVals, opsinputs_cxfields_Cf, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_qrain) ! IndexCxqrain
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % qrain, "qrain", Cx % Header % NumLocal, Cx % qrain, &
-        self % GeoVals, opsinputs_cxfields_qrain)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % qrain, "qrain", Cx % qrain, &
+        self % GeoVals, opsinputs_cxfields_qrain, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_Exner) ! IndexCxExnerA
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % ExnerA, "ExnerA", Cx % Header % NumLocal, Cx % ExnerA, &
-        self % GeoVals, opsinputs_cxfields_ExnerA)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % ExnerA, "ExnerA", Cx % ExnerA, &
+        self % GeoVals, opsinputs_cxfields_ExnerA, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_RichNumber) ! IndexCxRichNumber
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % RichNumber, "RichNumber", Cx % Header % NumLocal, Cx % RichNumber, &
-        self % GeoVals, opsinputs_cxfields_RichNumber)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % RichNumber, "RichNumber", Cx % RichNumber, &
+        self % GeoVals, opsinputs_cxfields_RichNumber, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_SoilMoisture) ! IndexCxSoilMoisture
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % SoilMoisture, "SoilMoisture", Cx % Header % NumLocal, Cx % SoilMoisture, &
-        self % GeoVals, opsinputs_cxfields_SoilMoisture)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % SoilMoisture, "SoilMoisture", Cx % SoilMoisture, &
+        self % GeoVals, opsinputs_cxfields_SoilMoisture, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_SoilTemp) ! IndexCxSoilTemp
-      call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % SoilTemp, "SoilTemp", Cx % Header % NumLocal, Cx % SoilTemp, &
-        self % GeoVals, opsinputs_cxfields_SoilTemp)
+      call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+        Cx % Header % SoilTemp, "SoilTemp", Cx % SoilTemp, &
+        self % GeoVals, opsinputs_cxfields_SoilTemp, &
+        self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:IndexCxDust6
       DustBinIndex = CxField - StashItem_dustMin + 1
       if (DustBinIndex <= NDustBins) then
         write (DustBinIndexStr, '(i1)') DustBinIndex
-        call opsinputs_fill_fillreal2dfromgeoval( &
-          Cx % Header % dustp, "dustp", Cx % Header % NumLocal, Cx % dustp(DustBinIndex) % field, &
-          self % GeoVals, opsinputs_cxfields_dustp // DustBinIndexStr)
+        call opsinputs_fill_fillreal2dfromgeovalorhofx( &
+          Cx % Header % dustp, "dustp", Cx % dustp(DustBinIndex) % field, &
+          self % GeoVals, opsinputs_cxfields_dustp // DustBinIndexStr, &
+          self % JediToOpsLayoutMapping, self % hofx, self % varnames)
       end if
   end select
 end do
