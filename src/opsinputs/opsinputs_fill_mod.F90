@@ -2024,8 +2024,8 @@ end if
 
 if (PackPGEs) then
   ! For varfields which Ops_VarobPGEs expects PGEs in packed form: 
-  ! pack consistent with OPS by multiplying by PPF, truncate and then add a (dummy) inital PGE value
-  ! as the fractional part.
+  ! pack consistent with OPS by multiplying by PPF, add a (dummy) inital PGE value
+  ! as the fractional part and then truncate.
   Element % PGEFinal = Element % PGEFinal * PPF + DummyPGEInit
   Element % PGEFinal = AINT(Element % PGEFinal)
 else
