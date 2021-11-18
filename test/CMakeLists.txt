@@ -129,6 +129,9 @@ ADD_WRITER_TEST(NAME     varobswriter_003_VarField_rh_Surface
 ADD_WRITER_TEST(NAME     varobswriter_003_VarField_rh_Sonde
                 YAML     003_VarField_rh_Sonde.yaml
                 DATA     003_VarField_rh_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Satwind
+                YAML     004_VarField_u_Satwind.yaml
+                DATA     004_VarField_u_Satwind.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Surface
                 YAML     004_VarField_u_Surface.yaml
                 DATA     004_VarField_u_Surface.nc4)

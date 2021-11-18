@@ -15,6 +15,35 @@ missing_int = np.iinfo(np.int32).min + 5
 # NetCDF missing values
 missing_float_nc = 9.969209968386869e+36
 
+def output_satwind_var_to_netcdf(var_name, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
+
+    nlocs = 4
+    f.createDimension('nlocs', nlocs)
+
+    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var[:] = [59.24331, 59.75357, 59.62949, 59.39227]
+    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var[:] = [-80.77397, -80.47578, -70.80056, -69.47110]
+    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var[:] = [81140, 82040, 34220, 36440]
+    var = f.createVariable('satellite_identifier@MetaData', 'i', ('nlocs'))
+    var[:] = [270, 270, 270, 270]
+    var = f.createVariable('datetime@MetaData', str, ('nlocs'))
+    # The NetCDF4 module doesn't support assigning values to variable-length string variables
+    # using the `var[:] = ...` syntax, so we do it using a loop
+    for i, s in enumerate(["2020-10-01T07:00:00Z", "2020-10-01T07:00:00Z",
+                           "2020-10-01T07:00:00Z", "2020-10-01T07:00:00Z"]):
+        var[i] = s
+    var = f.createVariable(var_name + '@ObsValue', 'f', ('nlocs',))
+    var[:] = [-6.64399, -6.12887, -3.85892, -5.14022]
+    var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
+    var[:] = [6.46456, 5.53716, 4.17585, 4.26592]
+    var = f.createVariable(var_name + '@GrossErrorProbability', 'f', ('nlocs',))
+    var[:] = [0.4215156, 0.3998851, 0.1660898, 0.238132]
+    
+    f.close()
+
 def output_1d_simulated_var_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
 
@@ -513,6 +542,7 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('air_temperature',             'testinput/002_VarField_temperature_RadarZ.nc4')
     output_1d_simulated_var_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Surface.nc4')
     output_simulated_var_profiles_to_netcdf('relative_humidity',           'testinput/003_VarField_rh_Sonde.nc4')
+    output_satwind_var_to_netcdf     ('eastward_wind',               'testinput/004_VarField_u_Satwind.nc4')
     output_1d_simulated_var_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Surface.nc4')
     output_simulated_var_profiles_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Surface.nc4')

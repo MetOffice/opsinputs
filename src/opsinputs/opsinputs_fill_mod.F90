@@ -2012,6 +2012,9 @@ real(kind=c_double), intent(in)   :: MissingDouble
 logical, intent(in)               :: PackPGEs
 type(Element_type), intent(inout) :: Element
 
+! Local declarations:
+real, parameter                   :: DummyPGEInit  = 0.1
+
 ! Body:
 if (PGE /= MissingDouble) then
   Element % PGEFinal = PGE
@@ -2019,16 +2022,18 @@ else
   Element % PGEFinal = PGEMDI
 end if
 
-! Pack the PGE
-Element % PGEFinal = Element % PGEFinal * PPF
-
-! Ops_VarobPGEs will chop off the fractional part. To reduce the error (and avoid having to take
-! the truncation error into account when preparing known good outputs for tests), round the number
-! first.
-Element % PGEFinal = NINT(Element % PGEFinal)
-
-if (.not. PackPGEs) then
-  ! Unpack the PGE
+if (PackPGEs) then
+  ! For varfields which Ops_VarobPGEs expects PGEs in packed form: 
+  ! pack consistent with OPS by multiplying by PPF, truncate and then add a (dummy) inital PGE value
+  ! as the fractional part.
+  Element % PGEFinal = Element % PGEFinal * PPF + DummyPGEInit
+  Element % PGEFinal = AINT(Element % PGEFinal)
+else
+  ! Varfields which Ops_VarobPGEs expects PGEs in unpacked form,
+  ! To reduce the error (and avoid having to take the truncation error into account when preparing 
+  ! known good outputs for tests), round the number after multiplying by PPF and then divide to undo.
+  Element % PGEFinal = Element % PGEFinal * PPF
+  Element % PGEFinal = NINT(Element % PGEFinal)
   Element % PGEFinal = Element % PGEFinal / PPF
 end if
 
