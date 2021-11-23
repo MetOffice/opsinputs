@@ -506,6 +506,31 @@ def output_2d_geoval_for_multi_level_obs_to_netcdf(var_name, file_name):
 
     f.close()
 
+def output_full_cx(oned_var_names, twod_var_names, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 4
+    nlevs = 3
+    f.createDimension('nlocs', nlocs)
+    f.createDimension('nlevs', nlevs)
+
+    for var_index, var_name in enumerate(twod_var_names):
+      var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+      shift = 10 * var_index
+      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
+                [shift + 2.1, missing_float, shift + 2.3],
+                [shift + 3.1, shift + 3.2, shift + 3.3],
+                [shift + 4.1, shift + 4.2, shift + 4.3]]
+
+    for var_index, var_name in enumerate(oned_var_names):
+      var = f.createVariable(var_name, 'f', ('nlocs',))
+      shift = 10 * var_index
+      var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
+
+    f.date_time = 2018010100
+
+    f.close()
+
 if __name__ == "__main__":
     # VarObs
     output_1d_simulated_var_to_netcdf('surface_pressure',            'testinput/001_VarField_pstar.nc4') # Surface
@@ -562,6 +587,14 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('mass_content_of_cloud_ice_in_atmosphere_layer', 'testinput/029_UpperAirCxField_qcf.nc4')
     output_2d_geoval_to_netcdf       ('mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'testinput/030_UpperAirCxField_qcl.nc4')
     output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
+
+    # Cx full output for an obsgroup testing
+    # list of 1d-variables; list of 2d-variables
+    output_full_cx(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
+                    'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
+                   ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                    'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels'],
+                   'testinput/cx_namelist_atms.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')

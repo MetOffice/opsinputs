@@ -410,9 +410,10 @@ ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 # Tests the namelist files in the etc directory
-#ADD_WRITER_TEST(NAME      cxwriter_namelist_atms
-#                YAML      cxwriter_namelist_atms.yaml
-#                NAMELIST  
+ADD_WRITER_TEST(NAME     cxwriter_namelist_atms
+                YAML     cxwriter_namelist_atms.yaml
+                NAMELIST ../../etc/global/cx/ATMS.nl
+                DATA     cx_namelist_atms.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
