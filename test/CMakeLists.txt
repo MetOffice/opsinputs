@@ -341,10 +341,22 @@ ADD_WRITER_TEST(NAME     cxwriter_030_UpperAirCxField_qcl
                 YAML     030_UpperAirCxField_qcl.yaml
                 NAMELIST CxWriterNamelists_030_UpperAirCxField_qcl/AMSUB.nl
                 DATA     030_UpperAirCxField_qcl.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_031_UpperAirCxField_cloud_bulk
+                YAML     031_UpperAirCxField_cloud_bulk.yaml
+                NAMELIST CxWriterNamelists_031_UpperAirCxField_cloud_bulk/AMSUB.nl
+                DATA     031_UpperAirCxField_cloud_bulk.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_033_UpperAirCxField_p_bar
                 YAML     033_UpperAirCxField_p_bar.yaml
                 NAMELIST CxWriterNamelists_033_UpperAirCxField_p_bar/AMSUB.nl
                 DATA     033_UpperAirCxField_p_bar.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_034_UpperAirCxField_Cf
+                YAML     034_UpperAirCxField_Cf.yaml
+                NAMELIST CxWriterNamelists_034_UpperAirCxField_Cf/AMSUB.nl
+                DATA     034_UpperAirCxField_Cf.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_035_UpperAirCxField_Cl
+                YAML     035_UpperAirCxField_Cl.yaml
+                NAMELIST CxWriterNamelists_035_UpperAirCxField_Cl/AMSUB.nl
+                DATA     035_UpperAirCxField_Cl.nc4 dummy.nc4)
 
 ADD_WRITER_TEST(NAME     cxwriter_041-042_UpperAirCxField_dust1-dust2
                 YAML     041-042_UpperAirCxField_dust1-dust2.yaml
