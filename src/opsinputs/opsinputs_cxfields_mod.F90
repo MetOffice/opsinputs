@@ -81,12 +81,12 @@ character(len=*), parameter, public :: opsinputs_cxfields_cloud_layer = opsinput
 character(len=*), parameter, public :: opsinputs_cxfields_ozone = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qcf = var_cli
 character(len=*), parameter, public :: opsinputs_cxfields_qcl = var_clw
-character(len=*), parameter, public :: opsinputs_cxfields_cloud_bulk = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_cloud_bulk = "cloud_area_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_aerosol_p = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CDNC = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_RH_AMC = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_Cl = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_Cf = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_Cl = "liquid_cloud_fraction"
+character(len=*), parameter, public :: opsinputs_cxfields_Cf = "frozen_cloud_fraction"
 character(len=*), parameter, public :: opsinputs_cxfields_qrain = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_RichNumber = opsinputs_cxfields_unknown
