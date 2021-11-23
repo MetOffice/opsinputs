@@ -531,6 +531,47 @@ def output_full_cx(oned_var_names, twod_var_names, file_name):
 
     f.close()
 
+def output_full_varobs(oned_float_varnames, twod_float_varnames, oned_int_varnames, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 4
+    f.createDimension('nlocs', nlocs)
+    nchans = 3
+    f.createDimension('nchans', nchans)
+    nstring = 9
+    f.createDimension('nstring', nstring)
+
+    var = f.createVariable('nchans', 'i', ('nchans',))
+    var[:] = [1,2,3]
+
+    for var_index, var_name in enumerate(oned_float_varnames):
+      var = f.createVariable(var_name, 'f', ('nlocs',))
+      shift = 10 * var_index
+      var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
+
+    for var_index, var_name in enumerate(twod_float_varnames):
+      var = f.createVariable(var_name, 'f', ('nlocs','nchans'))
+      shift = 10 * var_index
+      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
+                [shift + 2.1, missing_float, shift + 2.3],
+                [shift + 3.1, shift + 3.2, shift + 3.3],
+                [shift + 4.1, shift + 4.2, shift + 4.3]]
+
+    for var_index, var_name in enumerate(oned_int_varnames):
+      var = f.createVariable(var_name, 'i', ('nlocs',))
+      shift = 10 * var_index
+      var[:] = [shift + 3, missing_int, shift + 7, shift + 9]
+
+    var = f.createVariable('MetaData/datetime', str, ('nlocs'))
+    for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
+                           "2018-01-01T00:01:02Z", "2018-01-01T00:02:02Z"]):
+        var[i] = s
+
+    f.date_time = 2018010100
+
+    f.close()
+
+
 if __name__ == "__main__":
     # VarObs
     output_1d_simulated_var_to_netcdf('surface_pressure',            'testinput/001_VarField_pstar.nc4') # Surface
@@ -565,6 +606,15 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('air_potential_temperature', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
+
+    # Varobs full output for an obsgroup testing
+    # 1dfloats, 2dfloats, 1dints, filename
+    output_full_varobs(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
+                        'MetaData/solar_zenith_angle'],
+                       ['ObsValue/brightness_temperature','ObsError/brightness_temperature','Emiss/surface_emissivity',
+                        'BiasCorrObsValue/brightness_temperature'],
+                       ['MetaData/surface_type','MetaData/satellite_id'],
+                       'testinput/varobs_namelist_atms.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')

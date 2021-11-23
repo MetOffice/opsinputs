@@ -245,6 +245,12 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
                 DATA     028_VarField_satid.nc4
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
+# Tests the namelist files in the etc directory
+ADD_WRITER_TEST(NAME     varobswriter_namelist_atms
+                YAML     varobswriter_namelist_atms.yaml
+                NAMELIST ../../etc/global/varobs/ATMS.nl
+                DATA     varobs_namelist_atms.nc4)
+
 ### CxWriter tests
 
 # Tests of individual surface varfields
