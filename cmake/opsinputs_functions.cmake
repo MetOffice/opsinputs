@@ -1,10 +1,8 @@
-# Syntax: CREATE_SYMLINK(src dst [rel_path1 [rel_path2 [...]]])
+# Syntax: CREATE_SYMLINKS(src dst)
 #
 # Arguments:
 # - src: Source folder
 # - dst: Destination folder
-# - rel_path1, rel_path2, ...: Files within the source folder, specified in terms of their
-#                              their relative path with respect to that folder.
 #
 # Creates symbolic links in the destination folder pointing to the specified files in the source
 # folder, preserving subfolder hierarchy.
