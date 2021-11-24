@@ -612,9 +612,10 @@ if __name__ == "__main__":
     output_full_varobs(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
                         'MetaData/solar_zenith_angle'],
                        ['ObsValue/brightness_temperature','ObsError/brightness_temperature','Emiss/surface_emissivity',
-                        'BiasCorrObsValue/brightness_temperature'],
+                        'BiasCorrObsValue/brightness_temperature','thickness_850_300hPa_satid_13Predictor/brightness_temperature',
+                        'thickness_850_300hPa_satid_17Predictor/brightness_temperature'],
                        ['MetaData/surface_type','MetaData/satellite_id'],
-                       'testinput/varobs_namelist_atms.nc4')
+                       'testinput/varobs_globalnamelist_atms.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
@@ -642,12 +643,13 @@ if __name__ == "__main__":
     output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
 
     # Cx full output for an obsgroup testing
-    # list of 1d-variables; list of 2d-variables
+    # list of 1d-variables; list of 2d-variables; filename for output
     output_full_cx(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
                     'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
                    ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                    'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels'],
-                   'testinput/cx_namelist_atms.nc4')
+                    'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                    'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                   'testinput/cx_globalnamelist_atms.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
