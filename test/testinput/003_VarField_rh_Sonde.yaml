@@ -58,7 +58,7 @@ observations:
         # 1.111 is the missing value indicator for PGEs. VarObs files store PGEs multiplied by 10000.
         # A truncation/rounding error made by the Ops_VarobPGEs subroutine causes one of values to
         # stored as 1419 rather than 1420.
-        pge:      ["1210.00000", "1220.00000", "1230.00000",
+        pge:      ["1200.00000", "1220.00000", "1230.00000",
                    "11110.00000", "1419.00000", "11110.00000"]
         lat:      ["-21.00000", "-21.00000", "-21.00000",
                    "-41.00000", "-41.00000", "-41.00000" ]

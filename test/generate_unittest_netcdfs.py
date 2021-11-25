@@ -40,7 +40,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
     var = f.createVariable(var_name + '@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.01, missing_float, 0.03, 0.04]
+    var[:] = [0.4215156, missing_float, 0.1660898, 0.238132]
     var = f.createVariable(var_name + '@PreQC', 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
