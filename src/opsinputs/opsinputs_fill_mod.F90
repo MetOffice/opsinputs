@@ -2012,9 +2012,6 @@ real(kind=c_double), intent(in)   :: MissingDouble
 logical, intent(in)               :: PackPGEs
 type(Element_type), intent(inout) :: Element
 
-! Local declarations:
-real, parameter                   :: DummyPGEInit  = 1.0E-6 ! something small
-
 ! Body:
 if (PGE /= MissingDouble) then
   Element % PGEFinal = PGE
@@ -2024,11 +2021,8 @@ end if
 
 if (PackPGEs) then
   ! For varfields which Ops_VarobPGEs expects PGEs in packed form: 
-  ! pack consistent with OPS by multiplying by PPF, add a (dummy) inital PGE value
-  ! as the fractional part and then truncate.
-  ! Adding a small DummyPGEInit ensures that AINT gives the desired result when
-  ! PGEFinal * PPF is divisible by 10, otherwise if PGEFinal=0.01, AINT(10.0) gives 9
-  Element % PGEFinal = Element % PGEFinal * PPF + DummyPGEInit
+  ! pack consistent with OPS by multiplying by PPF and then truncate.
+  Element % PGEFinal = Element % PGEFinal * PPF
   Element % PGEFinal = AINT(Element % PGEFinal)
 else
   ! Varfields which Ops_VarobPGEs expects PGEs in unpacked form,
