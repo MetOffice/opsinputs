@@ -11,7 +11,7 @@
  * system.
  * -----------------------------------------------------------------------------
  */
-#include "ufo/filters/obsfunctions/GnssroStationIDMetOffice.h"
+#include "opsinputs/GnssroStationIDMetOffice.h"
 
 #include <math.h>
 #include <string>

@@ -15,6 +15,12 @@ observations:
       action:
         name: inflate error
         inflation factor: 2.0
+    - filter: Variable Assignment
+      assignments:
+      - name: station_id@MetaData
+        type: string
+        function:
+          name: GnssroStationIDMetOffice@StringObsFunction
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
     - filter: Reset Flags to Pass
@@ -58,9 +64,9 @@ observations:
         time:     ["-3540.00000", "-3540.00000",
                    "-3480.00000", "-3480.00000", 
                    "-3360.00000", "-3360.00000"]
-        Callsign: ["station_1", "station_1",
-                   "station_2", "station_2",
-                   "station_4", "station_4"]
+        Callsign: ["0003000000000000", "0003000000000000",
+                   "0003000010000001", "0003000010000001",
+                   "0720000030000003", "0720000030000003"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
