@@ -53,11 +53,11 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
 
   // Get the record number of each profile
   std::vector<size_t> recordNumbers = out.space().recidx_all_recnums();
-  std::cout << "Unique record numbers" << std::endl;
+  oops::Log::debug() << "Unique record numbers" << std::endl;
   for (size_t record : recordNumbers) {
-    std::cout << record << " ";
+    oops::Log::debug() << record << " ";
   }
-  std::cout << std::endl;
+  oops::Log::debug() << std::endl;
 
   // For each profile, apply the function to each member
   for (size_t iProfile : recordNumbers) {
