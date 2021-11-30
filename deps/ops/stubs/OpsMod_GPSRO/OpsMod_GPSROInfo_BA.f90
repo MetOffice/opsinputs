@@ -13,7 +13,7 @@ SAVE
 
 ! Public declarations:
 
-LOGICAL              :: GPSRO_pseudo_ops = .FALSE.  ! .TRUE. is pseudo-levels turned on.
-LOGICAL              :: GPSRO_vert_interp_ops = .FALSE.  ! .TRUE. is interp of ln(P) instead of Exner.
+LOGICAL              :: GPSRO_pseudo_ops = .TRUE.  ! .TRUE. is pseudo-levels turned on.
+LOGICAL              :: GPSRO_vert_interp_ops = .TRUE.  ! .TRUE. is interp of ln(P) instead of Exner.
 
 END MODULE OpsMod_GPSROInfo_BA
