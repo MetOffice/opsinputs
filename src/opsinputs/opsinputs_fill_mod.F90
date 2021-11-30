@@ -666,16 +666,13 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !>   they are needed for non-simulated variables. If necessary, it could be modified to retrieve
 !>   them from the same group of JEDI variables, GrossErrorProbability, as
 !>   opsinputs_fill_fillelementtype2dfromnormalvariable).
-!> \param[in] AddUnderscore
-!>    Optional; true by default. This is used to specify whether an underscore is added at the end 
-!>    of a variable name in function opsinputs_fill_varnames_with_channels
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromnormalvariable( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs, AddUnderscore)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -690,11 +687,9 @@ character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
 logical, optional, intent(in)                   :: PackPGEs
-logical, optional, intent(in)                   :: AddUnderscore
 
 ! Local declarations:
 logical                                         :: DoPackPGEs
-logical                                         :: DoAddUnderscore
 real(kind=c_double)                             :: ObsValue(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
@@ -721,19 +716,31 @@ else
   DoPackPGEs = .true.
 end if
 
-if (present(Addunderscore)) then
-  DoAddUnderscore = Addunderscore
-else
-  DoAddUnderscore = .true.
-end if
-
 MissingDouble = missing_value(0.0_c_double)
 
-JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-  JediValueVarName, Channels, AddUS=DoAddUnderscore)
-if (present(JediErrorVarName)) then
-  JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-    JediErrorVarName, Channels, AddUS=DoAddUnderscore)
+
+!check for lev or LEV in varname
+!this is currently only required for  clw
+if (index(JediValueVarName,"lev") > 0 .OR. index(JediValueVarName,"LEV") > 0) then
+
+  !the actual names required are levels not channels
+  !the main difference is lack of an "_" e.g. lev1, lev2 , etc
+  JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_levels( &
+    JediValueVarName, Channels)
+  if (present(JediErrorVarName)) then
+    JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_levels( &
+      JediErrorVarName, Channels)
+  end if
+  
+else
+
+  JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+    JediValueVarName, Channels)
+  if (present(JediErrorVarName)) then
+    JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+      JediErrorVarName, Channels)
+  end if
+
 end if
 
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
@@ -1977,44 +1984,51 @@ end if
 
 end subroutine opsinputs_fill_fillcoord2d
 
+! ------------------------------------------------------------------------------
+
+!> Return an array containing the names of JEDI variables storing individual levels of the
+!> variable \p VarName. This routine constructs a character array containing
+!> each level no. appended to the varname.
+function opsinputs_fill_varnames_with_levels(VarName, Levels) result(VarNames)
+implicit none
+! Subroutine arguments:
+character(len=*), intent(in)                   :: VarName
+integer(c_int), intent(in)                  :: Levels(:)
+
+! Local declarations:
+character(len=max_varname_with_channel_length) :: VarNames(max(size(Levels), 1))
+integer                                        :: i
+
+if (size(Levels) == 0) then
+  VarNames(1) = VarName
+else
+  do i = 1, size(Levels)
+    write (VarNames(i),'(A,I0)') VarName, Levels(i)
+  end do
+end if
+end function opsinputs_fill_varnames_with_levels
+
 
 ! ------------------------------------------------------------------------------
 
 !> Return an array containing the names of JEDI variables storing individual channels of the
 !> variable \p VarName. If the list of channels is empty, this means the variable in question is
 !> 1D and hence the returned array contains just the single string \p VarName.
-function opsinputs_fill_varnames_with_channels(VarName, Channels, AddUS) result(VarNames)
+function opsinputs_fill_varnames_with_channels(VarName, Channels) result(VarNames)
 implicit none
 ! Subroutine arguments:
 character(len=*), intent(in)                   :: VarName
 integer(c_int), intent(in)                     :: Channels(:)
-logical, optional, intent(in)                 :: AddUS
 
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: i
-logical                                        :: AddUnderscore
-character(len=10)                                  :: nameformat
-
-
-if (present(AddUS)) then
-AddUnderscore=AddUS
-else
-AddUnderscore=.true.
-endif
-
-if (AddUnderscore) then
- nameformat='(A,"_",I0)'
-else
- nameformat='(A,I0)'
-endif
-
 
 if (size(Channels) == 0) then
   VarNames(1) = VarName
 else
   do i = 1, size(Channels)
-    write (VarNames(i),trim(nameformat)) VarName, Channels(i)
+    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
   end do
 end if
 end function opsinputs_fill_varnames_with_channels

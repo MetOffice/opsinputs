@@ -948,7 +948,7 @@ do iVarField = 1, nVarFields
     case (VarField_clw)
       call opsinputs_fill_fillelementtype2dfromnormalvariable( &
         Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, & 
-        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water", AddUnderscore=.false.)
+        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water")
     case (VarField_refrac)
       ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
