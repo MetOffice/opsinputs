@@ -1,13 +1,13 @@
 /* -----------------------------------------------------------------------------
- * (C) British Crown Copyright 2020 Met Office
+ * (C) British Crown Copyright 2021 Met Office
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  * -----------------------------------------------------------------------------
  */
 
-#ifndef UFO_FILTERS_OBSFUNCTIONS_GNSSROSTATIONIDMETOFFICE_H_
-#define UFO_FILTERS_OBSFUNCTIONS_GNSSROSTATIONIDMETOFFICE_H_
+#ifndef OPSINPUTS_GNSSROSTATIONIDMETOFFICE_H_
+#define OPSINPUTS_GNSSROSTATIONIDMETOFFICE_H_
 
 #include <string>
 
@@ -33,10 +33,10 @@ class GnssroStationIDMetOffice : public ObsFunctionBase<std::string> {
   const ufo::Variables & requiredVariables() const;
  private:
   ufo::Variables invars_;
-  std::string stringFormat(const size_t&, const size_t&) const;
+  std::string stringFormat(const size_t, const size_t) const;
 };
 // -----------------------------------------------------------------------------
 
 }  // namespace ufo
 
-#endif  // UFO_FILTERS_OBSFUNCTIONS_GNSSROSTATIONIDMETOFFICE_H_
+#endif  // OPSINPUTS_GNSSROSTATIONIDMETOFFICE_H_

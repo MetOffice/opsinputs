@@ -4,11 +4,17 @@
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
  * -----------------------------------------------------------------------------
- */
-
-/* -----------------------------------------------------------------------------
+ *
  * Find the station ID for GNSS-RO observations used by the Met Office's DA
  * system.
+ *
+ * Example yaml snippet:
+ *  - filter: Variable Assignment
+ *   assignments:
+ *   - name: station_id@MetaData
+ *     type: string
+ *     function:
+ *       name: GnssroStationIDMetOffice@StringObsFunction
  * -----------------------------------------------------------------------------
  */
 #include "opsinputs/GnssroStationIDMetOffice.h"
@@ -53,14 +59,14 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
 
   // Get the record number of each profile
   std::vector<size_t> recordNumbers = out.space().recidx_all_recnums();
-  std::cout << "Unique record numbers" << std::endl;
+  oops::Log::debug() << "Unique record numbers" << std::endl;
   for (size_t record : recordNumbers) {
-    std::cout << record << " ";
+    oops::Log::debug() << record << " ";
   }
-  std::cout << std::endl;
+  oops::Log::debug() << std::endl;
 
   // For each profile, apply the function to each member
-  for (size_t iProfile : recordNumbers) {
+  for (const size_t& iProfile : recordNumbers) {
     const std::vector<size_t> & obsNumbers = out.space().recidx_vector(iProfile);
     for (size_t jobs : obsNumbers) {
       out[0][jobs] = stringFormat(satid[jobs], 4) +
@@ -73,7 +79,7 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
 /// Convert an integer to a fixed length string, checking whether the string is
 /// too long for the output
 std::string GnssroStationIDMetOffice::stringFormat
-                            (const size_t& input, const size_t& width) const {
+                            (const size_t input, const size_t width) const {
   std::stringstream returnStream;
   if (input >= pow(10, width)) {
     oops::Log::warning() << "stringFormat: " << input << " is too wide for a "
