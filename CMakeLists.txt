@@ -90,6 +90,7 @@ endforeach()
 include( opsinputs_compiler_flags )
 
 add_subdirectory( deps )
+add_subdirectory( etc )
 add_subdirectory( src )
 add_subdirectory( test )
 

@@ -16,7 +16,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_unknown = "UNKNOWN"
 
 ! TODO(someone): Replace instances of opsinputs_cxfields_unknown with appropriate geoval names.
 character(len=*), parameter, public :: opsinputs_cxfields_Orog = var_sfc_geomz
-character(len=*), parameter, public :: opsinputs_cxfields_pstar = var_sfc_p2m
+character(len=*), parameter, public :: opsinputs_cxfields_pstar = var_ps
 character(len=*), parameter, public :: opsinputs_cxfields_t2 = var_sfc_t2m
 character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_2m"
 character(len=*), parameter, public :: opsinputs_cxfields_u10 = var_sfc_u10
@@ -27,7 +27,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_WIND_SPED = opsinputs_
 character(len=*), parameter, public :: opsinputs_cxfields_SeaHeight = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_TskinSea = var_sfc_tskin
 character(len=*), parameter, public :: opsinputs_cxfields_TropPres = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_pmsl = var_ps
+character(len=*), parameter, public :: opsinputs_cxfields_pmsl = var_pmsl
 character(len=*), parameter, public :: opsinputs_cxfields_SeaIce = var_sfc_ifrac
 character(len=*), parameter, public :: opsinputs_cxfields_SnowAmount = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qt2 = opsinputs_cxfields_unknown

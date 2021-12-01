@@ -40,7 +40,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
     var = f.createVariable(var_name + '@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.01, missing_float, 0.03, 0.04]
+    var[:] = [0.4215156, missing_float, 0.1660898, 0.238132]
     var = f.createVariable(var_name + '@PreQC', 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
@@ -506,6 +506,72 @@ def output_2d_geoval_for_multi_level_obs_to_netcdf(var_name, file_name):
 
     f.close()
 
+def output_full_cx_to_netcdf(oned_var_names, twod_var_names, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 4
+    nlevs = 3
+    f.createDimension('nlocs', nlocs)
+    f.createDimension('nlevs', nlevs)
+
+    for var_index, var_name in enumerate(twod_var_names):
+      var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+      shift = 10 * var_index
+      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
+                [shift + 2.1, missing_float, shift + 2.3],
+                [shift + 3.1, shift + 3.2, shift + 3.3],
+                [shift + 4.1, shift + 4.2, shift + 4.3]]
+
+    for var_index, var_name in enumerate(oned_var_names):
+      var = f.createVariable(var_name, 'f', ('nlocs',))
+      shift = 10 * var_index
+      var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
+
+    f.date_time = 2018010100
+
+    f.close()
+
+def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_int_varnames, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 4
+    f.createDimension('nlocs', nlocs)
+    nchans = 3
+    f.createDimension('nchans', nchans)
+    nstring = 9
+    f.createDimension('nstring', nstring)
+
+    var = f.createVariable('nchans', 'i', ('nchans',))
+    var[:] = [1,2,3]
+
+    for var_index, var_name in enumerate(oned_float_varnames):
+      var = f.createVariable(var_name, 'f', ('nlocs',))
+      shift = 10 * var_index
+      var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
+
+    for var_index, var_name in enumerate(twod_float_varnames):
+      var = f.createVariable(var_name, 'f', ('nlocs','nchans'))
+      shift = 10 * var_index
+      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
+                [shift + 2.1, missing_float, shift + 2.3],
+                [shift + 3.1, shift + 3.2, shift + 3.3],
+                [shift + 4.1, shift + 4.2, shift + 4.3]]
+
+    for var_index, var_name in enumerate(oned_int_varnames):
+      var = f.createVariable(var_name, 'i', ('nlocs',))
+      shift = 10 * var_index
+      var[:] = [shift + 3, missing_int, shift + 7, shift + 9]
+
+    var = f.createVariable('MetaData/datetime', str, ('nlocs'))
+    for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
+                           "2018-01-01T00:01:02Z", "2018-01-01T00:02:02Z"]):
+        var[i] = s
+
+    f.date_time = 2018010100
+
+    f.close()
+
+
 if __name__ == "__main__":
     # VarObs
     output_1d_simulated_var_to_netcdf('surface_pressure',            'testinput/001_VarField_pstar.nc4') # Surface
@@ -541,16 +607,26 @@ if __name__ == "__main__":
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
 
+    # Varobs full output for an obsgroup testing
+    # 1dfloats, 2dfloats, 1dints, filename
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
+                                  'MetaData/solar_zenith_angle'],
+                                 ['ObsValue/brightness_temperature','ObsError/brightness_temperature','Emiss/surface_emissivity',
+                                  'BiasCorrObsValue/brightness_temperature','thickness_850_300hPa_satid_13Predictor/brightness_temperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightness_temperature'],
+                                 ['MetaData/surface_type','MetaData/satellite_id'],
+                                  'testinput/varobs_globalnamelist_atms.nc4')
+
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
     output_1d_geoval_to_netcdf       ('surface_altitude',           'testinput/001_SurfaceCxField_Orog.nc4')
-    output_1d_geoval_to_netcdf       ('air_pressure_at_two_meters_above_surface', 'testinput/002_SurfaceCxField_pstar.nc4')
+    output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/002_SurfaceCxField_pstar.nc4')
     output_1d_geoval_to_netcdf       ('surface_temperature',        'testinput/003_SurfaceCxField_t2.nc4')
     output_1d_geoval_to_netcdf       ('relative_humidity_2m',       'testinput/004_SurfaceCxField_rh2.nc4')
     output_1d_geoval_to_netcdf       ('uwind_at_10m',               'testinput/005_SurfaceCxField_u10.nc4')
     output_1d_geoval_to_netcdf       ('vwind_at_10m',               'testinput/006_SurfaceCxField_v10.nc4')
     output_1d_geoval_to_netcdf       ('skin_temperature',           'testinput/013_SurfaceCxField_TskinSea.nc4')
-    output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/016_SurfaceCxField_pmsl.nc4')
+    output_1d_geoval_to_netcdf       ('surface_pressure_at_mean_sea_level', 'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
     output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('relative_humidity',          'testinput/002_UpperAirCxField_relative_humidity.nc4')
@@ -565,6 +641,15 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('frozen_cloud_fraction',      'testinput/034_UpperAirCxField_Cf.nc4')
     output_2d_geoval_to_netcdf       ('liquid_cloud_fraction',      'testinput/035_UpperAirCxField_Cl.nc4')
     output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
+
+    # Cx full output for an obsgroup testing
+    # list of 1d-variables; list of 2d-variables; filename for output
+    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
+                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
+                             ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                              'testinput/cx_globalnamelist_atms.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')

@@ -13,6 +13,6 @@ SAVE
 
 ! Public declarations:
 
-LOGICAL             :: GPSRO_TPD = .FALSE.  ! .TRUE. is TPD is turned on.
+LOGICAL             :: GPSRO_TPD = .TRUE.  ! .TRUE. is TPD is turned on.
 
 END MODULE OpsMod_GPSRO
