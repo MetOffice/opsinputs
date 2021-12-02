@@ -33,6 +33,8 @@ list( APPEND opsinputs_src_files
     VarObsWriter.interface.F90
     VarObsWriter.interface.h
     VarObsWriterParameters.h
+    GnssroStationIDMetOffice.cc
+    GnssroStationIDMetOffice.h
 )
 
 # The opsinputs_cxgenerate_mod.F90 module includes *.inc files from OPS,
