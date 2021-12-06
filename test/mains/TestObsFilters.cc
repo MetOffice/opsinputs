@@ -5,11 +5,11 @@
  */
 
 #include "../opsinputs/instantiateObsFilterFactory.h"
-#include "../test/ufo/ObsFilters.h"
 #include "oops/runs/Run.h"
 #include "opsinputs/instantiateObsFilterFactory.h"
 #include "ufo/instantiateObsFilterFactory.h"
 #include "ufo/ObsTraits.h"
+#include "ufo/test/ufo/ObsFilters.h"
 
 int main(int argc,  char ** argv) {
   oops::Run run(argc, argv);
