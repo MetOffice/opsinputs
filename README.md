@@ -1,3 +1,5 @@
+[![CI](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml/badge.svg)](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml)
+
 (C) Crown Copyright 2020, the Met Office. All rights reserved.
 
 Refer to COPYRIGHT.txt of this distribution for details.
@@ -58,7 +60,7 @@ Usage
 VarObs and Cx files are written by the `VarObs Writer` and `Cx Writer` observation filters, respectively. See the Doxygen documentation of these filters in the `src/opsinputs/VarObsWriter.h` and `src/opsinputs/CxWriter.h` files (and the accompanying `...Parameters.h` files) for more information. 
 
 The following YAML snippet demonstrates the use of `VarObsWriter`. <ObsGroup> stands for the name of one of the observation groups known to OPS.
-   
+
     - ObsSpace:
         name: <ObsGroup>
         ObsDataIn:
@@ -195,3 +197,5 @@ Working practices
 =================
 
 The JEDI working principles are detailed at https://jointcenterforsatellitedataassimilation-jedi-docs.readthedocs-hosted.com/en/latest/working-practices/index.html.
+
+A continuous integration workflow runs in GitHub Actions using the [ghcr.io/metoffice/opsinputs-ci:latest](https://github.com/MetOffice/opsinputs-ci/pkgs/container/opsinputs-ci) Docker image.
