@@ -2,27 +2,8 @@
 #
 # Refer to COPYRIGHT.txt of this distribution for details.
 
-# Syntax: CREATE_SYMLINK(src dst [rel_path1 [rel_path2 [...]]])
-#
-# Arguments:
-# - src: Source folder
-# - dst: Destination folder
-# - rel_path1, rel_path2, ...: Files within the source folder, specified in terms of their
-#                              their relative path with respect to that folder.
-#
-# Creates symbolic links in the destination folder pointing to the specified files in the source
-# folder, preserving subfolder hierarchy.
-function(CREATE_SYMLINKS src dst)
-  file(MAKE_DIRECTORY ${dst})
-  foreach (FILENAME ${ARGN})
-    get_filename_component(absolute_subdir ${src}/${FILENAME} DIRECTORY)
-    file(RELATIVE_PATH relative_subdir ${src} ${absolute_subdir})
-    file(MAKE_DIRECTORY ${dst}/${relative_subdir})
-    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-                    ${src}/${FILENAME}
-                    ${dst}/${FILENAME})
-  endforeach(FILENAME)
-endfunction()
+# Include macros for creating links and symlinks
+include( opsinputs_functions )
 
 # Syntax: ADD_WRITER_TEST( NAME <name> YAML <yaml> [NAMELIST <namelist>]
 #                          [DATA <data>...] [MPI <num_tasks>] [DONT_SET_OPS_OUTPUT_DIR] )
@@ -268,6 +249,12 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
                 DATA     028_VarField_satid.nc4
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
+# Tests the namelist files in the etc directory
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
+                YAML     varobswriter_globalnamelist_atms.yaml
+                NAMELIST ../../etc/global/varobs/ATMS.nl
+                DATA     varobs_globalnamelist_atms.nc4)
+
 ### CxWriter tests
 
 # Tests of individual surface varfields
@@ -345,10 +332,22 @@ ADD_WRITER_TEST(NAME     cxwriter_030_UpperAirCxField_qcl
                 YAML     030_UpperAirCxField_qcl.yaml
                 NAMELIST CxWriterNamelists_030_UpperAirCxField_qcl/AMSUB.nl
                 DATA     030_UpperAirCxField_qcl.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_031_UpperAirCxField_cloud_bulk
+                YAML     031_UpperAirCxField_cloud_bulk.yaml
+                NAMELIST CxWriterNamelists_031_UpperAirCxField_cloud_bulk/AMSUB.nl
+                DATA     031_UpperAirCxField_cloud_bulk.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_033_UpperAirCxField_p_bar
                 YAML     033_UpperAirCxField_p_bar.yaml
                 NAMELIST CxWriterNamelists_033_UpperAirCxField_p_bar/AMSUB.nl
                 DATA     033_UpperAirCxField_p_bar.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_034_UpperAirCxField_Cf
+                YAML     034_UpperAirCxField_Cf.yaml
+                NAMELIST CxWriterNamelists_034_UpperAirCxField_Cf/AMSUB.nl
+                DATA     034_UpperAirCxField_Cf.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_035_UpperAirCxField_Cl
+                YAML     035_UpperAirCxField_Cl.yaml
+                NAMELIST CxWriterNamelists_035_UpperAirCxField_Cl/AMSUB.nl
+                DATA     035_UpperAirCxField_Cl.nc4 dummy.nc4)
 
 ADD_WRITER_TEST(NAME     cxwriter_041-042_UpperAirCxField_dust1-dust2
                 YAML     041-042_UpperAirCxField_dust1-dust2.yaml
@@ -431,6 +430,12 @@ ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
+
+# Tests the namelist files in the etc directory
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atms
+                YAML     cxwriter_globalnamelist_atms.yaml
+                NAMELIST ../../etc/global/cx/ATMS.nl
+                DATA     cx_globalnamelist_atms.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 

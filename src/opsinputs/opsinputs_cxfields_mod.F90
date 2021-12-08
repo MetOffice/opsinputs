@@ -16,7 +16,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_unknown = "UNKNOWN"
 
 ! TODO(someone): Replace instances of opsinputs_cxfields_unknown with appropriate geoval names.
 character(len=*), parameter, public :: opsinputs_cxfields_Orog = var_sfc_geomz
-character(len=*), parameter, public :: opsinputs_cxfields_pstar = var_sfc_p2m
+character(len=*), parameter, public :: opsinputs_cxfields_pstar = var_ps
 character(len=*), parameter, public :: opsinputs_cxfields_t2 = var_sfc_t2m
 character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_2m"
 character(len=*), parameter, public :: opsinputs_cxfields_u10 = var_sfc_u10
@@ -27,7 +27,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_WIND_SPED = opsinputs_
 character(len=*), parameter, public :: opsinputs_cxfields_SeaHeight = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_TskinSea = var_sfc_tskin
 character(len=*), parameter, public :: opsinputs_cxfields_TropPres = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_pmsl = var_ps
+character(len=*), parameter, public :: opsinputs_cxfields_pmsl = var_pmsl
 character(len=*), parameter, public :: opsinputs_cxfields_SeaIce = var_sfc_ifrac
 character(len=*), parameter, public :: opsinputs_cxfields_SnowAmount = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qt2 = opsinputs_cxfields_unknown
@@ -81,12 +81,12 @@ character(len=*), parameter, public :: opsinputs_cxfields_cloud_layer = opsinput
 character(len=*), parameter, public :: opsinputs_cxfields_ozone = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qcf = var_cli
 character(len=*), parameter, public :: opsinputs_cxfields_qcl = var_clw
-character(len=*), parameter, public :: opsinputs_cxfields_cloud_bulk = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_cloud_bulk = "cloud_area_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_aerosol_p = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CDNC = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_RH_AMC = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_Cl = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_Cf = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_Cl = "liquid_cloud_fraction"
+character(len=*), parameter, public :: opsinputs_cxfields_Cf = "frozen_cloud_fraction"
 character(len=*), parameter, public :: opsinputs_cxfields_qrain = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_RichNumber = opsinputs_cxfields_unknown
