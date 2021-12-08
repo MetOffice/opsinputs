@@ -110,7 +110,7 @@ ecbuild_print_summary()
 
 ecbuild_add_test( TARGET opsinputs_coding_norms
                   TYPE SCRIPT
-                  COMMAND ${oops_BINDIR}/oops_cpplint.py
+                  COMMAND ${CMAKE_BINARY_DIR}/bin/cpplint.py
                   ARGS --quiet --recursive ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/test
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 

@@ -25,7 +25,7 @@ Building
 
        git clone https://github.com/JCSDA/ufo-bundle.git -b feature/wsmigaj
        cd ufo-bundle
-       cp -a /home/h03/jopa/jedi_repos/nightly/ropp-ufo .
+       cp -a /project/SatImagery/utils/jedi_repos/ufo-bundle/ropp-ufo .
 
 2. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
 
