@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout current repo
+        uses: actions/checkout@v2
+      - name: checkout shumlib
+        uses: actions/checkout@v2
+        with:
+          path: ci/shumlib
+          repository: metomi/shumlib
+      - name: checkout ropp-ufo
+        uses: actions/checkout@v2
+        with:
+          path: ci/ropp-ufo
+          repository: MetOffice/ropp-ufo
+          token: ${{ secrets.GH_PAT }}
+      - name: checkout oops
+        uses: actions/checkout@v2
+        with:
+          path: ci/oops
+          repository: JCSDA-internal/oops
+          token: ${{ secrets.GH_PAT }}
+      - name: checkout jedicmake
+        uses: actions/checkout@v2
+        with:
+          path: ci/jedicmake
+          repository: JCSDA-internal/jedi-cmake
+          token: ${{ secrets.GH_PAT }}
+      - name: checkout ioda
+        uses: actions/checkout@v2
+        with:
+          path: ci/ioda
+          repository: JCSDA-internal/ioda
+          token: ${{ secrets.GH_PAT }}
+      - name: checkout ufo
+        uses: actions/checkout@v2
+        with:
+          path: ci/ufo
+          repository: JCSDA-internal/ufo
+          token: ${{ secrets.GH_PAT }}
+      - name: build and test
+        run: |
+          docker run --rm \
+            --entrypoint=/usr/local/src/opsinputs/ci/opsinputs-ci-build \
+            --workdir=/usr/local/src/opsinputs/ci \
+            --volume $PWD:/usr/local/src/opsinputs \
+            'jcsda/docker-gnu-openmpi-dev:latest'
