@@ -208,7 +208,7 @@ logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: StringValue
-integer                                    :: ii
+integer                                    :: ilev
 integer                                    :: IntValue
 logical                                    :: BoolValue
 real(kind=c_double)                        :: DoubleValue
@@ -431,8 +431,8 @@ self % RC_PoleLong = DoubleValue
 
 !construct the modlevs
 allocate(self % modlevs(self % IC_PLevels))
-do ii = 1, self % IC_PLevels
-  self % modlevs(ii) = ii
+do ilev = 1, self % IC_PLevels
+  self % modlevs(ilev) = ilev
 enddo
 
 ! Fill in the list of variables that will be needed to populate the requested varfields.

@@ -1993,17 +1993,17 @@ function opsinputs_fill_varnames_with_levels(VarName, Levels) result(VarNames)
 implicit none
 ! Subroutine arguments:
 character(len=*), intent(in)                   :: VarName
-integer(c_int), intent(in)                  :: Levels(:)
+integer(c_int), intent(in)                     :: Levels(:)
 
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Levels), 1))
-integer                                        :: i
+integer                                        :: ilev
 
 if (size(Levels) == 0) then
   VarNames(1) = VarName
 else
-  do i = 1, size(Levels)
-    write (VarNames(i),'(A,I0)') VarName, Levels(i)
+  do ilev = 1, size(Levels)
+    write (VarNames(ilev),'(A,I0)') VarName, Levels(ilev)
   end do
 end if
 end function opsinputs_fill_varnames_with_levels
@@ -2022,13 +2022,13 @@ integer(c_int), intent(in)                     :: Channels(:)
 
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
-integer                                        :: i
+integer                                        :: ichan
 
 if (size(Channels) == 0) then
   VarNames(1) = VarName
 else
-  do i = 1, size(Channels)
-    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
+  do ichan = 1, size(Channels)
+    write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
 end if
 end function opsinputs_fill_varnames_with_channels
