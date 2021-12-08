@@ -10,9 +10,9 @@
 #include <string>
 
 #include "eckit/testing/Test.h"
+#include "oops/../test/TestEnvironment.h"
 #include "oops/mpi/mpi.h"
 #include "oops/runs/Test.h"
-#include "oops/test/TestEnvironment.h"
 #include "oops/util/Expect.h"
 #include "opsinputs/MPIExceptionSynchronizer.h"
 
