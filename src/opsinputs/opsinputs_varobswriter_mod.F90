@@ -782,9 +782,21 @@ do iVarField = 1, nVarFields
     case (VarField_gpstzdelay)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
+  !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+  !      Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+  !      ObsSpace, Flags, ObsErrors, "total_zenith_delay", PackPGEs=.false.)
+	
+      call opsinputs_fill_fillelementtypefromnormalvariable( &
+        Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+        ObsSpace, "total_zenith_delay", "BiasCorrObsValue", "total_zenith_delay", "EffectiveError", Flags, PackPGEs=.false.)
+	
     case (VarField_GPS_Station_Height)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
+      call opsinputs_fill_fillreal( &
+        Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
+	ObsSpace, "station_height", "MetaData")
+	
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &

@@ -17,6 +17,6 @@ SAVE
 ! 1. Process control namelist parameters
 !-------------------------------------------------------------------------------
 
-INTEGER :: GroundGPSOperator = 1
+INTEGER :: GroundGPSOperator = 2
 
 END MODULE OpsMod_GroundGPS

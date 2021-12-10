@@ -559,7 +559,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
 !> are not found.
 subroutine opsinputs_fill_fillelementtypefromnormalvariable( &
   Hdr, OpsVarName, NumObs, El1, ObsSpace, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, Flags, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -572,12 +572,15 @@ character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
+type(c_ptr), optional, intent(in)               :: Flags
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
 logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: PGE(NumObs)
+integer(kind=c_int)                             :: Flag(NumbObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 integer                                         :: i
@@ -616,6 +619,22 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     ObsError(:) = MissingDouble
   end if
 
+ ! - gross error probability
+  if (obsspace_has(ObsSpace, "GrossErrorProbability", JediValueVarName)) then
+    call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediValueVarName, PGE)
+  else
+    PGE(:) = MissingDouble
+  end if
+
+ ! - QC flag
+  if (opsinputs_obsdatavector_int_has(Flags, JediValueVarName)) then
+    call opsinputs_obsdatavector_int_get(Flags, JediValueVarName, Flag)
+  else
+    write (ErrorMessage, '(A,A)') "QC flags not found for variable ", JediValueVarName
+    call gen_warn(RoutineName, ErrorMessage)
+    Flag(:) = 0 ! assume all observations passed QC
+  end if
+
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El1)
   do i = 1, NumObs
@@ -624,9 +643,10 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
     ! variables. At present, however, we don't even have a use case where there is a separate
     ! variable storing the observation error.
-
+    if (Flag(i) /= 0)                 El1(i) % Flags = ibset(0, FinalRejectFlag)
     ! Set El1(i) % PGEFinal to 'missing'
-    call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El1(i))
+  !!  call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El1(i))
+    call opsinputs_fill_setpgefinal(PGE(i), MissingDouble, DoPackPGEs, El1(i))
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromnormalvariable

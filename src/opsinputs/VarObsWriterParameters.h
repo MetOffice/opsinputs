@@ -95,7 +95,7 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Version of the ground GPS operator.
   ///
   /// Valid values (case-insensitive): Choice, Generic.
-  oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "choice", this};
+  oops::Parameter<std::string> IC_GroundGPSOperator{"IC_GroundGPSOperator", "generic", this};
   /// TODO(Neill): Describe this parameter.
   oops::Parameter<bool> IC_GPSRO_Operator_pseudo{"IC_GPSRO_Operator_pseudo", false, this};
   /// TODO(Neill): Describe this parameter.
