@@ -178,7 +178,10 @@ private
   real(real64)       :: RC_PoleLong
 
   integer(c_int), allocatable :: channels(:)
-
+  
+  !this stores the atmospheric levels we wish to pass to varobs
+  integer(c_int), allocatable :: modlevs(:) 
+  
   type(ufo_geovals), pointer :: GeoVals
   type(ufo_geovals), pointer :: ObsDiags
 end type opsinputs_varobswriter
@@ -205,6 +208,7 @@ logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
 character(len=:), allocatable              :: StringValue
+integer                                    :: ilev
 integer                                    :: IntValue
 logical                                    :: BoolValue
 real(kind=c_double)                        :: DoubleValue
@@ -425,6 +429,12 @@ self % RC_PoleLat = DoubleValue
 call f_conf % get_or_die("RC_PoleLong", DoubleValue)
 self % RC_PoleLong = DoubleValue
 
+!construct the modlevs
+allocate(self % modlevs(self % IC_PLevels))
+do ilev = 1, self % IC_PLevels
+  self % modlevs(ilev) = ilev
+enddo
+
 ! Fill in the list of variables that will be needed to populate the requested varfields.
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
 call opsinputs_varobswriter_addrequireddiagvars(self, diagvars)
@@ -443,6 +453,7 @@ type(opsinputs_varobswriter), intent(inout) :: self
 ! Body:
 call datetime_delete(self % validitytime)
 if (allocated(self % channels)) deallocate(self % channels)
+if (allocated(self % modlevs)) deallocate(self % modlevs)
 
 end subroutine opsinputs_varobswriter_delete
 
@@ -935,8 +946,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadFlag, "RadFlag", Ob % Header % NumObsLocal, Ob % RadFlag)
     case (VarField_clw)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % clw, "clw", Ob % Header % NumObsLocal, Ob % clw)
+      call opsinputs_fill_fillelementtype2dfromnormalvariable( &
+        Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, & 
+        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water")
     case (VarField_refrac)
       ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)

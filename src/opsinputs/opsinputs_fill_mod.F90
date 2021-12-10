@@ -718,11 +718,29 @@ end if
 
 MissingDouble = missing_value(0.0_c_double)
 
-JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-  JediValueVarName, Channels)
-if (present(JediErrorVarName)) then
-  JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-    JediErrorVarName, Channels)
+
+!check for lev or LEV in varname
+!this is currently only required for  clw
+if (index(JediValueVarName,"lev") > 0 .OR. index(JediValueVarName,"LEV") > 0) then
+
+  !the actual names required are levels not channels
+  !the main difference is lack of an "_" e.g. lev1, lev2 , etc
+  JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_levels( &
+    JediValueVarName, Channels)
+  if (present(JediErrorVarName)) then
+    JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_levels( &
+      JediErrorVarName, Channels)
+  end if
+  
+else
+
+  JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+    JediValueVarName, Channels)
+  if (present(JediErrorVarName)) then
+    JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+      JediErrorVarName, Channels)
+  end if
+
 end if
 
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
@@ -1966,6 +1984,30 @@ end if
 
 end subroutine opsinputs_fill_fillcoord2d
 
+! ------------------------------------------------------------------------------
+
+!> Return an array containing the names of JEDI variables storing individual levels of the
+!> variable \p VarName. This routine constructs a character array containing
+!> each level no. appended to the varname.
+function opsinputs_fill_varnames_with_levels(VarName, Levels) result(VarNames)
+implicit none
+! Subroutine arguments:
+character(len=*), intent(in)                   :: VarName
+integer(c_int), intent(in)                     :: Levels(:)
+
+! Local declarations:
+character(len=max_varname_with_channel_length) :: VarNames(max(size(Levels), 1))
+integer                                        :: ilev
+
+if (size(Levels) == 0) then
+  VarNames(1) = VarName
+else
+  do ilev = 1, size(Levels)
+    write (VarNames(ilev),'(A,I0)') VarName, Levels(ilev)
+  end do
+end if
+end function opsinputs_fill_varnames_with_levels
+
 
 ! ------------------------------------------------------------------------------
 
@@ -1980,13 +2022,13 @@ integer(c_int), intent(in)                     :: Channels(:)
 
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
-integer                                        :: i
+integer                                        :: ichan
 
 if (size(Channels) == 0) then
   VarNames(1) = VarName
 else
-  do i = 1, size(Channels)
-    write (VarNames(i),'(A,"_",I0)') VarName, Channels(i)
+  do ichan = 1, size(Channels)
+    write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
 end if
 end function opsinputs_fill_varnames_with_channels
