@@ -1,0 +1,44 @@
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T02:00:00Z
+
+observations:
+  - obs space:
+      name: GPSRO
+      obsdatain:
+        obsfile: Data/varobs_globalnamelist_gnssro.nc4
+      simulated variables: [bending_angle]
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.0
+    - filter: VarObs Writer
+      namelist_directory: ../etc/global/varobs
+      general_mode: debug
+    - filter: VarObs Checker
+      expected_main_table_columns:
+        # Only levels 1 and 3 are simulated and hence written to the VarObs file.
+        # In the arrays below, rows denote locations and columns channels.
+        field: [71,72,73,74,71,72,73,74,71,72,73,74,71,72,73,74]
+        level: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ob value: ["57.10000", "27.10000", "37.10000", "47.10000",
+                   "-1073741824.00000", "-1073741824.00000", "-1073741824.00000", "-1073741824.00000",
+                   "57.30000", "27.30000", "37.30000", "47.30000",
+                   "57.40000", "27.40000", "37.40000", "47.40000"]
+        lat: ["7.10000", "7.10000", "7.10000", "7.10000",
+               "-1073741824.00000", "-1073741824.00000", "-1073741824.00000", "-1073741824.00000",
+               "7.30000", "7.30000", "7.30000", "7.30000",
+               "7.40000", "7.40000", "7.40000", "7.40000"]
+        lon: ["17.10000", "17.10000", "17.10000", "17.10000",
+              "-1073741824.00000", "-1073741824.00000", "-1073741824.00000", "-1073741824.00000",
+              "17.30000", "17.30000", "17.30000", "17.30000",
+              "17.40000", "17.40000", "17.40000", "17.40000"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

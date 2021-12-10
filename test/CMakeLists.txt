@@ -250,6 +250,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
                 YAML     varobswriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/varobs/ATMS.nl
                 DATA     varobs_globalnamelist_atms.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_gnssro
+                YAML     varobswriter_globalnamelist_gnssro.yaml
+                NAMELIST ../../etc/global/varobs/GPSRO.nl
+                DATA     varobs_globalnamelist_gnssro.nc4)
 
 ### CxWriter tests
 
@@ -432,6 +436,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atms
                 YAML     cxwriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/cx/ATMS.nl
                 DATA     cx_globalnamelist_atms.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gnssro
+                YAML     cxwriter_globalnamelist_gnssro.yaml
+                NAMELIST ../../etc/global/cx/GPSRO.nl
+                DATA     cx_globalnamelist_gnssro.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
