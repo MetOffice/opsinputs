@@ -29,6 +29,8 @@ jobs:
           path: ci/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
+      - name: attempt to checkout oops ${{ github.ref_name }}
+        run: ./ci/get-ref-branch ./ci/oops
       - name: checkout jedicmake
         uses: actions/checkout@v2
         with:
@@ -41,12 +43,16 @@ jobs:
           path: ci/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
+      - name: attempt to checkout ioda ${{ github.ref_name }}
+        run: ./ci/get-ref-branch ./ci/ioda
       - name: checkout ufo
         uses: actions/checkout@v2
         with:
           path: ci/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
+      - name: attempt to checkout ufo ${{ github.ref_name }}
+        run: ./ci/get-ref-branch ./ci/ufo
       - name: build and test
         run: |
           docker run --rm \

@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euxo pipefail
+
+cd "$1"  # expect path to a repo
+
+if [[ "${GITHUB_REF_NAME}" == 'develop' ]]; then
+    exit
+fi
+
+# Attempt to checkout a branch from a dependency project with the same name as
+# the branch triggering this GitHub Actions workflow.
+if git fetch --progress --depth=1 origin \
+    "+refs/heads/${GITHUB_REF_NAME}:refs/remotes/origin/${GITHUB_REF_NAME}"
+then
+    git checkout --progress --force -B "${GITHUB_REF_NAME}" \
+        "refs/remotes/origin/${GITHUB_REF_NAME}"
+fi
+
+exit
