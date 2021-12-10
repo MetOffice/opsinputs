@@ -656,7 +656,7 @@ call opsinputs_fill_fillreal(Ob % Header % Latitude, "Latitude", JediToOpsLayout
 call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", JediToOpsLayoutMapping, &
   Ob % Longitude, ObsSpace, "longitude", "MetaData")
 call opsinputs_fill_filltimeoffsets(Ob % Header % Time, "Time", JediToOpsLayoutMapping, &
-  Ob % Time, ObsSpace, "datetime", "MetaData", self % validitytime)
+  Ob % Time, ObsSpace, "dateTime", "MetaData", self % validitytime)
 
 call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
 Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
@@ -997,7 +997,7 @@ do iVarField = 1, nVarFields
     case (VarField_LevelTime)
       call opsinputs_fill_filltimeoffsets2d( &
         Ob % Header % level_time, "level_time", JediToOpsLayoutMapping, Ob % level_time, &
-        ObsSpace, self % channels, "datetime", "MetaData", self % validitytime)
+        ObsSpace, self % channels, "dateTime", "MetaData", self % validitytime)
     case (VarField_LevelLat)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % level_lat, "level_lat", JediToOpsLayoutMapping, Ob % level_lat, &
