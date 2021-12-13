@@ -85,12 +85,13 @@ ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                                 opsinputs/VarObsCheckerParameters.h
                                 mains/TestObsFilters.cc
                         LIBS    opsinputs )
-target_include_directories(test_OpsInputsFilters.x PRIVATE
-  ${CMAKE_INSTALL_PREFIX}/include/ufo
-)
 if (ufo_SOURCE_DIR)
   target_include_directories(test_OpsInputsFilters.x PRIVATE
     ${ufo_SOURCE_DIR}
+  )
+else()
+  target_include_directories(test_OpsInputsFilters.x PRIVATE
+    ${CMAKE_INSTALL_PREFIX}/include/ufo
   )
 endif()
 
