@@ -609,6 +609,8 @@ if __name__ == "__main__":
 
     # Varobs full output for an obsgroup testing
     # 1dfloats, 2dfloats, 1dints, filename
+    
+    # ATMS
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
                                   'MetaData/solar_zenith_angle'],
                                  ['ObsValue/brightness_temperature','ObsError/brightness_temperature','Emiss/surface_emissivity',
@@ -616,6 +618,17 @@ if __name__ == "__main__":
                                   'thickness_850_300hPa_satid_17Predictor/brightness_temperature'],
                                  ['MetaData/surface_type','MetaData/satellite_id'],
                                   'testinput/varobs_globalnamelist_atms.nc4')
+    # GNSS-RO
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude',
+                                  'MetaData/impact_parameter',
+                                  'MetaData/earth_radius_of_curvature',
+                                  'MetaData/geoid_height_above_reference_ellipsoid',
+                                  'ObsValue/bending_angle',
+                                  'ObsError/bending_angle'],
+                                 [],
+                                 ['MetaData/satellite_id'],
+                                  'testinput/varobs_globalnamelist_gnssro.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
@@ -644,12 +657,22 @@ if __name__ == "__main__":
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output
+    
+    # ATMS
     output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
                               'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
                              ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
                               'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
                               'testinput/cx_globalnamelist_atms.nc4')
+
+    # GNSS-RO
+    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
+                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
+                             ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                              'testinput/cx_globalnamelist_gnssro.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
