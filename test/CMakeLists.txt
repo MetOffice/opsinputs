@@ -165,6 +165,10 @@ ADD_WRITER_TEST(NAME     varobswriter_055_VarField_channum
 ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
                 YAML     066_VarField_radarobazim.yaml
                 DATA     066_VarField_radarobazim.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_068_VarField_clw
+                YAML     068_VarField_clw.yaml
+                NAMELIST VarObsWriterNamelists_068_VarField_clw/AMSUB.nl
+                DATA     068_VarField_clw.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_071_VarField_bendingangle
                 YAML     071_VarField_bendingangle.yaml
                 DATA     071_VarField_bendingangle.nc4)
