@@ -70,6 +70,8 @@ public :: opsinputs_fill_fillcoord2d, &
           opsinputs_fill_fillreal2dfromgeovalorhofx, &
           opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
           opsinputs_fill_fillreal2dfromhofx, &
+          opsinputs_fill_fillrealfromgeovalformultilevelobs, &
+          opsinputs_fill_fillreal2dfromgeovalformultilevelobs, &
           opsinputs_fill_fillstring, &
           opsinputs_fill_filltimeoffsets, &
           opsinputs_fill_filltimeoffsets2d, &
@@ -1060,6 +1062,8 @@ end subroutine opsinputs_fill_fillreal2d
 ! ------------------------------------------------------------------------------
 
 !> Populate a 1D array of real numbers and its header from a GeoVaL.
+!> The method used to do this differs depending on whether the observations
+!> are single- or multi-level.
 !>
 !> \param[inout] Hdr
 !>   Header to be populated.
@@ -1073,6 +1077,8 @@ end subroutine opsinputs_fill_fillreal2d
 !>   A container holding the specified GeoVaL.
 !> \param[in] JediVarName
 !>   Name of the GeoVaL used to populate \p Real1.
+!> \param[in] JediToOpsLayoutMapping
+!>   Mapping between indices of observations in the JEDI and OPS data structures.
 !>
 !> \note If you're calling this function from opsinputs_fill_populateobservations, be sure
 !> to update opsinputs_fill_addrequiredgeovars by adding \p JediVarName to the list of
@@ -1082,16 +1088,17 @@ end subroutine opsinputs_fill_fillreal2d
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillrealfromgeoval( &
-  Hdr, OpsVarName, NumObs, Real1, GeoVals, JediVarName)
+  Hdr, OpsVarName, NumObs, Real1, GeoVals, JediVarName, JediToOpsLayoutMapping)
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer, intent(out)              :: Real1(:)
-type(ufo_geovals), intent(in)                   :: GeoVals
-character(len=*), intent(in)                    :: JediVarName
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+integer(integer64), intent(in)                     :: NumObs
+real(real64), pointer, intent(out)                 :: Real1(:)
+type(ufo_geovals), intent(in)                      :: GeoVals
+character(len=*), intent(in)                       :: JediVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
@@ -1105,20 +1112,26 @@ character(len=256)                              :: ErrorMessage
 
 MissingReal = missing_value(0.0_c_float)
 
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-  if (GeoVal % nval /= 1) then
-    write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
-      &Only the first of these values will be written to the VarObs file")') JediVarName
-    call gen_warn(RoutineName, ErrorMessage)
-  end if
+if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
+   call opsinputs_fill_fillrealfromgeovalformultilevelobs( &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real1, &
+        GeoVals, JediVarName, JediToOpsLayoutMapping)
+else
+  if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
+    ! Retrieve GeoVal
+    call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+    if (GeoVal % nval /= 1) then
+      write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
+        &Only the first of these values will be written to the VarObs file")') JediVarName
+      call gen_warn(RoutineName, ErrorMessage)
+    end if
 
-  ! Fill the OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
-  where (GeoVal % vals(1,:) /= MissingReal)
-    Real1 = GeoVal % vals(1,:)
-  end where
+    ! Fill the OPS data structures
+    call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
+    where (GeoVal % vals(1,:) /= MissingReal)
+      Real1 = GeoVal % vals(1,:)
+    end where
+  end if
 end if
 end subroutine opsinputs_fill_fillrealfromgeoval
 
@@ -1225,10 +1238,11 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
    if (hofxIndex > 0) then
       call opsinputs_fill_fillreal2dfromhofx( &
            Hdr, OpsVarName, Real2, &
-           JediToOpsLayoutMapping, hofx(hofxIndex,:))
+           JediToOpsLayoutMapping, hofx(hofxIndex,:), JediVarName, GeoVals)
    else
-      write(*, *) JediVarName, " does not appear in the list of simulated variables"
-      call abort()
+      call opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
+           Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+           GeoVals, JediVarName, JediToOpsLayoutMapping)
    end if
 else
    call opsinputs_fill_fillreal2dfromgeoval( &
@@ -1252,8 +1266,10 @@ end subroutine opsinputs_fill_fillreal2dfromgeovalorhofx
 !>   Mapping between indices of observations in the JEDI and OPS data structures.
 !> \param[in] hofx
 !>   The HofX vector to use.
+!> \param[in] GeoVals
+!>   A container holding the specified GeoVaL.
 subroutine opsinputs_fill_fillreal2dfromhofx( &
-  Hdr, OpsVarName, Real2, JediToOpsLayoutMapping, hofx)
+  Hdr, OpsVarName, Real2, JediToOpsLayoutMapping, hofx, JediVarName, GeoVals)
 implicit none
 
 ! Subroutine arguments:
@@ -1262,20 +1278,31 @@ character(len=*), intent(in)                       :: OpsVarName
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(c_double), intent(in)                         :: hofx(:)
+character(len=*), intent(in)                       :: JediVarName
+type(ufo_geovals), intent(in)                      :: GeoVals
 
 ! Local declarations:
+type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
 integer                                         :: iObs, iLevel, iJediObs, numLevels
 
 ! Body:
 
+if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
+  ! Retrieve GeoVal
+  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+  numLevels = GeoVal % nval
+else
+   numLevels = JediToOpsLayoutMapping % MaxNumLevelsPerObs
+end if
+
 MissingReal = missing_value(0.0_c_double)
 
 ! Fill the OPS data structures
 call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-               num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = 8))
+               num_levels = int(numLevels, kind = 8))
+
 do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-   numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs)
    do iLevel = 1, numLevels
       ! Location of current observation in the ObsSpace.
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
@@ -1356,6 +1383,140 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarNamesWithChannels(1)) > 0) the
 end if
 
 end subroutine opsinputs_fill_fillreal2dfrom1dgeovalwithchans
+
+
+
+! ------------------------------------------------------------------------------
+
+!> Populate a 1D array of real numbers and its header from a GeoVaL associated with a multi-level observation.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real2 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real1
+!>   Pointer to the array to be populated.
+!> \param[in] GeoVals
+!>   A container holding the specified GeoVaL.
+!> \param[in] JediVarName
+!>   Name of the GeoVal used to populate \p Real2.
+!> \param[in] JediToOpsLayoutMapping
+!>   Mapping between indices of observations in the JEDI and OPS data structures.
+!>
+!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
+subroutine opsinputs_fill_fillrealfromgeovalformultilevelobs( &
+  Hdr, OpsVarName, NumObs, Real1, GeoVals, JediVarName, JediToOpsLayoutMapping)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+integer(integer64), intent(in)                     :: NumObs
+real(real64), pointer, intent(out)                 :: Real1(:)
+character(len=*), intent(in)                       :: JediVarName
+type(ufo_geovals), intent(in)                      :: GeoVals
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+
+! Local declarations:
+type(ufo_geoval), pointer                       :: GeoVal
+real(kind_real)                                 :: MissingReal
+integer                                         :: iObs, iLevel, iJediObs, numLevels
+
+! Body:
+
+MissingReal = missing_value(0.0_c_float)
+
+if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
+  ! Retrieve GeoVal
+  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real1)
+
+  do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
+     if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+        cycle
+     end if
+     numLevels = GeoVal % nval
+     iLevel = 1
+     ! Location of current observation in the ObsSpace.
+     iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+          JediToOpsLayoutMapping % RecordStarts(iObs))
+     Real1(iObs) = GeoVal % vals(iLevel, JediToOpsLayoutMapping % RecordStarts(iObs))
+  end do
+end if
+end subroutine opsinputs_fill_fillrealfromgeovalformultilevelobs
+
+
+
+! ------------------------------------------------------------------------------
+
+!> Populate a 2D array of real numbers and its header from a GeoVaL associated with a multi-level observation.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Real2 corresponds.
+!> \param[in] NumObs
+!>   Number of observations held by this process.
+!> \param[inout] Real2
+!>   Pointer to the array to be populated.
+!> \param[in] GeoVals
+!>   A container holding the specified GeoVaL.
+!> \param[in] JediVarName
+!>   Name of the GeoVal used to populate \p Real2.
+!> \param[in] JediToOpsLayoutMapping
+!>   Mapping between indices of observations in the JEDI and OPS data structures.
+!>
+!> \note This function returns early (without a warning) if the specified GeoVaL is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
+subroutine opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
+  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName, JediToOpsLayoutMapping)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+integer(integer64), intent(in)                     :: NumObs
+real(real64), pointer, intent(out)                 :: Real2(:,:)
+character(len=*), intent(in)                       :: JediVarName
+type(ufo_geovals), intent(in)                      :: GeoVals
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+
+! Local declarations:
+type(ufo_geoval), pointer                       :: GeoVal
+real(kind_real)                                 :: MissingReal
+integer                                         :: iObs, iLevel, iJediObs, numLevels
+
+! Body:
+
+MissingReal = missing_value(0.0_c_float)
+
+if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
+  ! Retrieve GeoVal
+  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+       num_levels = int(GeoVal % nval, kind = 8))
+  do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
+     if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+        cycle
+     end if
+     numLevels = GeoVal % nval
+     do iLevel = 1, numLevels
+        ! Location of current observation in the ObsSpace.
+        iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+             JediToOpsLayoutMapping % RecordStarts(iObs))
+        Real2(iObs,iLevel) = GeoVal % vals(iLevel, JediToOpsLayoutMapping % RecordStarts(iObs))
+     end do
+  end do
+end if
+end subroutine opsinputs_fill_fillreal2dfromgeovalformultilevelobs
+
 
 ! ------------------------------------------------------------------------------
 

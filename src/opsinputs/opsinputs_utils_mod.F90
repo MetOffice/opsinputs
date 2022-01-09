@@ -65,12 +65,12 @@ logical                                            :: AllJediObsRejected
 ObsVariables = opsinputs_obsdatavector_int_varnames(Flags)
 NumObsVariables = ObsVariables % nvars()
 
-! Initialise ReportFlags
-if (RejectObsWithAnyVariableFailingQC) then
-  ReportFlags = 0  
-else if (RejectObsWithAllVariablesFailingQC) then
+! Initialise ReportFlags to zero
+ReportFlags = 0
+if (RejectObsWithAllVariablesFailingQC) then
   ReportFlags = ibset(ReportFlags, FinalRejectReport)
 end if
+! The option RejectObsWithAnyVariableFailingQC has no effect at this stage
 
 ! Iterate over variables
 do iVar = 1, NumObsVariables
