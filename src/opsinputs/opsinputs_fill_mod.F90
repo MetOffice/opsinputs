@@ -1384,8 +1384,6 @@ end if
 
 end subroutine opsinputs_fill_fillreal2dfrom1dgeovalwithchans
 
-
-
 ! ------------------------------------------------------------------------------
 
 !> Populate a 1D array of real numbers and its header from a GeoVaL associated with a multi-level observation.
@@ -1424,7 +1422,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
-integer                                         :: iObs, iLevel, iJediObs, numLevels
+integer                                         :: iObs, iJediObs
 
 ! Body:
 
@@ -1433,24 +1431,21 @@ MissingReal = missing_value(0.0_c_float)
 if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   ! Retrieve GeoVal
   call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real1)
-
+  ! Loop over each multi-level profile
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
+     ! Do not fill the CX column if there are no entries in the profile.
      if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
         cycle
      end if
-     numLevels = GeoVal % nval
-     iLevel = 1
      ! Location of current observation in the ObsSpace.
      iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
           JediToOpsLayoutMapping % RecordStarts(iObs))
-     Real1(iObs) = GeoVal % vals(iLevel, JediToOpsLayoutMapping % RecordStarts(iObs))
+     Real1(iObs) = GeoVal % vals(1, JediToOpsLayoutMapping % RecordStarts(iObs))
   end do
 end if
 end subroutine opsinputs_fill_fillrealfromgeovalformultilevelobs
-
 
 
 ! ------------------------------------------------------------------------------
@@ -1500,23 +1495,28 @@ MissingReal = missing_value(0.0_c_float)
 if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   ! Retrieve GeoVal
   call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+  ! Determine the number of levels in this GeoVaL. This governs the number of levels in the
+  ! output array.
+  numLevels = GeoVal % nval
+  ! Fill the OPS data structure
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-       num_levels = int(GeoVal % nval, kind = 8))
+       num_levels = int(numLevels, kind = 8))
+  ! Loop over each multi-level profile
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
+     ! Do not fill the CX column if there are no entries in the profile.
      if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
         cycle
      end if
-     numLevels = GeoVal % nval
      do iLevel = 1, numLevels
         ! Location of current observation in the ObsSpace.
         iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
              JediToOpsLayoutMapping % RecordStarts(iObs))
+        ! Fill the CX column with the GeoVal at the first location in the profile.
         Real2(iObs,iLevel) = GeoVal % vals(iLevel, JediToOpsLayoutMapping % RecordStarts(iObs))
      end do
   end do
 end if
 end subroutine opsinputs_fill_fillreal2dfromgeovalformultilevelobs
-
 
 ! ------------------------------------------------------------------------------
 
