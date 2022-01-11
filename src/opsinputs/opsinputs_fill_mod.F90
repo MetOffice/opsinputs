@@ -389,7 +389,6 @@ character(len=*), parameter                        :: &
 character(len=256)                                 :: ErrorMessage
 
 ! Body:
-write(*, *) "In opsinputs_fill_fillelementtype2dfromsimulatedvariable_records"
 if (present(PackPGEs)) then
   DoPackPGEs = PackPGEs
 else
@@ -405,11 +404,8 @@ end if
 MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
-write(*, *) "JediVarName = ", JediVarName
-write(*, *) "JediToOpsLayoutMapping % MaxNumLevelsPerObs = ", JediToOpsLayoutMapping % MaxNumLevelsPerObs
 if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   ! Allocate OPS data structures
-   write(*, *) "Allocating"
    if (IC_PLevels > 0) then
       call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
            num_levels = int(IC_PLevels, kind = integer64))
@@ -420,10 +416,8 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
 
   ! Retrieve data from JEDI:
   ! - observation value
-   write(*, *) "Get ObsValue"
   call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
   ! - QC flag
-   write(*, *) "Get QC flag"
   if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
   else
@@ -433,7 +427,6 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     Flag(:) = 0 ! assume all observations passed QC
   end if
   ! - observation error
-   write(*, *) "Get obs errors"
   if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
     call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
   else
@@ -443,7 +436,6 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     ObsError(:) = MissingFloat
   end if
   ! - gross error probability
-   write(*, *) "Get PGE"
   if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarName)) then
     call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarName, &
                          PGE)
@@ -452,7 +444,6 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   end if
 
   ! Fill the OPS data structures
-   write(*, *) "Starting loop"
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
 
     if (IC_PLevels > 0) then
@@ -466,9 +457,6 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
        cycle
     end if
-
-    write(*, *) "iObs = ", iObs
-    write(*, *) "numLevels = ", numLevels
 
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
@@ -488,7 +476,6 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
       ibset(0, FinalRejectFlag)
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-write(*, *) "... done"
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 
 ! ------------------------------------------------------------------------------

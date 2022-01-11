@@ -632,11 +632,13 @@ if __name__ == "__main__":
 
     # Sonde
     output_full_varobs_to_netcdf(['MetaData/latitude',
-                                  'MetaData/longitude'],
-                                 ['ObsValue/air_temperature','ObsError/air_temperature',
+                                  'MetaData/longitude',
+                                  'MetaData/air_pressure',
+                                  'ObsValue/air_potential_temperature','ObsError/air_potential_temperature',
                                   'ObsValue/eastward_wind','ObsError/eastward_wind',
                                   'ObsValue/northward_wind','ObsError/northward_wind',
                                   'ObsValue/relative_humidity','ObsError/relative_humidity'],
+                                 [],
                                  [],
                                  'testinput/varobs_globalnamelist_sonde.nc4')
 
