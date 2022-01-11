@@ -24,7 +24,6 @@ observations:
     - filter: VarObs Checker
       expected_main_table_columns:
         # Only levels 1 and 3 are simulated and hence written to the VarObs file.
-        # In the arrays below, rows denote locations and columns channels.
         field: [3,4,5,78,3,4,5,78,3,4,5,78,3,4,5,78]
         ob value: ["97.10000","57.10000","77.10000","37.10000","-1073741824.00000",
         "-1073741824.00000","-1073741824.00000","-1073741824.00000","97.30000",
