@@ -1,3 +1,5 @@
+[![CI](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml/badge.svg)](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml)
+
 (C) Crown Copyright 2020, the Met Office. All rights reserved.
 
 Refer to COPYRIGHT.txt of this distribution for details.
@@ -25,7 +27,7 @@ Building
 
        git clone https://github.com/JCSDA/ufo-bundle.git -b feature/wsmigaj
        cd ufo-bundle
-       cp -a /project/SatImagery/utils/jedi_repos/ufo-bundle/ropp-ufo .
+       cp -a ~jopa/jedi_repos/nightly/ropp-ufo .
 
 2. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
 
