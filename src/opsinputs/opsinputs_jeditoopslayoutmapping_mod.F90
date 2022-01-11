@@ -68,7 +68,7 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 integer                                :: nlocs, nrecs, i
 
 ! Body:
-
+write(*, *) "In opsinputs_jeditoopslayoutmapping_create"
 JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs = ConvertRecordsToMultilevelObs
 
 nlocs = obsspace_get_nlocs(ObsSpace)
@@ -93,6 +93,7 @@ else
   JediToOpsLayoutMapping % NumOpsObs = nlocs
   JediToOpsLayoutMapping % MaxNumLevelsPerObs = 1
 end if
+write(*, *) "JediToOpsLayoutMapping % MaxNumLevelsPerObs = ", JediToOpsLayoutMapping % MaxNumLevelsPerObs
 end function opsinputs_jeditoopslayoutmapping_create
 
 ! ------------------------------------------------------------------------------
@@ -111,9 +112,10 @@ integer              :: NewRecordStarts(JediToOpsLayoutMapping % NumOpsObs + 1)
 integer              :: NewNumLocations, i, RecordLength
 
 ! Body:
-
+write(*, *) "In opsinputs_jeditoopslayoutmapping_clear_rejected_records"
 NewNumLocations = 0
 do i = 1, JediToOpsLayoutMapping % NumOpsObs
+   write(*, *) "ReportFlags(", i, ") = ", ReportFlags(i)
   if (ReportFlags(i) == 0) then
     NewNumLocations = NewNumLocations + &
       (JediToOpsLayoutMapping % RecordStarts(i + 1) - JediToOpsLayoutMapping % RecordStarts(i))
