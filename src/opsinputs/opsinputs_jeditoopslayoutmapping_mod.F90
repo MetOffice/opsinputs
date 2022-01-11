@@ -68,6 +68,7 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 integer                                :: nlocs, nrecs, i
 
 ! Body:
+
 JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs = ConvertRecordsToMultilevelObs
 
 nlocs = obsspace_get_nlocs(ObsSpace)
@@ -110,6 +111,7 @@ integer              :: NewRecordStarts(JediToOpsLayoutMapping % NumOpsObs + 1)
 integer              :: NewNumLocations, i, RecordLength
 
 ! Body:
+
 NewNumLocations = 0
 do i = 1, JediToOpsLayoutMapping % NumOpsObs
   if (ReportFlags(i) == 0) then
