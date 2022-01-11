@@ -42,7 +42,7 @@ set( OPSINPUTS_LINKER_LANGUAGE CXX )
 include_directories( ${Boost_INCLUDE_DIR} )
 
 # NetCDF
-find_package( NetCDF REQUIRED COMPONENTS Fortran)
+find_package( NetCDF REQUIRED COMPONENTS C Fortran)
 
 # eckit
 find_package( eckit REQUIRED )
@@ -110,7 +110,7 @@ ecbuild_print_summary()
 
 ecbuild_add_test( TARGET opsinputs_coding_norms
                   TYPE SCRIPT
-                  COMMAND ${CMAKE_BINARY_DIR}/bin/cpplint.py
+                  COMMAND ${oops_BINDIR}/oops_cpplint.py
                   ARGS --quiet --recursive ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/test
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 
