@@ -669,8 +669,13 @@ call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", JediToOpsLayo
 call opsinputs_fill_filltimeoffsets(Ob % Header % Time, "Time", JediToOpsLayoutMapping, &
   Ob % Time, ObsSpace, "dateTime", "MetaData", self % validitytime)
 
-call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
-Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
+if (obsspace_has(ObsSpace, "MetaData", "ops_subtype")) then
+   call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
+        Ob % ObsType, ObsSpace, "ops_subtype", "MetaData")
+else
+   call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+   Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
+end if
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
