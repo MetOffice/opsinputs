@@ -14,11 +14,11 @@ observations:
     - filter: Reset Flags to Pass
       flags_to_reset: [10, 15]  # missing, Hfailed
     # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
-    - filter: Domain Check
+    - filter: BlackList
       where:
       - variable:
           name: latitude@MetaData
-        minvalue: 0.0
+        is_not_defined:
     - filter: VarObs Writer
       namelist_directory: ../etc/global/varobs
       general_mode: debug
