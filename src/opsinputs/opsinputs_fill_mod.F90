@@ -1303,6 +1303,10 @@ call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
                num_levels = int(numLevels, kind = 8))
 
 do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
+   ! Do not fill the CX column if there are no entries in the profile.
+   if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+      cycle
+   end if
    do iLevel = 1, numLevels
       ! Location of current observation in the ObsSpace.
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
