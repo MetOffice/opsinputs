@@ -38,7 +38,6 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
     opsinputs_fill_fillreal2dfromgeoval, &
-    opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
     opsinputs_fill_fillstring, &
     opsinputs_fill_filltimeoffsets, &
     opsinputs_fill_filltimeoffsets2d, &
