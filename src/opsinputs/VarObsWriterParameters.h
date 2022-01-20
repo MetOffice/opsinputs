@@ -55,7 +55,7 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
 
   /// Define the orientation of the GeoVaLs, true if they are toptobottom and otherwise false.
   /// default is true.
-  oops::Parameter<bool> topToBottom{"geovals_are_top_to_bottom", true, this};
+  oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
 
   /// Account for the GPSRO tangent point drift.
   oops::Parameter<bool> accountForGPSROTangentPointDrift{
