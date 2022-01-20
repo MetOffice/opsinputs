@@ -54,7 +54,8 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
 
-  /// Should the GeoVals be treated as toptobottom or bottomtotop.
+  /// Define the orientation of the GeoVaLs, true if they are toptobottom and otherwise false.
+  /// default is true.
   oops::Parameter<bool> topToBottom{"geovals_are_top_to_bottom", true, this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved

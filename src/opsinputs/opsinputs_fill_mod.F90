@@ -1268,7 +1268,6 @@ character(len=*), intent(in)                    :: JediVarName
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
-integer                                         :: nlevels
 
 ! Body:
 
@@ -1285,8 +1284,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
   end where
   ! VAR has model values from the surface -> TOA, therefore they may need reversing.
   if (GeoVaLsAreTopToBottom) then
-    nlevels = GeoVal % nval
-    Real2 = Real2(:,nlevels:1:-1)
+    Real2 = Real2(:, GeoVal % nval:1:-1)
   end if
 end if
 end subroutine opsinputs_fill_fillreal2dfromgeoval
@@ -1302,7 +1300,7 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !> \param[in] GeoVals
 !>   A container holding the specified GeoVaL.
 !> \param[in] GeoVaLsAreTopToBottom
-!>   A logical to specify if the geovals are orientated "toptobottom" or "bottomtotop".
+!>   A logical to specify if the geovals are oriented "toptobottom" or "bottomtotop".
 !>   The default in parameters is true.
 !> \param[in] JediVarName
 !>   Name of the input GeoVal.
