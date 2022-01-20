@@ -56,7 +56,7 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
 
   /// Define the orientation of the GeoVaLs, true if they are toptobottom and otherwise false.
   /// default is true.
-  oops::Parameter<bool> topToBottom{"geovals_are_top_to_bottom", true, this};
+  oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.
