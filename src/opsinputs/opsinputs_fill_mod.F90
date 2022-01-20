@@ -209,7 +209,7 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
+!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El2 and \p Hdr.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] Flags
@@ -218,7 +218,7 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate El1 and Hdr. The variables can either have no channel suffix (in which case
+!>   used to populate El2 and Hdr. The variables can either have no channel suffix (in which case
 !>   \p El2 will have only a single row) or have suffixes representing the indices specified in
 !>   \p Channels.
 !> \param[in] PackPGEs
@@ -343,14 +343,14 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
+!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El2 and \p Hdr.
 !> \param[in] Flags
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate El1 and Hdr.
+!>   used to populate El2 and Hdr.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -471,7 +471,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El1 and \p Hdr.
+!>   Pointer to ioda::ObsSpace containing the variables used to populate \p El2 and \p Hdr.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] Flags
@@ -480,7 +480,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups) used
-!>   to populate El1 and Hdr. If each JEDI location needs to be mapped to a separate OPS
+!>   to populate El2 and Hdr. If each JEDI location needs to be mapped to a separate OPS
 !>   observation, the variables can either have no channel suffix (in which case \p El2 will have
 !>   only a single row) or have suffixes representing the indices specified in \p Channels.
 !> \param[in] PackPGEs
@@ -640,7 +640,7 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> \param[inout] Hdr
 !>   Header to be populated.
 !> \param[in] OpsVarName
-!>   Name of the OB_type field to which El1 corresponds.
+!>   Name of the OB_type field to which El2 corresponds.
 !> \param[in] NumObs
 !>   Number of observations held by this process.
 !> \param[inout] El2
@@ -758,7 +758,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
       ! variables. At present, however, we don't even have a use case where there is a separate
       ! variable storing the observation error.
 
-      ! Set El1(i) % PGEFinal to 'missing'
+      ! Set El2(i) % PGEFinal to 'missing'
       call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El2(iObs, iChannel))
     end do
   end do
@@ -775,7 +775,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromnormalvariable
 !> \param[inout] Hdr
 !>   Header to be populated.
 !> \param[in] OpsVarName
-!>   Name of the OB_type field to which El1 corresponds.
+!>   Name of the OB_type field to which El2 corresponds.
 !> \param[in] NumObs
 !>   Number of observations held by this process.
 !> \param[inout] El2
