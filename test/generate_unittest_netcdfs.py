@@ -518,7 +518,7 @@ def output_full_cx_to_netcdf(oned_var_names, twod_var_names, file_name):
     for var_index, var_name in enumerate(twod_var_names):
       var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
       shift = 10 * var_index
-      # Reversed not geovals are top to bottom
+      # Reversed now geovals are top to bottom
       var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
                 [shift + 2.3, missing_float, shift + 2.1],
                 [shift + 3.3, shift + 3.2, shift + 3.1],
