@@ -714,7 +714,7 @@ do iVarField = 1, nVarFields
     case (VarField_theta)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-        ObsSpace, self % channels, Flags, ObsErrors, "theta")
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
