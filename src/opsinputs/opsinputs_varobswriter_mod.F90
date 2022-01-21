@@ -717,11 +717,9 @@ do iVarField = 1, nVarFields
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
-      ! TODO(wsmigaj): check if air_potential_temperature is the correct variable name
-      ! (it isn't used in JEDI, but virtual_temperature is)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_potential_temperature")
+        ObsSpace, self % channels, Flags, ObsErrors, "theta")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
