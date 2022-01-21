@@ -812,7 +812,7 @@ do iVarField = 1, nVarFields
       ! here and in opsinputs_varobswriter_addrequiredgeovars.
       call opsinputs_fill_fillrealfromgeoval( &
         Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface, &
-        self % GeoVals, "land_type_index")
+        self % GeoVals, "land_type_index", JediToOpsLayoutMapping)
     case (VarField_modelorog)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
