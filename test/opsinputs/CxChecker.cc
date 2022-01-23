@@ -74,7 +74,8 @@ CxChecker::~CxChecker() {
   oops::Log::trace() << "CxChecker destructor starting" << std::endl;
 }
 
-void CxChecker::postFilter(const ioda::ObsVector &/*hofx*/,
+void CxChecker::postFilter(const ufo::GeoVaLs &,
+                           const ioda::ObsVector &/*hofx*/,
                            const ioda::ObsVector &/*bias*/,
                            const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "CxChecker postFilter" << std::endl;

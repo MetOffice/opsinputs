@@ -99,26 +99,29 @@ end subroutine opsinputs_cxwriter_prior_c
 
 ! ------------------------------------------------------------------------------
 
-subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_flags, &
+subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_geovals, c_flags, &
                                      c_nvars, c_nlocs, c_varnames, c_hofx) &
   bind(c,name='opsinputs_cxwriter_post_f90')
 implicit none
 integer(c_int), intent(in)     :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
+integer(c_int), intent(in)     :: c_geovals
 type(c_ptr), value, intent(in) :: c_flags
 integer(c_int), intent(in)     :: c_nvars, c_nlocs
 type(c_ptr), value, intent(in) :: c_varnames
 real(c_double), intent(in)     :: c_hofx(c_nvars, c_nlocs)
 
 type(opsinputs_cxwriter), pointer :: self
+type(ufo_geovals), pointer :: geovals
 type(oops_variables) :: f_varnames
 
 call opsinputs_cxwriter_registry%get(c_self, self)
+call ufo_geovals_registry%get(c_geovals, geovals)
 
 ! Obtain simulated variable names.
 f_varnames = oops_variables(c_varnames)
 
-call opsinputs_cxwriter_post(self, c_obspace, c_flags, &
+call opsinputs_cxwriter_post(self, c_obspace, geovals, c_flags, &
                              f_varnames, c_hofx)
 
 end subroutine opsinputs_cxwriter_post_c

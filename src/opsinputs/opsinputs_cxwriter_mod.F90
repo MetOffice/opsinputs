@@ -470,12 +470,13 @@ end subroutine opsinputs_cxwriter_prior
 !> Called by the postFilter() method of the C++ CxWriter object.
 !>
 !> Write out a Cx file containing varfields derived from JEDI variables.
-subroutine opsinputs_cxwriter_post(self, ObsSpace, Flags, varnames, hofx)
+subroutine opsinputs_cxwriter_post(self, ObsSpace, GeoVals, Flags, varnames, hofx)
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(inout) :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
+type(ufo_geovals), intent(in), pointer  :: GeoVals
 type(c_ptr), value, intent(in)          :: Flags
 type(oops_variables), intent(in)        :: varnames
 real(c_double), intent(in), target      :: hofx(:, :)
@@ -486,6 +487,7 @@ type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
 
+self % GeoVals => GeoVals
 self % varnames = varnames
 self % hofx => hofx
 
