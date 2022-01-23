@@ -52,7 +52,8 @@ SELECT CASE (ObsGroup)
                         Varfield_surface,Varfield_numchans,Varfield_channum, &
                         Varfield_stratt,Varfield_iremiss,Varfield_qcinfo/)
   CASE (ObsGroupAircraft)
-    Varfields(1:4) = (/Varfield_theta,Varfield_u,Varfield_v,Varfield_rh/)
+!   Varfields(1:4) = (/Varfield_theta,Varfield_u,Varfield_v,Varfield_rh/)
+    Varfields(1:5) = (/Varfield_theta,Varfield_u,Varfield_v,Varfield_temperature,Varfield_rh/)
   CASE (ObsGroupAHIASR)
     Varfields(1:12) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
                         Varfield_solzenith,Varfield_tskin,Varfield_tcozone, &
