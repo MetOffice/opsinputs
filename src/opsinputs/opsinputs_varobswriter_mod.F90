@@ -31,6 +31,7 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillcoord2d, &
     opsinputs_fill_fillelementtypefromnormalvariable, &
     opsinputs_fill_fillelementtype2dfromnormalvariable, &
+    opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels, &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
     opsinputs_fill_fillinteger, &
@@ -148,10 +149,10 @@ private
 
   logical            :: RejectObsWithAnyVariableFailingQC
   logical            :: RejectObsWithAllVariablesFailingQC
+  logical            :: GeoVaLsAreTopToBottom
 
   logical            :: AccountForGPSROTangentPointDrift
   logical            :: UseRadarFamily
-
 
   integer(integer64) :: FH_VertCoord
   integer(integer64) :: FH_HorizGrid
@@ -275,6 +276,9 @@ call f_conf % get_or_die("reject_obs_with_any_variable_failing_qc", &
 
 call f_conf % get_or_die("reject_obs_with_all_variables_failing_qc", &
                          self % RejectObsWithAllVariablesFailingQC)
+
+call f_conf % get_or_die("geovals_are_top_to_bottom", &
+                         self % GeoVaLsAreTopToBottom)
 
 call f_conf % get_or_die("account_for_gpsro_tangent_point_drift", &
                          self % AccountForGPSROTangentPointDrift)
@@ -943,9 +947,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadFlag, "RadFlag", Ob % Header % NumObsLocal, Ob % RadFlag)
     case (VarField_clw)
-      call opsinputs_fill_fillelementtype2dfromnormalvariable( &
-        Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, & 
-        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water")
+      call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
+        Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, &
+        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water", self % GeoVaLsAreTopToBottom)
     case (VarField_refrac)
       ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
