@@ -10,7 +10,7 @@ observations:
       name: Sonde
       obsdatain:
         obsfile: Data/varobs_globalnamelist_sonde.nc4
-      simulated variables: [air_potential_temperature, eastward_wind, northward_wind, relative_humidity]
+      simulated variables: [theta, eastward_wind, northward_wind, relative_humidity]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
@@ -61,7 +61,7 @@ observations:
       name: Sonde
       obsdatain:
         obsfile: Data/varobs_globalnamelist_sonde.nc4
-      simulated variables: [air_potential_temperature, eastward_wind, northward_wind, relative_humidity]
+      simulated variables: [theta, eastward_wind, northward_wind, relative_humidity]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
