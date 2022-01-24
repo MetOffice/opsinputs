@@ -469,10 +469,11 @@ def output_2d_geovals_to_netcdf(var_names, file_name):
     for var_index, var_name in enumerate(var_names):
       var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
       shift = 10 * var_index
-      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
-                [shift + 2.1, missing_float, shift + 2.3],
-                [shift + 3.1, shift + 3.2, shift + 3.3],
-                [shift + 4.1, shift + 4.2, shift + 4.3]]
+      # Assumes the geovals are toptobottom
+      var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
+                [shift + 2.3, missing_float, shift + 2.1],
+                [shift + 3.3, shift + 3.2, shift + 3.1],
+                [shift + 4.3, shift + 4.2, shift + 4.1]]
 
     f.date_time = 2018010100
 
@@ -517,10 +518,11 @@ def output_full_cx_to_netcdf(oned_var_names, twod_var_names, file_name):
     for var_index, var_name in enumerate(twod_var_names):
       var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
       shift = 10 * var_index
-      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
-                [shift + 2.1, missing_float, shift + 2.3],
-                [shift + 3.1, shift + 3.2, shift + 3.3],
-                [shift + 4.1, shift + 4.2, shift + 4.3]]
+      # Assumes the geovals are toptobottom
+      var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
+                [shift + 2.3, missing_float, shift + 2.1],
+                [shift + 3.3, shift + 3.2, shift + 3.1],
+                [shift + 4.3, shift + 4.2, shift + 4.1]]
 
     for var_index, var_name in enumerate(oned_var_names):
       var = f.createVariable(var_name, 'f', ('nlocs',))
