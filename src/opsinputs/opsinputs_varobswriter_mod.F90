@@ -717,7 +717,7 @@ do iVarField = 1, nVarFields
     case (VarField_theta)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-        ObsSpace, self % channels, Flags, ObsErrors, "theta")
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
@@ -726,7 +726,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
-          ObsSpace, self % channels, Flags, ObsErrors, "air_temperature")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -736,7 +736,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", JediToOpsLayoutMapping, Ob % rh, &
-          ObsSpace, self % channels, Flags, ObsErrors, "relative_humidity")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "relative_humidity")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -747,7 +747,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
-          ObsSpace, self % channels, Flags, ObsErrors, "eastward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "eastward_wind")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -758,7 +758,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
-          ObsSpace, self % channels, Flags, ObsErrors, "northward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "northward_wind")
       end if
     case (VarField_logvis)
       ! TODO(someone): handle this varfield
@@ -815,7 +815,7 @@ do iVarField = 1, nVarFields
       ! here and in opsinputs_varobswriter_addrequiredgeovars.
       call opsinputs_fill_fillrealfromgeoval( &
         Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface, &
-        self % GeoVals, "land_type_index")
+        self % GeoVals, "land_type_index", JediToOpsLayoutMapping)
     case (VarField_modelorog)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
@@ -962,11 +962,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", JediToOpsLayoutMapping, Ob % BendingAngleAll, &
-          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", JediToOpsLayoutMapping, Ob % BendingAngle, &
-          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "bending_angle", PackPGEs=.false.)
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -991,7 +991,7 @@ do iVarField = 1, nVarFields
     case (VarField_AOD)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, "aerosol_optical_depth")
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosol_optical_depth")
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
