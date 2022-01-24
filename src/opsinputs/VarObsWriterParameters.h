@@ -48,9 +48,14 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Output only observations that passed the quality check in all variables.
   oops::Parameter<bool> rejectObsWithAnyVariableFailingQC{
     "reject_obs_with_any_variable_failing_qc", false, this};
+
   /// Output only observations that passed the quality check in at least one variable.
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
+
+  /// Define the orientation of the GeoVaLs, true if they are toptobottom and otherwise false.
+  /// default is true.
+  oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
 
   /// Account for the GPSRO tangent point drift.
   oops::Parameter<bool> accountForGPSROTangentPointDrift{
