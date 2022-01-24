@@ -610,7 +610,7 @@ if __name__ == "__main__":
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
 
     # Varobs full output for an obsgroup testing
-    # 1dfloats, 2dfloats, 1dints, filename
+    # Arguments are: 1D floats, 2D floats, 1D ints, filename
     
     # ATMS
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
@@ -631,6 +631,18 @@ if __name__ == "__main__":
                                  [],
                                  ['MetaData/satellite_id'],
                                   'testinput/varobs_globalnamelist_gnssro.nc4')
+
+    # Sonde
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude',
+                                  'MetaData/air_pressure',
+                                  'ObsValue/theta','ObsError/theta',
+                                  'ObsValue/eastward_wind','ObsError/eastward_wind',
+                                  'ObsValue/northward_wind','ObsError/northward_wind',
+                                  'ObsValue/relative_humidity','ObsError/relative_humidity'],
+                                 [],
+                                 [],
+                                 'testinput/varobs_globalnamelist_sonde.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
@@ -675,6 +687,19 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
                               'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
                               'testinput/cx_globalnamelist_gnssro.nc4')
+
+    # Sonde
+    output_full_cx_to_netcdf(['ice_area_fraction',
+                              'surface_altitude',
+                              'surface_pressure'],
+                             ['eastward_wind','northward_wind','theta','specific_humidity',
+                              'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+                              'air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer',
+                              'liquid_cloud_fraction',
+                              'frozen_cloud_fraction'],
+                             'testinput/cx_globalnamelist_sonde.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')

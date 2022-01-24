@@ -295,7 +295,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
       call opsinputs_obsdatavector_int_get(Flags, JediVarNamesWithChannels(iChannel), Flag)
     else
       write (ErrorMessage, '(A,A,A)') &
-        "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
+        "Warning: variable ", JediVarNamesWithChannels(iChannel), " QC flags not found"
       call gen_warn(RoutineName, ErrorMessage)
       Flag(:) = 0 ! assume all observations passed QC
     end if
@@ -389,7 +389,6 @@ character(len=*), parameter                        :: &
 character(len=256)                                 :: ErrorMessage
 
 ! Body:
-
 if (present(PackPGEs)) then
   DoPackPGEs = PackPGEs
 else
@@ -423,7 +422,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
   else
     write (ErrorMessage, '(A,A,A)') &
-      "Warning: variable ", JediVarName, "@ObsError not found"
+      "Warning: variable ", JediVarName, " QC flags not found"
     call gen_warn(RoutineName, ErrorMessage)
     Flag(:) = 0 ! assume all observations passed QC
   end if
