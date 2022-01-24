@@ -350,6 +350,8 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
+!> \param[in] IC_PLevels
+!>   Number of model pressure levels.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate El1 and Hdr.
@@ -358,7 +360,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, IC_PLevels, JediVarName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -369,6 +371,7 @@ type(Element_type), pointer                        :: El2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
+integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
 logical, optional, intent(in)                      :: PackPGEs
 
@@ -404,8 +407,13 @@ MissingFloat  = missing_value(0.0_c_float)
 
 if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
   ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
-                 num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+   if (IC_PLevels > 0) then
+      call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
+           num_levels = int(IC_PLevels, kind = integer64))
+   else
+      call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
+           num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+   end if
 
   ! Retrieve data from JEDI:
   ! - observation value
@@ -438,8 +446,19 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
 
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
-                JediToOpsLayoutMapping % RecordStarts(iObs)
+
+    if (IC_PLevels > 0) then
+       numLevels = IC_PLevels
+    else
+       numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+            JediToOpsLayoutMapping % RecordStarts(iObs)
+    end if
+
+    ! Do not deal with this observation if all levels have been rejected by QC
+    if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+       cycle
+    end if
+
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -480,6 +499,8 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
+!> \param[in] IC_PLevels
+!>   Number of model pressure levels.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups) used
 !>   to populate El1 and Hdr. If each JEDI location needs to be mapped to a separate OPS
@@ -494,7 +515,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, &
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, IC_PLevels, JediVarName, &
   PackPGEs)
 implicit none
 
@@ -507,6 +528,7 @@ type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
+integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
 logical, optional, intent(in)                      :: PackPGEs
 
@@ -514,7 +536,7 @@ logical, optional, intent(in)                      :: PackPGEs
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
+    Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, IC_PLevels, JediVarName, PackPGEs)
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
