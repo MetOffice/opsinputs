@@ -66,6 +66,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Require ObsValue/air_temperature is present if writing out the theta varfield
   oops::Parameter<bool> requireTforTheta{"require_T_for_theta_varfield", true, this};
 
+  /// Fill Ops % ObsType from MetaData/ops_subtype. If false, use ObsGroupName.
+  oops::Parameter<bool> fillObsTypeFromOpsSubtype{"fill_obstype_from_ops_subtype", false, this};
+
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
