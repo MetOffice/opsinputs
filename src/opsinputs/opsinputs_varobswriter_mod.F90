@@ -720,6 +720,14 @@ do iVarField = 1, nVarFields
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
+       ! If theta is present in the list of varfields, the OPS Ob % t structure must also
+       ! be filled. This ensures the routine Ops_VarobPGEs works correctly;
+       ! it requires Ob % t to be present in order for the theta PGEs to be filled.
+       ! Note that this routine is called purely to fill Ob % t,
+       ! irrespective of whether t is in the list of varfields requested.
+       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+          Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
         ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
