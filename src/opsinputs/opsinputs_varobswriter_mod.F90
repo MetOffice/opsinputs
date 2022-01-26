@@ -675,9 +675,14 @@ call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", JediToOpsLayo
 call opsinputs_fill_filltimeoffsets(Ob % Header % Time, "Time", JediToOpsLayoutMapping, &
   Ob % Time, ObsSpace, "dateTime", "MetaData", self % validitytime)
 
-if (self % FillObsTypeFromOpsSubType .and. obsspace_has(ObsSpace, "MetaData", "ops_subtype")) then
-   call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
-        Ob % ObsType, ObsSpace, "ops_subtype", "MetaData")
+if (self % FillObsTypeFromOpsSubType) then
+   if (obsspace_has(ObsSpace, "MetaData", "ops_subtype")) then
+      call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
+           Ob % ObsType, ObsSpace, "ops_subtype", "MetaData")
+   else
+      write(*, *) "MetaData/ops_subtype is not present"
+      call abort()
+   end if
 else
    call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
    Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
