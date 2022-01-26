@@ -63,6 +63,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Output the Family field (taken from the radar_family variable). Used for radar observations.
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
 
+  /// Fill Ops % ObsType from MetaData/ops_subtype. If false, use ObsGroupName.
+  oops::Parameter<bool> fillObsTypeFromOpsSubtype{"fill_obstype_from_ops_subtype", false, this};
+
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
