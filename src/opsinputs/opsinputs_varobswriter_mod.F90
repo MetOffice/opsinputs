@@ -734,8 +734,9 @@ do iVarField = 1, nVarFields
       ! If theta is present in the list of varfields, the OPS Ob % t structure must also
       ! be filled. This ensures the routine Ops_VarobPGEs works correctly;
       ! it requires Ob % t to be present in order for the theta PGEs to be filled.
-      ! Note that this routine is called purely to fill Ob % t,
-      ! irrespective of whether t is in the list of varfields requested.
+      ! Note that this is performed independently of whether t is in the list of varfields requested.
+      ! It is possible to override this requirement by setting the parameter
+      ! `require_T_for_theta_varfield` to false.
       if (self % RequireTforTheta) then
          if (obsspace_has(ObsSpace, "ObsValue", "air_temperature")) then
             call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
