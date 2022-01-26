@@ -153,6 +153,7 @@ private
 
   logical            :: AccountForGPSROTangentPointDrift
   logical            :: UseRadarFamily
+  logical            :: RequireTForTheta
 
   integer(integer64) :: FH_VertCoord
   integer(integer64) :: FH_HorizGrid
@@ -284,6 +285,8 @@ call f_conf % get_or_die("account_for_gpsro_tangent_point_drift", &
                          self % AccountForGPSROTangentPointDrift)
 
 call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
+
+call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta)
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
@@ -720,6 +723,11 @@ do iVarField = 1, nVarFields
       ! it requires Ob % t to be present in order for the theta PGEs to be filled.
       ! Note that this routine is called purely to fill Ob % t,
       ! irrespective of whether t is in the list of varfields requested.
+      if (self % RequireTforTheta .and. &
+           .not. obsspace_has(ObsSpace, "ObsValue", "air_temperature")) then
+         write(*, *) "ObsValue/air_temperature must be present when adding the theta varfield"
+         call abort()
+      end if
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")

@@ -63,6 +63,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Output the Family field (taken from the radar_family variable). Used for radar observations.
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
 
+  /// Require ObsValue/air_temperature is present if writing out the theta varfield
+  oops::Parameter<bool> requireTforTheta{"require_T_for_theta_varfield", true, this};
+
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
