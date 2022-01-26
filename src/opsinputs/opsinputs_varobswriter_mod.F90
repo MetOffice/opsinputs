@@ -715,6 +715,9 @@ do iVarField = 1, nVarFields
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
+        call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+          Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
         ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
