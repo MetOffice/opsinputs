@@ -683,8 +683,7 @@ if (self % FillObsTypeFromOpsSubType) then
       call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
            Ob % ObsType, ObsSpace, "ops_subtype", "MetaData")
    else
-      write(*, *) "MetaData/ops_subtype is not present"
-      call abort()
+      call abor1_ftn("MetaData/ops_subtype is not present")
    end if
 else
    call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
