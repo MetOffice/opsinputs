@@ -153,6 +153,7 @@ private
 
   logical            :: AccountForGPSROTangentPointDrift
   logical            :: UseRadarFamily
+  logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
 
   integer(integer64) :: FH_VertCoord
@@ -285,6 +286,8 @@ call f_conf % get_or_die("account_for_gpsro_tangent_point_drift", &
                          self % AccountForGPSROTangentPointDrift)
 
 call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
+
+call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta)
 
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
@@ -680,8 +683,7 @@ if (self % FillObsTypeFromOpsSubType) then
       call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
            Ob % ObsType, ObsSpace, "ops_subtype", "MetaData")
    else
-      write(*, *) "MetaData/ops_subtype is not present"
-      call abort()
+      call abor1_ftn("MetaData/ops_subtype is not present")
    end if
 else
    call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
@@ -728,9 +730,25 @@ do iVarField = 1, nVarFields
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
-      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-        Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
+      ! If theta is present in the list of varfields, the OPS Ob % t structure must also
+      ! be filled. This ensures the routine Ops_VarobPGEs works correctly;
+      ! it requires Ob % t to be present in order for the theta PGEs to be filled.
+      ! Note that this is performed independently of whether t is in the list of varfields requested.
+      ! It is possible to override this requirement by setting the parameter
+      ! `require_T_for_theta_varfield` to false.
+      if (self % RequireTforTheta) then
+         if (obsspace_has(ObsSpace, "ObsValue", "air_temperature")) then
+            call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+                 Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
+                 ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
+         else
+            write(*, *) "ObsValue/air_temperature must be present when adding the theta varfield"
+            call abort()
+         end if
+      end if
+     call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+          Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
