@@ -56,9 +56,11 @@ class ResetFlagsToPass : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
 
   void preProcess() override {}
   void priorFilter(const ufo::GeoVaLs &) override {}
-  void postFilter(const ioda::ObsVector &hofx,
+  void postFilter(const ufo::GeoVaLs &,
+                  const ioda::ObsVector &hofx,
                   const ioda::ObsVector &bias,
                   const ufo::ObsDiagnostics &) override;
+  void checkFilterData(const oops::FilterStage filterStage) override {}
 
   oops::Variables requiredVars() const override {return geovars_;}
   oops::Variables requiredHdiagnostics() const override {return extradiagvars_;}

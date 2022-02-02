@@ -35,6 +35,7 @@ extern "C" {
                                     const ufo::F90goms &);
   void opsinputs_cxwriter_post_f90(const F90check &self,
                                    const ioda::ObsSpace &obsSpace,
+                                   const ufo::F90goms &,
                                    const ioda::ObsDataVector<int> &flags,
                                    const int &nvars, const int &nlocs,
                                    const oops::Variables &varnames, const double *hofx);

@@ -92,7 +92,8 @@ VarObsChecker::~VarObsChecker() {
   oops::Log::trace() << "VarObsChecker destructor starting" << std::endl;
 }
 
-void VarObsChecker::postFilter(const ioda::ObsVector &/*hofx*/,
+void VarObsChecker::postFilter(const ufo::GeoVaLs &,
+                               const ioda::ObsVector &/*hofx*/,
                                const ioda::ObsVector &/*bias*/,
                                const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "VarObsChecker postFilter" << std::endl;
