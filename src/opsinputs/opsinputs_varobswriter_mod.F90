@@ -31,6 +31,7 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillcoord2d, &
     opsinputs_fill_fillelementtypefromnormalvariable, &
     opsinputs_fill_fillelementtype2dfromnormalvariable, &
+    opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels, &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
     opsinputs_fill_fillinteger, &
@@ -38,7 +39,6 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
     opsinputs_fill_fillreal2dfromgeoval, &
-    opsinputs_fill_fillreal2dfrom1dgeovalwithchans, &
     opsinputs_fill_fillstring, &
     opsinputs_fill_filltimeoffsets, &
     opsinputs_fill_filltimeoffsets2d, &
@@ -149,10 +149,12 @@ private
 
   logical            :: RejectObsWithAnyVariableFailingQC
   logical            :: RejectObsWithAllVariablesFailingQC
+  logical            :: GeoVaLsAreTopToBottom
 
   logical            :: AccountForGPSROTangentPointDrift
   logical            :: UseRadarFamily
-
+  logical            :: RequireTForTheta
+  logical            :: FillObsTypeFromOpsSubType
 
   integer(integer64) :: FH_VertCoord
   integer(integer64) :: FH_HorizGrid
@@ -277,10 +279,17 @@ call f_conf % get_or_die("reject_obs_with_any_variable_failing_qc", &
 call f_conf % get_or_die("reject_obs_with_all_variables_failing_qc", &
                          self % RejectObsWithAllVariablesFailingQC)
 
+call f_conf % get_or_die("geovals_are_top_to_bottom", &
+                         self % GeoVaLsAreTopToBottom)
+
 call f_conf % get_or_die("account_for_gpsro_tangent_point_drift", &
                          self % AccountForGPSROTangentPointDrift)
 
 call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
+
+call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta)
+
+call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
@@ -669,8 +678,17 @@ call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", JediToOpsLayo
 call opsinputs_fill_filltimeoffsets(Ob % Header % Time, "Time", JediToOpsLayoutMapping, &
   Ob % Time, ObsSpace, "dateTime", "MetaData", self % validitytime)
 
-call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
-Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
+if (self % FillObsTypeFromOpsSubType) then
+   if (obsspace_has(ObsSpace, "MetaData", "ops_subtype")) then
+      call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
+           Ob % ObsType, ObsSpace, "ops_subtype", "MetaData")
+   else
+      call abor1_ftn("MetaData/ops_subtype is not present")
+   end if
+else
+   call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
+   Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
+end if
 
 if (obsspace_has(ObsSpace, "MetaData", "station_id")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
@@ -712,11 +730,25 @@ do iVarField = 1, nVarFields
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
         ObsSpace, Flags, ObsErrors, "surface_pressure")
     case (VarField_theta)
-      ! TODO(wsmigaj): check if air_potential_temperature is the correct variable name
-      ! (it isn't used in JEDI, but virtual_temperature is)
-      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-        Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-        ObsSpace, self % channels, Flags, ObsErrors, "air_potential_temperature")
+      ! If theta is present in the list of varfields, the OPS Ob % t structure must also
+      ! be filled. This ensures the routine Ops_VarobPGEs works correctly;
+      ! it requires Ob % t to be present in order for the theta PGEs to be filled.
+      ! Note that this is performed independently of whether t is in the list of varfields requested.
+      ! It is possible to override this requirement by setting the parameter
+      ! `require_T_for_theta_varfield` to false.
+      if (self % RequireTforTheta) then
+         if (obsspace_has(ObsSpace, "ObsValue", "air_temperature")) then
+            call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+                 Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
+                 ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
+         else
+            write(*, *) "ObsValue/air_temperature must be present when adding the theta varfield"
+            call abort()
+         end if
+      end if
+     call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+          Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
@@ -725,7 +757,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
-          ObsSpace, self % channels, Flags, ObsErrors, "air_temperature")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -735,7 +767,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", JediToOpsLayoutMapping, Ob % rh, &
-          ObsSpace, self % channels, Flags, ObsErrors, "relative_humidity")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "relative_humidity")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -746,7 +778,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
-          ObsSpace, self % channels, Flags, ObsErrors, "eastward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "eastward_wind")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -757,7 +789,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
-          ObsSpace, self % channels, Flags, ObsErrors, "northward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "northward_wind")
       end if
     case (VarField_logvis)
       ! TODO(someone): handle this varfield
@@ -814,7 +846,7 @@ do iVarField = 1, nVarFields
       ! here and in opsinputs_varobswriter_addrequiredgeovars.
       call opsinputs_fill_fillrealfromgeoval( &
         Ob % Header % ModelSurface, "ModelSurface", Ob % Header % NumObsLocal, Ob % ModelSurface, &
-        self % GeoVals, "land_type_index")
+        self % GeoVals, "land_type_index", JediToOpsLayoutMapping)
     case (VarField_modelorog)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ModelOrog, "ModelOrog", Ob % Header % NumObsLocal, Ob % ModelOrog)
@@ -946,9 +978,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadFlag, "RadFlag", Ob % Header % NumObsLocal, Ob % RadFlag)
     case (VarField_clw)
-      call opsinputs_fill_fillelementtype2dfromnormalvariable( &
-        Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, & 
-        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water")
+      call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
+        Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, &
+        ObsSpace, self % modlevs, "lev", "OneDVar/cloud_liquid_water", self % GeoVaLsAreTopToBottom)
     case (VarField_refrac)
       ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
@@ -961,11 +993,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", JediToOpsLayoutMapping, Ob % BendingAngleAll, &
-          ObsSpace, self % channels, Flags, ObsErrors, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", JediToOpsLayoutMapping, Ob % BendingAngle, &
-          ObsSpace, self % channels, Flags, ObsErrors, "bending_angle", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "bending_angle", PackPGEs=.false.)
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -990,7 +1022,7 @@ do iVarField = 1, nVarFields
     case (VarField_AOD)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, "aerosol_optical_depth")
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosol_optical_depth")
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)

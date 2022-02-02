@@ -10,14 +10,14 @@ observations:
           group variables: [ "station_id" ]
           sort variable: "air_pressure"
           sort order: "descending"
-      simulated variables: [air_potential_temperature]
+      simulated variables: [theta]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
       where:
       - variable:
-          name: air_potential_temperature@ObsErrorData
+          name: theta@ObsErrorData
         is_defined:
       action:
         name: inflate error
@@ -36,6 +36,7 @@ observations:
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
+      require_T_for_theta_varfield: false
     - filter: VarObs Checker
       expected_main_table_columns:
         # Only records 2 and 4 are passed; the others are rejected by the

@@ -48,15 +48,26 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Output only observations that passed the quality check in all variables.
   oops::Parameter<bool> rejectObsWithAnyVariableFailingQC{
     "reject_obs_with_any_variable_failing_qc", false, this};
+
   /// Output only observations that passed the quality check in at least one variable.
   oops::Parameter<bool> rejectObsWithAllariablesFailingQC{
     "reject_obs_with_all_variables_failing_qc", false, this};
+
+  /// Define the orientation of the GeoVaLs, true if they are toptobottom and otherwise false.
+  /// default is true.
+  oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
 
   /// Account for the GPSRO tangent point drift.
   oops::Parameter<bool> accountForGPSROTangentPointDrift{
     "account_for_gpsro_tangent_point_drift", false, this};
   /// Output the Family field (taken from the radar_family variable). Used for radar observations.
   oops::Parameter<bool> useRadarFamily{"use_radar_family", false, this};
+
+  /// Require ObsValue/air_temperature is present if writing out the theta varfield
+  oops::Parameter<bool> requireTforTheta{"require_T_for_theta_varfield", true, this};
+
+  /// Fill Ops % ObsType from MetaData/ops_subtype. If false, use ObsGroupName.
+  oops::Parameter<bool> fillObsTypeFromOpsSubtype{"fill_obstype_from_ops_subtype", false, this};
 
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};

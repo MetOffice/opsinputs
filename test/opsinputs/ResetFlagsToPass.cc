@@ -33,7 +33,8 @@ ResetFlagsToPass::~ResetFlagsToPass() {
   oops::Log::trace() << "ResetFlagsToPass destructor starting" << std::endl;
 }
 
-void ResetFlagsToPass::postFilter(const ioda::ObsVector &/*hofx*/,
+void ResetFlagsToPass::postFilter(const ufo::GeoVaLs &,
+                                  const ioda::ObsVector &/*hofx*/,
                                   const ioda::ObsVector &/*bias*/,
                                   const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "ResetFlagsToPass postFilter" << std::endl;
