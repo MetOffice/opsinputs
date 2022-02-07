@@ -452,7 +452,7 @@ ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_asmr
                 YAML     cxwriter_globalnamelist_amsr.yaml
                 NAMELIST ../../etc/global/cx/AMSR.nl
-                DATA     cx_globalnamelist_asmr.nc4 dummy.nc4)
+                DATA     cx_globalnamelist_amsr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atms
                 YAML     cxwriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/cx/ATMS.nl
