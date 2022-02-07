@@ -385,8 +385,12 @@ call f_conf % get_or_die("IC_GroundGPSOperator", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
+  write (ErrorMessage, '("IC_GroundGPSOperator set to IC_GroundGPSOperatorChoice: ",A)') StringValue
+  call gen_warn(RoutineName, ErrorMessage)
 case ("generic")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorGeneric
+  write (ErrorMessage, '("IC_GroundGPSOperator set to IC_GroundGPSOperatorGeneric: ",A)') StringValue
+  call gen_warn(RoutineName, ErrorMessage)
 case default
   write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
@@ -814,9 +818,29 @@ do iVarField = 1, nVarFields
     case (VarField_gpstzdelay)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
+  !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+  !      Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+  !      ObsSpace, Flags, ObsErrors, "total_zenith_delay", PackPGEs=.false.)
+	
+  !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+  !      Ob % Header % GPSTZDelay, "GPSTZDelay",  JediToOpsLayoutMapping, Ob % GPSTZDelay, &
+  !      ObsSpace, Flags, ObsErrors, "total_zenith_delay")
+	
+  !    call opsinputs_fill_fillreal( &
+  !      Ob % Header % GPSTZDelay, "GPSTZDelay", JediToOpsLayoutMapping, Ob % GPSTZDelay, &
+  !      ObsSpace, "total_zenith_delay", "BiasCorrObsValue")
+	
+      call opsinputs_fill_fillelementtypefromnormalvariable( &
+        Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+        ObsSpace, "total_zenith_delay", "BiasCorrObsValue", "total_zenith_delay", "EffectiveError", Flags, PackPGEs=.false.)
+	
     case (VarField_GPS_Station_Height)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
+      call opsinputs_fill_fillreal( &
+        Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
+	ObsSpace, "station_height", "MetaData")
+	
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &
