@@ -8,6 +8,7 @@ include( opsinputs_functions )
 
 # Add list of resource files
 list( APPEND opsinputs_etc
+  global/cx/AMSR.nl
   global/cx/ATMS.nl
   global/cx/SSMIS.nl
   global/varobs/ATMS.nl
