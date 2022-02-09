@@ -45,7 +45,7 @@ SELECT CASE (name)
     num = ObsTypeALADIN
   CASE ("AMDARS")
     num = ObsTypeAmdar
-  CASE ("AMSR2")
+  CASE ("AMSR")
     num = ObsTypeAMSR2
   CASE ("AMSUB")
     num = ObsTypeAMSUB

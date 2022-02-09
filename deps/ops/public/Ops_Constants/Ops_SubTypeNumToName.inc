@@ -47,7 +47,7 @@ SELECT CASE (num)
   CASE (ObsTypeAmdar)
     name = "AMDARS"
   CASE (ObsTypeAMSR2)
-    name = "AMSR2"
+    name = "AMSR"
   CASE (ObsTypeAMV)
     name = "AMV"
   CASE (ObsTypeAMSUB)
