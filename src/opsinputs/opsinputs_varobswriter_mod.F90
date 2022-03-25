@@ -108,7 +108,8 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
     ObsGroupSonde,             &
-    ObsGroupSurface
+    ObsGroupSurface,           &
+    ObsGroupSatTCWV
 use OpsMod_ObsInfo, only: &
     FinalRejectReport,    &
     LenCallsign,          &
@@ -795,6 +796,10 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
     case (VarField_tcwv)
+      if (Ob % Header % ObsGroup == ObsGroupSatTCWV) then
+        call opsinputs_fill_fillelementtypefromsimulatedvariable(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv, &
+        ObsSpace, Flags, ObsErrors, "precipitableWater")
+      end if
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv)
     case (VarField_windspeed)
