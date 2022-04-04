@@ -6,7 +6,7 @@ observations:
       name: GroundGPS
       obsdatain:
         obsfile: Data/067_VarField_GPS_Station_Height.nc4
-      simulated variables: [total_zenith_delay]
+      simulated variables: [dummy]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
