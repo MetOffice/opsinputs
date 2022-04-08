@@ -818,17 +818,17 @@ do iVarField = 1, nVarFields
     case (VarField_gpstzdelay)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
-      call opsinputs_fill_fillelementtypefromsimulatedvariable( &
-        Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
-        ObsSpace, Flags, ObsErrors, "total_zenith_delay", PackPGEs=.false.)
+  !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+  !      Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+  !      ObsSpace, Flags, ObsErrors, "total_zenith_delay", PackPGEs=.false.)
 	
   !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
   !      Ob % Header % GPSTZDelay, "GPSTZDelay",  JediToOpsLayoutMapping, Ob % GPSTZDelay, &
   !      ObsSpace, Flags, ObsErrors, "total_zenith_delay")
 	
-  !    call opsinputs_fill_fillreal( &
-  !      Ob % Header % GPSTZDelay, "GPSTZDelay", JediToOpsLayoutMapping, Ob % GPSTZDelay, &
-  !      ObsSpace, "total_zenith_delay", "BiasCorrObsValue")
+      call opsinputs_fill_fillreal( &
+        Ob % Header % GPSTZDelay, "GPSTZDelay", JediToOpsLayoutMapping, Ob % GPSTZDelay, &
+        ObsSpace, "total_zenith_delay", "BiasCorrObsValue")
 	
   !    call opsinputs_fill_fillelementtypefromnormalvariable( &
   !      Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
