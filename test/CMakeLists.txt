@@ -271,6 +271,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
                 DATA     varobs_globalnamelist_sonde.nc4)
+#ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sattcwv
+#                YAML     varobswriter_globalnamelist_sattcwv.yaml
+#                NAMELIST ../../etc/global/varobs/SatTCWV.nl
+#                DATA     varobs_globalnamelist_sattcwv.nc4)
 
 ### CxWriter tests
 
