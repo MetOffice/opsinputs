@@ -732,7 +732,7 @@ do iVarField = 1, nVarFields
     case (VarField_pstar)
       call opsinputs_fill_fillelementtypefromsimulatedvariable( &
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
-        ObsSpace, Flags, ObsErrors, "surface_pressure")
+        ObsSpace, Flags, ObsErrors, "surface_pressure", "ObsValue")
     case (VarField_theta)
       ! If theta is present in the list of varfields, the OPS Ob % t structure must also
       ! be filled. This ensures the routine Ops_VarobPGEs works correctly;
@@ -757,7 +757,7 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
-          ObsSpace, Flags, ObsErrors, "air_temperature")
+          ObsSpace, Flags, ObsErrors, "air_temperature", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
@@ -767,7 +767,7 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
-          ObsSpace, Flags, ObsErrors, "relative_humidity")
+          ObsSpace, Flags, ObsErrors, "relative_humidity", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", JediToOpsLayoutMapping, Ob % rh, &
@@ -778,7 +778,7 @@ do iVarField = 1, nVarFields
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
-          ObsSpace, Flags, ObsErrors, "eastward_wind")
+          ObsSpace, Flags, ObsErrors, "eastward_wind", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
@@ -789,7 +789,7 @@ do iVarField = 1, nVarFields
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
-          ObsSpace, Flags, ObsErrors, "northward_wind")
+          ObsSpace, Flags, ObsErrors, "northward_wind", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
@@ -818,21 +818,29 @@ do iVarField = 1, nVarFields
     case (VarField_gpstzdelay)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
-  !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
-  !      Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
-  !      ObsSpace, Flags, ObsErrors, "total_zenith_delay", PackPGEs=.false.)
+      call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+        Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+        ObsSpace, Flags, ObsErrors, "total_zenith_delay", "BiasCorrObsValue", PackPGEs=.false.)
 	
   !    call opsinputs_fill_fillelementtypefromsimulatedvariable( &
   !      Ob % Header % GPSTZDelay, "GPSTZDelay",  JediToOpsLayoutMapping, Ob % GPSTZDelay, &
   !      ObsSpace, Flags, ObsErrors, "total_zenith_delay")
 	
-      call opsinputs_fill_fillreal( &
-        Ob % Header % GPSTZDelay, "GPSTZDelay", JediToOpsLayoutMapping, Ob % GPSTZDelay, &
-        ObsSpace, "total_zenith_delay", "BiasCorrObsValue")
+  !    call opsinputs_fill_fillreal( &
+  !      Ob % Header % GPSTZDelay, "GPSTZDelay", JediToOpsLayoutMapping, Ob % GPSTZDelay, &
+  !      ObsSpace, "total_zenith_delay", "BiasCorrObsValue")
 	
   !    call opsinputs_fill_fillelementtypefromnormalvariable( &
-  !      Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
-  !      ObsSpace, "total_zenith_delay", "BiasCorrObsValue", "total_zenith_delay", "EffectiveError", Flags, PackPGEs=.false.)
+  !      Ob % Header % GPSTZDelay, & 
+!	"GPSTZDelay", &
+!	Ob % Header % NumObsLocal, &
+!	Ob % GPSTZDelay, &
+!        ObsSpace, &
+!	"total_zenith_delay", &
+!	"BiasCorrObsValue", &
+!	JediErrorVarName="total_zenith_delay", &
+!	JEDIObsErrors=ObsErrors, &
+!	PackPGEs=.false.)
 	
     case (VarField_GPS_Station_Height)
       ! TODO(someone): handle this varfield

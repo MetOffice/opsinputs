@@ -353,6 +353,7 @@ END IF
 IF (Obs % header % GPSTZDelay % Present) THEN
   ALLOCATE (PGEfi(NumObsLocal,1))
   IF (PRESENT (PGEBd)) THEN
+    WRITE(*,*) "PGEBd is present"
     IF (PGEBd % header % GPSTZDelay % Present) THEN
       WHERE (PGEBd % GPSTZDelay /= RMDI)
         PGEfi(:,1) = PGEBd % GPSTZDelay(:)
@@ -363,12 +364,14 @@ IF (Obs % header % GPSTZDelay % Present) THEN
       PGEfi(:,1) = AINT (Obs % GPSTZDelay(:) % PGEFinal) / PPF
     END IF
   ELSE
+    WRITE(*,*) "PGEBd is not present", Obs % GPSTZDelay(:) % PGEFinal, PPF 
     PGEfi(:,1) = AINT (Obs % GPSTZDelay(:) % PGEFinal) / PPF
   END IF
   DO Ob = 1, NumObsLocal
     IF (IAND (FlagBits,Obs % GPSTZDelay(Ob) % Flags) /= 0 .AND. &
         PGEfi(Ob,1) < 0.5) PGEfi(Ob,1) = 1.0
     IF (Obs % GPSTZDelay(Ob) % Value == RMDI) PGEfi(Ob,1) = PGEMDI
+    WRITE(*,*) PGEfi(Ob,1)
   END DO
   VarobPGEs % GPSTZDelay(:) = REAL (INT (PGEfi(:,1) * 10000.0))
   DEALLOCATE (PGEfi)
@@ -422,38 +425,38 @@ IF (Obs % header % AWPriorPcorrect % Present) THEN
 END IF
 
 ! Doppler radar radial velocity
-IF (RadWind_SuperOb) THEN
-  CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
-                  ' VarobPGEs % RadialVelocity',       &
-                  NumObsLocal,                         &
-                  Real2 =  VarobPGEs % RadialVelocity)
-  IF (Obs % header % RadialVelocSO % Present) THEN
-    VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocSO(:,:) % PGEFinal
-  END IF
-ELSE
-  CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
-                  ' VarobPGEs % RadialVelocity',       &
-                  NumObsLocal,                         &
-                  Real2 =  VarobPGEs % RadialVelocity)
-  IF (Obs % header % RadialVelocity % Present) THEN
-    VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocity(:,:) % PGEFinal
-  END IF
-END IF
+!IF (RadWind_SuperOb) THEN
+!  CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
+!                  ' VarobPGEs % RadialVelocity',       &
+!                  NumObsLocal,                         &
+!                  Real2 =  VarobPGEs % RadialVelocity)
+!  IF (Obs % header % RadialVelocSO % Present) THEN
+!    VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocSO(:,:) % PGEFinal
+!  END IF
+!ELSE
+!  CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
+!                  ' VarobPGEs % RadialVelocity',       &
+!                  NumObsLocal,                         &
+!                  Real2 =  VarobPGEs % RadialVelocity)
+!  IF (Obs % header % RadialVelocity % Present) THEN
+!    VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocity(:,:) % PGEFinal
+!  END IF
+!END IF
 
-! Radar reflectivity
-IF (RadPerformSuperObservation) THEN
-  CALL Ops_Alloc (VarobPGEs % Header % Reflectivity, &
-                  ' VarobPGEs % Reflectivity',       &
-                  NumObsLocal,                       &
-                  Real2 =  VarobPGEs % Reflectivity)
-  IF (Obs % header % ReflectivitySO % Present) THEN
-    VarobPGEs % Reflectivity(:,:) =  Obs % ReflectivitySO(:,:) % PGEFinal
-  END IF
-ELSE
-  IF (Obs % header % Reflectivity % Present) THEN
-    VarobPGEs % Reflectivity(:,:) =  Obs % Reflectivity(:,:) % PGEFinal
-  END IF
-END IF
+!! Radar reflectivity
+!IF (RadPerformSuperObservation) THEN
+!  CALL Ops_Alloc (VarobPGEs % Header % Reflectivity, &
+!                  ' VarobPGEs % Reflectivity',       &
+!                  NumObsLocal,                       &
+!                  Real2 =  VarobPGEs % Reflectivity)
+!  IF (Obs % header % ReflectivitySO % Present) THEN
+!    VarobPGEs % Reflectivity(:,:) =  Obs % ReflectivitySO(:,:) % PGEFinal
+!  END IF
+!ELSE
+!  IF (Obs % header % Reflectivity % Present) THEN
+!    VarobPGEs % Reflectivity(:,:) =  Obs % Reflectivity(:,:) % PGEFinal
+!  END IF
+!END IF
 
 ! Upper air data
 

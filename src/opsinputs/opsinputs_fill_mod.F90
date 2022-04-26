@@ -111,7 +111,7 @@ contains
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtypefromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
+  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName, JediValueGroup, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -123,7 +123,9 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediValueGroup
 logical, optional, intent(in)                   :: PackPGEs
+
 
 ! Local declarations:
 logical                                         :: DoPackPGEs
@@ -139,12 +141,18 @@ character(len=*), parameter                     :: &
 character(len=256)                              :: ErrorMessage
 
 ! Body:
-
+WRITE(*,*) "Fill element from simulated variable"
 if (present(PackPGEs)) then
   DoPackPGEs = PackPGEs
 else
   DoPackPGEs = .true.
 end if
+
+!if (present(JediGroup)) then
+!  JediValueGroup = JediGroup
+!else
+!  JediValueGroup = "ObsValue"
+!end if
 
 ! The types of floating-point numbers used in this function are a bit confusing. OPS stores
 ! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
@@ -155,10 +163,10 @@ end if
 MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
-if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
+if (obsspace_has(ObsSpace, JediValueGroup, JediVarName)) then
   ! Retrieve data from JEDI:
   ! - observation value
-  call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+  call obsspace_get_db(ObsSpace, JediValueGroup, JediVarName, ObsValue)
   ! - QC flag
   if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
@@ -582,7 +590,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
 !> are not found.
 subroutine opsinputs_fill_fillelementtypefromnormalvariable( &
   Hdr, OpsVarName, NumObs, El1, ObsSpace, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediObsErrors, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -594,13 +602,15 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
-character(len=*), optional, intent(in)          :: JediErrorGroup
+character(len=*), optional, intent(in)          :: JediObsErrors
+!type(c_ptr), value, optional, intent(in)                  :: JediObsErrors
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
 logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: PGE(NumObs)
 real(kind=c_double)                             :: MissingDouble
 real(kind=c_float)                              :: MissingFloat
 integer                                         :: i
@@ -610,7 +620,12 @@ character(len=256)                              :: ErrorMessage
 
 ! Body:
 
-if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
+!if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
+!  write (ErrorMessage, '(A)') &
+!    "JediErrorVarName and JediErrorGroup must be either both absent or both present"
+!  call gen_warn(RoutineName, ErrorMessage)
+!end if
+if (present(JediErrorVarName) .neqv. present(JediObsErrors)) then
   write (ErrorMessage, '(A)') &
     "JediErrorVarName and JediErrorGroup must be either both absent or both present"
   call gen_warn(RoutineName, ErrorMessage)
@@ -623,34 +638,69 @@ else
 end if
 
 MissingDouble = missing_value(0.0_c_double)
+MissingFloat  = missing_value(0.0_c_float)
+
+WRITE(*,*) "Here before if"
+WRITE(*,*) "PRint JediValueGroup", JediValueGroup
+WRITE(*,*) "Print JediValueVarName ", JediValueVarName
+
+!JediValueVarName = "total_zenith_delay"
+!JediValueGroup = "BiasCorrObsValue"
 
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
   ! Retrieve data from JEDI
   call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarName, ObsValue)
-  if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
-    if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarName)) then
-      call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarName, ObsError)
+  if (present(JediErrorVarName) .and. present(JediObsErrors)) then
+    WRITE(*,*) "Now here"
+    if (obsspace_has(ObsSpace, JediObsErrors, JediErrorVarName)) then
+      call obsspace_get_db(ObsSpace, JediObsErrors, JediErrorVarName, ObsError)
     else
-      write (ErrorMessage, '("Variable ",A,"@",A," not found")') JediErrorVarName, JediErrorGroup
+      write (ErrorMessage, '("Variable ",A,"@",A," not found")') JediErrorVarName, JediObsErrors
       call gen_warn(RoutineName, ErrorMessage)
       ObsError(:) = MissingDouble
     end if
   else
     ObsError(:) = MissingDouble
   end if
-
+!  WRITE(*,*) "Starting stuff with Errors"
+!    ! - observation error
+!  if (present(JediErrorVarName))then
+!    WRITE(*,*) "Here now"
+!    if (opsinputs_obsdatavector_float_has(JediObsErrors, JediErrorVarName)) then
+!      call opsinputs_obsdatavector_float_get(JediObsErrors, JediErrorVarName, ObsError)
+!    else
+!      write (ErrorMessage, '(A,A,A)') "Variable ", JediErrorVarName, "@ObsError not found"
+!      call gen_warn(RoutineName, ErrorMessage)
+!      ObsError(:) = MissingFloat
+!    end if
+!  else
+!    WRITE(*,*) "Making every error Missing value"
+!    ObsError(:) = MissingFloat
+!  end if
+  
+  ! - gross error probability
+  if (obsspace_has(ObsSpace, "GrossErrorProbability", JediValueVarName)) then
+    call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediValueVarName, PGE)
+  else
+    WRITE(*,*) "Making every PGE missing value"
+    PGE(:) = MissingDouble
+  end if
+  
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El1)
   do i = 1, NumObs
     if (ObsValue(i) /= MissingDouble) El1(i) % Value = ObsValue(i)
-    if (ObsError(i) /= MissingDouble)  El1(i) % OBErr = ObsError(i)
+    if (ObsError(i) /= MissingFloat)  El1(i) % OBErr = ObsError(i)
     ! We could also fill Flags and PGEFinal if these quantities were available in separate JEDI
     ! variables. At present, however, we don't even have a use case where there is a separate
     ! variable storing the observation error.
 
     ! Set El1(i) % PGEFinal to 'missing'
-    call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El1(i))
+    !call opsinputs_fill_setpgefinal(MissingDouble, MissingDouble, DoPackPGEs, El1(i))
+    call opsinputs_fill_setpgefinal(PGE(i), MissingDouble, DoPackPGEs, El1(i))
   end do
+else
+  WRITE(*,*) "Obspace does not have JediValueGroup or JEDIValueVarname"
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 
