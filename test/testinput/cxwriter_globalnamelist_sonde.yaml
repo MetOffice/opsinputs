@@ -29,6 +29,49 @@ observations:
       expected_upper_air_variables: ["1","3","4","5","11","29","30","31","34","35"]
       expected_main_table_columns:
       - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
+        - ["17.10","27.10","7.10","21.10","21.20","21.30","1.10","1.20","1.30","11.10","11.20",
+        "11.30","31.10","31.20","31.30","61.10","61.20","61.30","41.10","41.20","41.30","51.10",
+        "51.20","51.30","71.10","71.20","71.30","91.10","91.20","91.30","81.10","81.20","81.30"]
+        - ["**********","**********","**********","22.10","**********","22.30","2.10","**********",
+        "2.30","12.10","**********","12.30","32.10","**********","32.30","62.10","**********",
+        "62.30","42.10","**********","42.30","52.10","**********","52.30","72.10","**********",
+        "72.30","92.10","**********","92.30","82.10","**********","82.30"]
+        - ["17.30","27.30","7.30","23.10","23.20","23.30","3.10","3.20","3.30","13.10","13.20",
+        "13.30","33.10","33.20","33.30","63.10","63.20","63.30","43.10","43.20","43.30","53.10",
+        "53.20","53.30","73.10","73.20","73.30","93.10","93.20","93.30","83.10","83.20","83.30"]
+    HofX: ObsValue # just a placeholder -- not used""but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
+
+  # The same test with GeoVaLs ordered from bottom to top
+  - obs space:
+      name: Sonde
+      obsdatain:
+        obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
+    geovals:
+      filename: Data/cx_globalnamelist_sonde.nc4
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10]  # missing
+    # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: latitude@MetaData
+        minvalue: 0.0
+    - filter: Cx Writer
+      namelist_directory: ../etc/global/cx
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+      geovals_are_top_to_bottom: false
+    - filter: Cx Checker
+      expected_surface_variables: ["1","2","17"]
+      expected_upper_air_variables: ["1","3","4","5","11","29","30","31","34","35"]
+      expected_main_table_columns:
+      - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
         - ["17.10","27.10","7.10","21.30","21.20","21.10","1.30","1.20","1.10","11.30","11.20",
         "11.10","31.30","31.20","31.10","61.30","61.20","61.10","41.30","41.20","41.10","51.30",
         "51.20","51.10","71.30","71.20","71.10","91.30","91.20","91.10","81.30","81.20","81.10"]
