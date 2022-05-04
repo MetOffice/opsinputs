@@ -23,25 +23,27 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     nstring = 9
     f.createDimension('nstring', nstring)
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
-    var[:] = ["station_1", "station_2", "station_3", "station_4"]
-    
-    var = f.createVariable(var_name + '@ObsValue', 'f', ('nlocs',))
+
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+        var[i] = s
+
+    var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
+    var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
-    var = f.createVariable(var_name + '@GrossErrorProbability', 'f', ('nlocs',))
+    var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs',))
     var[:] = [0.4215156, missing_float, 0.1660898, 0.238132]
-    var = f.createVariable(var_name + '@PreQC', 'i', ('nlocs',))
+    var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
     f.date_time = 2018010100
@@ -56,34 +58,36 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     nstring = 9
     f.createDimension('nstring', nstring)
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
-    var[:] = ["station_1", "station_2", "station_3", "station_4"]
 
-    var = f.createVariable(var_name_1 + '@ObsValue', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+        var[i] = s
+
+    var = f.createVariable('ObsValue/' + var_name_1, 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable(var_name_1 + '@ObsError', 'f', ('nlocs',))
+    var = f.createVariable('ObsError/' + var_name_1, 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
-    var = f.createVariable(var_name_1 + '@GrossErrorProbability', 'f', ('nlocs',))
+    var = f.createVariable('GrossErrorProbability/' + var_name_1, 'f', ('nlocs',))
     var[:] = [0.01, missing_float, 0.03, 0.04]
-    var = f.createVariable(var_name_1 + '@PreQC', 'i', ('nlocs',))
+    var = f.createVariable('PreQC/' + var_name_1, 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
-    var = f.createVariable(var_name_2 + '@ObsValue', 'f', ('nlocs',))
+    var = f.createVariable('ObsValue/' + var_name_2, 'f', ('nlocs',))
     var[:] = [2.1, missing_float, 2.3, 2.4]
-    var = f.createVariable(var_name_2 + '@ObsError', 'f', ('nlocs',))
+    var = f.createVariable('ObsError/' + var_name_2, 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable(var_name_2 + '@GrossErrorProbability', 'f', ('nlocs',))
+    var = f.createVariable('GrossErrorProbability/' + var_name_2, 'f', ('nlocs',))
     var[:] = [0.11, missing_float, 0.13, 0.14]
-    var = f.createVariable(var_name_2 + '@PreQC', 'i', ('nlocs',))
+    var = f.createVariable('PreQC/' + var_name_2, 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
     f.date_time = 2018010100
@@ -127,8 +131,12 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute, 5*minute, 6*minute]
+
     var = f.createVariable('MetaData/station_id', str, ('nlocs'))
-    var[:] = np.array(['station_1', 'station_1', 'station_1', 'station_1', 'station_2', 'station_2'], dtype=object)
+    for i, s in enumerate(["station_1", "station_1", "station_1",
+                           "station_1", "station_2", "station_2"]):
+        var[i] = s
+
     var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
     var[:] = [1.1, missing_float_nc, 1.3, 1.4, 1.5, 1.6]
     var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
@@ -159,29 +167,31 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
     nstring = 9
     f.createDimension('nstring', nstring)
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
-    var[:] = ["station_1", "station_2", "station_3", "station_4"]
+
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+        var[i] = s
 
     # There must be at least one simulated variable
-    var = f.createVariable('dummy@ObsValue', 'f', ('nlocs',))
+    var = f.createVariable('ObsValue/dummy', 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable('dummy@ObsError', 'f', ('nlocs',))
+    var = f.createVariable('ObsError/dummy', 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
-    var = f.createVariable('dummy@GrossErrorProbability', 'f', ('nlocs',))
+    var = f.createVariable('GrossErrorProbability/dummy', 'f', ('nlocs',))
     var[:] = [0.01, missing_float, 0.03, 0.04]
-    var = f.createVariable('dummy@PreQC', 'i', ('nlocs',))
+    var = f.createVariable('PreQC/dummy', 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
-    var = f.createVariable(var_name + '@' + var_group, 'f', ('nlocs',))
+    var = f.createVariable(var_group + '/' + var_name, 'f', ('nlocs',))
     var[:] = [5.1, missing_float, 5.3, 5.4]
 
     f.date_time = 2018010100
@@ -196,213 +206,210 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
     nstring = 9
     f.createDimension('nstring', nstring)
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
-    var[:] = ["station_1", "station_2", "station_3", "station_4"]
+
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+        var[i] = s
 
     # There must be at least one simulated variable
-    var = f.createVariable('dummy@ObsValue', 'f', ('nlocs',))
+    var = f.createVariable('ObsValue/dummy', 'f', ('nlocs',))
     var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable('dummy@ObsError', 'f', ('nlocs',))
+    var = f.createVariable('ObsError/dummy', 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
-    var = f.createVariable('dummy@GrossErrorProbability', 'f', ('nlocs',))
+    var = f.createVariable('GrossErrorProbability/dummy', 'f', ('nlocs',))
     var[:] = [0.01, missing_float, 0.03, 0.04]
-    var = f.createVariable('dummy@PreQC', 'i', ('nlocs',))
+    var = f.createVariable('PreQC/dummy', 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
-    var = f.createVariable(var_name + '@' + var_group, 'i', ('nlocs',))
+    var = f.createVariable(var_group + '/' + var_name, 'i', ('nlocs',))
     var[:] = [5, missing_int, 7, 8]
 
     f.date_time = 2018010100
 
     f.close()
 
-def output_1d_geoval_to_netcdf(var_name, file_name, with_channels=False):
+def output_1d_geoval_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
 
-    if (with_channels):
-        name = var_name + '_1'
-        var = f.createVariable(name, 'f', ('nlocs',))
-        var[:] = [7.1, missing_float, 7.3, 7.4]
-
-        name = var_name + '_2'
-        var = f.createVariable(name, 'f', ('nlocs',))
-        var[:] = [3.3, 4.1, 7.6, 6.2]
-
-        name = var_name + '_3'
-        var = f.createVariable(name, 'f', ('nlocs',))
-        var[:] = [missing_float, 13.1, 6.5, 8.7]
-    else:
-        var = f.createVariable(var_name, 'f', ('nlocs',))
-        var[:] = [7.1, missing_float, 7.3, 7.4]
+    var = f.createVariable(var_name, 'f', ('nlocs',))
+    var[:] = [7.1, missing_float, 7.3, 7.4]
 
     f.date_time = 2018010100
 
     f.close()
 
-def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with_radar_family=False):
+def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with_radar_family=False, add_occulting_satid=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
+    nchans = 3
+    f.createDimension('nchans', nchans)
     nstring = 9
     f.createDimension('nstring', nstring)
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('nchans', 'i', ('nchans',))
+    var[:] = [1,2,3]
+
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
-    var[:] = ["station_1", "station_2", "station_3", "station_4"]
+
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+        var[i] = s
+
     if with_radar_family:
-        var = f.createVariable('radar_family@MetaData', 'i', ('nlocs',))
+        var = f.createVariable('MetaData/radar_family', 'i', ('nlocs',))
         var[:] = [11, 12, 13, 14]
 
-    var = f.createVariable(var_name + '_1@ObsValue', 'f', ('nlocs',))
-    var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable(var_name + '_1@ObsError', 'f', ('nlocs',))
-    var[:] = [0.1, missing_float, 0.3, 0.4]
-    var = f.createVariable(var_name + '_1@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.01, missing_float, 0.03, 0.04]
-    var = f.createVariable(var_name + '_1@PreQC', 'i', ('nlocs',))
-    var[:] = [1, 1, 1, 1]
-    if with_bias:
-        var = f.createVariable(var_name + '_1@ObsBias', 'f', ('nlocs',))
-        var[:] = [-0.1, -0.2, -0.3, -0.4]
-        # BiasCorrObsValue = ObsValue - ObsBias
-        var = f.createVariable(var_name + '_1@BiasCorrObsValue', 'f', ('nlocs',))
-        var[:] = [1.2, missing_float, 1.6, 1.8]
+    if add_occulting_satid:
+        var = f.createVariable('MetaData/occulting_sat_id', 'i', ('nlocs',))
+        var[:] = [3, 3, 5, 720]
 
-    var = f.createVariable(var_name + '_2@ObsValue', 'f', ('nlocs',))
-    var[:] = [2.1, 2.2, 2.3, 2.4]
-    var = f.createVariable(var_name + '_2@ObsError', 'f', ('nlocs',))
-    var[:] = [1.1, 1.2, 1.3, 1.4]
-    var = f.createVariable(var_name + '_2@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.11, 0.12, 0.13, 0.14]
-    var = f.createVariable(var_name + '_2@PreQC', 'i', ('nlocs',))
-    var[:] = [1, 1, 1, 1]
+    # Create Variables
+    var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs','nchans'))
+    var[:,:] = [[1.1,2.1,3.1],
+                [missing_float,2.2,3.2],
+                [1.3,2.3,3.3],
+                [1.4,2.4,3.4]]
+    var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs','nchans'))
+    var[:,:] = [[0.1,1.1,2.1],
+                [missing_float,1.2,2.2],
+                [0.3,1.3,2.3],
+                [0.4,1.4,2.4]]
+    var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs','nchans'))
+    var[:,:] = [[0.01,0.11,0.21],
+                [missing_float,0.12,0.22],
+                [0.03,0.13,0.23],
+                [0.04,0.14,0.24]]
+    var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs','nchans'))
+    var[:,:] = [[1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]]
     if with_bias:
-        var = f.createVariable(var_name + '_2@ObsBias', 'f', ('nlocs',))
-        var[:] = [-0.5, -0.6, -0.7, -0.8]
+        var = f.createVariable('ObsBias/' + var_name, 'f', ('nlocs','nchans'))
+        var[:,:] = [[-0.1,-0.5,-0.01],
+                    [-0.2,-0.6,-0.02],
+                    [-0.3,-0.7,-0.03],
+                    [-0.4,-0.8,-0.04]]
         # BiasCorrObsValue = ObsValue - ObsBias
-        var = f.createVariable(var_name + '_2@BiasCorrObsValue', 'f', ('nlocs',))
-        var[:] = [2.6, 2.8, 3.0, 3.2]
-
-    var = f.createVariable(var_name + '_3@ObsValue', 'f', ('nlocs',))
-    var[:] = [3.1, 3.2, 3.3, 3.4]
-    var = f.createVariable(var_name + '_3@ObsError', 'f', ('nlocs',))
-    var[:] = [2.1, 2.2, 2.3, 2.4]
-    var = f.createVariable(var_name + '_3@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.21, 0.22, 0.23, 0.24]
-    var = f.createVariable(var_name + '_3@PreQC', 'i', ('nlocs',))
-    var[:] = [1, 1, 1, 1]
-    if with_bias:
-        var = f.createVariable(var_name + '_3@ObsBias', 'f', ('nlocs',))
-        var[:] = [-0.01, -0.02, -0.03, -0.04]
-        # BiasCorrObsValue = ObsValue - ObsBias
-        var = f.createVariable(var_name + '_3@BiasCorrObsValue', 'f', ('nlocs',))
-        var[:] = [3.11, 3.22, 3.33, 3.44]
+        var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('nlocs','nchans'))
+        var[:,:] = [[1.2,2.6,3.11],
+                    [missing_float, 2.8, 3.22],
+                    [1.6,3.0,3.33],
+                    [1.8,3.2,3.44]]
 
     f.date_time = 2018010100
 
     f.close()
 
 def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, 
-                                   with_radar_family=False, predictors=False):
+                                   with_radar_family=False, predictors=False,
+                                   use_chans=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('nlocs', nlocs)
     nstring = 9
     f.createDimension('nstring', nstring)
+    nchans = 3
+    f.createDimension('nchans', nchans)
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('nchans', 'i', ('nchans',))
+    var[:] = [1,2,3]
+
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [21, 22, -23, 24]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('time@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/time', 'f', ('nlocs',))
     minute = 1/60.
     var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
-    var = f.createVariable('station_id@MetaData', 'c', ('nlocs','nstring'))
-    var[:] = ["station_1", "station_2", "station_3", "station_4"]
+
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
+    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+        var[i] = s
+
     if with_radar_family:
-        var = f.createVariable('radar_family@MetaData', 'i', ('nlocs',))
+        var = f.createVariable('MetaData/radar_family', 'i', ('nlocs',))
         var[:] = [11, 12, 13, 14]
 
     # There must be at least one simulated variable
 
-    var = f.createVariable('dummy_1@ObsValue', 'f', ('nlocs',))
-    var[:] = [1.1, missing_float, 1.3, 1.4]
-    var = f.createVariable('dummy_1@ObsError', 'f', ('nlocs',))
-    var[:] = [0.1, missing_float, 0.3, 0.4]
-    var = f.createVariable('dummy_1@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.01, missing_float, 0.03, 0.04]
-    var = f.createVariable('dummy_1@PreQC', 'i', ('nlocs',))
-    var[:] = [1, 1, 1, 1]
-
-    var = f.createVariable('dummy_2@ObsValue', 'f', ('nlocs',))
-    var[:] = [2.1, 2.2, 2.3, 2.4]
-    var = f.createVariable('dummy_2@ObsError', 'f', ('nlocs',))
-    var[:] = [1.1, 1.2, 1.3, 1.4]
-    var = f.createVariable('dummy_2@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.11, 0.12, 0.13, 0.14]
-    var = f.createVariable('dummy_2@PreQC', 'i', ('nlocs',))
-    var[:] = [1, 1, 1, 1]
-
-    var = f.createVariable('dummy_3@ObsValue', 'f', ('nlocs',))
-    var[:] = [3.1, 3.2, 3.3, 3.4]
-    var = f.createVariable('dummy_3@ObsError', 'f', ('nlocs',))
-    var[:] = [2.1, 2.2, 2.3, 2.4]
-    var = f.createVariable('dummy_3@GrossErrorProbability', 'f', ('nlocs',))
-    var[:] = [0.21, 0.22, 0.23, 0.24]
-    var = f.createVariable('dummy_3@PreQC', 'i', ('nlocs',))
-    var[:] = [1, 1, 1, 1]
+    var = f.createVariable('ObsValue/dummy', 'f', ('nlocs','nchans'))
+    var[:,:] = [[1.1,2.1,3.1],
+                [missing_float,2.2,3.2],
+                [1.3,2.3,3.3],
+                [1.4,2.4,3.4]]
+    var = f.createVariable('ObsError/dummy', 'f', ('nlocs','nchans'))
+    var[:,:] = [[0.1,1.1,2.1],
+                [missing_float,1.2,2.2],
+                [0.3,1.3,2.3],
+                [0.4,1.4,2.4]]
+    var = f.createVariable('GrossErrorProbability/dummy', 'f', ('nlocs','nchans'))
+    var[:,:] = [[0.01,0.11,0.21],
+                [missing_float,0.12,0.22],
+                [0.03,0.13,0.23],
+                [0.04,0.14,0.24]]
+    var = f.createVariable('PreQC/dummy', 'i', ('nlocs','nchans'))
+    var[:,:] = [[1,1,1],
+                [1,1,1],
+                [1,1,1],
+                [1,1,1]]
 
     if type(var_group) != list:
         var_group = [var_group]
     for grp in var_group:
-        var = f.createVariable(var_name + '_1@' + grp, 'f', ('nlocs',))
-        var[:] = [4.1, missing_float, 4.3, 4.4]
-        if "5Predictor" in grp:
-            var[:] = [4.1, missing_float, 4.3, 0.0]
-        if "8Predictor" in grp:
-            var[:] = [0.0, 0.0, 0.0, 4.4]
+        if (predictors or use_chans):
+            var = f.createVariable(grp + '/' + var_name, 'f', ('nlocs','nchans'))
+            var[:,:] = [[4.1,5.1,6.1],
+                        [missing_float,5.2,6.2],
+                        [4.3,5.3,6.3],
+                        [4.4,5.4,6.4]]
+            if "5Predictor" in grp:
+                var[:,:] = [[4.1,5.1,6.1],
+                            [missing_float,5.2,6.2],
+                            [4.3,5.3,6.3],
+                            [0.0,0.0,0.0]]
+            if "8Predictor" in grp:
+                var[:,:] = [[0.0,0.0,0.0],
+                            [0.0,0.0,0.0],
+                            [0.0,0.0,0.0],
+                            [4.4,5.4,6.4]]
+        else:
+            var = f.createVariable(grp + '/' + var_name + '_1', 'f', ('nlocs',))
+            var[:] = [4.1, missing_float, 4.3, 4.4]
+  
+            var2 = f.createVariable(grp + '/' + var_name + '_2', 'f', ('nlocs',))
+            var2[:] = [5.1, 5.2, 5.3, 5.4]
 
-        var2 = f.createVariable(var_name + '_2@' + grp, 'f', ('nlocs',))
-        var2[:] = [5.1, 5.2, 5.3, 5.4]
-        if "5Predictor" in grp:
-            var2[:] = [5.1, 5.2, 5.3, 0.0]
-        if "8Predictor" in grp:
-            var2[:] = [0.0, 0.0, 0.0, 5.4]
-
-        var3 = f.createVariable(var_name + '_3@' + grp, 'f', ('nlocs',))
-        var3[:] = [6.1, 6.2, 6.3, 6.4]
-        if "5Predictor" in grp:
-            var3[:] = [6.1, 6.2, 6.3, 0.0]
-        if "8Predictor" in grp:
-            var3[:] = [0.0, 0.0, 0.0, 6.4]
-
+            var3 = f.createVariable(grp + '/' + var_name + '_3', 'f', ('nlocs',))
+            var3[:] = [6.1, 6.2, 6.3, 6.4]
 
     if predictors:
-        var = f.createVariable('satellite_id@MetaData', 'i', ('nlocs',))
+        var = f.createVariable('MetaData/satellite_id', 'i', ('nlocs',))
         var[:] = [5, 5, 5, 8]
 
     f.date_time = 2018010100
@@ -419,14 +426,14 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
     # or by datetimes); this makes it possible to verify that the record ordering specified in the
     # YAML file is respected by the filters writing VarObs and Cx files.
 
-    var = f.createVariable('latitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/latitude', 'f', ('nlocs',))
     var[:] = [-11, -23, -12, -22, -13, -21, -14, -31, -42, -32, -41, -33, -51, -52]
-    var = f.createVariable('longitude@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/longitude', 'f', ('nlocs',))
     var[:] = [11, 23, 12, 22, 13, 21, 14, 31, 42, 32, 41, 33, 51, 52]
-    var = f.createVariable('air_pressure@MetaData', 'f', ('nlocs',))
+    var = f.createVariable('MetaData/air_pressure', 'f', ('nlocs',))
     var[:] = [100100, 80200, 90100, 90200, 80100, 100200, 70100,
               100300, 90400, 90200, 100400, 80300, 100500, 90500]
-    var = f.createVariable('datetime@MetaData', str, ('nlocs'))
+    var = f.createVariable('MetaData/datetime', str, ('nlocs'))
     # The NetCDF4 module doesn't support assigning values to variable-length string variables
     # using the `var[:] = ...` syntax, so we do it using a loop
     for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
@@ -435,22 +442,22 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
                            "2018-01-01T00:04:02Z", "2018-01-01T00:03:02Z", "2018-01-01T00:04:01Z",
                            "2018-01-01T00:03:03Z", "2018-01-01T00:05:01Z", "2018-01-01T00:05:02Z"]):
         var[i] = s
-    var = f.createVariable('station_id@MetaData', str, ('nlocs'))
+    var = f.createVariable('MetaData/station_id', str, ('nlocs'))
     for i, s in enumerate(["station_1", "station_2", "station_1", "station_2",
                            "station_1", "station_2", "station_1",
                            "station_3", "station_4", "station_3", "station_4",
                            "station_3", "station_5", "station_5"]):
         var[i] = s
-    var = f.createVariable(var_name + '@ObsValue', 'f', ('nlocs',))
+    var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
     var[:] = [0.11, 0.23, 0.12, 0.22, 0.13, 0.21, 0.14,
               0.31, 0.42, 0.32, missing_float, 0.33, 0.51, 0.52]
-    var = f.createVariable(var_name + '@ObsError', 'f', ('nlocs',))
+    var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
     var[:] = [0.011, 0.023, 0.012, 0.022, 0.013, missing_float, 0.014,
              0.031, 0.042, 0.032, 0.041, 0.033, 0.051, 0.052]
-    var = f.createVariable(var_name + '@GrossErrorProbability', 'f', ('nlocs',))
+    var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs',))
     var[:] = [0.111, 0.123, 0.112, 0.122, 0.113, 0.121, 0.114,
               0.131, 0.142, 0.132, 0.141, 0.133, 0.151, 0.152]
-    var = f.createVariable(var_name + '@PreQC', 'i', ('nlocs',))
+    var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs',))
     var[:] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     f.close()
@@ -573,6 +580,22 @@ def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_
 
     f.close()
 
+def copy_var_to_var(Group, invarname, outvarname, filename):
+    f = nc4.Dataset(filename, 'r+', format="NETCDF4")
+    grp = f.groups[Group]
+
+    # Create new variable and copy
+    for name, var in grp.variables.items():
+        if (name == invarname):
+            dimensions = var.dimensions
+            datatype = var.dtype
+            array = grp.variables[name][:]
+
+    grp.createVariable(outvarname, datatype, dimensions)
+    grp.variables[outvarname][:] = array
+
+    f.close()
+
 
 if __name__ == "__main__":
     # VarObs
@@ -587,7 +610,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
-    output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4')
+    output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_normal_int_var_to_netcdf('surface_type', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
@@ -600,7 +623,7 @@ if __name__ == "__main__":
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
                                                                  'Legendre_order_1_satid_5Predictor',    'Legendre_order_1_satid_8Predictor'],
                                       'testinput/080_VarField_biaspredictors.nc4', predictors=True)
-    output_2d_simulated_var_to_netcdf('bending_angle',              'testinput/071_VarField_bendingangle.nc4')
+    output_2d_simulated_var_to_netcdf('bending_angle',              'testinput/071_VarField_bendingangle.nc4', add_occulting_satid=True)
     output_2d_normal_var_to_netcdf('impact_parameter', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
     output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
     output_1d_normal_var_to_netcdf('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
@@ -643,6 +666,8 @@ if __name__ == "__main__":
                                  [],
                                  [],
                                  'testinput/varobs_globalnamelist_sonde.nc4')
+    copy_var_to_var('ObsValue', 'theta', 'air_temperature', 'testinput/varobs_globalnamelist_sonde.nc4')
+    copy_var_to_var('ObsError', 'theta', 'air_temperature','testinput/varobs_globalnamelist_sonde.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
