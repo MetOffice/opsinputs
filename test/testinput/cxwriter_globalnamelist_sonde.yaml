@@ -2,12 +2,14 @@ window begin: 2018-01-01T00:00:00Z
 window end: 2018-01-01T01:00:00Z
 
 observations:
-  - obs space:
+  # The GeoVaLs in the input file are ordered from bottom to top. In this case their order is
+  # incorrectly flipped when writing out the CX columns.
+  - obs space: &ObsSpace
       name: Sonde
       obsdatain:
         obsfile: Data/dummy.nc4
       simulated variables: [dummy]
-    geovals:
+    geovals: &GeoVaLs
       filename: Data/cx_globalnamelist_sonde.nc4
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
@@ -43,14 +45,10 @@ observations:
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
 
-  # The same test with GeoVaLs ordered from bottom to top
-  - obs space:
-      name: Sonde
-      obsdatain:
-        obsfile: Data/dummy.nc4
-      simulated variables: [dummy]
-    geovals:
-      filename: Data/cx_globalnamelist_sonde.nc4
+  # This is the same test as above but with the option `geovals_are_top_to_bottom` set to false.
+  # The GeoVaLs are treated correctly when writing out the CX columns.
+  - obs space: *ObsSpace
+    geovals: *GeoVaLs
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the Cx file.
