@@ -15,7 +15,7 @@ missing_int = np.iinfo(np.int32).min + 5
 # NetCDF missing values
 missing_float_nc = 9.969209968386869e+36
 
-def output_1d_simulated_var_to_netcdf(var_name, file_name):
+def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
 
     nlocs = 4
@@ -45,6 +45,13 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     var[:] = [0.4215156, missing_float, 0.1660898, 0.238132]
     var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
+
+    if with_bias:
+        var = f.createVariable('ObsBias/' + var_name, 'f', ('nlocs'))
+        var[:] = [-0.1,-0.5,-0.01, 0.1]
+        # BiasCorrObsValue = ObsValue - ObsBias
+        var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('nlocs'))
+        var[:] = [1.2,missing_float,1.31,1.3]
 
     f.date_time = 2018010100
 
@@ -631,7 +638,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
-    output_1d_simulated_var_to_netcdf   ('total_zenith_delay', 'testinput/012_VarField_gpstzdelay.nc4')
+    output_1d_simulated_var_to_netcdf   ('total_zenith_delay', 'testinput/012_VarField_gpstzdelay.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('station_height', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
 
     # Varobs full output for an obsgroup testing
