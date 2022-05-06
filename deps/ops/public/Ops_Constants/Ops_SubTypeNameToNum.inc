@@ -131,8 +131,8 @@ SELECT CASE (name)
     num = ObsTypeGoesVIS
   CASE ("GOESWV")
     num = ObsTypeGOESWV
-  CASE ("GroundGPS")
-    num = ObsTypeGroundGPS
+  CASE ("GPSIWV")
+    num = ObsTypeGpsiwv
   CASE ("GPSRO")
     num = ObsTypeGPSRO
   CASE ("HRSEAICE")
