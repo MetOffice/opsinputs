@@ -1381,7 +1381,7 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
    else
       call opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
            Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-           GeoVals, JediVarName, JediToOpsLayoutMapping)
+           GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping)
    end if
 else
    call opsinputs_fill_fillreal2dfromgeoval( &
@@ -1545,7 +1545,7 @@ end subroutine opsinputs_fill_fillrealfromgeovalformultilevelobs
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
-  Hdr, OpsVarName, NumObs, Real2, GeoVals, JediVarName, JediToOpsLayoutMapping)
+  Hdr, OpsVarName, NumObs, Real2, GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping)
 implicit none
 
 ! Subroutine arguments:
@@ -1555,6 +1555,7 @@ integer(integer64), intent(in)                     :: NumObs
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 character(len=*), intent(in)                       :: JediVarName
 type(ufo_geovals), intent(in)                      :: GeoVals
+logical, intent(in)                                :: GeoVaLsAreTopToBottom
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 
 ! Local declarations:
@@ -1589,6 +1590,10 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
         Real2(iObs,iLevel) = GeoVal % vals(iLevel, JediToOpsLayoutMapping % RecordStarts(iObs))
      end do
   end do
+  ! VAR has model values from the surface -> TOA, therefore they may need reversing.
+  if (GeoVaLsAreTopToBottom) then
+     Real2 = Real2(:, GeoVal % nval:1:-1)
+  end if
 end if
 end subroutine opsinputs_fill_fillreal2dfromgeovalformultilevelobs
 
