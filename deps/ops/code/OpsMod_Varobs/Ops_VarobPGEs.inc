@@ -362,7 +362,7 @@ IF (Obs % header % GPSTZDelay % Present) THEN
     ELSE
       PGEfi(:,1) = AINT (Obs % GPSTZDelay(:) % PGEFinal) / PPF
     END IF
-  ELSE 
+  ELSE
     PGEfi(:,1) = AINT (Obs % GPSTZDelay(:) % PGEFinal) / PPF
   END IF
   DO Ob = 1, NumObsLocal
