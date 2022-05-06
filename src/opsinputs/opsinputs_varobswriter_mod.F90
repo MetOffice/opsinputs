@@ -800,8 +800,6 @@ do iVarField = 1, nVarFields
         call opsinputs_fill_fillelementtypefromsimulatedvariable(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv, &
         ObsSpace, Flags, ObsErrors, "precipitableWater")
       end if
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv)
     case (VarField_windspeed)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed)
