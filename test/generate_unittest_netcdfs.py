@@ -38,7 +38,8 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
         var[i] = s
 
     var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
-    var[:] = [1.1, missing_float, 1.3, 1.4]
+    obsVal = [1.1, missing_float, 1.3, 1.4]
+    var[:] = obsVal
     var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
     var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs',))
@@ -48,11 +49,20 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
 
     if with_bias:
         var = f.createVariable('ObsBias/' + var_name, 'f', ('nlocs'))
-        var[:] = [-0.1,-0.5,-0.01, 0.1]
-        # BiasCorrObsValue = ObsValue - ObsBias
+        biasVal = [-0.1,-0.5,-0.01, 0.1]
+        var[:] = biasVal
         var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('nlocs'))
-        var[:] = [1.2,missing_float,1.31,1.3]
-
+        biascorr = np.array(obsVal) - np.array(biasVal)
+	# Check for missing floats, if ObsVal has a missing float then
+	# the bias corrected value will be missing float. If the bias 
+	# correction is missing then no bias correction should be applied to
+	# and the obsVal used. 
+        for i, val in enumerate(obsVal):
+            if obsVal[i] == missing_float:
+                biascorr[i] = missing_float
+            if biasVal[i] == missing_float:
+                biascorr[i] = obsVal[i]
+        var[:] = biascorr
     f.date_time = 2018010100
 
     f.close()

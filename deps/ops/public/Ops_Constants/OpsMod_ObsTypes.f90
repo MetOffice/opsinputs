@@ -205,7 +205,7 @@ INTEGER, PARAMETER :: ObsTypeATOVS_L2     = 21501   ! => products only
 INTEGER, PARAMETER :: ObsTypeATOVS_L1D    = 21502   ! => radiances/products
 INTEGER, PARAMETER :: ObsTypeMWSFY3B      = 21450   ! => Global FY3B as ATOVS subtype
 
-INTEGER, PARAMETER :: ObsTypeGpsiwv      = 21700   ! => Ground GPS
+INTEGER, PARAMETER :: ObsTypeGpsiwv       = 21700   ! => Ground GPS
 
 INTEGER, PARAMETER :: ObsTypeATMS         = 21800   ! => ATMS radiances
 INTEGER, PARAMETER :: ObsTypeATMSHR       = 21900   ! => High res ATMS radiances
