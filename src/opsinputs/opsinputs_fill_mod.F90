@@ -128,7 +128,6 @@ character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediGroupName
 logical, optional, intent(in)                   :: PackPGEs
 
-
 ! Local declarations:
 logical                                         :: DoPackPGEs
 real(kind=c_double)                             :: ObsValue(NumObs)
