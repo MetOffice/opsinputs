@@ -11,7 +11,7 @@
 | 9 | `VarField_lwp` | | | | Implement |
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `brightness_temperature@BiasCorrObsValue` | |
 | 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `skin_temperature@OneDVar` | |
-| 12 | `VarField_gpstzdelay` | | | | Implement |
+| 12 | `VarField_gpstzdelay` | `gpstzdelay(:)`| Ground based GNSS Total Zenith Delay | total_zenith_delay@BiasCorrObsValue | |
 | 15 | `VarField_cloud` | | | | Implement |
 | 16 | `VarField_rainrate` | | | | Implement |
 | 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `surface_emissivity@Emiss` |  |
@@ -55,7 +55,7 @@
 | 64 | `VarField_RadarBeamElev` | | | | Implement |
 | 65 | `VarField_RadarObRange` | | | | Implement |
 | 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `radar_azimuth@MetaData` | |
-| 67 | `VarField_GPS_Station_Height` | | | | Implement |
+| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | station_height@MetaData| |
 | 68 | `VarField_clw` | | | | Implement |
 | 69 | `VarField_RadIdent` | | | | Implement Implement |
 | 70 | `VarField_Reflectivity` | | | | Implement |
