@@ -816,15 +816,11 @@ do iVarField = 1, nVarFields
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
         ObsSpace, "skin_temperature", "OneDVar")
     case (VarField_gpstzdelay)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
       call opsinputs_fill_fillelementtypefromsimulatedvariable( &
         Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
         ObsSpace, Flags, ObsErrors, "total_zenith_delay", "BiasCorrObsValue", PackPGEs=.false.)
 	
     case (VarField_GPS_Station_Height)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
       call opsinputs_fill_fillreal( &
         Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
 	ObsSpace, "station_height", "MetaData")

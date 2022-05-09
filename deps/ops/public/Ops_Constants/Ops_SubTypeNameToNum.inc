@@ -132,7 +132,7 @@ SELECT CASE (name)
   CASE ("GOESWV")
     num = ObsTypeGOESWV
   CASE ("GPSIWV")
-    num = ObsTypeGpsiwv
+    num = ObsTypeGPSIWV
   CASE ("GPSRO")
     num = ObsTypeGPSRO
   CASE ("HRSEAICE")

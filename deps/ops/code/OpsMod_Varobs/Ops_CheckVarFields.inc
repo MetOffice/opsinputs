@@ -139,10 +139,6 @@ DO Ivar = 1, ActualMaxVarfield
     CASE (VarField_tskin)
       ObHdrVrbl = Ob % header % Tskin
     CASE (VarField_gpstzdelay)
-      WRITE (ErrorMessage, '(A,I0,2A)') "#Variable ", VarField, &
-      " requested in the case..", TRIM (Ob % header % ObsGroupName)
-      CALL gen_message (RoutineName,  &
-                        ErrorMessage)
       ObHdrVrbl = Ob % header % GPSTZDelay
     CASE (VarField_GPS_Station_Height)
       ObHdrVrbl = Ob % header % Zstation

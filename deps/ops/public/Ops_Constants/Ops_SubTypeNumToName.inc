@@ -134,8 +134,8 @@ SELECT CASE (num)
     name = "GOESVIS"
   CASE (ObsTypeGOESWV)
     name = "GOESWV"
-  CASE (ObsTypeGpsiwv)
-    name = "Gpsiwv"
+  CASE (ObsTypeGPSIWV)
+    name = "GPSIWV"
   CASE (ObsTypeGPSRO)
     name = "GPSRO"
   CASE (ObsTypeGroundLidar)

@@ -102,6 +102,8 @@ contains
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate \p El1 and \p Hdr.
+!> \param[in] JediValueGroup
+!>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
