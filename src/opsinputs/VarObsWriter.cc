@@ -64,7 +64,9 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
   // We need to pass the list of channels in a separate parameter because the Fortran interface to
   // oops::Variables doesn't give access to it. I (wsmigaj) suspect channel handling will change
   // in the refactored version of ioda, so it doesn't seem worth patching oops::Variables now.
-  const std::vector<int> &channels = obsdb_.obsvariables().channels();
+  const std::vector<int> scatwindchannels{1, 2, 3, 4};
+  const std::vector<int> &channels = obsdb.obsname() == "Scatwind" ?
+                                     scatwindchannels : obsdb_.obsvariables().channels();
   const int fallbackChannels = 0;
   // Avoid passing a null pointer to Fortran.
   const int *channelsData = channels.empty() ? &fallbackChannels : channels.data();
