@@ -34,7 +34,6 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels, &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
-    opsinputs_fill_fillelementtypefromsimulatedvariable2dobsvalue, &
     opsinputs_fill_fillinteger, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
@@ -917,18 +916,18 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Snowrate, "Snowrate", Ob % Header % NumObsLocal, Ob % Snowrate)
     case (VarField_u10ambwind)
-      call opsinputs_fill_fillelementtypefromsimulatedvariable2dobsvalue( &
-        Ob % Header % u10AmbWind, "u10AmbWind", JediToOpsLayoutMapping % NumOpsObs, Ob % u10AmbWind, &
-        ObsSpace, self % channels, Flags, ObsErrors, "eastward_wind")
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % u10AmbWind, "u10AmbWind", JediToOpsLayoutMapping, Ob % u10AmbWind, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "eastward_wind")
     case (VarField_v10ambwind)
-      call opsinputs_fill_fillelementtypefromsimulatedvariable2dobsvalue( &
-        Ob % Header % v10AmbWind, "v10AmbWind", JediToOpsLayoutMapping % NumOpsObs, Ob % v10AmbWind, &
-        ObsSpace, self % channels, Flags, ObsErrors, "northward_wind")
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % v10AmbWind, "v10AmbWind", JediToOpsLayoutMapping, Ob % v10AmbWind, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "northward_wind")
     case (VarField_pcorrect)
       ! Note that its PGEs should not be packed.
-      call opsinputs_fill_fillelementtypefromsimulatedvariable2dobsvalue( &
-        Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", JediToOpsLayoutMapping % NumOpsObs, Ob % AWPriorPCorrect, &
-        ObsSpace, self % channels, Flags, ObsErrors, "ambwind_probability", PackPGEs=.false.)
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", JediToOpsLayoutMapping, Ob % AWPriorPCorrect, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "ambwind_probability", PackPGEs=.false.)
     case (VarField_NumChans)
       FillNumChans = .true.
     case (VarField_ChanNum)
