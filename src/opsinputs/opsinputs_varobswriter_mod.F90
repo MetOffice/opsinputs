@@ -802,7 +802,7 @@ do iVarField = 1, nVarFields
     case (VarField_tcwv)
       if (Ob % Header % ObsGroup == ObsGroupSatTCWV) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv, &
-        ObsSpace, Flags, ObsErrors, "precipitableWater")
+        ObsSpace, Flags, ObsErrors, "precipitableWater", "ObsValue")
       end if
     case (VarField_windspeed)
       ! TODO(someone): handle this varfield
