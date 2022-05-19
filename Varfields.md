@@ -6,7 +6,7 @@
 | 4 | `VarField_u` | `u10(:)` or `u(:,:)` | eastward wind | `eastward_wind@ObsValue` | |
 | 5 | `VarField_v` | `v10(:)` or `v(:,:)` | northward wind | `northward_wind@ObsValue` | |
 | 6 | `VarField_logvis` | | | | Implement |
-| 7 | `VarField_tcwv` | | | | Implement |
+| 7 | `VarField_tcwv` | `TCWV(:)` | total column water vapour | `precipitableWater@ObsValue` | |
 | 8 | `VarField_windspeed` | | | | Implement |
 | 9 | `VarField_lwp` | | | | Implement |
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `brightness_temperature@BiasCorrObsValue` | |

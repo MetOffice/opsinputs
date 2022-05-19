@@ -625,6 +625,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('eastward_wind',               'testinput/004_VarField_u_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('northward_wind',              'testinput/005_VarField_v_Surface.nc4')
     output_simulated_var_profiles_to_netcdf('northward_wind',              'testinput/005_VarField_v_Sonde.nc4')
+    output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
@@ -688,6 +689,7 @@ if __name__ == "__main__":
     copy_var_to_var('ObsValue', 'theta', 'air_temperature', 'testinput/varobs_globalnamelist_sonde.nc4')
     copy_var_to_var('ObsError', 'theta', 'air_temperature','testinput/varobs_globalnamelist_sonde.nc4')
 
+
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
     output_1d_geoval_to_netcdf       ('surface_altitude',           'testinput/001_SurfaceCxField_Orog.nc4')
@@ -699,6 +701,7 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('skin_temperature',           'testinput/013_SurfaceCxField_TskinSea.nc4')
     output_1d_geoval_to_netcdf       ('surface_pressure_at_mean_sea_level', 'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
+    output_1d_geoval_to_netcdf       ('total_cloud_amount', 'testinput/024_SurfaceCxField_CloudAmount.nc4')
     output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('relative_humidity',          'testinput/002_UpperAirCxField_relative_humidity.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
@@ -763,6 +766,13 @@ if __name__ == "__main__":
                               'liquid_cloud_fraction',
                               'frozen_cloud_fraction'],
                              'testinput/cx_globalnamelist_sonde.nc4')
+
+    # SatTCWV
+    output_full_cx_to_netcdf(['surface_altitude','surface_pressure','ice_area_fraction','total_cloud_amount'],
+                             ['theta','specific_humidity','air_pressure_levels','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+                              'cloud_area_fraction_in_atmosphere_layer','frozen_cloud_fraction','liquid_cloud_fraction'],
+                              'testinput/cx_globalnamelist_sattcwv.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
