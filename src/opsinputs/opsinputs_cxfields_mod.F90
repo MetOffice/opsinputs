@@ -35,7 +35,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_aerosol = opsinputs_cx
 character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamA = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamB = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_LapseRate = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_CloudAmount = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_CloudAmount = "total_cloud_amount"
 character(len=*), parameter, public :: opsinputs_cxfields_ConvCloudAmount = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_ConvCloudBaseLevel = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_ConvCloudTopLevel = opsinputs_cxfields_unknown

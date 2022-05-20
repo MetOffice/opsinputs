@@ -131,6 +131,9 @@ ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Surface
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Sonde
                 YAML     005_VarField_v_Sonde.yaml
                 DATA     005_VarField_v_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_007_VarField_tcwv
+                YAML     007_VarField_tcwv.yaml
+                DATA     007_VarField_tcwv.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_010_VarField_britemp
                 YAML     010_VarField_britemp.yaml
                 NAMELIST VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
@@ -324,6 +327,10 @@ ADD_WRITER_TEST(NAME     cxwriter_017_SurfaceCxField_SeaIce
                 YAML     017_SurfaceCxField_SeaIce.yaml
                 NAMELIST CxWriterNamelists_017_SurfaceCxField_SeaIce/AMSUB.nl
                 DATA     017_SurfaceCxField_SeaIce.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_024_SurfaceCxField_CloudAmount
+                YAML     024_SurfaceCxField_CloudAmount.yaml
+                NAMELIST CxWriterNamelists_024_SurfaceCxField_CloudAmount/SatTCWV.nl
+                DATA     024_SurfaceCxField_CloudAmount.nc4 dummy.nc4)
 
 # Tests of individual upper-air varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
@@ -482,6 +489,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sonde
                 YAML     cxwriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/cx/Sonde.nl
                 DATA     cx_globalnamelist_sonde.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sattcwv
+                YAML     cxwriter_globalnamelist_sattcwv.yaml
+                NAMELIST ../../etc/global/cx/SatTCWV.nl
+                DATA     cx_globalnamelist_sattcwv.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
