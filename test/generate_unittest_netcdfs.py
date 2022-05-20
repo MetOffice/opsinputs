@@ -672,6 +672,14 @@ if __name__ == "__main__":
     copy_var_to_var('ObsValue', 'theta', 'air_temperature', 'testinput/varobs_globalnamelist_sonde.nc4')
     copy_var_to_var('ObsError', 'theta', 'air_temperature','testinput/varobs_globalnamelist_sonde.nc4')
 
+    # Scatwind
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude'],
+                                 ['ObsValue/eastward_wind','ObsError/eastward_wind','GrossErrorProbability/eastward_wind',
+                                  'ObsValue/northward_wind','ObsError/northward_wind','GrossErrorProbability/northward_wind',
+                                  'ObsValue/ambwind_probability','ObsError/ambwind_probability','GrossErrorProbability/ambwind_probability',],
+                                 ['MetaData/satellite_id'],
+                                  'testinput/varobs_globalnamelist_scatwind.nc4')
+
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
     output_1d_geoval_to_netcdf       ('surface_altitude',           'testinput/001_SurfaceCxField_Orog.nc4')
