@@ -12,7 +12,7 @@ observations:
           sort order: "descending"
       simulated variables: [relative_humidity]
       extension:
-        average profiles onto model levels: 3
+        allocate companion records with length: 3
     geovals:
       filename: Data/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4
     obs filters:
