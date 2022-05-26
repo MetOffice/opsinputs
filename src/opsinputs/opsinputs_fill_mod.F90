@@ -1516,7 +1516,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
      ! Location of current observation in the ObsSpace.
      iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
           JediToOpsLayoutMapping % RecordStarts(iObs))
-     Real1(iObs) = GeoVal % vals(1, JediToOpsLayoutMapping % RecordStarts(iObs))
+     Real1(iObs) = GeoVal % vals(1, iJediObs)
   end do
 end if
 end subroutine opsinputs_fill_fillrealfromgeovalformultilevelobs
@@ -1587,7 +1587,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
         iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
              JediToOpsLayoutMapping % RecordStarts(iObs))
         ! Fill the CX column with the GeoVal at the first location in the profile.
-        Real2(iObs,iLevel) = GeoVal % vals(iLevel, JediToOpsLayoutMapping % RecordStarts(iObs))
+        Real2(iObs,iLevel) = GeoVal % vals(iLevel, iJediObs)
      end do
   end do
   ! VAR has model values from the surface -> TOA, therefore they may need reversing.
