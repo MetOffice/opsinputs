@@ -266,6 +266,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
                 YAML     varobswriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/varobs/ATMS.nl
                 DATA     varobs_globalnamelist_atms.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atovs
+                YAML     varobswriter_globalnamelist_atovs.yaml
+                NAMELIST ../../etc/global/varobs/ATOVS.nl
+                DATA     varobs_globalnamelist_atovs.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_gnssro
                 YAML     varobswriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/varobs/GPSRO.nl

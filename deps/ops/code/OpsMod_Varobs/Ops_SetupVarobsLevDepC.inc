@@ -138,8 +138,8 @@ SELECT CASE (Observations % header % ObsGroup)
 
   CASE (ObsGroupATOVS)
 
-    ObsLevelType = 3.0
-    NumLevelLevs = NumObLev
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
 
   CASE (ObsGroupTOVS)
 

@@ -1,0 +1,23 @@
+window begin: 1999-01-01T00:00:00Z
+window end: 2032-01-01T02:00:00Z
+
+observations:
+# This ob space shows what happens if the following are left as defaults
+# reject_obs_with_all_variables_failing_qc: false
+# reject_obs_with_any_variables_failing_qc: false
+# This means that despite the blacklist the entries still end up in the varobs file
+  - obs space:
+      name: ATOVS
+      obsdatain:
+        obsfile: Data/varobs_globalnamelist_atovs.nc4
+      simulated variables: [brightness_temperature]
+      channels: 1-20
+    obs filters:
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    - filter: VarObs Writer
+      namelist_directory: ../etc/global/varobs
+      general_mode: verbose
+    HofX: ObsValue 
+    benchmarkFlag: 1000
+    flaggedBenchmark: 0
