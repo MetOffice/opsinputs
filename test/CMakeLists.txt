@@ -169,6 +169,15 @@ ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
                 YAML     031_VarField_solzenith.yaml
                 NAMELIST VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
                 DATA     031_VarField_solzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_051_VarField_u10ambwind
+                YAML     051_VarField_u10ambwind.yaml
+                DATA     051_VarField_u10ambwind.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_052_VarField_v10ambwind
+                YAML     052_VarField_v10ambwind.yaml
+                DATA     052_VarField_v10ambwind.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_053_VarField_awpriorpcorrect
+                YAML     053_VarField_awpriorpcorrect.yaml
+                DATA     053_VarField_awpriorpcorrect.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_054_VarField_numchans
                 YAML     054_VarField_numchans.yaml
                 NAMELIST VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
@@ -280,6 +289,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
                 DATA     varobs_globalnamelist_sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_scatwind
+                YAML     varobswriter_globalnamelist_scatwind.yaml
+                NAMELIST ../../etc/global/varobs/Scatwind.nl
+                DATA     varobs_globalnamelist_scatwind.nc4)
 
 ### CxWriter tests
 

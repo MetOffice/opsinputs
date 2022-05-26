@@ -927,14 +927,18 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Snowrate, "Snowrate", Ob % Header % NumObsLocal, Ob % Snowrate)
     case (VarField_u10ambwind)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % u10AmbWind, "u10AmbWind", Ob % Header % NumObsLocal, Ob % u10AmbWind)
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % u10AmbWind, "u10AmbWind", JediToOpsLayoutMapping, Ob % u10AmbWind, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "eastward_wind")
     case (VarField_v10ambwind)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % v10AmbWind, "v10AmbWind", Ob % Header % NumObsLocal, Ob % v10AmbWind)
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % v10AmbWind, "v10AmbWind", JediToOpsLayoutMapping, Ob % v10AmbWind, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "northward_wind")
     case (VarField_pcorrect)
-      ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
-      ! call Ops_Alloc(Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", Ob % Header % NumObsLocal, Ob % AWPriorPCorrect)
+      ! Note that its PGEs should not be packed.
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", JediToOpsLayoutMapping, Ob % AWPriorPCorrect, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "ambwind_probability", PackPGEs=.false.)
     case (VarField_NumChans)
       FillNumChans = .true.
     case (VarField_ChanNum)
