@@ -142,6 +142,9 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
                 YAML     011_VarField_tskin.yaml
                 NAMELIST VarObsWriterNamelists_011_VarField_tskin/AMSUB.nl
                 DATA     011_VarField_tskin.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_012_VarField_gpstzdelay
+                YAML     012_VarField_gpstzdelay.yaml
+                DATA     012_VarField_gpstzdelay.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
                 YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
@@ -186,6 +189,9 @@ ADD_WRITER_TEST(NAME     varobswriter_055_VarField_channum
 ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
                 YAML     066_VarField_radarobazim.yaml
                 DATA     066_VarField_radarobazim.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_067_VarField_GPS_Station_Height
+                YAML     067_VarField_GPS_Station_Height.yaml
+                DATA     067_VarField_GPS_Station_Height.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_068_VarField_clw
                 YAML     068_VarField_clw.yaml
                 NAMELIST VarObsWriterNamelists_068_VarField_clw/AMSUB.nl
