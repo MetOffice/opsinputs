@@ -108,7 +108,8 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
     ObsGroupSonde,             &
-    ObsGroupSurface
+    ObsGroupSurface,           &
+    ObsGroupSatTCWV
 use OpsMod_ObsInfo, only: &
     FinalRejectReport,    &
     LenCallsign,          &
@@ -385,8 +386,12 @@ call f_conf % get_or_die("IC_GroundGPSOperator", StringValue)
 select case (ops_to_lower_case(StringValue))
 case ("choice")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorChoice
+  write (ErrorMessage, '("IC_GroundGPSOperator set to IC_GroundGPSOperatorChoice: ",A)') StringValue
+  call gen_warn(RoutineName, ErrorMessage)
 case ("generic")
   self % IC_GroundGPSOperator = IC_GroundGPSOperatorGeneric
+  write (ErrorMessage, '("IC_GroundGPSOperator set to IC_GroundGPSOperatorGeneric: ",A)') StringValue
+  call gen_warn(RoutineName, ErrorMessage)
 case default
   write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
@@ -728,7 +733,7 @@ do iVarField = 1, nVarFields
     case (VarField_pstar)
       call opsinputs_fill_fillelementtypefromsimulatedvariable( &
         Ob % Header % pstar, "pstar", Ob % Header % NumObsLocal, Ob % pstar, &
-        ObsSpace, Flags, ObsErrors, "surface_pressure")
+        ObsSpace, Flags, ObsErrors, "surface_pressure", "ObsValue")
     case (VarField_theta)
       ! If theta is present in the list of varfields, the OPS Ob % t structure must also
       ! be filled. This ensures the routine Ops_VarobPGEs works correctly;
@@ -753,7 +758,7 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % t2, "t2", Ob % Header % NumObsLocal, Ob % t2, &
-          ObsSpace, Flags, ObsErrors, "air_temperature")
+          ObsSpace, Flags, ObsErrors, "air_temperature", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
@@ -763,7 +768,7 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % rh2, "rh2", Ob % Header % NumObsLocal, Ob % rh2, &
-          ObsSpace, Flags, ObsErrors, "relative_humidity")
+          ObsSpace, Flags, ObsErrors, "relative_humidity", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", JediToOpsLayoutMapping, Ob % rh, &
@@ -774,7 +779,7 @@ do iVarField = 1, nVarFields
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
-          ObsSpace, Flags, ObsErrors, "eastward_wind")
+          ObsSpace, Flags, ObsErrors, "eastward_wind", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
@@ -785,7 +790,7 @@ do iVarField = 1, nVarFields
           Ob % Header % ObsGroup == ObsGroupScatwind) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
-          ObsSpace, Flags, ObsErrors, "northward_wind")
+          ObsSpace, Flags, ObsErrors, "northward_wind", "ObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
@@ -795,8 +800,10 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
     case (VarField_tcwv)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv)
+      if (Ob % Header % ObsGroup == ObsGroupSatTCWV) then
+        call opsinputs_fill_fillelementtypefromsimulatedvariable(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv, &
+        ObsSpace, Flags, ObsErrors, "precipitableWater", "ObsValue")
+      end if
     case (VarField_windspeed)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed)
@@ -812,11 +819,15 @@ do iVarField = 1, nVarFields
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
         ObsSpace, "skin_temperature", "OneDVar")
     case (VarField_gpstzdelay)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % GPSTZDelay, "GPSTZDelay", Ob % Header % NumObsLocal, Ob % GPSTZDelay)
+      call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+        Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
+        ObsSpace, Flags, ObsErrors, "total_zenith_delay", "BiasCorrObsValue", PackPGEs=.false.)
+	
     case (VarField_GPS_Station_Height)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % Zstation, "Zstation", Ob % Header % NumObsLocal, Ob % Zstation)
+      call opsinputs_fill_fillreal( &
+        Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
+	ObsSpace, "station_height", "MetaData")
+	
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &
@@ -916,14 +927,18 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Snowrate, "Snowrate", Ob % Header % NumObsLocal, Ob % Snowrate)
     case (VarField_u10ambwind)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % u10AmbWind, "u10AmbWind", Ob % Header % NumObsLocal, Ob % u10AmbWind)
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % u10AmbWind, "u10AmbWind", JediToOpsLayoutMapping, Ob % u10AmbWind, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "eastward_wind")
     case (VarField_v10ambwind)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % v10AmbWind, "v10AmbWind", Ob % Header % NumObsLocal, Ob % v10AmbWind)
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % v10AmbWind, "v10AmbWind", JediToOpsLayoutMapping, Ob % v10AmbWind, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "northward_wind")
     case (VarField_pcorrect)
-      ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
-      ! call Ops_Alloc(Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", Ob % Header % NumObsLocal, Ob % AWPriorPCorrect)
+      ! Note that its PGEs should not be packed.
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", JediToOpsLayoutMapping, Ob % AWPriorPCorrect, &
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "ambwind_probability", PackPGEs=.false.)
     case (VarField_NumChans)
       FillNumChans = .true.
     case (VarField_ChanNum)
