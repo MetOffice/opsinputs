@@ -15,7 +15,7 @@ missing_int = np.iinfo(np.int32).min + 5
 # NetCDF missing values
 missing_float_nc = 9.969209968386869e+36
 
-def output_1d_simulated_var_to_netcdf(var_name, file_name):
+def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
 
     nlocs = 4
@@ -38,7 +38,8 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
         var[i] = s
 
     var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
-    var[:] = [1.1, missing_float, 1.3, 1.4]
+    obsVal = [1.1, missing_float, 1.3, 1.4]
+    var[:] = obsVal
     var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
     var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs',))
@@ -46,6 +47,22 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
+    if with_bias:
+        var = f.createVariable('ObsBias/' + var_name, 'f', ('nlocs'))
+        biasVal = [-0.1,-0.5,-0.01, 0.1]
+        var[:] = biasVal
+        var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('nlocs'))
+        biascorr = np.array(obsVal) - np.array(biasVal)
+	# Check for missing floats, if ObsVal has a missing float then
+	# the bias corrected value will be missing float. If the bias 
+	# correction is missing then no bias correction should be applied to
+	# and the obsVal used. 
+        for i, val in enumerate(obsVal):
+            if obsVal[i] == missing_float:
+                biascorr[i] = missing_float
+            if biasVal[i] == missing_float:
+                biascorr[i] = obsVal[i]
+        var[:] = biascorr
     f.date_time = 2018010100
 
     f.close()
@@ -632,6 +649,8 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
+    output_1d_simulated_var_to_netcdf   ('total_zenith_delay', 'testinput/012_VarField_gpstzdelay.nc4', with_bias=True)
+    output_1d_normal_var_to_netcdf   ('station_height', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
 
     # Varobs full output for an obsgroup testing
     # Arguments are: 1D floats, 2D floats, 1D ints, filename

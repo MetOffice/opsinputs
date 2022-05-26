@@ -102,6 +102,8 @@ contains
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate \p El1 and \p Hdr.
+!> \param[in] JediGroupName
+!>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -111,7 +113,7 @@ contains
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtypefromsimulatedvariable( &
-  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
+  Hdr, OpsVarName, NumObs, El1, ObsSpace, Flags, ObsErrors, JediVarName, JediGroupName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -123,6 +125,7 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediGroupName
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
@@ -155,10 +158,10 @@ end if
 MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
-if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
+if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   ! Retrieve data from JEDI:
   ! - observation value
-  call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+  call obsspace_get_db(ObsSpace, JediGroupName, JediVarName, ObsValue)
   ! - QC flag
   if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
