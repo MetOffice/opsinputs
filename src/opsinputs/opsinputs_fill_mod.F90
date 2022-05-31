@@ -1019,7 +1019,7 @@ end subroutine opsinputs_fill_fillreal
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
-  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetLevels)
 implicit none
 
 ! Subroutine arguments:
@@ -1031,14 +1031,24 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
+integer, optional, intent(in)                   :: OffsetLevels
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
 real(kind=c_double)                             :: MissingDouble
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
+integer                                         :: offset
+
 
 ! Body:
+
+!take into account offsetting of 2nd dimension if required
+if (present(OffsetLevels)) then
+  offset = OffsetLevels
+else
+  offset = 0
+end if
 
 MissingDouble = missing_value(0.0_c_double)
 
@@ -1047,14 +1057,14 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                 num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
+                 num_levels = int(size(JediVarNamesWithChannels)+offset, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
 
     ! Fill the OPS data structures
     where (VarValue /= MissingDouble)
-      Real2(:, iChannel) = VarValue
+      Real2(:, iChannel+offset) = VarValue
     end where
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -1160,7 +1170,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetLevels)
 implicit none
 
 ! Subroutine arguments:
@@ -1172,6 +1182,7 @@ type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
+integer, optional, intent(in)                      :: OffsetLevels
 
 ! Body:
 
@@ -1179,9 +1190,15 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
 else
-  call opsinputs_fill_fillreal2d_norecords( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-    JediVarName, JediVarGroup)
+  if (Present(OffsetLevels)) then
+    call opsinputs_fill_fillreal2d_norecords( &
+      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+      JediVarName, JediVarGroup, OffsetLevels)
+  else
+    call opsinputs_fill_fillreal2d_norecords( &
+      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+      JediVarName, JediVarGroup)
+  end if
 end if
 
 end subroutine opsinputs_fill_fillreal2d

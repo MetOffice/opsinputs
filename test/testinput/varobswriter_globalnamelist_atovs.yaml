@@ -18,6 +18,7 @@ observations:
     - filter: VarObs Writer
       namelist_directory: ../etc/global/varobs
       general_mode: verbose
+      channel_offset_for_britemp: 20
     HofX: ObsValue 
     benchmarkFlag: 1000
     flaggedBenchmark: 0

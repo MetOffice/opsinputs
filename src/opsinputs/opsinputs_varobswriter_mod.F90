@@ -185,6 +185,9 @@ private
   !this stores the atmospheric levels we wish to pass to varobs
   integer(c_int), allocatable :: modlevs(:) 
   
+  !this stores the offset for channels when storing britemp
+  integer            :: channel_offset
+  
   type(ufo_geovals), pointer :: GeoVals
   type(ufo_geovals), pointer :: ObsDiags
 end type opsinputs_varobswriter
@@ -291,6 +294,15 @@ call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
 call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta)
 
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
+
+!add offset channels for use where some of the channel positions are ignored in JEDI
+!but required in Varobs
+if (f_conf % has("channel_offset_for_britemp")) then
+  call f_conf % get_or_die("channel_offset_for_britemp", self % channel_offset)
+else
+  self % channel_offset = 0
+end if
+
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
@@ -807,9 +819,15 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
     case (VarField_britemp)
-      call opsinputs_fill_fillreal2d( &
-        Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
-        ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue")
+      if (self % channel_offset > 0) then
+        call opsinputs_fill_fillreal2d( &
+          Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
+          ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue", self % channel_offset)
+      else
+       call opsinputs_fill_fillreal2d( &
+          Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
+          ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue")
+      end if
     case (VarField_tskin)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
@@ -1027,8 +1045,9 @@ do iVarField = 1, nVarFields
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
+      call opsinputs_fill_fillreal2d( &
+        Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
+        ObsSpace, self % channels, "brightness_temperature", "ObsError")
     case (VarField_CloudRTError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
