@@ -166,6 +166,10 @@ ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
                 YAML     031_VarField_solzenith.yaml
                 NAMELIST VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
                 DATA     031_VarField_solzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_034_VarField_iremiss
+                YAML     034_VarField_iremiss.yaml
+                NAMELIST VarObsWriterNamelists_034_VarField_iremiss/AMSUB.nl
+                DATA     034_VarField_iremiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_054_VarField_numchans
                 YAML     054_VarField_numchans.yaml
                 NAMELIST VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl

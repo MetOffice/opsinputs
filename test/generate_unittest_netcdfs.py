@@ -617,6 +617,7 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
     output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
+    output_1d_normal_var_to_netcdf   ('ir_emissivity', 'Emiss', 'testinput/034_VarField_iremiss.nc4')
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
     output_2d_normal_var_to_netcdf   ('brightness_temperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
