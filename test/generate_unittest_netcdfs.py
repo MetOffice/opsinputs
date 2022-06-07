@@ -15,7 +15,7 @@ missing_int = np.iinfo(np.int32).min + 5
 # NetCDF missing values
 missing_float_nc = 9.969209968386869e+36
 
-def output_1d_simulated_var_to_netcdf(var_name, file_name):
+def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
 
     nlocs = 4
@@ -38,7 +38,8 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
         var[i] = s
 
     var = f.createVariable('ObsValue/' + var_name, 'f', ('nlocs',))
-    var[:] = [1.1, missing_float, 1.3, 1.4]
+    obsVal = [1.1, missing_float, 1.3, 1.4]
+    var[:] = obsVal
     var = f.createVariable('ObsError/' + var_name, 'f', ('nlocs',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
     var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('nlocs',))
@@ -46,6 +47,22 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable('PreQC/' + var_name, 'i', ('nlocs',))
     var[:] = [1, 1, 1, 1]
 
+    if with_bias:
+        var = f.createVariable('ObsBias/' + var_name, 'f', ('nlocs'))
+        biasVal = [-0.1,-0.5,-0.01, 0.1]
+        var[:] = biasVal
+        var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('nlocs'))
+        biascorr = np.array(obsVal) - np.array(biasVal)
+	# Check for missing floats, if ObsVal has a missing float then
+	# the bias corrected value will be missing float. If the bias 
+	# correction is missing then no bias correction should be applied to
+	# and the obsVal used. 
+        for i, val in enumerate(obsVal):
+            if obsVal[i] == missing_float:
+                biascorr[i] = missing_float
+            if biasVal[i] == missing_float:
+                biascorr[i] = obsVal[i]
+        var[:] = biascorr
     f.date_time = 2018010100
 
     f.close()
@@ -618,6 +635,9 @@ if __name__ == "__main__":
     output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
     output_1d_normal_var_to_netcdf   ('ir_emissivity', 'Emiss', 'testinput/034_VarField_iremiss.nc4')
+    output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4')
+    output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4')
+    output_2d_simulated_var_to_netcdf('ambwind_probability', 'testinput/053_VarField_awpriorpcorrect.nc4')
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
     output_2d_normal_var_to_netcdf   ('brightness_temperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
@@ -634,6 +654,8 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
+    output_1d_simulated_var_to_netcdf   ('total_zenith_delay', 'testinput/012_VarField_gpstzdelay.nc4', with_bias=True)
+    output_1d_normal_var_to_netcdf   ('station_height', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
 
     # Varobs full output for an obsgroup testing
     # Arguments are: 1D floats, 2D floats, 1D ints, filename
@@ -672,6 +694,13 @@ if __name__ == "__main__":
     copy_var_to_var('ObsValue', 'theta', 'air_temperature', 'testinput/varobs_globalnamelist_sonde.nc4')
     copy_var_to_var('ObsError', 'theta', 'air_temperature','testinput/varobs_globalnamelist_sonde.nc4')
 
+    # Scatwind
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude'],
+                                 ['ObsValue/eastward_wind','ObsError/eastward_wind','GrossErrorProbability/eastward_wind',
+                                  'ObsValue/northward_wind','ObsError/northward_wind','GrossErrorProbability/northward_wind',
+                                  'ObsValue/ambwind_probability','ObsError/ambwind_probability','GrossErrorProbability/ambwind_probability',],
+                                 ['MetaData/satellite_id'],
+                                  'testinput/varobs_globalnamelist_scatwind.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
