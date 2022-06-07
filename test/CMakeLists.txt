@@ -193,9 +193,13 @@ ADD_WRITER_TEST(NAME     varobswriter_073_VarField_ro_rad_curv
 ADD_WRITER_TEST(NAME     varobswriter_074_VarField_ro_geoid_und
                 YAML     074_VarField_ro_geoid_und.yaml
                 DATA     074_VarField_ro_geoid_und.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_076_VarField_britempvarerror
+                YAML     076_VarField_britempvarerror.yaml
+                NAMELIST VarObsWriterNamelists_076_VarField_britempvarerror/AMSUB.nl
+                DATA     076_VarField_britempvarerror.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_077_VarField_aod
                 YAML     077_VarField_aod.yaml
-                DATA     077_VarField_aod.nc4)
+                DATA     077_VarField_aod.nc4)         
 ADD_WRITER_TEST(NAME     varobswriter_078_VarField_theta
                 YAML     078_VarField_theta.yaml
                 DATA     078_VarField_theta.nc4)
