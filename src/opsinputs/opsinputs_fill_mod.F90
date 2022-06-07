@@ -63,6 +63,7 @@ public :: opsinputs_fill_fillcoord2d, &
           opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels, &
           opsinputs_fill_fillelementtypefromsimulatedvariable, &
           opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
+          opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable, &
           opsinputs_fill_fillinteger, &
           opsinputs_fill_fillreal, &
           opsinputs_fill_fillreal2d, &
@@ -195,6 +196,92 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
+
+
+subroutine opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable( &
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, Flags, ObsErrors, JediVarName, PackPGEs)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)         :: Hdr
+character(len=*), intent(in)                    :: OpsVarName
+integer(integer64), intent(in)                  :: NumObs
+type(Element_type), pointer                     :: El2(:,:)
+type(c_ptr), value, intent(in)                  :: ObsSpace
+type(c_ptr), value, intent(in)                  :: Flags
+type(c_ptr), value, intent(in)                  :: ObsErrors
+character(len=*), intent(in)                    :: JediVarName
+logical, optional, intent(in)                   :: PackPGEs
+
+! Local declarations:
+logical                                         :: DoPackPGEs
+real(kind=c_double)                             :: ObsValue(NumObs)
+integer(kind=c_int)                             :: Flag(NumObs)
+real(kind=c_float)                              :: ObsError(NumObs)
+real(kind=c_double)                             :: PGE(NumObs)
+real(kind=c_double)                             :: MissingDouble
+real(kind=c_float)                              :: MissingFloat
+integer                                         :: i
+character(len=*), parameter                     :: &
+  RoutineName = "opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable"
+character(len=256)                              :: ErrorMessage
+
+! Body:
+
+if (present(PackPGEs)) then
+  DoPackPGEs = PackPGEs
+else
+  DoPackPGEs = .true.
+end if
+
+! The types of floating-point numbers used in this function are a bit confusing. OPS stores
+! observation values as doubles, whereas JEDI stores them as floats. However, the Fortran interface
+! to the IODA ObsSpace is only partially implemented: obsspace_get_db_real32 doesn't work, only
+! obsspace_get_db_real64 does. So we need to retrieve observation values as doubles. Observation
+! errors, though, are retrieved as floats.
+
+MissingDouble = missing_value(0.0_c_double)
+MissingFloat  = missing_value(0.0_c_float)
+
+if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
+  ! Retrieve data from JEDI:
+  ! - observation value
+  call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+  ! - QC flag
+  if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
+    call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
+  else
+    write (ErrorMessage, '(A,A)') "QC flags not found for variable ", JediVarName
+    call gen_warn(RoutineName, ErrorMessage)
+    Flag(:) = 0 ! assume all observations passed QC
+  end if
+  ! - observation error
+  if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
+    call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
+  else
+    write (ErrorMessage, '(A,A,A)') "Variable ", JediVarName, "@ObsError not found"
+    call gen_warn(RoutineName, ErrorMessage)
+    ObsError(:) = MissingFloat
+  end if
+  ! - gross error probability
+  if (obsspace_has(ObsSpace, "GrossErrorProbability", JediVarName)) then
+    call obsspace_get_db(ObsSpace, "GrossErrorProbability", JediVarName, PGE)
+  else
+    PGE(:) = MissingDouble
+  end if
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
+                 num_levels = int(1, kind=integer64))
+  do i = 1, NumObs
+    if (ObsValue(i) /= MissingDouble) El2(i,1) % Value = ObsValue(i)
+    if (ObsError(i) /= MissingFloat)  El2(i,1) % OBErr = ObsError(i)
+    if (Flag(i) /= 0)                 El2(i,1) % Flags = ibset(0, FinalRejectFlag)
+    call opsinputs_fill_setpgefinal(PGE(i), MissingDouble, DoPackPGEs, El2(i,1))
+  end do
+end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
+end subroutine opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable
+
 
 ! ------------------------------------------------------------------------------
 

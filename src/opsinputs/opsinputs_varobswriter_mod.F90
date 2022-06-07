@@ -34,6 +34,7 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels, &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
+    opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable, &
     opsinputs_fill_fillinteger, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
@@ -1035,11 +1036,10 @@ do iVarField = 1, nVarFields
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
         ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData", PackPGEs = .false.)
     case (VarField_AOD)
-      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-        Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosol_optical_depth")
-        ! NAODWaves is used by the Ops_VarobPGEs subroutine.
-        if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
+      call opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable(Ob % Header % AOD, "AOD", & 
+        Ob % Header % NumObsLocal, Ob % AOD, ObsSpace, Flags, ObsErrors, "aerosolOpticalDepth")
+        ! NAODWaves is used by the Ops_VarobPGEs subroutine but use the default here.
+        ! if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)

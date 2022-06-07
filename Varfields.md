@@ -65,7 +65,7 @@
 | 74 | `VarField_RO_geoid_und` | `RO_geoid_und(:)` | GPSRO Geoid undulation (above WGS-84 ellipsoid, m) | geoid_height_above_reference_ellipsoid@ MetaData | |
 | 75 | `VarField_RadAltAboveMSL` | | | | Implement |
 | 76 | `VarField_BriTempVarError` | | | | Implement |
-| 77 | `VarField_AOD` | `AOD(:,:)` | aerosol optical depth | `aerosol_optical_depth@ObsValue` | |
+| 77 | `VarField_AOD` | `AOD(:,1)` | aerosol optical depth | `aerosolOpticalDepth@ObsValue` | |
 | 78 | `VarField_Theta` | `theta(:,:)` | potential temperature (?) | `air_potential_temperature@ObsValue` (?) | |
 | 79 | `VarField_RadNoiseLvl` | | | | Implement |
 | 80 | `VarField_BiasPredictors` | | | | Implement |
