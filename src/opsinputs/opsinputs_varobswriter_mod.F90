@@ -1045,9 +1045,15 @@ do iVarField = 1, nVarFields
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
-      call opsinputs_fill_fillreal2d( &
-        Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
-        ObsSpace, self % channels, "brightness_temperature", "ObsError")
+      if (self % channel_offset > 0) then
+        call opsinputs_fill_fillreal2d( &
+          Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
+          ObsSpace, self % channels, "brightness_temperature", "ObsError", self % channel_offset)
+      else
+        call opsinputs_fill_fillreal2d( &
+          Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
+          ObsSpace, self % channels, "brightness_temperature", "ObsError")
+      end if
     case (VarField_CloudRTError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
