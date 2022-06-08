@@ -1036,9 +1036,13 @@ do iVarField = 1, nVarFields
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
         ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData", PackPGEs = .false.)
     case (VarField_AOD)
+      ! OPS is written to allow multiple dust bins (NDustBins) and multiple AOD wavelengths (NAODWaves)
+      ! even though only 2 dust bins are used and 1 wavelength. Only the operational setting has been ported
+      ! to JEDI so far and so the JEDI AOD field is 1-d whereas OPS is 2-d. Hence we must transform a 1-d
+      ! JEDI field into a 2-d OPS field for now. 
       call opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable(Ob % Header % AOD, "AOD", & 
         Ob % Header % NumObsLocal, Ob % AOD, ObsSpace, Flags, ObsErrors, "aerosolOpticalDepth")
-        ! NAODWaves is used by the Ops_VarobPGEs subroutine but use the default here.
+        ! We will use the default NAODWaves but if we wish to add other options in future we will need to do:
         ! if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
       ! TODO(someone): handle this varfield
