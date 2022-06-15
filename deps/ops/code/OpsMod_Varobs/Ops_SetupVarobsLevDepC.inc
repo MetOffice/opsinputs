@@ -294,17 +294,17 @@ SELECT CASE (Observations % header % ObsGroup)
   CASE (ObsGroupMWSFY3B)
 
     ObsLevelType = 0.0
-    NumLevelLevs = NumObLev
+    NumLevelLevs = 1
 
   CASE (ObsGroupMWSFY3)
 
     ObsLevelType = 0.0
-    NumLevelLevs = NumObLev
+    NumLevelLevs = 1
 
   CASE (ObsGroupMWRI)
 
     ObsLevelType = 0.0
-    NumLevelLevs = NumObLev
+    NumLevelLevs = 1
 
   CASE (ObsGroupHLOSWIND)
   
