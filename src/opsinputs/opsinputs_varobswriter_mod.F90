@@ -1110,7 +1110,7 @@ do iVarField = 1, nVarFields
 
   if (FillChanNum .or. FillNumChans) then
     call opsinputs_varobswriter_fillchannumandnumchans( &
-      Ob, ObsSpace, self % channels, Flags, FillChanNum, FillNumChans)
+      Ob, ObsSpace, self % channels, Flags, FillChanNum, FillNumChans, self % channel_offset)
   end if
 
 end do
@@ -1149,10 +1149,14 @@ end subroutine opsinputs_varobswriter_fillreportflags
 
 !> Populate the Ob % NumChans and/or Ob % ChanNum field.
 !>
-!> Ob % ChanNum is filled with the indices of channels that passed QC; the number of these channels
-!> is stored in Ob % NumChans.
+!> Ob % ChanNum is filled with the indices of channels that passed QC;
+!> an optional offset to the channel number can be added. This is
+!> sometimes required when multiple instruments are packed together
+!> e.g. for HIRS & AMSUA 
+!> the number of these channels is stored in Ob % NumChans.
 subroutine opsinputs_varobswriter_fillchannumandnumchans( &
-  Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans)
+  Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans, &
+  OffsetChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1161,6 +1165,7 @@ type(c_ptr), value, intent(in) :: ObsSpace
 integer(c_int), intent(in)     :: Channels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
+integer, intent(in)            :: OffsetChans
 
 ! Local declarations:
 integer(integer64)             :: NumChannels
@@ -1176,7 +1181,7 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
-  Ob % ChanNum = ChannelIndices
+  Ob % ChanNum = ChannelIndices + int(OffsetChans, kind=integer64)
 end if
 
 if (FillNumChans) then
