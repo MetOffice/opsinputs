@@ -142,6 +142,9 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
                 YAML     011_VarField_tskin.yaml
                 NAMELIST VarObsWriterNamelists_011_VarField_tskin/AMSUB.nl
                 DATA     011_VarField_tskin.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_012_VarField_gpstzdelay
+                YAML     012_VarField_gpstzdelay.yaml
+                DATA     012_VarField_gpstzdelay.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
                 YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
@@ -170,6 +173,15 @@ ADD_WRITER_TEST(NAME     varobswriter_034_VarField_iremiss
                 YAML     034_VarField_iremiss.yaml
                 NAMELIST VarObsWriterNamelists_034_VarField_iremiss/AMSUB.nl
                 DATA     034_VarField_iremiss.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_051_VarField_u10ambwind
+                YAML     051_VarField_u10ambwind.yaml
+                DATA     051_VarField_u10ambwind.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_052_VarField_v10ambwind
+                YAML     052_VarField_v10ambwind.yaml
+                DATA     052_VarField_v10ambwind.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_053_VarField_awpriorpcorrect
+                YAML     053_VarField_awpriorpcorrect.yaml
+                DATA     053_VarField_awpriorpcorrect.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_054_VarField_numchans
                 YAML     054_VarField_numchans.yaml
                 NAMELIST VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
@@ -181,6 +193,9 @@ ADD_WRITER_TEST(NAME     varobswriter_055_VarField_channum
 ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
                 YAML     066_VarField_radarobazim.yaml
                 DATA     066_VarField_radarobazim.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_067_VarField_GPS_Station_Height
+                YAML     067_VarField_GPS_Station_Height.yaml
+                DATA     067_VarField_GPS_Station_Height.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_068_VarField_clw
                 YAML     068_VarField_clw.yaml
                 NAMELIST VarObsWriterNamelists_068_VarField_clw/AMSUB.nl
@@ -286,6 +301,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
                 DATA     varobs_globalnamelist_sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_scatwind
+                YAML     varobswriter_globalnamelist_scatwind.yaml
+                NAMELIST ../../etc/global/varobs/Scatwind.nl
+                DATA     varobs_globalnamelist_scatwind.nc4)
 
 ### CxWriter tests
 
