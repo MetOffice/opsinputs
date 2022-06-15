@@ -72,9 +72,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
-  /// Optional additional channels to pack the britemp part of the obstructure
+  /// Additional channels to pack the britemp part of the obstructure
   /// e.g. for ATOVS we pack the britemps with 20 dummy channels to mimic HIRS
-  oops::OptionalParameter<int> channel_offset_for_britemp{"channel_offset_for_britemp", this};
+  oops::Parameter<int> channel_offset_for_britemp{"channel_offset_for_britemp", 0, this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.

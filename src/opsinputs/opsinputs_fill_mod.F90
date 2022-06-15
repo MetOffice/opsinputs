@@ -1019,7 +1019,7 @@ end subroutine opsinputs_fill_fillreal
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
-  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetLevels)
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1031,7 +1031,7 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
-integer, optional, intent(in)                   :: OffsetLevels
+integer, optional, intent(in)                   :: OffsetChans
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1044,8 +1044,10 @@ integer                                         :: offset
 ! Body:
 
 !take into account offsetting of 2nd dimension if required
-if (present(OffsetLevels)) then
-  offset = OffsetLevels
+!designed to be used to pack where multiple satellite instruments expected
+!e.g. HIRS in ATOVS stream
+if (present(OffsetChans)) then
+  offset = OffsetChans
 else
   offset = 0
 end if
@@ -1170,7 +1172,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetLevels)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1182,7 +1184,7 @@ type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
-integer, optional, intent(in)                      :: OffsetLevels
+integer, optional, intent(in)                      :: OffsetChans
 
 ! Body:
 
@@ -1190,10 +1192,10 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
 else
-  if (Present(OffsetLevels)) then
+  if (Present(OffsetChans)) then
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, OffsetLevels)
+      JediVarName, JediVarGroup, OffsetChans)
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &

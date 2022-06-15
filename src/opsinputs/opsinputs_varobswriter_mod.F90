@@ -297,11 +297,7 @@ call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFrom
 
 !add offset channels for use where some of the channel positions are ignored in JEDI
 !but required in Varobs
-if (f_conf % has("channel_offset_for_britemp")) then
-  call f_conf % get_or_die("channel_offset_for_britemp", self % channel_offset)
-else
-  self % channel_offset = 0
-end if
+call f_conf % get_or_die("channel_offset_for_britemp", self % channel_offset)
 
 
 ! Updates the varbc flag passedaround by a module in OPS
@@ -819,15 +815,9 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
     case (VarField_britemp)
-      if (self % channel_offset > 0) then
-        call opsinputs_fill_fillreal2d( &
-          Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
-          ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue", self % channel_offset)
-      else
-       call opsinputs_fill_fillreal2d( &
-          Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
-          ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue")
-      end if
+      call opsinputs_fill_fillreal2d( &
+        Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
+        ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue", self % channel_offset)
     case (VarField_tskin)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
@@ -1045,15 +1035,9 @@ do iVarField = 1, nVarFields
         ! NAODWaves is used by the Ops_VarobPGEs subroutine.
         if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
-      if (self % channel_offset > 0) then
-        call opsinputs_fill_fillreal2d( &
-          Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
-          ObsSpace, self % channels, "brightness_temperature", "ObsError", self % channel_offset)
-      else
-        call opsinputs_fill_fillreal2d( &
-          Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
-          ObsSpace, self % channels, "brightness_temperature", "ObsError")
-      end if
+      call opsinputs_fill_fillreal2d( &
+        Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
+        ObsSpace, self % channels, "brightness_temperature", "ObsError", self % channel_offset)
     case (VarField_CloudRTError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
