@@ -1183,6 +1183,8 @@ integer, intent(in)            :: OffsetChans
 integer(integer64)             :: NumChannels
 integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size(Channels))
 integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
+integer                        :: iChannel
+integer                        :: iObs
 
 ! Body:
 NumChannels = size(Channels)
@@ -1193,7 +1195,11 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
-  Ob % ChanNum = ChannelIndices + int(OffsetChans, kind=integer64)
+  Ob % ChanNum = ChannelIndices
+  !only apply offset to actual channels in list, not missing data              
+  where (Ob % ChanNum > 0)
+    Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
+  end where
 end if
 
 if (FillNumChans) then

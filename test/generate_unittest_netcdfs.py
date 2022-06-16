@@ -668,6 +668,15 @@ if __name__ == "__main__":
                                   'thickness_850_300hPa_satid_17Predictor/brightness_temperature'],
                                  ['MetaData/surface_type','MetaData/satellite_id'],
                                   'testinput/varobs_globalnamelist_atms.nc4')
+    # ATOVS
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
+                                  'MetaData/solar_zenith_angle','Emiss/ir_emissivity'],
+                                 ['ObsValue/brightness_temperature','ObsError/brightness_temperature','Emiss/surface_emissivity',
+                                  'BiasCorrObsValue/brightness_temperature','thickness_850_300hPa_satid_13Predictor/brightness_temperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightness_temperature'],
+                                 ['MetaData/surface_type','MetaData/satellite_id'],
+                                  'testinput/varobs_globalnamelist_atovs.nc4')
+                                  
     # GNSS-RO
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
