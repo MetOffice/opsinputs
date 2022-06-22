@@ -34,7 +34,6 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels, &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
-    opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable, &
     opsinputs_fill_fillinteger, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
@@ -1036,16 +1035,14 @@ do iVarField = 1, nVarFields
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
         ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData", PackPGEs = .false.)
     case (VarField_AOD)
-      ! OPS is written to allow multiple dust bins (NDustBins) and multiple AOD wavelengths (NAODWaves)
-      ! even though operationally only 2 dust bins are used and 1 wavelength. In JEDI, we only have the option of 
-      ! 1 wavelength (550nm) so far.  This means that while the OPS Obs % AOD field has a second
-      ! dimension of size NAODWaves = 1, the JEDI aerosolOpticalDepth@ObsValue field is only 1-dimensional. 
-      ! Hence we must transform a 1-d JEDI field into a 2-d OPS field for the moment but this could be changed in 
-      ! future. 
-      call opsinputs_fill_fillelementtype2dfrom1dsimulatedvariable(Ob % Header % AOD, "AOD", & 
-        Ob % Header % NumObsLocal, Ob % AOD, ObsSpace, Flags, ObsErrors, "aerosolOpticalDepth")
-        ! We will use the default NAODWaves but if we wish to add other options in future we will need to also do:
-        ! if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
+      ! Note that currently in JOPA only one wavelength (550nm) is supported and so aersolOpticalDepth@ObsValue 
+      ! is a 1-dimensional field which is here transformed onto a 2-dimensional OPS filed, Ob % AOD.
+      ! However multiple wavelength options could be added in future.
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+        Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosolOpticalDepth")
+      ! NAODWaves is used by the Ops_VarobPGEs subroutine.
+      if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % BriTempVarError, "BriTempVarError", Ob % Header % NumObsLocal, Ob % BriTempVarError)
