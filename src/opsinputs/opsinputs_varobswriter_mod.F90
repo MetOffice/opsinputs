@@ -1041,11 +1041,14 @@ do iVarField = 1, nVarFields
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
         ObsSpace, "geoid_height_above_reference_ellipsoid", "MetaData", PackPGEs = .false.)
     case (VarField_AOD)
+      ! Note that currently in JOPA only one wavelength (550nm) is supported and so aersolOpticalDepth@ObsValue 
+      ! is a 1-dimensional field which is here transformed onto a 2-dimensional OPS filed, Ob % AOD.
+      ! However multiple wavelength options could be added in future.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosol_optical_depth")
-        ! NAODWaves is used by the Ops_VarobPGEs subroutine.
-        if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosolOpticalDepth")
+      ! NAODWaves is used by the Ops_VarobPGEs subroutine.
+      if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &

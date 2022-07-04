@@ -650,7 +650,7 @@ if __name__ == "__main__":
     output_1d_normal_var_to_netcdf('earth_radius_of_curvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
     output_1d_normal_var_to_netcdf('geoid_height_above_reference_ellipsoid', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
     output_2d_normal_var_to_netcdf   ('brightness_temperature', 'ObsError', 'testinput/076_VarField_britempvarerror.nc4', use_chans=True)
-    output_2d_simulated_var_to_netcdf('aerosol_optical_depth', 'testinput/077_VarField_aod.nc4')
+    output_1d_simulated_var_to_netcdf('aerosolOpticalDepth', 'testinput/077_VarField_aod.nc4')
     output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
@@ -735,7 +735,7 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('cloud_area_fraction_in_atmosphere_layer', 'testinput/031_UpperAirCxField_cloud_bulk.nc4')
     output_2d_geoval_to_netcdf       ('frozen_cloud_fraction',      'testinput/034_UpperAirCxField_Cf.nc4')
     output_2d_geoval_to_netcdf       ('liquid_cloud_fraction',      'testinput/035_UpperAirCxField_Cl.nc4')
-    output_2d_geovals_to_netcdf      (['dust%s' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
+    output_2d_geovals_to_netcdf      (['mass_fraction_of_dust00%s_in_air' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output

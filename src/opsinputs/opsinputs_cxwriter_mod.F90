@@ -748,7 +748,7 @@ do i = 1, size(CxFields)
       DustBinIndex = CxField - StashItem_dustMin + 1
       if (DustBinIndex <= NDustBins) then
         write (DustBinIndexStr, '(i1)') DustBinIndex
-        GeoVarName = opsinputs_cxfields_dustp // DustBinIndexStr
+        GeoVarName = opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end
       end if
 
   end select
@@ -1230,7 +1230,8 @@ do iCxField = 1, size(CxFields)
         write (DustBinIndexStr, '(i1)') DustBinIndex
         call opsinputs_fill_fillreal2dfromgeovalorhofx( &
           Cx % Header % dustp, "dustp", Cx % dustp(DustBinIndex) % field, &
-          self % GeoVals,  self % GeoVaLsAreTopToBottom, opsinputs_cxfields_dustp // DustBinIndexStr, &
+          self % GeoVals,  self % GeoVaLsAreTopToBottom, &
+          opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end, &
           self % JediToOpsLayoutMapping, self % hofx, self % varnames)
       end if
   end select
