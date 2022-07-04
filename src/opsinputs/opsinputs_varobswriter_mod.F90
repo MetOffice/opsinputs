@@ -299,7 +299,6 @@ call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFrom
 !but required in Varobs
 call f_conf % get_or_die("channel_offset_for_britemp", self % channel_offset)
 
-
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
 VarBC = BoolValue

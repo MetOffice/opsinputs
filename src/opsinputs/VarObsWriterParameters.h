@@ -116,7 +116,6 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// TODO(Neill): Describe this parameter.
   oops::Parameter<bool> IC_GPSRO_Operator_press{"IC_GPSRO_Operator_press", false, this};
 
-
   /// As described in the Unified Model Documentation Paper F03.
   oops::Parameter<double> RC_LongSpacing{"RC_LongSpacing", 0.0, this};
   /// As described in the Unified Model Documentation Paper F03.
