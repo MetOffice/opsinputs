@@ -634,6 +634,8 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
     output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
+    output_1d_normal_var_to_netcdf   ('cloud_top_pressure', 'OneDVar', 'testinput/035_VarField_cloudtopp.nc4')
+    output_1d_normal_var_to_netcdf   ('cloud_fraction', 'OneDVar', 'testinput/036_VarField_cloudfrac.nc4')
     output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4')
     output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4')
     output_2d_simulated_var_to_netcdf('ambwind_probability', 'testinput/053_VarField_awpriorpcorrect.nc4')

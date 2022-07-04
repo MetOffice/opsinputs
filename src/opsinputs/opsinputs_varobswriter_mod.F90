@@ -891,11 +891,13 @@ do iVarField = 1, nVarFields
         Ob % Header % IREmiss, "IREmiss", JediToOpsLayoutMapping, Ob % IREmiss, &
         ObsSpace, "PLACEHOLDER_VARIABLE_NAME", "PLACEHOLDER_GROUP")
     case (VarField_cloudtopp)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % CloudTopP, "CloudTopP", Ob % Header % NumObsLocal, Ob % CloudTopP)
+      call opsinputs_fill_fillreal( &
+        Ob % Header % CloudTopP, "CloudTopP", JediToOpsLayoutMapping, Ob % CloudTopP, &
+        ObsSpace, "cloud_top_pressure", "OneDVar")
     case (VarField_cloudfrac)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % CloudFrac, "CloudFrac", Ob % Header % NumObsLocal, Ob % CloudFrac)
+      call opsinputs_fill_fillreal( &
+        Ob % Header % CloudFrac, "CloudFrac", JediToOpsLayoutMapping, Ob % CloudFrac, &
+        ObsSpace, "cloud_fraction", "OneDVar")
     case (VarField_vnatovpp)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % VnATOVPP, "VnATOVPP", Ob % Header % NumObsLocal, Ob % VnATOVPP)

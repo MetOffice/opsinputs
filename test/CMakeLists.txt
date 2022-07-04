@@ -169,6 +169,14 @@ ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
                 YAML     031_VarField_solzenith.yaml
                 NAMELIST VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
                 DATA     031_VarField_solzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_035_VarField_cloudtopp
+                YAML     035_VarField_cloudtopp.yaml
+                NAMELIST VarObsWriterNamelists_035_VarField_cloudtopp/IASI.nl
+                DATA     035_VarField_cloudtopp.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_036_VarField_cloudfrac
+                YAML     036_VarField_cloudfrac.yaml
+                NAMELIST VarObsWriterNamelists_036_VarField_cloudfrac/IASI.nl
+                DATA     036_VarField_cloudfrac.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_051_VarField_u10ambwind
                 YAML     051_VarField_u10ambwind.yaml
                 DATA     051_VarField_u10ambwind.nc4)

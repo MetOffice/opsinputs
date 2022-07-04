@@ -1,0 +1,3 @@
+&VarobsControlNL
+Varfields=36
+/
