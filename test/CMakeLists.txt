@@ -169,6 +169,10 @@ ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
                 YAML     031_VarField_solzenith.yaml
                 NAMELIST VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
                 DATA     031_VarField_solzenith.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_034_VarField_iremiss
+                YAML     034_VarField_iremiss.yaml
+                NAMELIST VarObsWriterNamelists_034_VarField_iremiss/AMSUB.nl
+                DATA     034_VarField_iremiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_035_VarField_cloudtopp
                 YAML     035_VarField_cloudtopp.yaml
                 NAMELIST VarObsWriterNamelists_035_VarField_cloudtopp/IASI.nl
@@ -216,6 +220,10 @@ ADD_WRITER_TEST(NAME     varobswriter_073_VarField_ro_rad_curv
 ADD_WRITER_TEST(NAME     varobswriter_074_VarField_ro_geoid_und
                 YAML     074_VarField_ro_geoid_und.yaml
                 DATA     074_VarField_ro_geoid_und.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_076_VarField_britempvarerror
+                YAML     076_VarField_britempvarerror.yaml
+                NAMELIST VarObsWriterNamelists_076_VarField_britempvarerror/AMSUB.nl
+                DATA     076_VarField_britempvarerror.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_077_VarField_aod
                 YAML     077_VarField_aod.yaml
                 DATA     077_VarField_aod.nc4)
@@ -289,6 +297,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
                 YAML     varobswriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/varobs/ATMS.nl
                 DATA     varobs_globalnamelist_atms.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atovs
+                YAML     varobswriter_globalnamelist_atovs.yaml
+                NAMELIST ../../etc/global/varobs/ATOVS.nl
+                DATA     varobs_globalnamelist_atovs.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_gnssro
                 YAML     varobswriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/varobs/GPSRO.nl
