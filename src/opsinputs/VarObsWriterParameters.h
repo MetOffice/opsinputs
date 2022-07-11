@@ -14,6 +14,8 @@
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/RequiredParameter.h"
+#include "ufo/filters/Variable.h"
+#include "ufo/utils/parameters/ParameterTraitsVariable.h"
 
 namespace opsinputs {
 
@@ -72,9 +74,18 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
-  /// Additional channels to pack the britemp part of the obstructure
-  /// e.g. for ATOVS we pack the britemps with 20 dummy channels to mimic HIRS
-  oops::Parameter<int> channel_offset_for_britemp{"channel_offset_for_britemp", 0, this};
+  /// This contains the offset that needs to be added to the channel number in order to
+  /// index the output arrays correctly.
+  oops::Parameter<int> channel_offset{"channel_offset", 0, this};
+
+  /// This is the number of additional entries needed in an array e.g. atovs jedi has 20 brightness
+  /// temperatures but var expects 40.  Therefore numchans_add_to_varobs = 20.
+  oops::Parameter<int> numchans_to_add_to_varobs{"number_of_channels_to_add_to_varobs", 0, this};
+
+  /// If this variable is defined in the yaml a subset of the flags will be made with just this variable 
+  /// present.  This will allow fortran calls such-as "reject_obs_with_all_variables_failing_qc" and 
+  /// channel numbering work correctly.
+  oops::OptionalParameter<ufo::Variable> variable_for_qc{"variable_for_quality_control", this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.

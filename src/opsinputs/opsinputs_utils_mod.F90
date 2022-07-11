@@ -30,6 +30,16 @@ integer, parameter, public :: max_varname_length=MAXVARLEN
 ! Maximum length of a variable name with channel suffix
 integer, parameter, public :: max_varname_with_channel_length=max_varname_length + 10
 
+! Type to contain the channels offset when converting from JEDI to VAR.
+type, public :: opsinputs_channeloffset
+  !this stores the offset for channels when storing britemp.  e.g. jedi channel 1, offset =20,
+  !varobs channel 21
+  integer  :: channel_offset
+  !this is the number of addtional entries needed in an array  e.g. atovs jedi has 20 channels
+  !var expects 40.  Therefore numchans_add_to_varobs = 20.
+  integer  :: numchans_add_to_varobs
+end type opsinputs_channeloffset
+
 ! ------------------------------------------------------------------------------
 contains
 

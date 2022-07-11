@@ -35,7 +35,8 @@ use opsinputs_obsspace_mod, only:                        &
 use opsinputs_jeditoopslayoutmapping_mod, only: &
     opsinputs_jeditoopslayoutmapping
 use opsinputs_utils_mod, only: &
-    max_varname_with_channel_length
+    max_varname_with_channel_length, &
+    opsinputs_channeloffset
 
 use GenMod_Core, only: &
     gen_warn,          &
@@ -1026,15 +1027,15 @@ subroutine opsinputs_fill_fillreal2d_norecords( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)         :: Hdr
-character(len=*), intent(in)                    :: OpsVarName
-integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer, intent(out)              :: Real2(:,:)
-type(c_ptr), value, intent(in)                  :: ObsSpace
-integer(c_int), intent(in)                      :: Channels(:)
-character(len=*), intent(in)                    :: JediVarName
-character(len=*), intent(in)                    :: JediVarGroup
-integer, optional, intent(in)                   :: OffsetChans
+type(ElementHeader_Type), intent(inout)             :: Hdr
+character(len=*), intent(in)                        :: OpsVarName
+integer(integer64), intent(in)                      :: NumObs
+real(real64), pointer, intent(out)                  :: Real2(:,:)
+type(c_ptr), value, intent(in)                      :: ObsSpace
+integer(c_int), intent(in)                          :: Channels(:)
+character(len=*), intent(in)                        :: JediVarName
+character(len=*), intent(in)                        :: JediVarGroup
+type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1042,27 +1043,30 @@ real(kind=c_double)                             :: MissingDouble
 character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
 integer                                         :: offset
-
+integer                                         :: numchans
 
 ! Body:
-
-!take into account offsetting of 2nd dimension if required
-!designed to be used to pack where multiple satellite instruments expected
-!e.g. HIRS in ATOVS stream
-if (present(OffsetChans)) then
-  offset = OffsetChans
-else
-  offset = 0
-end if
 
 MissingDouble = missing_value(0.0_c_double)
 
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
+!take into account offsetting of 2nd dimension if required
+!designed to be used to pack where multiple satellite instruments expected
+!e.g. HIRS in ATOVS stream
+if (present(OffsetChans)) then
+  offset = OffsetChans % channel_offset
+  numchans = size(JediVarNamesWithChannels) + &
+             OffsetChans % numchans_add_to_varobs
+else
+  offset = 0
+  numchans = size(JediVarNamesWithChannels)
+end if
+
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
-                 num_levels = int(size(JediVarNamesWithChannels)+offset, kind=integer64))
+                 num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
@@ -1179,15 +1183,15 @@ subroutine opsinputs_fill_fillreal2d( &
 implicit none
 
 ! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)            :: Hdr
-character(len=*), intent(in)                       :: OpsVarName
-type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                 :: Real2(:,:)
-type(c_ptr), value, intent(in)                     :: ObsSpace
-integer(c_int), intent(in)                         :: Channels(:)
-character(len=*), intent(in)                       :: JediVarName
-character(len=*), intent(in)                       :: JediVarGroup
-integer, optional, intent(in)                      :: OffsetChans
+type(ElementHeader_Type), intent(inout)             :: Hdr
+character(len=*), intent(in)                        :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in)  :: JediToOpsLayoutMapping
+real(real64), pointer, intent(out)                  :: Real2(:,:)
+type(c_ptr), value, intent(in)                      :: ObsSpace
+integer(c_int), intent(in)                          :: Channels(:)
+character(len=*), intent(in)                        :: JediVarName
+character(len=*), intent(in)                        :: JediVarGroup
+type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
 
 ! Body:
 
