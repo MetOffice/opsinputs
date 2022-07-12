@@ -1390,12 +1390,16 @@ integer :: hofxIndex
 if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
    ! Index of variable in hofx array.
    hofxIndex = 0
-   do i = 1, size(hofx, 1)
-      if (varnames % variable(i) == JediVarName) then
-         hofxIndex = i
-         exit
-      end if
-   end do
+   ! Filling CX data from H(x) is not performed in OPS
+   ! so this is not used.
+   ! todo(ctgh) Revisit this at a later date.
+   !do i = 1, size(hofx, 1)
+   !   if (varnames % variable(i) == JediVarName) then
+   !      hofxIndex = i
+   !      exit
+   !   end if
+   !end do
+
    if (hofxIndex > 0) then
       call opsinputs_fill_fillreal2dfromhofx( &
            Hdr, OpsVarName, Real2, &
