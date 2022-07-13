@@ -111,10 +111,10 @@ void VarObsWriter::postFilter(const ufo::GeoVaLs & gv,
     for (int ivar = 0; ivar < flags.nvars(); ivar++) {
       std::string varname = flags.varnames()[ivar];
       flags[varname] = flags_->operator[](varname);
-      opsinputs_varobswriter_post_f90(key_, obsdb_, flags, *obsErrors_,
-                                      hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
-                                      obsdiags.toFortran());
     }
+    opsinputs_varobswriter_post_f90(key_, obsdb_, flags, *obsErrors_,
+                                    hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
+                                    obsdiags.toFortran());
   } else {
     opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
                                     hofx.nvars(), hofx.nlocs(), hofx.toFortran(),

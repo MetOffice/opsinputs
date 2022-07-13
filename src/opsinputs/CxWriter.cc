@@ -85,8 +85,19 @@ void CxWriter::postFilter(const ufo::GeoVaLs & gv,
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), *flags_,
-                              hofx.nvars(), hofx.nlocs(), hofx.varnames(), &hofx.toFortran());
+  if (parameters_.variable_for_qc.value() != boost::none) {
+    ioda::ObsDataVector<int> flags(obsdb_,
+                                   parameters_.variable_for_qc.value().get().toOopsVariables());
+    for (int ivar = 0; ivar < flags.nvars(); ivar++) {
+      std::string varname = flags.varnames()[ivar];
+      flags[varname] = flags_->operator[](varname);
+    }
+    opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), flags,
+                                hofx.nvars(), hofx.nlocs(), hofx.varnames(), &hofx.toFortran());
+  } else {
+    opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), *flags_,
+                                hofx.nvars(), hofx.nlocs(), hofx.varnames(), &hofx.toFortran());
+  }
 }
 
 void CxWriter::print(std::ostream & os) const {
