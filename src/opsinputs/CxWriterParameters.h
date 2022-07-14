@@ -59,9 +59,9 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   /// default is true.
   oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
 
-  /// If this variable is defined in the yaml a subset of the flags will be made with just this variable
-  /// present.  This will allow fortran calls such-as "reject_obs_with_all_variables_failing_qc" and
-  /// channel numbering work correctly.
+  /// If this variable is defined in the yaml a subset of the flags will be made with
+  /// just this variable present.  This will allow fortran calls such-as
+  /// "reject_obs_with_all_variables_failing_qc" and channel numbering work correctly.
   oops::OptionalParameter<ufo::Variable> variable_for_qc{"variable_for_quality_control", this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
