@@ -523,6 +523,9 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gnssro
                 YAML     cxwriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/cx/GPSRO.nl
                 DATA     cx_globalnamelist_gnssro.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_iasi
+                YAML     cxwriter_globalnamelist_iasi.yaml
+                DATA     cx_globalnamelist_iasi.nc4 varobs_globalnamelist_iasi.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sonde
                 YAML     cxwriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/cx/Sonde.nl
