@@ -157,6 +157,10 @@ private
   logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
 
+  character(len=100) :: latitudeName
+  character(len=100) :: longitudeName
+  character(len=100) :: dateTimeName
+
   integer(integer64) :: FH_VertCoord
   integer(integer64) :: FH_HorizGrid
   integer(integer64) :: FH_GridStagger
@@ -302,6 +306,15 @@ call f_conf % get_or_die("channel_offset_for_britemp", self % channel_offset)
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
 VarBC = BoolValue
+
+call f_conf % get_or_die ("latitude_name", StringValue)
+self % latitudeName = StringValue
+
+call f_conf % get_or_die ("longitude_name", StringValue)
+self % longitudeName = StringValue
+
+call f_conf % get_or_die ("dateTime_name", StringValue)
+self % dateTimeName = StringValue
 
 call f_conf % get_or_die("FH_VertCoord", StringValue)
 select case (ops_to_lower_case(StringValue))
@@ -684,11 +697,11 @@ end if
 
 ! Fill in the "generic" parts of the Obs object (not dependent on the list of varfields)
 call opsinputs_fill_fillreal(Ob % Header % Latitude, "Latitude", JediToOpsLayoutMapping, &
-  Ob % Latitude, ObsSpace, "latitude", "MetaData")
+  Ob % Latitude, ObsSpace, trim(self % latitudeName), "MetaData")
 call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", JediToOpsLayoutMapping, &
-  Ob % Longitude, ObsSpace, "longitude", "MetaData")
+  Ob % Longitude, ObsSpace, trim(self % longitudeName), "MetaData")
 call opsinputs_fill_filltimeoffsets(Ob % Header % Time, "Time", JediToOpsLayoutMapping, &
-  Ob % Time, ObsSpace, "dateTime", "MetaData", self % validitytime)
+  Ob % Time, ObsSpace, trim(self % dateTimeName), "MetaData", self % validitytime)
 
 if (self % FillObsTypeFromOpsSubType) then
    if (obsspace_has(ObsSpace, "MetaData", "ops_subtype")) then

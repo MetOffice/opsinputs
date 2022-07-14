@@ -76,6 +76,15 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// e.g. for ATOVS we pack the britemps with 20 dummy channels to mimic HIRS
   oops::Parameter<int> channel_offset_for_britemp{"channel_offset_for_britemp", 0, this};
 
+  /// Name of latitude variable
+  oops::Parameter<std::string> latitude_name{"latitude_name", "latitude", this};
+
+  /// Name of longitude variable
+  oops::Parameter<std::string> longitude_name{"longitude_name", "longitude", this};
+
+  /// Name of dateTime variable
+  oops::Parameter<std::string> dateTime_name{"dateTime_name", "dateTime", this};
+
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.
 
