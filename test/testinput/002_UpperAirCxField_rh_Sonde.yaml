@@ -40,8 +40,8 @@ observations:
       expected_upper_air_variables: ["2"] # IndexCxrh
       expected_main_table_columns:
       - # batch 1
-        - ["1.25", "1.35", "1.45"]       # column 1
-        - ["1.55", "1.65", "1.75"]       # column 2
+        - ["1.30", "1.20", "1.10"]       # column 1
+        - ["5.30", "5.20", "5.10"]       # column 2
     HofX: HofX
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
