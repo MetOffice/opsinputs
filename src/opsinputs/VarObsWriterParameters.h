@@ -83,8 +83,8 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   oops::Parameter<int> numchans_to_add_to_varobs{"number_of_channels_to_add_to_varobs", 0, this};
 
   /// If this variable is defined in the yaml a subset of the flags will be made with just this
-  /// variable present.  This will allow fortran calls such-as
-  /// "reject_obs_with_all_variables_failing_qc" and channel numbering work correctly.
+  /// variable present.  This will allow Fortran calls such-as
+  /// "reject_obs_with_all_variables_failing_qc" and channel numbering to work correctly.
   oops::OptionalParameter<ufo::Variable> variable_for_qc{"variable_for_quality_control", this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
