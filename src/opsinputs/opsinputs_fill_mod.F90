@@ -68,10 +68,9 @@ public :: opsinputs_fill_fillcoord2d, &
           opsinputs_fill_fillreal2d, &
           opsinputs_fill_fillrealfromgeoval, &
           opsinputs_fill_fillreal2dfromgeoval, &
-          opsinputs_fill_fillreal2dfromgeovalorhofx, &
-          opsinputs_fill_fillreal2dfromhofx, &
           opsinputs_fill_fillrealfromgeovalformultilevelobs, &
           opsinputs_fill_fillreal2dfromgeovalformultilevelobs, &
+          &opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs, &
           opsinputs_fill_fillstring, &
           opsinputs_fill_filltimeoffsets, &
           opsinputs_fill_filltimeoffsets2d, &
@@ -1308,7 +1307,7 @@ end subroutine opsinputs_fill_fillrealfromgeoval
 !> \note This function returns early (without a warning) if the specified GeoVaL is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
-subroutine opsinputs_fill_fillreal2dfromgeoval( &
+subroutine opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs( &
   Hdr, OpsVarName, NumObs, Real2, GeoVals, GeoVaLsAreTopToBottom, JediVarName)
 implicit none
 
@@ -1343,7 +1342,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
     Real2 = Real2(:, GeoVal % nval:1:-1)
   end if
 end if
-end subroutine opsinputs_fill_fillreal2dfromgeoval
+end subroutine opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs
 
 !> Populate a 2D array of real numbers and its header from either a GeoVaL or an HofX vector.
 !>
@@ -1366,7 +1365,7 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !>   HofX data structure.
 !> \param[in] varnames
 !>   List of simulated variables.
-subroutine opsinputs_fill_fillreal2dfromgeovalorhofx( &
+subroutine opsinputs_fill_fillreal2dfromgeoval( &
   Hdr, OpsVarName, Real2, GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping, hofx, varnames)
 implicit none
 
@@ -1388,101 +1387,16 @@ integer :: hofxIndex
 ! Body:
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
-   ! Index of variable in hofx array.
-   hofxIndex = 0
-   ! Filling CX data from H(x) is not performed in OPS
-   ! so this is not used.
-   ! todo(ctgh) Revisit this at a later date.
-   !do i = 1, size(hofx, 1)
-   !   if (varnames % variable(i) == JediVarName) then
-   !      hofxIndex = i
-   !      exit
-   !   end if
-   !end do
-
-   if (hofxIndex > 0) then
-      call opsinputs_fill_fillreal2dfromhofx( &
-           Hdr, OpsVarName, Real2, &
-           JediToOpsLayoutMapping, hofx(hofxIndex,:), JediVarName, GeoVals)
-   else
-      call opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
-           Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-           GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping)
-   end if
+   call opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+        GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping)
 else
-   call opsinputs_fill_fillreal2dfromgeoval( &
+   call opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs( &
         Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
         GeoVals, GeoVaLsAreTopToBottom, JediVarName)
 end if
 
-end subroutine opsinputs_fill_fillreal2dfromgeovalorhofx
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of real numbers and its header from an HofX vector.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real2 corresponds.
-!> \param[inout] Real2
-!>   Pointer to the array to be populated.
-!> \param[in] JediToOpsLayoutMapping
-!>   Mapping between indices of observations in the JEDI and OPS data structures.
-!> \param[in] hofx
-!>   The HofX vector to use.
-!> \param[in] GeoVals
-!>   A container holding the specified GeoVaL.
-subroutine opsinputs_fill_fillreal2dfromhofx( &
-  Hdr, OpsVarName, Real2, JediToOpsLayoutMapping, hofx, JediVarName, GeoVals)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)            :: Hdr
-character(len=*), intent(in)                       :: OpsVarName
-real(real64), pointer, intent(out)                 :: Real2(:,:)
-type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(c_double), intent(in)                         :: hofx(:)
-character(len=*), intent(in)                       :: JediVarName
-type(ufo_geovals), intent(in)                      :: GeoVals
-
-! Local declarations:
-type(ufo_geoval), pointer                       :: GeoVal
-real(kind_real)                                 :: MissingReal
-integer                                         :: iObs, iLevel, iJediObs, numLevels
-
-! Body:
-
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-  numLevels = GeoVal % nval
-else
-   numLevels = JediToOpsLayoutMapping % MaxNumLevelsPerObs
-end if
-
-MissingReal = missing_value(0.0_c_double)
-
-! Fill the OPS data structures
-call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-               num_levels = int(numLevels, kind = 8))
-
-do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-   ! Do not fill the CX column if there are no entries in the profile.
-   if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
-      cycle
-   end if
-   do iLevel = 1, numLevels
-      ! Location of current observation in the ObsSpace.
-      iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
-           JediToOpsLayoutMapping % RecordStarts(iObs) - 1 + iLevel)
-      if (hofx(iJediObs) /= MissingReal) then
-         Real2(iObs,iLevel) = hofx(iJediObs)
-      end if
-   end do
-end do
-
-end subroutine opsinputs_fill_fillreal2dfromhofx
+end subroutine opsinputs_fill_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 
