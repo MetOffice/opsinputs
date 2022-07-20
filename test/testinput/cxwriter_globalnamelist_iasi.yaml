@@ -34,8 +34,8 @@ observations:
           name: latitude@MetaData #ensures ob2 is failed
         is_not_defined:
     - filter: Cx Writer
-      variable_for_quality_control:
-        name: brightness_temperature
+      variables_for_quality_control:
+      - name: brightness_temperature
         channels: *all_channels
       reject_obs_with_all_variables_failing_qc: true
       general_mode: debug
