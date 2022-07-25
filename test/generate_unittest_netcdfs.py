@@ -635,8 +635,8 @@ if __name__ == "__main__":
     output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
     output_1d_normal_var_to_netcdf   ('ir_emissivity', 'Emiss', 'testinput/034_VarField_iremiss.nc4')
-    output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4')
-    output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4')
+    output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4', with_bias=True)
+    output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4', with_bias=True)
     output_2d_simulated_var_to_netcdf('ambwind_probability', 'testinput/053_VarField_awpriorpcorrect.nc4')
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
@@ -707,7 +707,8 @@ if __name__ == "__main__":
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude'],
                                  ['ObsValue/eastward_wind','ObsError/eastward_wind','GrossErrorProbability/eastward_wind',
                                   'ObsValue/northward_wind','ObsError/northward_wind','GrossErrorProbability/northward_wind',
-                                  'ObsValue/ambwind_probability','ObsError/ambwind_probability','GrossErrorProbability/ambwind_probability',],
+                                  'ObsValue/ambwind_probability','ObsError/ambwind_probability','GrossErrorProbability/ambwind_probability',
+                                  'BiasCorrObsValue/eastward_wind','BiasCorrObsValue/northward_wind'],
                                  ['MetaData/satellite_id'],
                                   'testinput/varobs_globalnamelist_scatwind.nc4')
 
