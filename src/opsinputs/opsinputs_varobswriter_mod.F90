@@ -765,7 +765,7 @@ do iVarField = 1, nVarFields
          if (obsspace_has(ObsSpace, "ObsValue", "air_temperature")) then
             call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
                  Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
-                 ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
+                 ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature", "ObsValue")
          else
             write(*, *) "ObsValue/air_temperature must be present when adding the theta varfield"
             call abort()
@@ -773,7 +773,7 @@ do iVarField = 1, nVarFields
       end if
      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta", "ObsValue")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
@@ -782,7 +782,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature", "ObsValue")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -792,7 +792,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", JediToOpsLayoutMapping, Ob % rh, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "relative_humidity")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "relative_humidity", "ObsValue")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -803,7 +803,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "eastward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "eastward_wind", "ObsValue")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -814,7 +814,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "northward_wind")
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "northward_wind", "ObsValue")
       end if
     case (VarField_logvis)
       ! TODO(someone): handle this varfield
@@ -947,16 +947,16 @@ do iVarField = 1, nVarFields
     case (VarField_u10ambwind)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % u10AmbWind, "u10AmbWind", JediToOpsLayoutMapping, Ob % u10AmbWind, &
-        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "eastward_wind")
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "eastward_wind", "BiasCorrObsValue")
     case (VarField_v10ambwind)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % v10AmbWind, "v10AmbWind", JediToOpsLayoutMapping, Ob % v10AmbWind, &
-        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "northward_wind")
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "northward_wind", "BiasCorrObsValue")
     case (VarField_pcorrect)
       ! Note that its PGEs should not be packed.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", JediToOpsLayoutMapping, Ob % AWPriorPCorrect, &
-        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "ambwind_probability", PackPGEs=.false.)
+        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "ambwind_probability", "ObsValue", PackPGEs=.false.)
     case (VarField_NumChans)
       FillNumChans = .true.
     case (VarField_ChanNum)
@@ -1026,11 +1026,11 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", JediToOpsLayoutMapping, Ob % BendingAngleAll, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "PLACEHOLDER_VARIABLE_NAME", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "PLACEHOLDER_VARIABLE_NAME", "ObsValue", PackPGEs=.false.)
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", JediToOpsLayoutMapping, Ob % BendingAngle, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "bending_angle", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "bending_angle", "ObsValue", PackPGEs=.false.)
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -1058,7 +1058,7 @@ do iVarField = 1, nVarFields
       ! However multiple wavelength options could be added in future.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosolOpticalDepth")
+        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosolOpticalDepth", "ObsValue")
       ! NAODWaves is used by the Ops_VarobPGEs subroutine.
       if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
