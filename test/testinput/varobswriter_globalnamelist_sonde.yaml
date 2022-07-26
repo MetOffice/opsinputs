@@ -27,10 +27,29 @@ observations:
           name: latitude@MetaData
         is_not_defined:
       defer to post: true
+    # Copy latitude, longitude and dateTime to 'initial' values which
+    # are then used in the Varobs writer.
+    - filter: Variable Assignment
+      assignments:
+      - name: MetaData/initialLatitude
+        type: float
+        source variable:
+          name: MetaData/latitude
+      - name: MetaData/initialLongitude
+        type: float
+        source variable:
+          name: MetaData/longitude
+      - name: MetaData/initialdateTime
+        type: datetime
+        source variable:
+          name: MetaData/dateTime
     - filter: VarObs Writer
       namelist_directory: ../etc/global/varobs
       general_mode: debug
       IC_PLevels: 1
+      latitude_name: initialLatitude
+      longitude_name: initialLongitude
+      dateTime_name: initialdateTime
     - filter: VarObs Checker
       expected_main_table_columns:
         # Rows are locations, columns are filter variables
