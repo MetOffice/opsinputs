@@ -499,6 +499,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atms
                 YAML     cxwriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/cx/ATMS.nl
                 DATA     cx_globalnamelist_atms.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atovs
+                YAML     cxwriter_globalnamelist_atovs.yaml
+                NAMELIST ../../etc/global/cx/ATOVS.nl
+                DATA     cx_globalnamelist_atovs.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_ssmis
                 YAML     cxwriter_globalnamelist_ssmis.yaml
                 NAMELIST ../../etc/global/cx/SSMIS.nl
