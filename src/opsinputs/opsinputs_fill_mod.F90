@@ -69,10 +69,9 @@ public :: opsinputs_fill_fillcoord2d, &
           opsinputs_fill_fillreal2d, &
           opsinputs_fill_fillrealfromgeoval, &
           opsinputs_fill_fillreal2dfromgeoval, &
-          opsinputs_fill_fillreal2dfromgeovalorhofx, &
-          opsinputs_fill_fillreal2dfromhofx, &
           opsinputs_fill_fillrealfromgeovalformultilevelobs, &
           opsinputs_fill_fillreal2dfromgeovalformultilevelobs, &
+          &opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs, &
           opsinputs_fill_fillstring, &
           opsinputs_fill_filltimeoffsets, &
           opsinputs_fill_filltimeoffsets2d, &
@@ -227,6 +226,8 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !>   used to populate El2 and Hdr. The variables can either have no channel suffix (in which case
 !>   \p El2 will have only a single row) or have suffixes representing the indices specified in
 !>   \p Channels.
+!> \param[in] JediGroupName
+!>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -236,7 +237,7 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
-  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, PackPGEs)
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, JediGroupName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -249,6 +250,7 @@ integer(c_int), intent(in)                      :: Channels(:)
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
+character(len=*), intent(in)                    :: JediGroupName
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
@@ -285,7 +287,7 @@ MissingFloat  = missing_value(0.0_c_float)
 
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
-if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
+if (obsspace_has(ObsSpace, JediGroupName, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
                  num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
@@ -293,7 +295,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarNamesWithChannels(1))) then
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI:
     ! - observation value
-    call obsspace_get_db(ObsSpace, "ObsValue", JediVarNamesWithChannels(iChannel), ObsValue)
+    call obsspace_get_db(ObsSpace, JediGroupName, JediVarNamesWithChannels(iChannel), ObsValue)
     ! - QC flag
     if (opsinputs_obsdatavector_int_has(Flags, JediVarNamesWithChannels(iChannel))) then
       call opsinputs_obsdatavector_int_get(Flags, JediVarNamesWithChannels(iChannel), Flag)
@@ -359,12 +361,14 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate El2 and Hdr.
+!> \param[in] JediGroupName
+!>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, IC_PLevels, JediVarName, PackPGEs)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, IC_PLevels, JediVarName, JediGroupName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -377,6 +381,7 @@ type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
 integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediGroupName
 logical, optional, intent(in)                      :: PackPGEs
 
 ! Local declarations:
@@ -408,7 +413,7 @@ end if
 MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
-if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
+if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   ! Allocate OPS data structures
    if (IC_PLevels > 0) then
       call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
@@ -420,7 +425,7 @@ if (obsspace_has(ObsSpace, "ObsValue", JediVarName)) then
 
   ! Retrieve data from JEDI:
   ! - observation value
-  call obsspace_get_db(ObsSpace, "ObsValue", JediVarName, ObsValue)
+  call obsspace_get_db(ObsSpace, JediGroupName, JediVarName, ObsValue)
   ! - QC flag
   if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
@@ -509,6 +514,8 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !>   to populate El2 and Hdr. If each JEDI location needs to be mapped to a separate OPS
 !>   observation, the variables can either have no channel suffix (in which case \p El2 will have
 !>   only a single row) or have suffixes representing the indices specified in \p Channels.
+!> \param[in] JediGroupName
+!>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -519,7 +526,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, IC_PLevels, JediVarName, &
-  PackPGEs)
+  JediGroupName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -533,17 +540,19 @@ type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
 integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediGroupName
 logical, optional, intent(in)                      :: PackPGEs
 
 ! Body:
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, IC_PLevels, JediVarName, PackPGEs)
+    Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, &
+    ObsErrors, IC_PLevels, JediVarName, JediGroupName, PackPGEs)
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
-    ObsErrors, JediVarName, PackPGEs)
+    ObsErrors, JediVarName, JediGroupName, PackPGEs)
 end if
 
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
@@ -1311,7 +1320,7 @@ end subroutine opsinputs_fill_fillrealfromgeoval
 !> \note This function returns early (without a warning) if the specified GeoVaL is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
-subroutine opsinputs_fill_fillreal2dfromgeoval( &
+subroutine opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs( &
   Hdr, OpsVarName, NumObs, Real2, GeoVals, GeoVaLsAreTopToBottom, JediVarName)
 implicit none
 
@@ -1346,7 +1355,7 @@ if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
     Real2 = Real2(:, GeoVal % nval:1:-1)
   end if
 end if
-end subroutine opsinputs_fill_fillreal2dfromgeoval
+end subroutine opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs
 
 !> Populate a 2D array of real numbers and its header from either a GeoVaL or an HofX vector.
 !>
@@ -1369,7 +1378,7 @@ end subroutine opsinputs_fill_fillreal2dfromgeoval
 !>   HofX data structure.
 !> \param[in] varnames
 !>   List of simulated variables.
-subroutine opsinputs_fill_fillreal2dfromgeovalorhofx( &
+subroutine opsinputs_fill_fillreal2dfromgeoval( &
   Hdr, OpsVarName, Real2, GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping, hofx, varnames)
 implicit none
 
@@ -1391,97 +1400,16 @@ integer :: hofxIndex
 ! Body:
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
-   ! Index of variable in hofx array.
-   hofxIndex = 0
-   do i = 1, size(hofx, 1)
-      if (varnames % variable(i) == JediVarName) then
-         hofxIndex = i
-         exit
-      end if
-   end do
-   if (hofxIndex > 0) then
-      call opsinputs_fill_fillreal2dfromhofx( &
-           Hdr, OpsVarName, Real2, &
-           JediToOpsLayoutMapping, hofx(hofxIndex,:), JediVarName, GeoVals)
-   else
-      call opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
-           Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-           GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping)
-   end if
+   call opsinputs_fill_fillreal2dfromgeovalformultilevelobs( &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+        GeoVals, GeoVaLsAreTopToBottom, JediVarName, JediToOpsLayoutMapping)
 else
-   call opsinputs_fill_fillreal2dfromgeoval( &
+   call opsinputs_fill_fillreal2dfromgeovalforsinglelevelobs( &
         Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
         GeoVals, GeoVaLsAreTopToBottom, JediVarName)
 end if
 
-end subroutine opsinputs_fill_fillreal2dfromgeovalorhofx
-
-! ------------------------------------------------------------------------------
-
-!> Populate a 2D array of real numbers and its header from an HofX vector.
-!>
-!> \param[inout] Hdr
-!>   Header to be populated.
-!> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real2 corresponds.
-!> \param[inout] Real2
-!>   Pointer to the array to be populated.
-!> \param[in] JediToOpsLayoutMapping
-!>   Mapping between indices of observations in the JEDI and OPS data structures.
-!> \param[in] hofx
-!>   The HofX vector to use.
-!> \param[in] GeoVals
-!>   A container holding the specified GeoVaL.
-subroutine opsinputs_fill_fillreal2dfromhofx( &
-  Hdr, OpsVarName, Real2, JediToOpsLayoutMapping, hofx, JediVarName, GeoVals)
-implicit none
-
-! Subroutine arguments:
-type(ElementHeader_Type), intent(inout)            :: Hdr
-character(len=*), intent(in)                       :: OpsVarName
-real(real64), pointer, intent(out)                 :: Real2(:,:)
-type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(c_double), intent(in)                         :: hofx(:)
-character(len=*), intent(in)                       :: JediVarName
-type(ufo_geovals), intent(in)                      :: GeoVals
-
-! Local declarations:
-type(ufo_geoval), pointer                       :: GeoVal
-real(kind_real)                                 :: MissingReal
-integer                                         :: iObs, iLevel, iJediObs, numLevels
-
-! Body:
-
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-  numLevels = GeoVal % nval
-else
-   numLevels = JediToOpsLayoutMapping % MaxNumLevelsPerObs
-end if
-
-MissingReal = missing_value(0.0_c_double)
-
-! Fill the OPS data structures
-call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-               num_levels = int(numLevels, kind = 8))
-
-do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-   ! Do not fill the CX column if there are no entries in the profile.
-   if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
-      cycle
-   end if
-   do iLevel = 1, numLevels
-      ! Location of current observation in the ObsSpace.
-      iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
-           JediToOpsLayoutMapping % RecordStarts(iObs) - 1 + iLevel)
-      if (hofx(iJediObs) /= MissingReal) then
-         Real2(iObs,iLevel) = hofx(iJediObs)
-      end if
-   end do
-end do
-
-end subroutine opsinputs_fill_fillreal2dfromhofx
+end subroutine opsinputs_fill_fillreal2dfromgeoval
 
 ! ------------------------------------------------------------------------------
 

@@ -40,8 +40,8 @@
 | 46 | `VarField_amsua1_temp` | | | | Implement |
 | 47 | `VarField_amsua2_temp` | | | | Implement |
 | 48 | `VarField_amsub_temp` | | | | Implement |
-| 51 | `VarField_u10ambwind` | `u10AmbWind(:,:)` | 10m ambiguous eastward wind | `eastward_wind@ObsValue` | |
-| 52 | `VarField_v10ambwind` | `v10AmbWind(:,:)` | 10m ambiguous northward wind | `northward_wind@ObsValue` | |
+| 51 | `VarField_u10ambwind` | `u10AmbWind(:,:)` | 10m ambiguous eastward wind | `eastward_wind@BiasCorrObsValue` | |
+| 52 | `VarField_v10ambwind` | `v10AmbWind(:,:)` | 10m ambiguous northward wind | `northward_wind@BiasCorrObsValue` | |
 | 53 | `VarField_pcorrect` | `AWPriorPCorrect(:,:)` | Probability for ambiguous wind | `ambwind_probability@ObsValue` |  |
 | 54 | `VarField_NumChans` | `NumChans(:)` \[`INTEGER`\] | number of channels | From obsSpace.obsvariables().channels() and obs flags | |
 | 55 | `VarField_ChanNum` | `ChanNum(:,:)` \[`INTEGER`\] | channel numbers | From obsSpace.obsvariables().channels() and obs flags | |

@@ -90,6 +90,15 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   oops::OptionalParameter<std::vector<ufo::Variable>> variables_for_qc{
       "variables_for_quality_control", this};
 
+  /// Name of latitude variable
+  oops::Parameter<std::string> latitude_name{"latitude_name", "latitude", this};
+
+  /// Name of longitude variable
+  oops::Parameter<std::string> longitude_name{"longitude_name", "longitude", this};
+
+  /// Name of dateTime variable
+  oops::Parameter<std::string> dateTime_name{"dateTime_name", "dateTime", this};
+
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.
 

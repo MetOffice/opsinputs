@@ -10,6 +10,7 @@ include( opsinputs_functions )
 list( APPEND opsinputs_etc
   global/cx/AMSR.nl
   global/cx/ATMS.nl
+  global/cx/ATOVS.nl
   global/cx/GMIlow.nl
   global/cx/GPSRO.nl
   global/cx/IASI.nl

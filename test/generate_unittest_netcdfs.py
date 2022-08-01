@@ -638,8 +638,8 @@ if __name__ == "__main__":
     output_1d_normal_var_to_netcdf   ('ir_emissivity', 'Emiss', 'testinput/034_VarField_iremiss.nc4')
     output_1d_normal_var_to_netcdf   ('cloud_top_pressure', 'OneDVar', 'testinput/035_VarField_cloudtopp.nc4')
     output_1d_normal_var_to_netcdf   ('cloud_fraction', 'OneDVar', 'testinput/036_VarField_cloudfrac.nc4')
-    output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4')
-    output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4')
+    output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4', with_bias=True)
+    output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4', with_bias=True)
     output_2d_simulated_var_to_netcdf('ambwind_probability', 'testinput/053_VarField_awpriorpcorrect.nc4')
     output_2d_normal_var_to_netcdf   ('surface_emissivity', 'OneDVar', 'testinput/057_VarField_emissivity.nc4', use_chans=True)
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
@@ -711,7 +711,8 @@ if __name__ == "__main__":
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude'],
                                  ['ObsValue/eastward_wind','ObsError/eastward_wind','GrossErrorProbability/eastward_wind',
                                   'ObsValue/northward_wind','ObsError/northward_wind','GrossErrorProbability/northward_wind',
-                                  'ObsValue/ambwind_probability','ObsError/ambwind_probability','GrossErrorProbability/ambwind_probability',],
+                                  'ObsValue/ambwind_probability','ObsError/ambwind_probability','GrossErrorProbability/ambwind_probability',
+                                  'BiasCorrObsValue/eastward_wind','BiasCorrObsValue/northward_wind'],
                                  ['MetaData/satellite_id'],
                                   'testinput/varobs_globalnamelist_scatwind.nc4')
 
@@ -778,6 +779,14 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
                               'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
                               'testinput/cx_globalnamelist_atms.nc4')
+
+    # ATOVS
+    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
+                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
+                             ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                              'testinput/cx_globalnamelist_atovs.nc4')
                               
     # SSMIS
     output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
