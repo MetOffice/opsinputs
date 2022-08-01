@@ -149,6 +149,10 @@ ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
                 YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
                 DATA     017_VarField_mwemiss.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_018_VarField_tcozone_obsdiag
+                YAML     018_VarField_tcozone_obsdiag.yaml
+                NAMELIST VarObsWriterNamelists_018_VarField_tcozone/Surface.nl
+                DATA     018_VarField_tcozone_obsdiag.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
@@ -173,6 +177,14 @@ ADD_WRITER_TEST(NAME     varobswriter_034_VarField_iremiss
                 YAML     034_VarField_iremiss.yaml
                 NAMELIST VarObsWriterNamelists_034_VarField_iremiss/AMSUB.nl
                 DATA     034_VarField_iremiss.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_035_VarField_cloudtopp
+                YAML     035_VarField_cloudtopp.yaml
+                NAMELIST VarObsWriterNamelists_035_VarField_cloudtopp/IASI.nl
+                DATA     035_VarField_cloudtopp.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_036_VarField_cloudfrac
+                YAML     036_VarField_cloudfrac.yaml
+                NAMELIST VarObsWriterNamelists_036_VarField_cloudfrac/IASI.nl
+                DATA     036_VarField_cloudfrac.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_051_VarField_u10ambwind
                 YAML     051_VarField_u10ambwind.yaml
                 DATA     051_VarField_u10ambwind.nc4)
@@ -190,6 +202,10 @@ ADD_WRITER_TEST(NAME     varobswriter_055_VarField_channum
                 YAML     055_VarField_channum.yaml
                 NAMELIST VarObsWriterNamelists_055_VarField_channum/AMSUB.nl
                 DATA     010_VarField_britemp.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_057_VarField_emissivity
+                YAML     057_VarField_emissivity.yaml
+                NAMELIST VarObsWriterNamelists_057_VarField_emissivity/IASI.nl
+                DATA     057_VarField_emissivity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
                 YAML     066_VarField_radarobazim.yaml
                 DATA     066_VarField_radarobazim.nc4)
@@ -297,6 +313,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_gnssro
                 YAML     varobswriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/varobs/GPSRO.nl
                 DATA     varobs_globalnamelist_gnssro.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_iasi
+                YAML     varobswriter_globalnamelist_iasi.yaml
+                NAMELIST ../../etc/global/varobs/IASI.nl
+                DATA     varobs_globalnamelist_iasi.nc4 018_VarField_tcozone_obsdiag.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
@@ -511,6 +531,9 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gnssro
                 YAML     cxwriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/cx/GPSRO.nl
                 DATA     cx_globalnamelist_gnssro.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_iasi
+                YAML     cxwriter_globalnamelist_iasi.yaml
+                DATA     cx_globalnamelist_iasi.nc4 varobs_globalnamelist_iasi.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sonde
                 YAML     cxwriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/cx/Sonde.nl
