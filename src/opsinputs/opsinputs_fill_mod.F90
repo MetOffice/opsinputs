@@ -1054,13 +1054,12 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 !take into account offsetting of 2nd dimension if required
 !designed to be used to pack where multiple satellite instruments expected
 !e.g. HIRS in ATOVS stream
+offset = 0
+numchans = size(JediVarNamesWithChannels)
 if (present(OffsetChans)) then
   offset = OffsetChans % channel_offset
-  numchans = size(JediVarNamesWithChannels) + &
-             OffsetChans % numchans_add_to_varobs
-else
-  offset = 0
-  numchans = size(JediVarNamesWithChannels)
+  if (OffsetChans % size_of_varobs_array > 0) &
+    numchans = OffsetChans % size_of_varobs_array
 end if
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then

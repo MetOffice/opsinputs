@@ -24,7 +24,7 @@ observations:
       namelist_directory: ../etc/global/varobs
       general_mode: verbose
       channel_offset: 1
-      number_of_channels_to_add_to_varobs: 1
+      size_of_varobs_array: 3
     - filter: VarObs Checker
       expected_main_table_columns:
         # Only channels 1 and 3 are simulated and hence written to the VarObs file.

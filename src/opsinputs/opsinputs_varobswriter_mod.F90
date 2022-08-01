@@ -300,9 +300,10 @@ call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFrom
 ! index the output arrays correctly.
 call f_conf % get_or_die("channel_offset", self % channel_offset % channel_offset)
 
-! This is the number of additional entries needed in an array e.g. atovs jedi has 20 brightness
-! tempperatures but var expects 40.  Therefore numchans_add_to_varobs = 20.
-call f_conf % get_or_die("number_of_channels_to_add_to_varobs", self % channel_offset % numchans_add_to_varobs)
+! This is the size of the varobs array for output.  The default is zero and the size of the array will be used.
+! For atovs, jedi has 20 brightness temperatures but var expects 40.
+! Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
+call f_conf % get_or_die("size_of_varobs_array", self % channel_offset % size_of_varobs_array)
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)

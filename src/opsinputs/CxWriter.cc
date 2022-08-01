@@ -93,7 +93,7 @@ void CxWriter::postFilter(const ufo::GeoVaLs & gv,
       filtervars += var;
     ioda::ObsDataVector<int> flags(obsdb_, filtervars.toOopsVariables());
     for (int ivar = 0; ivar < flags.nvars(); ivar++) {
-      std::string varname = flags.varnames()[ivar];
+      const std::string varname = flags.varnames()[ivar];
       flags[varname] = flags_->operator[](varname);
     }
     opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), flags,

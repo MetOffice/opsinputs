@@ -79,9 +79,10 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// index the output arrays correctly.
   oops::Parameter<int> channel_offset{"channel_offset", 0, this};
 
-  /// This is the number of additional entries needed in an array e.g. atovs jedi has 20 brightness
-  /// temperatures but var expects 40.  Therefore numchans_add_to_varobs = 20.
-  oops::Parameter<int> numchans_to_add_to_varobs{"number_of_channels_to_add_to_varobs", 0, this};
+  /// This is the size of the varobs array for output.  The default is zero and the size of the array will be used.
+  /// For atovs, jedi has 20 brightness temperatures but var expects 40.
+  /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
+  oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as

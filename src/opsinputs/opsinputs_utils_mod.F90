@@ -35,9 +35,10 @@ type, public :: opsinputs_channeloffset
   !this stores the offset for channels when storing britemp.  e.g. jedi channel 1, offset =20,
   !varobs channel 21
   integer  :: channel_offset
-  !this is the number of addtional entries needed in an array  e.g. atovs jedi has 20 channels
-  !var expects 40.  Therefore numchans_add_to_varobs = 20.
-  integer  :: numchans_add_to_varobs
+  ! This is the size of the varobs array for output.  The default is zero and the size of the array will be used.
+  ! For atovs, jedi has 20 brightness temperatures but var expects 40.
+  ! Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
+  integer  :: size_of_varobs_array
 end type opsinputs_channeloffset
 
 ! ------------------------------------------------------------------------------

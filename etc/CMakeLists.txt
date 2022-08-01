@@ -10,9 +10,18 @@ include( opsinputs_functions )
 list( APPEND opsinputs_etc
   global/cx/AMSR.nl
   global/cx/ATMS.nl
-  global/cx/SSMIS.nl
+  global/cx/GMIlow.nl
+  global/cx/GPSRO.nl
+  global/cx/IASI.nl
   global/cx/SatTCWV.nl
+  global/cx/Sonde.nl
+  global/cx/SSMIS.nl
   global/varobs/ATMS.nl
+  global/varobs/ATOVS.nl
+  global/varobs/GPSRO.nl
+  global/varobs/IASI.nl
+  global/varobs/Scatwind.nl
+  global/varobs/Sonde.nl
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/global/cx)
