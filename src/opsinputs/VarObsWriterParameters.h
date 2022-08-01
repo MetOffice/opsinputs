@@ -79,7 +79,8 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// index the output arrays correctly.
   oops::Parameter<int> channel_offset{"channel_offset", 0, this};
 
-  /// This is the size of the varobs array for output.  The default is zero and the size of the array will be used.
+  /// This is the size of the varobs array for output.  The default is zero and the size
+  /// of the array will be used.
   /// For atovs, jedi has 20 brightness temperatures but var expects 40.
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
