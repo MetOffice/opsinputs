@@ -30,6 +30,17 @@ integer, parameter, public :: max_varname_length=MAXVARLEN
 ! Maximum length of a variable name with channel suffix
 integer, parameter, public :: max_varname_with_channel_length=max_varname_length + 10
 
+! Type to contain the channels offset when converting from JEDI to VAR.
+type, public :: opsinputs_channeloffset
+  !this stores the offset for channels when storing britemp.  e.g. jedi channel 1, offset =20,
+  !varobs channel 21
+  integer  :: channel_offset
+  ! This is the size of the varobs array for output.  The default is zero and the size of the array will be used.
+  ! For atovs, jedi has 20 brightness temperatures but var expects 40.
+  ! Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
+  integer  :: size_of_varobs_array
+end type opsinputs_channeloffset
+
 ! ------------------------------------------------------------------------------
 contains
 

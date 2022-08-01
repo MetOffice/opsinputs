@@ -8,12 +8,15 @@
 #define OPSINPUTS_VAROBSWRITERPARAMETERS_H_
 
 #include <string>
+#include <vector>
 
 #include "eckit/exception/Exceptions.h"
 #include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/RequiredParameter.h"
+#include "ufo/filters/Variable.h"
+#include "ufo/utils/parameters/ParameterTraitsVariable.h"
 
 namespace opsinputs {
 
@@ -72,9 +75,21 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
-  /// Additional channels to pack the britemp part of the obstructure
-  /// e.g. for ATOVS we pack the britemps with 20 dummy channels to mimic HIRS
-  oops::Parameter<int> channel_offset_for_britemp{"channel_offset_for_britemp", 0, this};
+  /// This contains the offset that needs to be added to the channel number in order to
+  /// index the output arrays correctly.
+  oops::Parameter<int> channel_offset{"channel_offset", 0, this};
+
+  /// This is the size of the varobs array for output.  The default is zero and the size
+  /// of the array will be used.
+  /// For atovs, jedi has 20 brightness temperatures but var expects 40.
+  /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
+  oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
+
+  /// If this list of ufo::variable is defined in the yaml a subset of the flags
+  /// will be made with just these variables present.  This will allow Fortran calls such-as
+  /// "reject_obs_with_all_variables_failing_qc" and channel numbering to work correctly.
+  oops::OptionalParameter<std::vector<ufo::Variable>> variables_for_qc{
+      "variables_for_quality_control", this};
 
   /// Name of latitude variable
   oops::Parameter<std::string> latitude_name{"latitude_name", "latitude", this};

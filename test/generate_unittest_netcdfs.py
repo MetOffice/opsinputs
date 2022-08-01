@@ -629,15 +629,19 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
+    output_1d_geoval_to_netcdf       ('total_column_ozone',          'testinput/018_VarField_tcozone_obsdiag.nc4')
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_normal_int_var_to_netcdf('surface_type', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
     output_1d_normal_int_var_to_netcdf('satellite_id', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solar_zenith_angle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
     output_1d_normal_var_to_netcdf   ('ir_emissivity', 'Emiss', 'testinput/034_VarField_iremiss.nc4')
+    output_1d_normal_var_to_netcdf   ('cloud_top_pressure', 'OneDVar', 'testinput/035_VarField_cloudtopp.nc4')
+    output_1d_normal_var_to_netcdf   ('cloud_fraction', 'OneDVar', 'testinput/036_VarField_cloudfrac.nc4')
     output_2d_simulated_var_to_netcdf('eastward_wind', 'testinput/051_VarField_u10ambwind.nc4', with_bias=True)
     output_2d_simulated_var_to_netcdf('northward_wind', 'testinput/052_VarField_v10ambwind.nc4', with_bias=True)
     output_2d_simulated_var_to_netcdf('ambwind_probability', 'testinput/053_VarField_awpriorpcorrect.nc4')
+    output_2d_normal_var_to_netcdf   ('surface_emissivity', 'OneDVar', 'testinput/057_VarField_emissivity.nc4', use_chans=True)
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radar_azimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
     output_2d_normal_var_to_netcdf   ('brightness_temperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
@@ -711,6 +715,17 @@ if __name__ == "__main__":
                                   'BiasCorrObsValue/eastward_wind','BiasCorrObsValue/northward_wind'],
                                  ['MetaData/satellite_id'],
                                   'testinput/varobs_globalnamelist_scatwind.nc4')
+
+    # IASI - this tests the variable_for_quality_control option
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude',
+                                  'OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
+                                  'MetaData/solar_zenith_angle','OneDVar/cloud_top_pressure','OneDVar/cloud_fraction'],
+                                 ['ObsValue/radiance','DerivedObsValue/brightness_temperature','EffectiveError/brightness_temperature',
+                                  'OneDVar/surface_emissivity', 'BiasCorrObsValue/brightness_temperature',
+                                  'thickness_850_300hPa_satid_13Predictor/brightness_temperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightness_temperature'],
+                                 ['MetaData/surface_type','MetaData/satellite_id','MetaData/ops_subtype'],
+                                  'testinput/varobs_globalnamelist_iasi.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
@@ -810,6 +825,14 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'cloud_area_fraction_in_atmosphere_layer','frozen_cloud_fraction','liquid_cloud_fraction'],
                               'testinput/cx_globalnamelist_sattcwv.nc4')
+
+    # IASI - this tests the variable_for_quality_control option
+    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
+                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
+                             ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                              'testinput/cx_globalnamelist_iasi.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relative_humidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
