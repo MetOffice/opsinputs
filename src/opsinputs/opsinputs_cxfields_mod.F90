@@ -47,8 +47,8 @@ character(len=*), parameter, public :: opsinputs_cxfields_SurfRainRate_LS = opsi
 character(len=*), parameter, public :: opsinputs_cxfields_SurfSnowRate_LS = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SWradiation = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_BLheight = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_ObukhovLength = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_FrictionVel = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_ObukhovLength = "obukhov_length"
+character(len=*), parameter, public :: opsinputs_cxfields_FrictionVel = "friction_velocity_over_water"
 character(len=*), parameter, public :: opsinputs_cxfields_PrecipAcc6hr = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_LowCloudAmount = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_MedCloudAmount = opsinputs_cxfields_unknown
