@@ -23,7 +23,8 @@ observations:
     - filter: VarObs Writer
       namelist_directory: ../etc/global/varobs
       general_mode: verbose
-      channel_offset_for_britemp: 1
+      channel_offset: 1
+      size_of_varobs_array: 3
     - filter: VarObs Checker
       expected_main_table_columns:
         # Only channels 1 and 3 are simulated and hence written to the VarObs file.

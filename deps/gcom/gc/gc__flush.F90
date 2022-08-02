@@ -59,7 +59,7 @@ CALL FLUSH(lunit,icode)
 #elif defined(IBM) || defined(GNU)
 FLUSH(lunit)
 #else
-CALL FLUSH(lunit)
+FLUSH(lunit)
 #endif
 
 #endif

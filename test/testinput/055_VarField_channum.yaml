@@ -87,7 +87,7 @@ observations:
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_055_VarField_channum
       general_mode: debug
-      channel_offset_for_britemp: 15
+      channel_offset: 15
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
@@ -121,4 +121,4 @@ observations:
                    "station_4", "station_4"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
-    flaggedBenchmark: 0    
+    flaggedBenchmark: 0

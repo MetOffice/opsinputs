@@ -13,6 +13,7 @@
 #include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
+#include "ufo/utils/parameters/ParameterTraitsVariable.h"
 
 namespace opsinputs {
 
@@ -57,6 +58,12 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   /// Define the orientation of the GeoVaLs, true if they are toptobottom and otherwise false.
   /// default is true.
   oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
+
+  /// If this list of ufo::variable is defined in the yaml a subset of the flags
+  /// will be made with just these variables present.  This will allow Fortran calls such-as
+  /// "reject_obs_with_all_variables_failing_qc" and channel numbering to work correctly.
+  oops::OptionalParameter<std::vector<ufo::Variable>> variables_for_qc{
+      "variables_for_quality_control", this};
 
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.

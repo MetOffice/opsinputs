@@ -21,6 +21,8 @@
 #include "oops/util/Logger.h"
 #include "opsinputs/LocalEnvironment.h"
 #include "opsinputs/VarObsWriterParameters.h"
+#include "ufo/filters/Variable.h"
+#include "ufo/filters/Variables.h"
 #include "ufo/GeoVaLs.h"
 #include "ufo/ObsDiagnostics.h"
 
@@ -105,9 +107,23 @@ void VarObsWriter::postFilter(const ufo::GeoVaLs & gv,
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
-  opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
-                                  hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
-                                  obsdiags.toFortran());
+  if (parameters_.variables_for_qc.value() != boost::none) {
+    ufo::Variables filtervars;
+    for (const ufo::Variable &var : parameters_.variables_for_qc.value().get())
+      filtervars += var;
+    ioda::ObsDataVector<int> flags(obsdb_, filtervars.toOopsVariables());
+    for (int ivar = 0; ivar < flags.nvars(); ivar++) {
+      std::string varname = flags.varnames()[ivar];
+      flags[varname] = flags_->operator[](varname);
+    }
+    opsinputs_varobswriter_post_f90(key_, obsdb_, flags, *obsErrors_,
+                                    hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
+                                    obsdiags.toFortran());
+  } else {
+    opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
+                                    hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
+                                    obsdiags.toFortran());
+  }
 }
 
 void VarObsWriter::print(std::ostream & os) const {
