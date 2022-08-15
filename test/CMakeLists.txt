@@ -369,6 +369,14 @@ ADD_WRITER_TEST(NAME     cxwriter_024_SurfaceCxField_CloudAmount
                 YAML     024_SurfaceCxField_CloudAmount.yaml
                 NAMELIST CxWriterNamelists_024_SurfaceCxField_CloudAmount/SatTCWV.nl
                 DATA     024_SurfaceCxField_CloudAmount.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_056_SurfaceCxField_obukhov_length
+                YAML     056_SurfaceCxField_obukhov_length.yaml
+                NAMELIST CxWriterNamelists_056_SurfaceCxField_obukhov_length/Scatwind.nl
+                DATA     056_SurfaceCxField_obukhov_length.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_057_SurfaceCxField_friction_velocity_over_water
+                YAML     057_SurfaceCxField_friction_velocity_over_water.yaml
+                NAMELIST CxWriterNamelists_057_SurfaceCxField_friction_velocity_over_water/Scatwind.nl
+                DATA     057_SurfaceCxField_friction_velocity_over_water.nc4 dummy.nc4)
 
 # Tests of individual upper-air varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
