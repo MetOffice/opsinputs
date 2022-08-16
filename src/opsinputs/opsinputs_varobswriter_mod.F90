@@ -608,7 +608,7 @@ integer                                  :: i, ichan
 character(len=200)                       :: varname
 
 ! Body:
-call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
+!call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 
 ! Example not from ObsDiags anymore
 !do i = 1, size(VarFields)
