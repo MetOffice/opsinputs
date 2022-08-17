@@ -846,7 +846,7 @@ do iVarField = 1, nVarFields
     case (VarField_GPS_Station_Height)
       call opsinputs_fill_fillreal( &
         Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
-        ObsSpace, "station_height", "MetaData")
+        ObsSpace, "station_altitude", "MetaData")
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &
