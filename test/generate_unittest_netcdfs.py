@@ -659,7 +659,7 @@ if __name__ == "__main__":
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
     output_1d_simulated_var_to_netcdf   ('total_zenith_delay', 'testinput/012_VarField_gpstzdelay.nc4', with_bias=True)
-    output_1d_normal_var_to_netcdf   ('station_height', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
+    output_1d_normal_var_to_netcdf   ('station_altitude', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
 
     # Varobs full output for an obsgroup testing
     # Arguments are: 1D floats, 2D floats, 1D ints, filename
