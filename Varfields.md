@@ -55,7 +55,7 @@
 | 64 | `VarField_RadarBeamElev` | | | | Implement |
 | 65 | `VarField_RadarObRange` | | | | Implement |
 | 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `radar_azimuth@MetaData` | |
-| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | station_height@MetaData| |
+| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | station_altitude@MetaData| |
 | 68 | `VarField_clw` | | | | Implement |
 | 69 | `VarField_RadIdent` | | | | Implement Implement |
 | 70 | `VarField_Reflectivity` | | | | Implement |
