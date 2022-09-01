@@ -14,6 +14,7 @@ list( APPEND opsinputs_etc
   global/cx/GMIlow.nl
   global/cx/GPSRO.nl
   global/cx/IASI.nl
+  global/cx/MWRI.nl
   global/cx/SatTCWV.nl
   global/cx/Sonde.nl
   global/cx/SSMIS.nl
