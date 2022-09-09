@@ -481,8 +481,11 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
       end if
       call opsinputs_fill_setpgefinal(PGE(iJediObs), MissingDouble, DoPackPGEs, El2(iObs, iLevel))
     end do
-    El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = &
-      ibset(0, FinalRejectFlag)
+    ! Reject any superfluous model levels
+    if (size(El2, 2) > numLevels) then
+       El2(iObs, numLevels + 1 : JediToOpsLayoutMapping % MaxNumLevelsPerObs) % Flags = &
+              ibset(0, FinalRejectFlag)
+    end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
