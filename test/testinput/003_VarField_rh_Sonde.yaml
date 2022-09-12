@@ -49,13 +49,11 @@ observations:
         # Record 2 (first row) contains 3 levels, whereas record 4 (second row) contains only 2.
         # But in the VarObs file all observations need to have the same number of levels, so the
         # observation corresponding to record 4 is padded with missing values. In addition, the
-        # input file contains a missing ObsValue at the first location from record 4 (this is
-        # "propagated" to the ObsError by the VarObs writer) and a missing ObsError at the first
-        # location from record 2.
+        # input file contains a missing ObsError at the first location from record 2.
         ob value: ["0.21000",           "0.22000",           "0.23000",
                    "-1073741824.00000", "0.42000", "-1073741824.00000" ]
         ob error: ["-1073741824.00000", "0.04400",           "0.04600",
-                   "-1073741824.00000", "0.08400", "-1073741824.00000" ]
+                             "0.04100", "0.08400", "-1073741824.00000" ]
         # 1.111 is the missing value indicator for PGEs. VarObs files store PGEs multiplied by 10000.
         # A truncation/rounding error made by the Ops_VarobPGEs subroutine causes one of values to
         # stored as 1419 rather than 1420.
