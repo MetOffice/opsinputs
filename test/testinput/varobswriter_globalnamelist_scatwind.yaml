@@ -8,7 +8,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_scatwind.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_scatwind.nc4
       simulated variables: [eastward_wind, northward_wind, ambwind_probability]
       observed variables: [eastward_wind, northward_wind, ambwind_probability]
       channels: 1, 3
@@ -65,7 +67,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_scatwind.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_scatwind.nc4
       simulated variables: [eastward_wind, northward_wind, ambwind_probability]
       observed variables: [eastward_wind, northward_wind, ambwind_probability]
       channels: 1, 3
@@ -134,7 +138,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_scatwind.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_scatwind.nc4
       simulated variables: [eastward_wind, northward_wind, ambwind_probability]
       observed variables: [eastward_wind, northward_wind, ambwind_probability]
       channels: 1, 3

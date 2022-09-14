@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: Surface
       obsdatain:
-        obsfile: Data/001_VarField_pstar.nc4
+        engine:
+          type: H5File
+          obsfile: Data/001_VarField_pstar.nc4
       simulated variables: [surface_pressure]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are

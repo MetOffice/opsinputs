@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: IASI
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_iasi.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_iasi.nc4
       observed variables: [radiance]
       simulated variables: [brightness_temperature]
       derived variables: [brightness_temperature]

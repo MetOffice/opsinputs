@@ -8,7 +8,9 @@ observations:
   - obs space:
       name: AOD
       obsdatain:
-        obsfile: Data/dummy.nc4
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
       simulated variables: [dummy]
     geovals:
       filename: Data/041-046_UpperAirCxField_dust1-dust6.nc4

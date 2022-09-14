@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: AMSUB
       obsdatain:
-        obsfile: Data/076_VarField_britempvarerror.nc4
+        engine:
+          type: H5File
+          obsfile: Data/076_VarField_britempvarerror.nc4
       simulated variables: [dummy]
       channels: 1-3
     obs filters:

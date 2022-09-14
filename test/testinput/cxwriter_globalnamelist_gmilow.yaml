@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: GMIlow
       obsdatain:
-        obsfile: Data/dummy.nc4
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
       simulated variables: [dummy]
     geovals:
       filename: Data/cx_globalnamelist_gmilow.nc4
