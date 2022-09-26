@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: GroundGPS
       obsdatain:
-        obsfile: Data/012_VarField_gpstzdelay.nc4
+        engine:
+          type: H5File
+          obsfile: Data/012_VarField_gpstzdelay.nc4
       simulated variables: [total_zenith_delay]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are

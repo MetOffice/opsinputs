@@ -8,7 +8,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_scatwind.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_scatwind.nc4
       simulated variables: [eastward_wind, northward_wind, ambwind_probability]
       observed variables: [eastward_wind, northward_wind, ambwind_probability]
       channels: 1, 3
@@ -65,7 +67,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_scatwind.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_scatwind.nc4
       simulated variables: [eastward_wind, northward_wind, ambwind_probability]
       observed variables: [eastward_wind, northward_wind, ambwind_probability]
       channels: 1, 3
@@ -106,9 +110,8 @@ observations:
                    "92.10000","92.30000","102.10000","102.30000","62.10000","62.30000",
                    "93.10000","93.30000","103.10000","103.30000","63.10000","63.30000",
                    "94.10000","94.30000","104.10000","104.30000","64.10000","64.30000"]
-        # The errors for observation 2 are set to missing due to the blacklist
         ob error: ["11.10000","11.30000","41.10000","41.30000","71.10000","71.30000",
-                   "-1073741824.00000","-1073741824.00000","-1073741824.00000","-1073741824.00000","-1073741824.00000","-1073741824.00000",
+                   "12.10000","12.30000","42.10000","42.30000","72.10000","72.30000",
                    "13.10000","13.30000","43.10000","43.30000","73.10000","73.30000",
                    "14.10000","14.30000","44.10000","44.30000","74.10000","74.30000"]
         # Note that PGE values for field 52 (v10ambwind) are copied from field 51 (u10ambwind).
@@ -135,7 +138,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_scatwind.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_scatwind.nc4
       simulated variables: [eastward_wind, northward_wind, ambwind_probability]
       observed variables: [eastward_wind, northward_wind, ambwind_probability]
       channels: 1, 3

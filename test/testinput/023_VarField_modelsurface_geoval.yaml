@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: Surface
       obsdatain:
-        obsfile: Data/002_VarField_temperature_Surface.nc4
+        engine:
+          type: H5File
+          obsfile: Data/002_VarField_temperature_Surface.nc4
       simulated variables: [air_temperature]
     geovals:
       filename: Data/023_VarField_modelsurface_geoval.nc4

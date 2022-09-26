@@ -7,7 +7,9 @@ observations:
   - obs space: &ObsSpace
       name: Sonde
       obsdatain:
-        obsfile: Data/dummy.nc4
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
       simulated variables: [dummy]
     geovals: &GeoVaLs
       filename: Data/cx_globalnamelist_sonde.nc4

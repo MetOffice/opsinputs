@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: AMSUB
       obsdatain:
-        obsfile: Data/010_VarField_britemp.nc4
+        engine:
+          type: H5File
+          obsfile: Data/010_VarField_britemp.nc4
       simulated variables: [brightness_temperature]
       channels: 1, 3
     obs filters:

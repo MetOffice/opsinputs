@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: AMSUB
       obsdatain:
-        obsfile: Data/028_VarField_satid.nc4
+        engine:
+          type: H5File
+          obsfile: Data/028_VarField_satid.nc4
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
@@ -24,7 +26,9 @@ observations:
   - obs space:
       name: AMSUB
       obsdatain:
-        obsfile: Data/028_VarField_satid.nc4
+        engine:
+          type: H5File
+          obsfile: Data/028_VarField_satid.nc4
       simulated variables: [dummy]
     obs filters:
     - filter: VarObs Writer
