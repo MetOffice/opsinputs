@@ -37,6 +37,7 @@ jobs:
         with:
           path: ci/jedicmake
           repository: JCSDA-internal/jedi-cmake
+          submodules: true
           token: ${{ secrets.GH_PAT }}
       - name: checkout ioda
         uses: actions/checkout@v2
