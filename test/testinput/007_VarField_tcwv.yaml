@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: SatTCWV
       obsdatain:
-        obsfile: Data/007_VarField_tcwv.nc4
+        engine:
+          type: H5File
+          obsfile: Data/007_VarField_tcwv.nc4
       simulated variables: [precipitableWater]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are

@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: Surface
       obsdatain:
-        obsfile: Data/004_VarField_u_Surface.nc4
+        engine:
+          type: H5File
+          obsfile: Data/004_VarField_u_Surface.nc4
       simulated variables: [eastward_wind]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are

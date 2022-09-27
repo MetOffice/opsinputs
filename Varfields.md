@@ -15,7 +15,7 @@
 | 15 | `VarField_cloud` | | | | Implement |
 | 16 | `VarField_rainrate` | | | | Implement |
 | 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `surface_emissivity@Emiss` |  |
-| 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) | `total_column_ozone@ObsDiag` |  |
+| 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) | `total_column_ozone@MetaData` |  |
 | 19 | `VarField_satzenith` | `SatZenithAngle(:)` | sat zenith angle | `sensor_zenith_angle@MetaData` | |
 | 20 | `VarField_scanpos` | | | | Implement |
 | 21 | `VarField_surface` | `surface(:)` \[`INTEGER`\] | surface type | `surface_type@MetaData` | |
@@ -55,7 +55,7 @@
 | 64 | `VarField_RadarBeamElev` | | | | Implement |
 | 65 | `VarField_RadarObRange` | | | | Implement |
 | 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `radar_azimuth@MetaData` | |
-| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | station_height@MetaData| |
+| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | station_altitude@MetaData| |
 | 68 | `VarField_clw` | | | | Implement |
 | 69 | `VarField_RadIdent` | | | | Implement Implement |
 | 70 | `VarField_Reflectivity` | | | | Implement |

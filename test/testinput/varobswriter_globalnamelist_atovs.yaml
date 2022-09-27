@@ -9,7 +9,9 @@ observations:
   - obs space:
       name: ATOVS
       obsdatain:
-        obsfile: Data/varobs_globalnamelist_atovs.nc4
+        engine:
+          type: H5File
+          obsfile: Data/varobs_globalnamelist_atovs.nc4
       simulated variables: [brightness_temperature]
       channels: 1, 3
     obs filters:

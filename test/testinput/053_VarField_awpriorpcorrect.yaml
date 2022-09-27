@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: Scatwind
       obsdatain:
-        obsfile: Data/053_VarField_awpriorpcorrect.nc4
+        engine:
+          type: H5File
+          obsfile: Data/053_VarField_awpriorpcorrect.nc4
       simulated variables: [ambwind_probability]
       channels: 1, 3
     obs filters:

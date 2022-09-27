@@ -5,7 +5,9 @@ observations:
   - obs space:
       name: RadarZ
       obsdatain:
-        obsfile: Data/002_VarField_temperature_RadarZ.nc4
+        engine:
+          type: H5File
+          obsfile: Data/002_VarField_temperature_RadarZ.nc4
       simulated variables: [air_temperature]
       channels: 1, 3
     obs filters:

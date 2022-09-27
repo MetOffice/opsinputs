@@ -608,14 +608,15 @@ integer                                  :: i, ichan
 character(len=200)                       :: varname
 
 ! Body:
-call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
+!call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 
-do i = 1, size(VarFields)
-  select case (VarFields(i))
-  case (VarField_tcozone)
-    call diagvars % push_back("total_column_ozone")
-  end select
-end do
+! Example not from ObsDiags anymore
+!do i = 1, size(VarFields)
+!  select case (VarFields(i))
+!  case (VarField_tcozone)
+!    call diagvars % push_back("total_column_ozone")
+!  end select
+!end do
 
 end subroutine opsinputs_varobswriter_addrequireddiagvars
 
@@ -846,15 +847,15 @@ do iVarField = 1, nVarFields
     case (VarField_GPS_Station_Height)
       call opsinputs_fill_fillreal( &
         Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
-        ObsSpace, "station_height", "MetaData")
+        ObsSpace, "station_altitude", "MetaData")
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &
         ObsSpace, self % channels, "surface_emissivity", "Emiss")
     case (VarField_TCozone)
-      call opsinputs_fill_fillrealfromgeoval( &
-        Ob % Header % TCozone, "TCozone", Ob % Header % NumObsLocal, Ob % TCozone, &
-        self % ObsDiags, "total_column_ozone", JediToOpsLayoutMapping)
+      call opsinputs_fill_fillreal( &
+        Ob % Header % TCozone, "TCozone", JediToOpsLayoutMapping, Ob % TCozone, &
+        ObsSpace, "total_column_ozone", "MetaData")
     case (VarField_satzenith)
       call opsinputs_fill_fillreal( &
         Ob % Header % SatZenithAngle, "SatZenithAngle", JediToOpsLayoutMapping, Ob % SatZenithAngle, &

@@ -629,7 +629,7 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('brightness_temperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('surface_emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
-    output_1d_geoval_to_netcdf       ('total_column_ozone',          'testinput/018_VarField_tcozone_obsdiag.nc4')
+    output_1d_normal_var_to_netcdf   ('total_column_ozone', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
     output_1d_normal_var_to_netcdf   ('sensor_zenith_angle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_normal_int_var_to_netcdf('surface_type', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
@@ -659,7 +659,7 @@ if __name__ == "__main__":
     output_1d_simulated_vars_to_netcdf('eastward_wind', 'northward_wind',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
     output_1d_simulated_var_to_netcdf   ('total_zenith_delay', 'testinput/012_VarField_gpstzdelay.nc4', with_bias=True)
-    output_1d_normal_var_to_netcdf   ('station_height', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
+    output_1d_normal_var_to_netcdf   ('station_altitude', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
 
     # Varobs full output for an obsgroup testing
     # Arguments are: 1D floats, 2D floats, 1D ints, filename
@@ -719,7 +719,8 @@ if __name__ == "__main__":
     # IASI - this tests the variable_for_quality_control option
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude',
                                   'OneDVar/skin_temperature','MetaData/sensor_zenith_angle',
-                                  'MetaData/solar_zenith_angle','OneDVar/cloud_top_pressure','OneDVar/cloud_fraction'],
+                                  'MetaData/solar_zenith_angle','OneDVar/cloud_top_pressure','OneDVar/cloud_fraction',
+                                  'MetaData/total_column_ozone'],
                                  ['ObsValue/radiance','DerivedObsValue/brightness_temperature','EffectiveError/brightness_temperature',
                                   'OneDVar/surface_emissivity', 'BiasCorrObsValue/brightness_temperature',
                                   'thickness_850_300hPa_satid_13Predictor/brightness_temperature',
