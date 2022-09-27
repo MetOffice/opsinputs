@@ -1061,7 +1061,7 @@ do iVarField = 1, nVarFields
     case (VarField_BriTempVarError)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
-        ObsSpace, self % channels, "brightness_temperature", "ObsError", self % channel_offset)
+        ObsSpace, self % channels, "brightness_temperature", "ObsErrorData", self % channel_offset)
     case (VarField_CloudRTError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
