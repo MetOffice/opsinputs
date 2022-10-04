@@ -63,4 +63,4 @@ jobs:
             --entrypoint=/usr/local/src/opsinputs/ci/opsinputs-ci-build \
             --workdir=/usr/local/src/opsinputs/ci \
             --volume $PWD:/usr/local/src/opsinputs \
-            'jcsda/docker-gnu-openmpi-dev:latest'
+            'jcsda/docker-gnu-openmpi-dev:revert'
