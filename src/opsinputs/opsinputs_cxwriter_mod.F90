@@ -26,6 +26,7 @@ use obsspace_mod, only: &
 use oops_variables_mod, only: oops_variables
 use opsinputs_cxfields_mod
 use opsinputs_fill_mod, only:                 &
+    opsinputs_fill_fillreal,                  &
     opsinputs_fill_fillrealfromgeoval,        &
     opsinputs_fill_fillreal2dfromgeoval
 use opsinputs_mpl_mod, only: opsinputs_mpl_allgather_integer
@@ -62,6 +63,7 @@ use GenMod_MiscUMScienceConstants, only: &
 use GenMod_ModelIO, only: LenFixHd, UM_header_type
 use GenMod_Setup, only: Gen_SetupControl
 use GenMod_UMHeaderConstants
+use GenMod_Utilities, only: Gen_LatLon_to_Eq
 use GenMod_CLookAdd, only: &
     LBYR,                  &
     LBMON,                 &
@@ -121,6 +123,9 @@ use OpsMod_ObsInfo, only: &
     Ops_Alloc,            &
     Ops_SetupObType
 use OpsMod_Stash
+use OpsMod_Utilities, only: &
+     Ops_WCoeff, &
+     Ops_WEq_to_ll
 
 implicit none
 public :: opsinputs_cxwriter_create, opsinputs_cxwriter_delete, &
@@ -136,6 +141,9 @@ private
   logical                                :: RejectObsWithAnyVariableFailingQC
   logical                                :: RejectObsWithAllVariablesFailingQC
   logical                                :: GeoVaLsAreTopToBottom
+
+  character(len=100)                     :: latitudeName
+  character(len=100)                     :: longitudeName
 
   integer(integer64)                     :: FH_VertCoord
   integer(integer64)                     :: FH_HorizGrid
@@ -251,6 +259,12 @@ call f_conf % get_or_die("reject_obs_with_all_variables_failing_qc", &
 
 call f_conf % get_or_die("geovals_are_top_to_bottom", &
                          self % GeoVaLsAreTopToBottom)
+
+call f_conf % get_or_die ("latitude_name", StringValue)
+self % latitudeName = StringValue
+
+call f_conf % get_or_die ("longitude_name", StringValue)
+self % longitudeName = StringValue
 
 call f_conf % get_or_die("FH_VertCoord", StringValue)
 select case (ops_to_lower_case(StringValue))
@@ -540,12 +554,13 @@ integer(integer64)                                    :: ReportFlags(self % Jedi
 
 ! Body:
 
-call opsinputs_cxwriter_initialiseobservations(self, Ob)
+call opsinputs_cxwriter_initialiseobservations(self, Ob, ObsSpace)
 call opsinputs_cxwriter_initialisecx(self, Ob, Cx)
 call opsinputs_utils_fillreportflags(self % JediToOpsLayoutMapping, ObsSpace, Flags, &
                                      self % RejectObsWithAnyVariableFailingQC, &
                                      self % RejectObsWithAllVariablesFailingQC, ReportFlags)
 call opsinputs_cxwriter_populatecx(self, ReportFlags, Cx)
+call opsinputs_cxwriter_unrotatewinds(self, Ob, Cx)
 call opsinputs_cxwriter_populateumheader(self, UMHeader)
 
 Retained = opsinputs_cxwriter_retainflag(self, ReportFlags)
@@ -765,13 +780,14 @@ end subroutine opsinputs_cxwriter_addrequiredgeovars
 !> Fill components of the Ob structure required by the OPS subroutine writing a Cx file.
 !>
 !> This includes the number of observations and the validity time.
-subroutine opsinputs_cxwriter_initialiseobservations(self, Ob)
+subroutine opsinputs_cxwriter_initialiseobservations(self, Ob, ObsSpace)
 use mpl, ONLY: gc_int_kind
 implicit none
 
 ! Subroutine arguments:
 type(opsinputs_cxwriter), intent(in) :: self
 type(OB_type), intent(inout)         :: Ob
+type(c_ptr), value, intent(in)       :: ObsSpace
 
 ! Local declarations:
 integer(kind=gc_int_kind)            :: istat
@@ -800,6 +816,12 @@ Ob % Header % ValidityTime % minute = minute
 Ob % Header % ValidityTime % second = second
 ! util::DateTime is represented internally as UTC quantized to the nearest second.
 Ob % Header % ValidityTime % diff_from_utc = 0
+
+! Retrieve observation latitude and longitude
+call opsinputs_fill_fillreal(Ob % Header % Latitude, "Latitude", self % JediToOpsLayoutMapping, &
+  Ob % Latitude, ObsSpace, trim(self % latitudeName), "MetaData")
+call opsinputs_fill_fillreal(Ob % Header % Longitude, "Longitude", self % JediToOpsLayoutMapping, &
+  Ob % Longitude, ObsSpace, trim(self % longitudeName), "MetaData")
 
 end subroutine opsinputs_cxwriter_initialiseobservations
 
@@ -833,6 +855,10 @@ if (Cx % Header % NewDynamics .and. ModelType /= ModelType_SST) then
 else
   Cx % Header % FirstConstantRhoLevel = IMDI
 end if
+
+! The following code is inspired by Ops_CXComplete
+
+Cx % Header % Rotated = self % FH_HorizGrid > FH_HorizGrid_Eq
 
 end subroutine opsinputs_cxwriter_initialisecx
 
@@ -1237,6 +1263,100 @@ do iCxField = 1, size(CxFields)
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx
+
+! ------------------------------------------------------------------------------
+
+!> Rotate winds back to their original orientation.
+!> Can be used for limited-area domains such as the UKV.
+subroutine opsinputs_cxwriter_unrotatewinds(self, Ob, Cx)
+implicit none
+
+! Subroutine arguments:
+type(opsinputs_cxwriter), intent(inout) :: self
+type(OB_type), intent(in)               :: Ob
+type(CX_type), intent(inout)            :: Cx
+
+! Local declarations:
+character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_unrotatewinds"
+character(len=80)                       :: ErrorMessage
+integer(integer64)                      :: CxFields(MaxModelCodes), CxField
+
+integer                   :: Ilev         ! Loop variable
+real(real64), allocatable :: EqLat(:)     ! Latitudes on equatorial grid
+real(real64), allocatable :: EqLon(:)     ! Longitudes on equatorial grid
+real(real64), allocatable :: Coeff1(:)    ! Coefficients for rotation
+real(real64), allocatable :: Coeff2(:)    ! Coefficients for rotation
+real(real64), allocatable :: Uunrot(:)    ! Array for unrotated wind u component
+real(real64), allocatable :: Vunrot(:)    ! Array for unrotated wind v component
+
+! Body:
+call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
+
+! Do not do anything if the winds were not rotated in the first place.
+if (.not. Cx % header % rotated) then
+   return
+end if
+
+! Require both wind components to be present.
+if (all(CxFields /= StashItem_u) .and. all(CxFields /= StashItem_v)) then
+   return
+end if
+
+! Code initially taken from Ops_RotateWinds.
+! The rotation matrix has been modified to perform an un-rotation of the winds.
+if (Cx % header % NumLocal > 0) then
+  allocate (Coeff1(Cx % header % NumLocal))
+  allocate (Coeff2(Cx % header % NumLocal))
+  allocate (EqLon(Cx % header % NumLocal))
+  allocate (EqLat(Cx % header % NumLocal))
+  allocate (Uunrot(Cx % header % NumLocal))
+  allocate (Vunrot(Cx % header % NumLocal))
+
+  ! Calculate longitudes on equatorial grid
+  call Gen_LatLon_to_Eq (Ob % latitude,      & ! in
+                         Ob % longitude,     & ! in
+                         EqLat(:),           & ! out
+                         EqLon(:),           & ! out
+                         self % RC_PoleLat,  & ! in
+                         self % RC_PoleLong)   ! in
+
+  deallocate (EqLat) ! Don't need latitudes
+
+  ! Get rotation coefficients for winds
+  call Ops_WCoeff (Coeff1(:),              & ! out
+                   Coeff2(:),              & ! out
+                   Ob % longitude,         & ! in
+                   EqLon(:),               & ! in
+                   self % RC_PoleLat,      & ! in
+                   self % RC_PoleLong,     & ! in
+                   Cx % header % NumLocal)   ! in
+
+  deallocate (EqLon)
+
+  ! Unrotate model level wind components.
+  ! Note minus sign in front of Coeff2, which reverses the previous rotation.
+  do Ilev = 1, Cx % Header % u % NumLev
+     call Ops_WEq_to_ll (Coeff1(:), & ! in
+          -Coeff2(:),               & ! in
+          Cx % u(:,Ilev),           & ! in
+          Cx % v(:,Ilev),           & ! in
+          Uunrot(:),                & ! out
+          Vunrot(:),                & ! out
+          Cx % header % NumLocal,   & ! in
+          Cx % header % NumLocal)     ! in
+     ! Put unrotated values into Cx structure
+     Cx % u(:,ILev) = Uunrot(:)
+     Cx % v(:,Ilev) = Vunrot(:)
+  end do
+
+  deallocate (Vunrot)
+  deallocate (Uunrot)
+  deallocate (Coeff2)
+  deallocate (Coeff1)
+end if
+
+end subroutine opsinputs_cxwriter_unrotatewinds
+
 
 ! ------------------------------------------------------------------------------
 
