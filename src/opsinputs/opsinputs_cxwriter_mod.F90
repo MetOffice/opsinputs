@@ -1279,7 +1279,7 @@ type(CX_type), intent(inout)            :: Cx
 ! Local declarations:
 character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_unrotatewinds"
 character(len=80)                       :: ErrorMessage
-integer(integer64)                      :: CxFields(MaxModelCodes), CxField
+integer(integer64)                      :: CxFields(MaxModelCodes)
 
 integer                   :: Ilev         ! Loop variable
 real(real64), allocatable :: EqLat(:)     ! Latitudes on equatorial grid
