@@ -23,6 +23,33 @@ jobs:
           path: ci/ropp-ufo
           repository: MetOffice/ropp-ufo
           token: ${{ secrets.GH_PAT }}
+      - name: checkout eckit
+        uses: actions/checkout@v2
+        with:
+          path: ci/eckit
+          repository: ecmwf/eckit
+          ref: refs/tags/1.19.0
+      - name: matching branch checkout attempt eckit ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./ci/get-ref-branch ./ci/eckit
+      - name: checkout fckit
+        uses: actions/checkout@v2
+        with:
+          path: ci/fckit
+          repository: ecmwf/fckit
+          ref: refs/tags/0.9.5
+      - name: matching branch checkout attempt fckit ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./ci/get-ref-branch ./ci/fckit
+      - name: checkout atlas
+        uses: actions/checkout@v2
+        with:
+          path: ci/atlas
+          repository: ecmwf/atlas
+          ref: refs/tags/0.30.0
+      - name: matching branch checkout attempt atlas ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./ci/get-ref-branch ./ci/atlas
       - name: checkout oops
         uses: actions/checkout@v2
         with:
@@ -63,4 +90,4 @@ jobs:
             --entrypoint=/usr/local/src/opsinputs/ci/opsinputs-ci-build \
             --workdir=/usr/local/src/opsinputs/ci \
             --volume $PWD:/usr/local/src/opsinputs \
-            'jcsda/docker-gnu-openmpi-dev:latest'
+            'jcsda/docker-gnu-openmpi-dev:revert'
