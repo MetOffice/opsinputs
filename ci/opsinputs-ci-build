@@ -30,6 +30,7 @@ cd "${WORKD}"
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
+source /etc/profile.d/z10_spack_environment.sh
 ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
 make -j "${NPROC}"
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
