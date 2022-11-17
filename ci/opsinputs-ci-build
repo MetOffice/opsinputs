@@ -20,8 +20,11 @@ trap finally EXIT
 
 cd "${WORKD}"
 
+set -x
 sed 's:LD_LIBRARY_PATH=:LD_LIBRARY_PATH=/opt/view/lib\::g' /etc/profile.d/z10_spack_environment.sh > "${HERE}/set_env.sh"
 source ${HERE}/set_env.sh
+echo "$LD_LIBRARY_PATH"
+set +x
 
 # cp -a "${HERE}/shumlib" .
 # arch='vm-x86-gfortran-gcc'
