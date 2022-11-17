@@ -20,13 +20,13 @@ trap finally EXIT
 
 cd "${WORKD}"
 
-cp -a "${HERE}/shumlib" .
-arch='vm-x86-gfortran-gcc'
-(cd './shumlib' && make -f "./make/${arch}.mk")
-prefix="${PREFIX:-/usr/local/}"
-cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
-cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
-rm -fr './shumlib'
+# cp -a "${HERE}/shumlib" .
+# arch='vm-x86-gfortran-gcc'
+# (cd './shumlib' && make -f "./make/${arch}.mk")
+# prefix="${PREFIX:-/usr/local/}"
+# cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
+# cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
+# rm -fr './shumlib'
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
