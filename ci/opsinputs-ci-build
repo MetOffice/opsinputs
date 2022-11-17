@@ -20,15 +20,16 @@ trap finally EXIT
 
 cd "${WORKD}"
 
-source /etc/profile.d/z10_spack_environment.sh
+sed 's:LD_LIBRARY_PATH=:LD_LIBRARY_PATH=/opt/view/lib\::g' /etc/profile.d/z10_spack_environment.sh > "${HERE}/set_env.sh"
+source ${HERE}/set_env.sh
 
-cp -a "${HERE}/shumlib" .
-arch='vm-x86-gfortran-gcc'
-(cd './shumlib' && make -f "./make/${arch}.mk")
-prefix="${PREFIX:-/usr/local/}"
-cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
-cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
-rm -fr './shumlib'
+# cp -a "${HERE}/shumlib" .
+# arch='vm-x86-gfortran-gcc'
+# (cd './shumlib' && make -f "./make/${arch}.mk")
+# prefix="${PREFIX:-/usr/local/}"
+# cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
+# cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
+# rm -fr './shumlib'
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
