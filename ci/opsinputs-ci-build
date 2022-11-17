@@ -20,17 +20,18 @@ trap finally EXIT
 
 cd "${WORKD}"
 
-# cp -a "${HERE}/shumlib" .
-# arch='vm-x86-gfortran-gcc'
-# (cd './shumlib' && make -f "./make/${arch}.mk")
-# prefix="${PREFIX:-/usr/local/}"
-# cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
-# cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
-# rm -fr './shumlib'
+source /etc/profile.d/z10_spack_environment.sh
+
+cp -a "${HERE}/shumlib" .
+arch='vm-x86-gfortran-gcc'
+(cd './shumlib' && make -f "./make/${arch}.mk")
+prefix="${PREFIX:-/usr/local/}"
+cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
+cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
+rm -fr './shumlib'
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
-source /etc/profile.d/z10_spack_environment.sh
 ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
 make -j "${NPROC}"
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \

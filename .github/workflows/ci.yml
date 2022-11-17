@@ -12,6 +12,11 @@ jobs:
     steps:
       - name: checkout current repo
         uses: actions/checkout@v2
+      - name: checkout shumlib
+        uses: actions/checkout@v2
+        with:
+          path: ci/shumlib
+          repository: metomi/shumlib
       - name: checkout ropp-ufo
         uses: actions/checkout@v2
         with:
