@@ -20,12 +20,6 @@ trap finally EXIT
 
 cd "${WORKD}"
 
-# set -x
-# sed 's:LD_LIBRARY_PATH=:LD_LIBRARY_PATH=/opt/view/lib\::g' /etc/profile.d/z10_spack_environment.sh > "${WORKD}/set_spack_env.sh"
-# source ${WORKD}/set_spack_env.sh
-# echo "$LD_LIBRARY_PATH"
-# set +x
-
 cp -a "${HERE}/shumlib" .
 arch='vm-x86-gfortran-gcc'
 (cd './shumlib' && make -f "./make/${arch}.mk")
@@ -34,10 +28,11 @@ cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
 cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
 rm -fr './shumlib'
 
-set -x
+# - jcsda container requires manual sourcing of spack environment
 source /etc/profile.d/z10_spack_environment.sh
+
+# - override container shumlib (does not work)
 export SHUM_ROOT=$prefix
-set +x
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
