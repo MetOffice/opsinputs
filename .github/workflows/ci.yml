@@ -18,24 +18,6 @@ jobs:
           path: ci/ropp-ufo
           repository: MetOffice/ropp-ufo
           token: ${{ secrets.GH_PAT }}
-      - name: checkout eckit
-        uses: actions/checkout@v2
-        with:
-          path: ci/eckit
-          repository: ecmwf/eckit
-          ref: refs/tags/1.19.0
-      - name: checkout fckit
-        uses: actions/checkout@v2
-        with:
-          path: ci/fckit
-          repository: ecmwf/fckit
-          ref: refs/tags/0.9.5
-      - name: checkout atlas
-        uses: actions/checkout@v2
-        with:
-          path: ci/atlas
-          repository: ecmwf/atlas
-          ref: refs/tags/0.30.0
       - name: checkout oops
         uses: actions/checkout@v2
         with:
