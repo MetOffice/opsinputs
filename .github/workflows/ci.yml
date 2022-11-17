@@ -12,11 +12,6 @@ jobs:
     steps:
       - name: checkout current repo
         uses: actions/checkout@v2
-      - name: checkout shumlib
-        uses: actions/checkout@v2
-        with:
-          path: ci/shumlib
-          repository: metomi/shumlib
       - name: checkout ropp-ufo
         uses: actions/checkout@v2
         with:
@@ -81,4 +76,4 @@ jobs:
             --entrypoint=/usr/local/src/opsinputs/ci/opsinputs-ci-build \
             --workdir=/usr/local/src/opsinputs/ci \
             --volume $PWD:/usr/local/src/opsinputs \
-            'jcsda/docker-gnu-openmpi-dev:revert'
+            'jcsda/docker-gnu-openmpi-dev:latest'
