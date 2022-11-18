@@ -28,6 +28,12 @@ cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
 cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
 rm -fr './shumlib'
 
+# - jcsda container requires manual sourcing of spack environment
+source /etc/profile.d/z10_spack_environment.sh
+
+# - override container shumlib (does not work)
+export SHUM_ROOT=$prefix
+
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
 ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
