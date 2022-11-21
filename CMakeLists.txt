@@ -38,6 +38,9 @@ set( OPSINPUTS_LINKER_LANGUAGE CXX )
 # Dependencies
 ################################################################################
 
+## Dependencies
+find_package( jedicmake QUIET )  # Prefer find modules from jedi-cmake
+
 # Boost
 include_directories( ${Boost_INCLUDE_DIR} )
 
