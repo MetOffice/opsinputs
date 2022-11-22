@@ -11,6 +11,7 @@ list( APPEND opsinputs_etc
   global/cx/AMSR.nl
   global/cx/ATMS.nl
   global/cx/ATOVS.nl
+  global/cx/CrIS.nl
   global/cx/GMIlow.nl
   global/cx/GPSRO.nl
   global/cx/GroundGPS.nl
@@ -21,6 +22,7 @@ list( APPEND opsinputs_etc
   global/cx/SSMIS.nl
   global/varobs/ATMS.nl
   global/varobs/ATOVS.nl
+  global/varobs/CrIS.nl
   global/varobs/GPSRO.nl
   global/varobs/IASI.nl
   global/varobs/Scatwind.nl
