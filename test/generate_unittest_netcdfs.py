@@ -663,7 +663,7 @@ if __name__ == "__main__":
     output_2d_normal_var_to_netcdf('impactParameterRO', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
     output_1d_normal_var_to_netcdf('earthRadiusCurvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
     output_1d_normal_var_to_netcdf('geoidUndulation', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
-    output_2d_normal_var_to_netcdf   ('brightnessTemperature', 'ObsError', 'testinput/076_VarField_britempvarerror.nc4', use_chans=True)
+    output_2d_normal_var_to_netcdf   ('brightnessTemperature', 'ObsErrorData', 'testinput/076_VarField_britempvarerror.nc4', use_chans=True)
     output_1d_simulated_var_to_netcdf('aerosolOpticalDepth', 'testinput/077_VarField_aod.nc4')
     output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('windEastwardAt10M', 'windNorthwardAt10M',
@@ -685,7 +685,7 @@ if __name__ == "__main__":
     # ATOVS
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle','Emiss/ir_emissivity'],
-                                 ['ObsValue/brightnessTemperature','ObsError/brightnessTemperature','Emiss/emissivity',
+                                 ['ObsValue/brightnessTemperature','ObsErrorData/brightnessTemperature','Emiss/emissivity',
                                   'BiasCorrObsValue/brightnessTemperature','thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
                                  ['MetaData/surfaceQualifier','MetaData/satelliteIdentifier'],

@@ -64,7 +64,7 @@
 | 73 | `VarField_RO_Rad_Curv` | `RO_Rad_Curv(:)` | GPSRO Earth\'s local radius of curvature (m) | `MetaData/earthRadiusCurvature` | |
 | 74 | `VarField_RO_geoid_und` | `RO_geoid_und(:)` | GPSRO Geoid undulation (above WGS-84 ellipsoid, m) | MetaData/geoidUndulation | |
 | 75 | `VarField_RadAltAboveMSL` | | | | Implement |
-| 76 | `VarField_BriTempVarError` | `BriTempVarError(:,:)` | scene dependent obs errors for BTs (oblocation, channel) | `ObsError/brightnessTemperature` | |
+| 76 | `VarField_BriTempVarError` | `BriTempVarError(:,:)` | scene dependent obs errors for BTs (oblocation, channel) | `ObsErrorData/brightnessTemperature` | |
 | 77 | `VarField_AOD` | `AOD(:,:)` | aerosol optical depth | `ObsValue/aerosolOpticalDepth` | |
 | 78 | `VarField_Theta` | `theta(:,:)` | potential temperature | `ObsValue/airTemperature` | |
 | 79 | `VarField_RadNoiseLvl` | | | | Implement |
