@@ -20,7 +20,7 @@ observations:
     - filter: Domain Check
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         minvalue: 0.0
     - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_033_UpperAirCxField_p_bar

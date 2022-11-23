@@ -38,7 +38,7 @@ static ObsFunctionMaker<GnssroStationIDMetOffice>
  */
 GnssroStationIDMetOffice::GnssroStationIDMetOffice(const eckit::LocalConfiguration & conf)
   : invars_() {
-  invars_ += Variable("MetaData/occulting_sat_id");
+  invars_ += Variable("MetaData/satelliteIdentifier");
 }
 
 // -----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
   // Get the satellite identifier
   const size_t nlocs = in.nlocs();
   std::vector<int> satid;
-  in.get(Variable("MetaData/occulting_sat_id"), satid);
+  in.get(Variable("MetaData/satelliteIdentifier"), satid);
 
   // Get the record number of each profile
   std::vector<size_t> recordNumbers = out.space().recidx_all_recnums();

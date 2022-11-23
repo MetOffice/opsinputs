@@ -25,7 +25,7 @@ observations:
     - filter: Domain Check
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         minvalue: 0.0
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true

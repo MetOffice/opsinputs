@@ -9,10 +9,10 @@ observations:
           type: H5File
           obsfile: Data/relative_humidity_Sonde.nc4
         obsgrouping:
-          group variables: [ "station_id" ]
-          sort variable: "air_pressure"
+          group variables: [ "stationIdentification" ]
+          sort variable: "pressure"
           sort order: "descending"
-      simulated variables: [relative_humidity]
+      simulated variables: [relativeHumidity]
       extension:
         allocate companion records with length: 3
     geovals:

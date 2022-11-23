@@ -12,8 +12,8 @@ observations:
         engine:
           type: H5File
           obsfile: Data/varobs_globalnamelist_sonde.nc4
-      simulated variables: [theta, eastward_wind, northward_wind, relative_humidity]
-      observed variables: [theta, eastward_wind, northward_wind, relative_humidity]
+      simulated variables: [theta, windEastward, windNorthward, relativeHumidity]
+      observed variables: [theta, windEastward, windNorthward, relativeHumidity]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
@@ -26,7 +26,7 @@ observations:
     - filter: BlackList
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         is_not_defined:
       defer to post: true
     # Copy latitude, longitude and dateTime to 'initial' values which
@@ -85,8 +85,8 @@ observations:
         engine:
           type: H5File
           obsfile: Data/varobs_globalnamelist_sonde.nc4
-      simulated variables: [theta, eastward_wind, northward_wind, relative_humidity]
-      observed variables: [theta, eastward_wind, northward_wind, relative_humidity]
+      simulated variables: [theta, windEastward, windNorthward, relativeHumidity]
+      observed variables: [theta, windEastward, windNorthward, relativeHumidity]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
@@ -99,7 +99,7 @@ observations:
     - filter: BlackList
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         is_not_defined:
       defer to post: true
     - filter: VarObs Writer

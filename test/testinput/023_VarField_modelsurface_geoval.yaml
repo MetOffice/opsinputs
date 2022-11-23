@@ -8,7 +8,7 @@ observations:
         engine:
           type: H5File
           obsfile: Data/002_VarField_temperature_Surface.nc4
-      simulated variables: [air_temperature]
+      simulated variables: [airTemperatureAt2M]
     geovals:
       filename: Data/023_VarField_modelsurface_geoval.nc4
     obs filters:
@@ -26,7 +26,7 @@ observations:
     - filter: Domain Check
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         minvalue: 0.0
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true

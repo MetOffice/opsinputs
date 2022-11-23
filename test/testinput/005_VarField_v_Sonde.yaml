@@ -9,17 +9,17 @@ observations:
           type: H5File
           obsfile: Data/005_VarField_v_Sonde.nc4
         obsgrouping:
-          group variables: [ "station_id" ]
-          sort variable: "air_pressure"
+          group variables: [ "stationIdentification" ]
+          sort variable: "pressure"
           sort order: "descending"
-      simulated variables: [northward_wind]
+      simulated variables: [windNorthward]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
       where:
       - variable:
-          name: northward_wind@ObsErrorData
+          name: ObsErrorData/windNorthward
         is_defined:
       action:
         name: inflate error
@@ -33,7 +33,7 @@ observations:
     - filter: RejectList
       where:
       - variable:
-          name: station_id@MetaData
+          name: MetaData/stationIdentification
         is_in: [station_1, station_3, station_5]
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true

@@ -8,19 +8,19 @@ observations:
         engine:
           type: H5File
           obsfile: Data/reject_obs_with_all_variables_failing_qc.nc4
-      simulated variables: [eastward_wind, northward_wind]
+      simulated variables: [windEastwardAt10M, windNorthwardAt10M]
     obs filters:
     # BlackList all eastward_wind observations...
     - filter: BlackList
       filter variables:
-      - name: eastward_wind
+      - name: windEastwardAt10M
     # But only one northward_wind observation.
     - filter: Domain Check
       filter variables:
-      - name: northward_wind
+      - name: windNorthwardAt10M
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         minvalue: 0.0
     # Set the flag of observations with missing values to "pass".
     - filter: Reset Flags to Pass
