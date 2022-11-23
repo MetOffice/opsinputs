@@ -11,10 +11,10 @@
  * Example yaml snippet:
  *  - filter: Variable Assignment
  *   assignments:
- *   - name: station_id@MetaData
+ *   - name: MetaData/station_id
  *     type: string
  *     function:
- *       name: GnssroStationIDMetOffice@StringObsFunction
+ *       name: StringObsFunction/GnssroStationIDMetOffice
  * -----------------------------------------------------------------------------
  */
 #include "opsinputs/GnssroStationIDMetOffice.h"

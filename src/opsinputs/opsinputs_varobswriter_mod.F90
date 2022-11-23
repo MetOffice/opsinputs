@@ -1051,7 +1051,7 @@ do iVarField = 1, nVarFields
         Ob % Header % RO_geoid_und, "RO_geoid_und", Ob % Header % NumObsLocal, Ob % RO_geoid_und, &
         ObsSpace, "geoidUndulation", "MetaData", PackPGEs = .false.)
     case (VarField_AOD)
-      ! Note that currently in JOPA only one wavelength (550nm) is supported and so aersolOpticalDepth@ObsValue 
+      ! Note that currently in JOPA only one wavelength (550nm) is supported and so ObsValue/aersolOpticalDepth
       ! is a 1-dimensional field which is here transformed onto a 2-dimensional OPS filed, Ob % AOD.
       ! However multiple wavelength options could be added in future.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
