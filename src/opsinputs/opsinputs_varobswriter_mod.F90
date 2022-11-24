@@ -905,7 +905,7 @@ do iVarField = 1, nVarFields
     case (VarField_iremiss)
       call opsinputs_fill_fillreal( &
         Ob % Header % IREmiss, "IREmiss", JediToOpsLayoutMapping, Ob % IREmiss, &
-        ObsSpace, "ir_emissivity", "Emiss")
+        ObsSpace, "emissivityIR", "Emiss")
     case (VarField_cloudtopp)
       call opsinputs_fill_fillreal( &
         Ob % Header % CloudTopP, "CloudTopP", JediToOpsLayoutMapping, Ob % CloudTopP, &
