@@ -668,6 +668,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('windEastwardAt10M', 'windNorthwardAt10M',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
+    output_2d_simulated_var_to_netcdf('brightnessTemperature', 'testinput/reject_obs_with_all_variables_failing_qc_satellite.nc4')
     output_1d_simulated_var_to_netcdf   ('zenithTotalDelay', 'testinput/012_VarField_gpstzdelay.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('stationElevation', 'MetaData', 'testinput/067_VarField_GPS_Station_Height.nc4')
 

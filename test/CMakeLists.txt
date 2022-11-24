@@ -507,7 +507,7 @@ ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_4
 ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
                 YAML     cxwriter_reject_obs_with_all_variables_failing_qc.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
-                DATA     001_UpperAirCxField_theta.nc4 reject_obs_with_all_variables_failing_qc.nc4)
+                DATA     001_UpperAirCxField_theta.nc4 reject_obs_with_all_variables_failing_qc_satellite.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 YAML     cxwriter_nested_output_directory.yaml
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4

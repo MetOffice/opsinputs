@@ -7,19 +7,22 @@ observations:
       obsdatain:
         engine:
           type: H5File
-          obsfile: Data/reject_obs_with_all_variables_failing_qc.nc4
-      simulated variables: [windEastwardAt10M, windNorthwardAt10M]
+          obsfile: Data/reject_obs_with_all_variables_failing_qc_satellite.nc4
+      simulated variables: [brightnessTemperature]
+      channels: 1-3
     geovals:
       filename: Data/001_UpperAirCxField_theta.nc4
     obs filters:
-    # BlackList all eastward_wind observations...
+    # BlackList all channel 1 data
     - filter: BlackList
       filter variables:
-      - name: windEastwardAt10M
-    # But only one northward_wind observation.
+      - name: brightnessTemperature
+        channels: 1
+    # Remove all channels for profile 3
     - filter: Domain Check
       filter variables:
-      - name: windNorthwardAt10M
+      - name: brightnessTemperature
+        channels: 1-3
       where:
       - variable:
           name: MetaData/latitude
