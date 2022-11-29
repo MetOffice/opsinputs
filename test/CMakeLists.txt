@@ -441,6 +441,13 @@ ADD_WRITER_TEST(NAME     cxwriter_041-046_UpperAirCxField_dust1-dust6
                 NAMELIST CxWriterNamelists_041-046_UpperAirCxField_dust1-dust6/AOD.nl
                 DATA     041-046_UpperAirCxField_dust1-dust6.nc4 dummy.nc4)
 
+# Test of wind un-rotation
+
+ADD_WRITER_TEST(NAME     cxwriter_UnRotateWinds
+                YAML     CxWriter_UnRotateWinds.yaml
+                NAMELIST CxWriterNamelists_UnRotateWinds/Sonde.nl
+                DATA     CxWriter_UnRotateWinds.nc4 dummy.nc4)
+
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
                 YAML     cxwriter_FixedHeader_VertCoord.yaml
