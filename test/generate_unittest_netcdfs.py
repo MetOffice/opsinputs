@@ -636,7 +636,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('windNorthward',          'testinput/005_VarField_v_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
-    output_1d_normal_var_to_netcdf   ('skin_temperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
+    output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
     output_1d_normal_var_to_netcdf   ('total_column_ozone', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
     output_1d_normal_var_to_netcdf   ('sensorZenithAngle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
@@ -676,7 +676,7 @@ if __name__ == "__main__":
     # Arguments are: 1D floats, 2D floats, 1D ints, filename
     
     # ATMS
-    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensorZenithAngle',
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skinTemperature','MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle'],
                                  ['ObsValue/brightnessTemperature','ObsError/brightnessTemperature','Emiss/emissivity',
                                   'BiasCorrObsValue/brightnessTemperature','thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
@@ -684,7 +684,7 @@ if __name__ == "__main__":
                                  ['MetaData/surfaceQualifier','MetaData/satelliteIdentifier'],
                                   'testinput/varobs_globalnamelist_atms.nc4')
     # ATOVS
-    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skin_temperature','MetaData/sensorZenithAngle',
+    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skinTemperature','MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle','Emiss/emissivityIR'],
                                  ['ObsValue/brightnessTemperature','ObsErrorData/brightnessTemperature','Emiss/emissivity',
                                   'BiasCorrObsValue/brightnessTemperature','thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
@@ -729,7 +729,7 @@ if __name__ == "__main__":
 
     # IASI - this tests the variable_for_quality_control option
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude',
-                                  'OneDVar/skin_temperature','MetaData/sensorZenithAngle',
+                                  'OneDVar/skinTemperature','MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle','OneDVar/pressureAtTopOfCloud','OneDVar/cloudAmount',
                                   'MetaData/total_column_ozone'],
                                  ['ObsValue/radiance','DerivedObsValue/brightnessTemperature','EffectiveError/brightnessTemperature',

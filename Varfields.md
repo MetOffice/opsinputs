@@ -10,7 +10,7 @@
 | 8 | `VarField_windspeed` | | | | Implement |
 | 9 | `VarField_lwp` | | | | Implement |
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `BiasCorrObsValue/brightnessTemperature` | |
-| 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `OneDVar/skin_temperature` | |
+| 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `OneDVar/skinTemperature` | |
 | 12 | `VarField_gpstzdelay` | `gpstzdelay(:)`| Ground based GNSS Total Zenith Delay | BiasCorrObsValue/zenithTotalDelay | |
 | 15 | `VarField_cloud` | | | | Implement |
 | 16 | `VarField_rainrate` | | | | Implement |

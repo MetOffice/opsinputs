@@ -839,7 +839,7 @@ do iVarField = 1, nVarFields
     case (VarField_tskin)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
-        ObsSpace, "skin_temperature", "OneDVar")
+        ObsSpace, "skinTemperature", "OneDVar")
     case (VarField_gpstzdelay)
       call opsinputs_fill_fillelementtypefromsimulatedvariable( &
         Ob % Header % GPSTZDelay, "GPSTZDelay",  Ob % Header % NumObsLocal, Ob % GPSTZDelay, &
