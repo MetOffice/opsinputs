@@ -11,7 +11,7 @@
  * Example yaml snippet:
  *  - filter: Variable Assignment
  *   assignments:
- *   - name: MetaData/station_id
+ *   - name: MetaData/stationIdentification
  *     type: string
  *     function:
  *       name: StringObsFunction/GnssroStationIDMetOffice
@@ -46,7 +46,7 @@ GnssroStationIDMetOffice::GnssroStationIDMetOffice(const eckit::LocalConfigurati
 GnssroStationIDMetOffice::~GnssroStationIDMetOffice() {}
 
 /* -----------------------------------------------------------------------------
- * Perform the computation.  For each profile construct the station_id as a
+ * Perform the computation.  For each profile construct the stationIdentification as a
  * fixed length string.
  * -----------------------------------------------------------------------------
  */

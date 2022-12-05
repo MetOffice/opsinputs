@@ -638,7 +638,7 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
-    output_1d_normal_var_to_netcdf   ('total_column_ozone', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
+    output_1d_normal_var_to_netcdf   ('ozoneTotal', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
     output_1d_normal_var_to_netcdf   ('sensorZenithAngle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
     output_1d_normal_int_var_to_netcdf('surfaceQualifier', 'MetaData', 'testinput/021_VarField_surface.nc4')
     output_1d_geoval_to_netcdf       ('land_type_index',            'testinput/023_VarField_modelsurface_geoval.nc4')
@@ -731,7 +731,7 @@ if __name__ == "__main__":
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude',
                                   'OneDVar/skinTemperature','MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle','OneDVar/pressureAtTopOfCloud','OneDVar/cloudAmount',
-                                  'MetaData/total_column_ozone'],
+                                  'MetaData/ozoneTotal'],
                                  ['ObsValue/radiance','DerivedObsValue/brightnessTemperature','EffectiveError/brightnessTemperature',
                                   'OneDVar/emissivity', 'BiasCorrObsValue/brightnessTemperature',
                                   'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',

@@ -614,7 +614,7 @@ character(len=200)                       :: varname
 !do i = 1, size(VarFields)
 !  select case (VarFields(i))
 !  case (VarField_tcozone)
-!    call diagvars % push_back("total_column_ozone")
+!    call diagvars % push_back("ozoneTotal")
 !  end select
 !end do
 
@@ -855,7 +855,7 @@ do iVarField = 1, nVarFields
     case (VarField_TCozone)
       call opsinputs_fill_fillreal( &
         Ob % Header % TCozone, "TCozone", JediToOpsLayoutMapping, Ob % TCozone, &
-        ObsSpace, "total_column_ozone", "MetaData")
+        ObsSpace, "ozoneTotal", "MetaData")
     case (VarField_satzenith)
       call opsinputs_fill_fillreal( &
         Ob % Header % SatZenithAngle, "SatZenithAngle", JediToOpsLayoutMapping, Ob % SatZenithAngle, &

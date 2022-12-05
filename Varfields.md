@@ -15,7 +15,7 @@
 | 15 | `VarField_cloud` | | | | Implement |
 | 16 | `VarField_rainrate` | | | | Implement |
 | 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `Emiss/emissivity` |  |
-| 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) | `MetaData/total_column_ozone` |  |
+| 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) | `MetaData/ozoneTotal` |  |
 | 19 | `VarField_satzenith` | `SatZenithAngle(:)` | sat zenith angle | `MetaData/sensorZenithAngle` | |
 | 20 | `VarField_scanpos` | | | | Implement |
 | 21 | `VarField_surface` | `surface(:)` \[`INTEGER`\] | surface type | `MetaData/surfaceQualifier` | |
