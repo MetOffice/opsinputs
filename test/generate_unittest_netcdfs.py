@@ -665,7 +665,7 @@ if __name__ == "__main__":
     output_1d_normal_var_to_netcdf('geoidUndulation', 'MetaData', 'testinput/074_VarField_ro_geoid_und.nc4')
     output_2d_normal_var_to_netcdf   ('brightnessTemperature', 'ObsErrorData', 'testinput/076_VarField_britempvarerror.nc4', use_chans=True)
     output_1d_simulated_var_to_netcdf('aerosolOpticalDepth', 'testinput/077_VarField_aod.nc4')
-    output_simulated_var_profiles_to_netcdf('theta', 'testinput/078_VarField_theta.nc4') # Sonde
+    output_simulated_var_profiles_to_netcdf('potentialTemperature', 'testinput/078_VarField_theta.nc4') # Sonde
     output_1d_simulated_vars_to_netcdf('windEastwardAt10M', 'windNorthwardAt10M',
                                        'testinput/reject_obs_with_all_variables_failing_qc.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature', 'testinput/reject_obs_with_all_variables_failing_qc_satellite.nc4')
@@ -708,15 +708,15 @@ if __name__ == "__main__":
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
                                   'MetaData/pressure',
-                                  'ObsValue/theta','ObsError/theta',
+                                  'ObsValue/potentialTemperature','ObsError/potentialTemperature',
                                   'ObsValue/windEastward','ObsError/windEastward',
                                   'ObsValue/windNorthward','ObsError/windNorthward',
                                   'ObsValue/relativeHumidity','ObsError/relativeHumidity'],
                                  [],
                                  [],
                                  'testinput/varobs_globalnamelist_sonde.nc4')
-    copy_var_to_var('ObsValue', 'theta', 'airTemperature', 'testinput/varobs_globalnamelist_sonde.nc4')
-    copy_var_to_var('ObsError', 'theta', 'airTemperature','testinput/varobs_globalnamelist_sonde.nc4')
+    copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_sonde.nc4')
+    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature','testinput/varobs_globalnamelist_sonde.nc4')
 
     # Scatwind
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude'],
