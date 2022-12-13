@@ -70,12 +70,12 @@ IF (mype == 0) THEN
 #endif
           IOSTAT = ErrorStatus)
   ELSE
-    OPEN (UNIT = StatsOut,            &
-          FILE = gen_stats_file_name, &
-          STATUS = 'REPLACE',         &
-          RECL = rec_len,             &
+    OPEN (UNIT = StatsOut,    &
+          FILE = "fort.7",    &
+          STATUS = 'REPLACE', &
+          RECL = rec_len,     &
 #if FORTRAN_VERSION >= 2003
-          IOMSG = io_msg,             &
+          IOMSG = io_msg,     &
 #endif
           IOSTAT = ErrorStatus)
   END IF
