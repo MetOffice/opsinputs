@@ -29,7 +29,7 @@ observations:
     - filter: BlackList
       where:
       - variable:
-          name: MetaData/extended_obs_space
+          name: MetaData/extendedObsSpace
         is_in: 0
       defer to post: true
     - filter: Cx Writer

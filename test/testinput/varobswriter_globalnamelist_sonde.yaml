@@ -12,8 +12,8 @@ observations:
         engine:
           type: H5File
           obsfile: Data/varobs_globalnamelist_sonde.nc4
-      simulated variables: [theta, windEastward, windNorthward, relativeHumidity]
-      observed variables: [theta, windEastward, windNorthward, relativeHumidity]
+      simulated variables: [potentialTemperature, windEastward, windNorthward, relativeHumidity]
+      observed variables: [potentialTemperature, windEastward, windNorthward, relativeHumidity]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
@@ -85,8 +85,8 @@ observations:
         engine:
           type: H5File
           obsfile: Data/varobs_globalnamelist_sonde.nc4
-      simulated variables: [theta, windEastward, windNorthward, relativeHumidity]
-      observed variables: [theta, windEastward, windNorthward, relativeHumidity]
+      simulated variables: [potentialTemperature, windEastward, windNorthward, relativeHumidity]
+      observed variables: [potentialTemperature, windEastward, windNorthward, relativeHumidity]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
