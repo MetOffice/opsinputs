@@ -99,9 +99,6 @@ use OpsMod_CXInfo, only: &
 use opsinputs_cxgenerate_mod, only: &
     MaxModelCodes,                  &
     Ops_ReadCXControlNL
-use OpsMod_DateTime, only: &
-    DateTime_type,         &
-    OpsFn_DateTime_now
 use OpsMod_Kinds, only: &
     integer64,          &
     logical64,          &
@@ -1370,7 +1367,6 @@ type(UM_header_type), intent(inout)  :: UmHeader
 ! Local declarations:
 integer                              :: NumLevels
 integer(c_int)                       :: year, month, day, hour, minute, second
-TYPE (DateTime_type)                 :: now
 
 ! Body:
 
@@ -1416,15 +1412,6 @@ UmHeader % FixHd(FH_VTHour) = hour
 UmHeader % FixHd(FH_VTMinute) = minute
 UmHeader % FixHd(FH_VTSecond) = second
 UmHeader % FixHd(FH_VTDayNo) = IMDI
-
-now = OpsFn_DateTime_now()
-UmHeader % FixHd(FH_CTYear) = now % year
-UmHeader % FixHd(FH_CTMonth) = now % month
-UmHeader % FixHd(FH_CTDay) = now % day
-UmHeader % FixHd(FH_CTHour) = now % hour
-UmHeader % FixHd(FH_CTMinute) = now % minute
-UmHeader % FixHd(FH_CTSecond) = now % second
-UmHeader % FixHd(FH_CTDayNo) = IMDI
 
 UmHeader % IntC = IMDI
 UmHeader % IntC(IC_XLen) = self % IC_XLen
