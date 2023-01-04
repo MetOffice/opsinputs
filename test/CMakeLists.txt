@@ -300,7 +300,7 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
                 DATA     028_VarField_satid.nc4
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
-# Tests the namelist files in the etc directory
+# Tests the global namelist files in the etc directory
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
                 YAML     varobswriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/varobs/ATMS.nl
@@ -325,6 +325,13 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_scatwind
                 YAML     varobswriter_globalnamelist_scatwind.yaml
                 NAMELIST ../../etc/global/varobs/Scatwind.nl
                 DATA     varobs_globalnamelist_scatwind.nc4)
+
+# Tests the UKV namelist files in the etc directory
+
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_sonde
+                YAML     varobswriter_ukvnamelist_sonde.yaml
+                NAMELIST ../../etc/ukv/varobs/Sonde.nl
+                DATA     varobs_ukvnamelist_sonde.nc4)
 
 ### CxWriter tests
 
