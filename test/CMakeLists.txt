@@ -528,7 +528,7 @@ ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
-# Tests the namelist files in the etc directory
+# Tests the global namelist files in the etc directory
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_asmr
                 YAML     cxwriter_globalnamelist_amsr.yaml
                 NAMELIST ../../etc/global/cx/AMSR.nl
@@ -568,6 +568,13 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sattcwv
                 YAML     cxwriter_globalnamelist_sattcwv.yaml
                 NAMELIST ../../etc/global/cx/SatTCWV.nl
                 DATA     cx_globalnamelist_sattcwv.nc4 dummy.nc4)
+
+# Tests the ukv namelist files in the etc directory
+
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_sonde
+                YAML     cxwriter_ukvnamelist_sonde.yaml
+                NAMELIST ../../etc/ukv/cx/Sonde.nl
+                DATA     cx_ukvnamelist_sonde.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
