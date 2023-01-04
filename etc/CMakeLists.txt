@@ -29,6 +29,8 @@ list( APPEND opsinputs_etc
   global/varobs/IASI.nl
   global/varobs/Scatwind.nl
   global/varobs/Sonde.nl
+  ukv/cx/Sonde.nl
+  ukv/varobs/Sonde.nl
 )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/global/cx)
