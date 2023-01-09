@@ -1117,7 +1117,7 @@ end subroutine opsinputs_fill_fillreal2d_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, IC_PLevels, JediVarName, JediVarGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1126,6 +1126,7 @@ character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 
@@ -1140,15 +1141,24 @@ MissingDouble = missing_value(0.0_c_double)
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-                 num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  if (IC_PLevels > 0) then
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(IC_PLevels, kind = integer64))
+  else
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  end if
   ! Retrieve data from JEDI
   call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
 
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
-                JediToOpsLayoutMapping % RecordStarts(iObs)
+    if (IC_PLevels > 0) then
+       numLevels = IC_PLevels
+    else
+       numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+            JediToOpsLayoutMapping % RecordStarts(iObs)
+    end if
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1190,7 +1200,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetChans)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, IC_PLevels, JediVarName, JediVarGroup, OffsetChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1200,6 +1210,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in)  :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                  :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
+integer(integer64), intent(in)                      :: IC_PLevels
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
@@ -1208,7 +1219,7 @@ type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
+    Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, IC_PLevels, JediVarName, JediVarGroup)
 else
   if (Present(OffsetChans)) then
     call opsinputs_fill_fillreal2d_norecords( &
@@ -1869,7 +1880,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup, ReferenceTime)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, IC_PLevels, JediVarName, JediVarGroup, ReferenceTime)
 use datetime_mod, only: datetime
 implicit none
 
@@ -1879,6 +1890,7 @@ character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 type(datetime), intent(in)                         :: ReferenceTime
@@ -1898,12 +1910,23 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     ObsSpace, JediVarGroup, JediVarName, ReferenceTime, VarValue)
 
   ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-                 num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  if (IC_PLevels > 0) then
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(IC_PLevels, kind = integer64))
+  else
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  end if
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
-                JediToOpsLayoutMapping % RecordStarts(iObs)
+
+    if (IC_PLevels > 0) then
+       numLevels = IC_PLevels
+    else
+       numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+            JediToOpsLayoutMapping % RecordStarts(iObs)
+    end if
+
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1947,7 +1970,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, &
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, IC_PLevels, JediVarName, JediVarGroup, &
   ReferenceTime)
 use datetime_mod, only: datetime
 implicit none
@@ -1959,6 +1982,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
+integer(integer64), intent(in)                     :: IC_PLevels
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 type(datetime), intent(in)                         :: ReferenceTime
@@ -1968,7 +1992,7 @@ type(datetime), intent(in)                         :: ReferenceTime
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_filltimeoffsets2d_records(Hdr, OpsVarName, &
                                                 JediToOpsLayoutMapping, Real2, &
-                                                ObsSpace, JediVarName, JediVarGroup, &
+                                                ObsSpace, IC_PLevels, JediVarName, JediVarGroup, &
                                                 ReferenceTime)
 else
   call opsinputs_fill_filltimeoffsets2d_norecords(Hdr, OpsVarName, &
