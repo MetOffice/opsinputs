@@ -13,7 +13,6 @@ finally() {
 HERE="$(cd "$(dirname "$0")" && pwd)"
 THIS="$(basename "$0")"
 NPROC=${NPROC:-$(nproc)}
-# NPROC=${NPROC:-2}
 WORKD="$(mktemp -d "${THIS}-XXXXXX" -t)"
 
 trap finally ERR
@@ -23,18 +22,6 @@ cd "${WORKD}"
 
 # - jcsda container requires manual sourcing of spack environment
 source /etc/profile.d/z10_spack_environment.sh
-
-# - build shumlib (remove when shumlib available via container)
-# cp -a "${HERE}/shumlib" .
-# arch='vm-x86-gfortran-gcc'
-# (cd './shumlib' && make -f "./make/${arch}.mk")
-# prefix="${PREFIX:-/usr/local/}"
-# cp -p "./shumlib/build/${arch}/include/"* "${prefix}include/"
-# cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
-# rm -fr './shumlib'
-
-# - override container shumlib path (when container shumlib fails)
-# export SHUM_ROOT=$prefix
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
