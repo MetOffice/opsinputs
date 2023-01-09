@@ -12,7 +12,8 @@ finally() {
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 THIS="$(basename "$0")"
-NPROC=${NPROC:-2}
+NPROC=${NPROC:-$(nproc)}
+# NPROC=${NPROC:-2}
 WORKD="$(mktemp -d "${THIS}-XXXXXX" -t)"
 
 trap finally ERR
@@ -20,6 +21,10 @@ trap finally EXIT
 
 cd "${WORKD}"
 
+# - jcsda container requires manual sourcing of spack environment
+source /etc/profile.d/z10_spack_environment.sh
+
+# - build shumlib (remove when shumlib available via container)
 # cp -a "${HERE}/shumlib" .
 # arch='vm-x86-gfortran-gcc'
 # (cd './shumlib' && make -f "./make/${arch}.mk")
@@ -28,16 +33,15 @@ cd "${WORKD}"
 # cp -p "./shumlib/build/${arch}/lib/"* "${prefix}lib/"
 # rm -fr './shumlib'
 
-# - jcsda container requires manual sourcing of spack environment
-source /etc/profile.d/z10_spack_environment.sh
-
-# - override container shumlib (does not work)
+# - override container shumlib path (when container shumlib fails)
 # export SHUM_ROOT=$prefix
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
-ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
-make -j "${NPROC}"
+# ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
+# make -j "${NPROC}"
+cmake -B . -S "${HERE}" -DMPI_ARGS="--oversubscribe"
+cmake --build . -j "${NPROC}"
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
     ctest -j "${NPROC}" --output-on-failure --test-dir './opsinputs'
 
