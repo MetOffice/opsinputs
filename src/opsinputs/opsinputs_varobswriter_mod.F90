@@ -98,9 +98,6 @@ use OpsMod_Control, only:   &
     DefaultDocURL,          &
     mpi_group,              &
     Ops_InitMPI
-use OpsMod_DateTime, only: &
-    DateTime_type,         &
-    OpsFn_DateTime_now
 use OpsMod_MiscTypes, only: ElementHeader_Type
 use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
@@ -1454,7 +1451,6 @@ type(UM_header_type), intent(inout)     :: CxHeader
 
 ! Local declarations:
 integer(c_int)                          :: year, month, day, hour, minute, second
-TYPE (DateTime_type)                    :: now
 
 ! Body:
 
@@ -1487,15 +1483,6 @@ CxHeader % FixHd(FH_VTHour) = hour
 CxHeader % FixHd(FH_VTMinute) = minute
 CxHeader % FixHd(FH_VTSecond) = second
 CxHeader % FixHd(FH_VTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
-
-now = OpsFn_DateTime_now()
-CxHeader % FixHd(FH_CTYear) = now % year
-CxHeader % FixHd(FH_CTMonth) = now % month
-CxHeader % FixHd(FH_CTDay) = now % day
-CxHeader % FixHd(FH_CTHour) = now % hour
-CxHeader % FixHd(FH_CTMinute) = now % minute
-CxHeader % FixHd(FH_CTSecond) = now % second
-CxHeader % FixHd(FH_CTDayNo) = 0  ! TODO(wsmigaj): What should this be set to?
 
 CxHeader % IntC(IC_ShipWind) = self % IC_ShipWind
 CxHeader % IntC(IC_GroundGPSOperator) = self % IC_GroundGPSOperator
