@@ -38,10 +38,8 @@ source /etc/profile.d/z10_spack_environment.sh
 
 rm -f "${HERE}/opsinputs"
 ln -s '..' "${HERE}/opsinputs"
-# ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
-# make -j "${NPROC}"
-cmake -B . -S "${HERE}" -DMPI_ARGS="--oversubscribe"
-cmake --build . -j "${NPROC}"
+ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
+make -j "${NPROC}"
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
     ctest -j "${NPROC}" --output-on-failure --test-dir './opsinputs'
 
