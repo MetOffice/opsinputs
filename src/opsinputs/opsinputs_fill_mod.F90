@@ -1159,6 +1159,10 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
        numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
             JediToOpsLayoutMapping % RecordStarts(iObs)
     end if
+    ! Do not deal with this observation if all levels have been rejected by QC
+    if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+       cycle
+    end if
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1925,6 +1929,10 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     else
        numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
             JediToOpsLayoutMapping % RecordStarts(iObs)
+    end if
+    ! Do not deal with this observation if all levels have been rejected by QC
+    if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+       cycle
     end if
 
     do iLevel = 1, numLevels
