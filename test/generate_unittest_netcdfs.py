@@ -491,7 +491,7 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
 def output_2d_geoval_to_netcdf(var_name, file_name):
     return output_2d_geovals_to_netcdf([var_name], file_name)
 
-def output_2d_geovals_to_netcdf(var_names, file_name):
+def output_2d_geovals_to_netcdf(var_names, file_name, shift_by_varindex=True):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
@@ -501,7 +501,10 @@ def output_2d_geovals_to_netcdf(var_names, file_name):
 
     for var_index, var_name in enumerate(var_names):
       var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
-      shift = 10 * var_index
+      if shift_by_varindex:
+          shift = 10 * var_index
+      else:
+          shift = 0
       # Assumes the geovals are toptobottom
       var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
                 [shift + 2.3, missing_float, shift + 2.1],
@@ -780,6 +783,7 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('frozen_cloud_fraction',      'testinput/034_UpperAirCxField_Cf.nc4')
     output_2d_geoval_to_netcdf       ('liquid_cloud_fraction',      'testinput/035_UpperAirCxField_Cl.nc4')
     output_2d_geovals_to_netcdf      (['mass_fraction_of_dust00%s_in_air' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
+    output_2d_geovals_to_netcdf      (['eastward_wind', 'northward_wind'], 'testinput/CxWriter_UnRotateWinds.nc4', shift_by_varindex=False)
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output
