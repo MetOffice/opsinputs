@@ -356,8 +356,8 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
-!> \param[in] IC_PLevels
-!>   Number of model pressure levels.
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate El2 and Hdr.
@@ -368,7 +368,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, IC_PLevels, JediVarName, JediGroupName, PackPGEs)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, ObsErrors, VarobsLength, JediVarName, JediGroupName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -379,7 +379,7 @@ type(Element_type), pointer                        :: El2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
-integer(integer64), intent(in)                     :: IC_PLevels
+integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediGroupName
 logical, optional, intent(in)                      :: PackPGEs
@@ -415,9 +415,9 @@ MissingFloat  = missing_value(0.0_c_float)
 
 if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   ! Allocate OPS data structures
-   if (IC_PLevels > 0) then
+   if (VarobsLength > 0) then
       call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
-           num_levels = int(IC_PLevels, kind = integer64))
+           num_levels = int(VarobsLength, kind = integer64))
    else
       call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, &
            num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
@@ -455,8 +455,8 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
 
-    if (IC_PLevels > 0) then
-       numLevels = IC_PLevels
+    if (VarobsLength > 0) then
+       numLevels = VarobsLength
     else
        numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
             JediToOpsLayoutMapping % RecordStarts(iObs)
@@ -510,8 +510,8 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !>   Pointer to a ioda::ObsDataVector<int> object containing QC flags.
 !> \param[in] ObsErrors
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
-!> \param[in] IC_PLevels
-!>   Number of model pressure levels.
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups) used
 !>   to populate El2 and Hdr. If each JEDI location needs to be mapped to a separate OPS
@@ -528,7 +528,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, IC_PLevels, JediVarName, &
+  Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, VarobsLength, JediVarName, &
   JediGroupName, PackPGEs)
 implicit none
 
@@ -541,7 +541,7 @@ type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
-integer(integer64), intent(in)                     :: IC_PLevels
+integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediGroupName
 logical, optional, intent(in)                      :: PackPGEs
@@ -551,7 +551,7 @@ logical, optional, intent(in)                      :: PackPGEs
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, &
-    ObsErrors, IC_PLevels, JediVarName, JediGroupName, PackPGEs)
+    ObsErrors, VarobsLength, JediVarName, JediGroupName, PackPGEs)
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
@@ -1108,6 +1108,8 @@ end subroutine opsinputs_fill_fillreal2d_norecords
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2.
 !> \param[in] JediGroup
@@ -1117,7 +1119,7 @@ end subroutine opsinputs_fill_fillreal2d_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 implicit none
 
 ! Subroutine arguments:
@@ -1126,6 +1128,7 @@ character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 
@@ -1140,15 +1143,28 @@ MissingDouble = missing_value(0.0_c_double)
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-                 num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  if (VarobsLength > 0) then
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(VarobsLength, kind = integer64))
+  else
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  end if
   ! Retrieve data from JEDI
   call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
 
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
-                JediToOpsLayoutMapping % RecordStarts(iObs)
+    if (VarobsLength > 0) then
+       numLevels = VarobsLength
+    else
+       numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+            JediToOpsLayoutMapping % RecordStarts(iObs)
+    end if
+    ! Do not deal with this observation if all levels have been rejected by QC
+    if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+       cycle
+    end if
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1178,6 +1194,8 @@ end subroutine opsinputs_fill_fillreal2d_records
 !>   representing the indices specified in \p Channels.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. If each JEDI location needs to be mapped
 !>   to a separate OPS observation, this can represent either a single variable with no channel
@@ -1190,7 +1208,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetChans)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, VarobsLength, JediVarName, JediVarGroup, OffsetChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1200,6 +1218,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in)  :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                  :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
+integer(integer64), intent(in)                      :: VarobsLength
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
@@ -1208,7 +1227,7 @@ type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup)
+    Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
   if (Present(OffsetChans)) then
     call opsinputs_fill_fillreal2d_norecords( &
@@ -1858,6 +1877,8 @@ end subroutine opsinputs_fill_filltimeoffsets2d_norecords
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable.
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2.
 !> \param[in] JediGroup
@@ -1869,7 +1890,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_norecords
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d_records( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, JediVarName, JediVarGroup, ReferenceTime)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup, ReferenceTime)
 use datetime_mod, only: datetime
 implicit none
 
@@ -1879,6 +1900,7 @@ character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 type(datetime), intent(in)                         :: ReferenceTime
@@ -1898,12 +1920,27 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     ObsSpace, JediVarGroup, JediVarName, ReferenceTime, VarValue)
 
   ! Allocate OPS data structures
-  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
-                 num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  if (VarobsLength > 0) then
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(VarobsLength, kind = integer64))
+  else
+     call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, &
+          num_levels = int(JediToOpsLayoutMapping % MaxNumLevelsPerObs, kind = integer64))
+  end if
   ! Fill the OPS data structures
   do iObs = 1, JediToOpsLayoutMapping % NumOpsObs
-    numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
-                JediToOpsLayoutMapping % RecordStarts(iObs)
+
+    if (VarobsLength > 0) then
+       numLevels = VarobsLength
+    else
+       numLevels = JediToOpsLayoutMapping % RecordStarts(iObs + 1) - &
+            JediToOpsLayoutMapping % RecordStarts(iObs)
+    end if
+    ! Do not deal with this observation if all levels have been rejected by QC
+    if (JediToOpsLayoutMapping % RecordStarts(iObs + 1) - JediToOpsLayoutMapping % RecordStarts(iObs) == 0) then
+       cycle
+    end if
+
     do iLevel = 1, numLevels
       iJediObs = JediToOpsLayoutMapping % LocationsOrderedByRecord( &
         JediToOpsLayoutMapping % RecordStarts(iObs) + (iLevel - 1))
@@ -1933,6 +1970,8 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !>   representing the indices specified in \p Channels.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. If each JEDI location needs to be mapped
 !>   to a separate OPS observation, this can represent either a single variable with no channel
@@ -1947,7 +1986,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, &
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, VarobsLength, JediVarName, JediVarGroup, &
   ReferenceTime)
 use datetime_mod, only: datetime
 implicit none
@@ -1959,6 +1998,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                 :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
+integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 type(datetime), intent(in)                         :: ReferenceTime
@@ -1968,7 +2008,7 @@ type(datetime), intent(in)                         :: ReferenceTime
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_filltimeoffsets2d_records(Hdr, OpsVarName, &
                                                 JediToOpsLayoutMapping, Real2, &
-                                                ObsSpace, JediVarName, JediVarGroup, &
+                                                ObsSpace, VarobsLength, JediVarName, JediVarGroup, &
                                                 ReferenceTime)
 else
   call opsinputs_fill_filltimeoffsets2d_norecords(Hdr, OpsVarName, &
