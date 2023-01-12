@@ -154,6 +154,7 @@ private
   logical            :: UseRadarFamily
   logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
+  logical            :: VarobsLengthIsIC_PLevels
 
   character(len=100) :: latitudeName
   character(len=100) :: longitudeName
@@ -181,6 +182,8 @@ private
   real(real64)       :: RC_FirstLong
   real(real64)       :: RC_PoleLat
   real(real64)       :: RC_PoleLong
+
+  integer(integer64) :: VarobsLength
 
   integer(c_int), allocatable :: channels(:)
   
@@ -296,6 +299,8 @@ call f_conf % get_or_die("use_radar_family", self % UseRadarFamily)
 call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta)
 
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
+
+call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_PLevels)
 
 ! This contains the offset that needs to be added to the channel number in order to
 ! index the output arrays correctly.
@@ -465,6 +470,14 @@ self % RC_PoleLat = DoubleValue
 
 call f_conf % get_or_die("RC_PoleLong", DoubleValue)
 self % RC_PoleLong = DoubleValue
+
+if (self % VarobsLengthIsIC_PLevels) then
+   ! set varobs profile length to IC_PLevels
+   self % VarobsLength = self % IC_PLevels
+else
+   ! set varobs profile length to length of record in ObsSpace
+   self % VarobsLength = 0
+end if
 
 !construct the modlevs
 allocate(self % modlevs(self % IC_PLevels))
@@ -764,7 +777,7 @@ do iVarField = 1, nVarFields
          if (obsspace_has(ObsSpace, "ObsValue", "air_temperature")) then
             call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
                  Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
-                 ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature", "ObsValue")
+                 ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "air_temperature", "ObsValue")
          else
             write(*, *) "ObsValue/air_temperature must be present when adding the theta varfield"
             call abort()
@@ -772,7 +785,7 @@ do iVarField = 1, nVarFields
       end if
      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % theta, "theta", JediToOpsLayoutMapping, Ob % theta, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "theta", "ObsValue")
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "theta", "ObsValue")
     case (VarField_temperature)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
@@ -781,7 +794,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % t, "t", JediToOpsLayoutMapping, Ob % t, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "air_temperature", "ObsValue")
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "air_temperature", "ObsValue")
       end if
     case (VarField_rh)
       if (Ob % Header % ObsGroup == ObsGroupSurface) then
@@ -791,7 +804,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % rh, "rh", JediToOpsLayoutMapping, Ob % rh, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "relative_humidity", "ObsValue")
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "relative_humidity", "ObsValue")
       end if
     case (VarField_u)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -802,7 +815,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "eastward_wind", "ObsValue")
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "eastward_wind", "ObsValue")
       end if
     case (VarField_v)
       if (Ob % Header % ObsGroup == ObsGroupSurface .or. &
@@ -813,7 +826,7 @@ do iVarField = 1, nVarFields
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "northward_wind", "ObsValue")
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "northward_wind", "ObsValue")
       end if
     case (VarField_logvis)
       ! TODO(someone): handle this varfield
@@ -832,7 +845,7 @@ do iVarField = 1, nVarFields
     case (VarField_britemp)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
-        ObsSpace, self % channels, "brightness_temperature", "BiasCorrObsValue", self % channel_offset)
+        ObsSpace, self % channels, self % VarobsLength, "brightness_temperature", "BiasCorrObsValue", self % channel_offset)
     case (VarField_tskin)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
@@ -848,7 +861,7 @@ do iVarField = 1, nVarFields
     case (VarField_mwemiss)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &
-        ObsSpace, self % channels, "surface_emissivity", "Emiss")
+        ObsSpace, self % channels, self % VarobsLength, "surface_emissivity", "Emiss")
     case (VarField_TCozone)
       call opsinputs_fill_fillreal( &
         Ob % Header % TCozone, "TCozone", JediToOpsLayoutMapping, Ob % TCozone, &
@@ -944,16 +957,16 @@ do iVarField = 1, nVarFields
     case (VarField_u10ambwind)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % u10AmbWind, "u10AmbWind", JediToOpsLayoutMapping, Ob % u10AmbWind, &
-        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "eastward_wind", "BiasCorrObsValue")
+        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "eastward_wind", "BiasCorrObsValue")
     case (VarField_v10ambwind)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % v10AmbWind, "v10AmbWind", JediToOpsLayoutMapping, Ob % v10AmbWind, &
-        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "northward_wind", "BiasCorrObsValue")
+        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "northward_wind", "BiasCorrObsValue")
     case (VarField_pcorrect)
       ! Note that its PGEs should not be packed.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AWPriorPCorrect, "AWPriorPCorrect", JediToOpsLayoutMapping, Ob % AWPriorPCorrect, &
-        ObsSpace, self % channels, Flags, ObsErrors, IC_PLevels, "ambwind_probability", "ObsValue", PackPGEs=.false.)
+        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "ambwind_probability", "ObsValue", PackPGEs=.false.)
     case (VarField_NumChans)
       FillNumChans = .true.
     case (VarField_ChanNum)
@@ -961,7 +974,7 @@ do iVarField = 1, nVarFields
     case (VarField_Emissivity)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % Emissivity, "Emissivity", JediToOpsLayoutMapping, Ob % Emissivity, &
-        ObsSpace, self % channels, "surface_emissivity", "OneDVar", self % channel_offset)
+        ObsSpace, self % channels, self % VarobsLength, "surface_emissivity", "OneDVar", self % channel_offset)
     case (VarField_QCinfo)
       ! TODO(someone): This will come from a variable generated by the 1D-Var filter. Its name and
       ! group are not known yet. Once they are, replace the placeholders in the call below.
@@ -992,7 +1005,7 @@ do iVarField = 1, nVarFields
     case (VarField_RadarObAzim)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % RadarObAzim, "RadarObAzim", JediToOpsLayoutMapping, Ob % RadarObAzim, &
-        ObsSpace, self % channels, "radar_azimuth", "MetaData")
+        ObsSpace, self % channels, self % VarobsLength, "radar_azimuth", "MetaData")
     case (VarField_RadIdent)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
@@ -1021,11 +1034,12 @@ do iVarField = 1, nVarFields
         ! once it is known.
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngleAll, "BendingAngleAll", JediToOpsLayoutMapping, Ob % BendingAngleAll, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "PLACEHOLDER_VARIABLE_NAME", "ObsValue", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "PLACEHOLDER_VARIABLE_NAME", &
+          "ObsValue", PackPGEs=.false.)
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % BendingAngle, "BendingAngle", JediToOpsLayoutMapping, Ob % BendingAngle, &
-          ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "bending_angle", "ObsValue", PackPGEs=.false.)
+          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "bending_angle", "ObsValue", PackPGEs=.false.)
       end if
     case (VarField_ImpactParam)
        if (GPSRO_TPD) then
@@ -1053,13 +1067,13 @@ do iVarField = 1, nVarFields
       ! However multiple wavelength options could be added in future.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % IC_PLevels, "aerosolOpticalDepth", "ObsValue")
+        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "aerosolOpticalDepth", "ObsValue")
       ! NAODWaves is used by the Ops_VarobPGEs subroutine.
       if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % BriTempVarError, "BriTempVarError", JediToOpsLayoutMapping, Ob % BriTempVarError, &
-        ObsSpace, self % channels, "brightness_temperature", "ObsErrorData", self % channel_offset)
+        ObsSpace, self % channels, self % VarobsLength, "brightness_temperature", "ObsErrorData", self % channel_offset)
     case (VarField_CloudRTError)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % CloudRTError, "CloudRTError", Ob % Header % NumObsLocal, Ob % CloudRTError)
@@ -1073,15 +1087,15 @@ do iVarField = 1, nVarFields
     case (VarField_LevelTime)
       call opsinputs_fill_filltimeoffsets2d( &
         Ob % Header % level_time, "level_time", JediToOpsLayoutMapping, Ob % level_time, &
-        ObsSpace, self % channels, "dateTime", "MetaData", self % validitytime)
+        ObsSpace, self % channels, self % VarobsLength, "dateTime", "MetaData", self % validitytime)
     case (VarField_LevelLat)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % level_lat, "level_lat", JediToOpsLayoutMapping, Ob % level_lat, &
-        ObsSpace, self % channels, "latitude", "MetaData")
+        ObsSpace, self % channels, self % VarobsLength, "latitude", "MetaData")
     case (VarField_LevelLon)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % level_lon, "level_lon", JediToOpsLayoutMapping, Ob % level_lon, &
-        ObsSpace, self % channels, "longitude", "MetaData")
+        ObsSpace, self % channels, self % VarobsLength, "longitude", "MetaData")
     case (VarField_RainAccum)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RainAccum, "RainAccum", Ob % Header % NumObsLocal, Ob % RainAccum)

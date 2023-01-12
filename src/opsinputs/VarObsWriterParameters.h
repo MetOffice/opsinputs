@@ -72,6 +72,11 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Fill Ops % ObsType from MetaData/ops_subtype. If false, use ObsGroupName.
   oops::Parameter<bool> fillObsTypeFromOpsSubtype{"fill_obstype_from_ops_subtype", false, this};
 
+  /// This parameter is only used for data divided into records. If it is true, the length
+  /// of each output varobs profile is set to the value of `IC_PLevels`. Otherwise the
+  /// length of each output profile is set to the length of the profiles in the ObsSpace.
+  oops::Parameter<bool> varobsLengthIsIC_PLevels{"varobs_length_is_IC_PLevels", false, this};
+
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
