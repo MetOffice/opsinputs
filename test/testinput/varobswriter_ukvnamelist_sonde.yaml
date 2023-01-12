@@ -1,0 +1,51 @@
+window begin: 2018-01-01T00:00:00Z
+window end: 2018-01-01T02:00:00Z
+
+observations:
+  - obs space:
+      name: Sonde
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/varobs_ukvnamelist_sonde.nc4
+      simulated variables: [theta, eastward_wind, northward_wind, relative_humidity]
+      observed variables: [theta, eastward_wind, northward_wind, relative_humidity]
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10]  # missing
+    # Blacklist all missing entries in the original profiles (i.e. observation 2)
+    # This must be run after the Reset Flags to Pass filter,
+    # which sets the flags of any missing values in the original profiles
+    # to 'pass'. Therefore this filter is run with the 'defer to post' option set to true.
+    - filter: BlackList
+      where:
+      - variable:
+          name: latitude@MetaData
+        is_not_defined:
+      defer to post: true
+    - filter: VarObs Writer
+      namelist_directory: ../etc/ukv/varobs
+      general_mode: debug
+      IC_PLevels: 1
+      reject_obs_with_all_variables_failing_qc: true
+    - filter: VarObs Checker
+      expected_main_table_columns:
+        # Rows are locations, columns are filter variables
+        # The blacklist prevents the missing ob from being written out
+        field: [3,4,5,78,81,82,83,
+        3,4,5,78,81,82,83,
+        3,4,5,78,81,82,83]
+        ob value: ["97.10000","57.10000","77.10000","37.10000","-3539.00000","7.10000","17.10000",
+        "97.30000","57.30000","77.30000","37.30000","-3538.00000","7.30000","17.30000",
+        "97.40000","57.40000","77.40000","37.40000","-3478.00000","7.40000","17.40000"]
+        lat: ["7.10000","7.10000","7.10000","7.10000","7.10000","7.10000","7.10000",
+        "7.30000","7.30000","7.30000","7.30000","7.30000","7.30000","7.30000",
+        "7.40000","7.40000","7.40000","7.40000","7.40000","7.40000","7.40000"]
+        lon: ["17.10000","17.10000","17.10000","17.10000","17.10000","17.10000","17.10000",
+        "17.30000","17.30000","17.30000","17.30000","17.30000","17.30000","17.30000",
+        "17.40000","17.40000","17.40000","17.40000","17.40000","17.40000","17.40000"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
