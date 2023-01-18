@@ -174,7 +174,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
     call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
   else
-    write (ErrorMessage, '(A,A,A)') "Variable ", JediVarName, "@ObsError not found"
+    write (ErrorMessage, '(A,A,A)') "Variable ObsError/", JediVarName, " not found"
     call gen_warn(RoutineName, ErrorMessage)
     ObsError(:) = MissingFloat
   end if
@@ -310,7 +310,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarNamesWithChannels(1))) then
       call opsinputs_obsdatavector_float_get(ObsErrors, JediVarNamesWithChannels(iChannel), ObsError)
     else
       write (ErrorMessage, '(A,A,A)') &
-        "Warning: variable ", JediVarNamesWithChannels(iChannel), "@ObsError not found"
+        "Warning: variable ObsError/", JediVarNamesWithChannels(iChannel), " not found"
       call gen_warn(RoutineName, ErrorMessage)
       ObsError(:) = MissingFloat
     end if
@@ -440,7 +440,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
     call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
   else
     write (ErrorMessage, '(A,A,A)') &
-      "Warning: variable ", JediVarName, "@ObsError not found"
+      "Warning: variable ObsError/", JediVarName, " not found"
     call gen_warn(RoutineName, ErrorMessage)
     ObsError(:) = MissingFloat
   end if
@@ -647,7 +647,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarName)) then
     if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarName)) then
       call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarName, ObsError)
     else
-      write (ErrorMessage, '("Variable ",A,"@",A," not found")') JediErrorVarName, JediErrorGroup
+      write (ErrorMessage, '("Variable ",A,"/",A," not found")') JediErrorGroup, JediErrorVarName
       call gen_warn(RoutineName, ErrorMessage)
       ObsError(:) = MissingDouble
     end if
@@ -780,8 +780,8 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
         call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
                              ObsError)
       else
-        write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
-          JediErrorVarNamesWithChannels(iChannel), JediErrorGroup
+        write (ErrorMessage, '("Variable ",A,"/",A," not found")') &
+          JediErrorGroup, JediErrorVarNamesWithChannels(iChannel)
         call gen_warn(RoutineName, ErrorMessage)
         ObsError(:) = MissingDouble
       end if
@@ -903,8 +903,8 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithLevels(1))) then
         call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithLevels(iLevel), &
                              ObsError)
       else
-        write (ErrorMessage, '("Variable ",A,"@",A," not found")') &
-          JediErrorVarNamesWithLevels(iLevel), JediErrorGroup
+        write (ErrorMessage, '("Variable ",A,"/",A," not found")') &
+          JediErrorGroup, JediErrorVarNamesWithLevels(iLevel)
         call gen_warn(RoutineName, ErrorMessage)
         ObsError(:) = MissingDouble
       end if

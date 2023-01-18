@@ -9,17 +9,17 @@ observations:
           type: H5File
           obsfile: Data/078_VarField_theta.nc4
         obsgrouping:
-          group variables: [ "station_id" ]
-          sort variable: "air_pressure"
+          group variables: [ "stationIdentification" ]
+          sort variable: "pressure"
           sort order: "descending"
-      simulated variables: [theta]
+      simulated variables: [potentialTemperature]
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
     # propagated to VarObs files
     - filter: BlackList
       where:
       - variable:
-          name: theta@ObsErrorData
+          name: ObsErrorData/potentialTemperature
         is_defined:
       action:
         name: inflate error
@@ -33,7 +33,7 @@ observations:
     - filter: RejectList
       where:
       - variable:
-          name: station_id@MetaData
+          name: MetaData/stationIdentification
         is_in: [station_1, station_3, station_5]
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_081_VarField_level_time

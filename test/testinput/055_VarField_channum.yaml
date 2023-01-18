@@ -8,7 +8,7 @@ observations:
         engine:
           type: H5File
           obsfile: Data/010_VarField_britemp.nc4
-      simulated variables: [brightness_temperature]
+      simulated variables: [brightnessTemperature]
       channels: 1, 3
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are
@@ -71,7 +71,7 @@ observations:
         engine:
           type: H5File
           obsfile: Data/010_VarField_britemp.nc4
-      simulated variables: [brightness_temperature]
+      simulated variables: [brightnessTemperature]
       channels: 1, 3
     obs filters:
     # Double all observation errors: we want to check if error changes made by filters are

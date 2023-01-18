@@ -8,7 +8,7 @@ observations:
         engine:
           type: H5File
           obsfile: Data/varobs_globalnamelist_gnssro.nc4
-      simulated variables: [bending_angle]
+      simulated variables: [bendingAngle]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
@@ -18,7 +18,7 @@ observations:
     - filter: Domain Check
       where:
       - variable:
-          name: latitude@MetaData
+          name: MetaData/latitude
         minvalue: 0.0
     - filter: VarObs Writer
       namelist_directory: ../etc/global/varobs

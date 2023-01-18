@@ -11,10 +11,10 @@
  * Example yaml snippet:
  *  - filter: Variable Assignment
  *   assignments:
- *   - name: station_id@MetaData
+ *   - name: MetaData/stationIdentification
  *     type: string
  *     function:
- *       name: GnssroStationIDMetOffice@StringObsFunction
+ *       name: StringObsFunction/GnssroStationIDMetOffice
  * -----------------------------------------------------------------------------
  */
 #include "opsinputs/GnssroStationIDMetOffice.h"
@@ -38,7 +38,7 @@ static ObsFunctionMaker<GnssroStationIDMetOffice>
  */
 GnssroStationIDMetOffice::GnssroStationIDMetOffice(const eckit::LocalConfiguration & conf)
   : invars_() {
-  invars_ += Variable("MetaData/occulting_sat_id");
+  invars_ += Variable("MetaData/satelliteIdentifier");
 }
 
 // -----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ GnssroStationIDMetOffice::GnssroStationIDMetOffice(const eckit::LocalConfigurati
 GnssroStationIDMetOffice::~GnssroStationIDMetOffice() {}
 
 /* -----------------------------------------------------------------------------
- * Perform the computation.  For each profile construct the station_id as a
+ * Perform the computation.  For each profile construct the stationIdentification as a
  * fixed length string.
  * -----------------------------------------------------------------------------
  */
@@ -55,7 +55,7 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
   // Get the satellite identifier
   const size_t nlocs = in.nlocs();
   std::vector<int> satid;
-  in.get(Variable("MetaData/occulting_sat_id"), satid);
+  in.get(Variable("MetaData/satelliteIdentifier"), satid);
 
   // Get the record number of each profile
   std::vector<size_t> recordNumbers = out.space().recidx_all_recnums();

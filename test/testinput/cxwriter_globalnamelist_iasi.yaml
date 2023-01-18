@@ -9,8 +9,8 @@ observations:
           type: H5File
           obsfile: Data/varobs_globalnamelist_iasi.nc4
       observed variables: [radiance]
-      simulated variables: [brightness_temperature]
-      derived variables: [brightness_temperature]
+      simulated variables: [brightnessTemperature]
+      derived variables: [brightnessTemperature]
       channels: &all_channels 1, 3
     geovals:
       filename: Data/cx_globalnamelist_iasi.nc4
@@ -22,22 +22,22 @@ observations:
     ### Assign nominal error (ensure not missing values) ###
     - filter: Perform Action
       filter variables:
-      - name: brightness_temperature
+      - name: brightnessTemperature
         channels: *all_channels
       action:
         name: assign error
         error parameter: 10.0
     - filter: BlackList
       filter variables:
-      - name: brightness_temperature
+      - name: brightnessTemperature
         channels: *all_channels
       where:
       - variable:
-          name: latitude@MetaData #ensures ob2 is failed
+          name: MetaData/latitude #ensures ob2 is failed
         is_not_defined:
     - filter: Cx Writer
       variables_for_quality_control:
-      - name: brightness_temperature
+      - name: brightnessTemperature
         channels: *all_channels
       namelist_directory: ../etc/global/cx
       reject_obs_with_all_variables_failing_qc: true
