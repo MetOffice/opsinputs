@@ -141,6 +141,7 @@ private
 
   character(len=100)                     :: latitudeName
   character(len=100)                     :: longitudeName
+  character(len=100)                     :: modelPotentialTemperatureName
 
   integer(integer64)                     :: FH_VertCoord
   integer(integer64)                     :: FH_HorizGrid
@@ -262,6 +263,9 @@ self % latitudeName = StringValue
 
 call f_conf % get_or_die ("longitude_name", StringValue)
 self % longitudeName = StringValue
+
+call f_conf % get_or_die ("model_potential_temperature_name", StringValue)
+self % modelPotentialTemperatureName = StringValue
 
 call f_conf % get_or_die("FH_VertCoord", StringValue)
 select case (ops_to_lower_case(StringValue))
@@ -1085,7 +1089,7 @@ do iCxField = 1, size(CxFields)
     ! Upper-air variables
     case (StashItem_theta) ! IndexCxtheta
       call opsinputs_fill_fillreal2dfromgeoval( &
-        Cx % Header % theta, "theta", Cx % theta, &
+        Cx % Header % theta, trim(self % modelPotentialTemperatureName), Cx % theta, &
         self % GeoVals, self % GeoVaLsAreTopToBottom, opsinputs_cxfields_theta, &
         self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh

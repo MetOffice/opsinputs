@@ -71,6 +71,10 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   /// Name of longitude variable
   oops::Parameter<std::string> longitude_name{"longitude_name", "longitude", this};
 
+  /// Name of model potential temperature variable
+  oops::Parameter<std::string> model_potential_temperature_name
+    {"model_potential_temperature_name", "theta", this};
+
   // Values of UM header elements. Ultimately some of them might be set using data retrieved
   // from the model.
 
