@@ -697,7 +697,7 @@ do i = 1, size(CxFields)
 
     ! Upper-air variables
     case (StashItem_theta) ! IndexCxtheta
-      GeoVarName = opsinputs_cxfields_theta
+      GeoVarName = self % modelPotentialTemperatureName
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
       GeoVarName = opsinputs_cxfields_rh
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
@@ -1090,7 +1090,7 @@ do iCxField = 1, size(CxFields)
     case (StashItem_theta) ! IndexCxtheta
       call opsinputs_fill_fillreal2dfromgeoval( &
         Cx % Header % theta, trim(self % modelPotentialTemperatureName), Cx % theta, &
-        self % GeoVals, self % GeoVaLsAreTopToBottom, opsinputs_cxfields_theta, &
+        self % GeoVals, self % GeoVaLsAreTopToBottom, trim(self % modelPotentialTemperatureName), &
         self % JediToOpsLayoutMapping, self % hofx, self % varnames)
     case (StashCode_rh, StashCode_rh_p) ! IndexCxrh
       call opsinputs_fill_fillreal2dfromgeoval( &

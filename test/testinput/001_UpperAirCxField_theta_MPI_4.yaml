@@ -25,6 +25,7 @@ observations:
     - filter: Cx Writer
       namelist_directory: testinput/CxWriterNamelists_001_UpperAirCxField_theta
       reject_obs_with_any_variable_failing_qc: true
+      model_potential_temperature_name: potential_temperature
       general_mode: debug
       IC_PLevels: 5
     - filter: Cx Checker

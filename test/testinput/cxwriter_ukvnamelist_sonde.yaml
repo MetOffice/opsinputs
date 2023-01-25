@@ -27,6 +27,7 @@ observations:
       reject_obs_with_any_variable_failing_qc: true
       general_mode: debug
       geovals_are_top_to_bottom: false
+      model_potential_temperature_name: potential_temperature
     - filter: Cx Checker
       expected_surface_variables: ["1","2","17"]
       expected_upper_air_variables: ["1","3","4","5","11","29","30","31","34","35"]

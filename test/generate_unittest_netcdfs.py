@@ -770,7 +770,7 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('total_cloud_amount', 'testinput/024_SurfaceCxField_CloudAmount.nc4')
     output_1d_geoval_to_netcdf       ('obukhov_length',             'testinput/056_SurfaceCxField_obukhov_length.nc4')
     output_1d_geoval_to_netcdf       ('friction_velocity_over_water', 'testinput/057_SurfaceCxField_friction_velocity_over_water.nc4')
-    output_2d_geoval_to_netcdf       ('theta',                      'testinput/001_UpperAirCxField_theta.nc4')
+    output_2d_geoval_to_netcdf       ('potential_temperature',      'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('relative_humidity',          'testinput/002_UpperAirCxField_relative_humidity.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
@@ -842,7 +842,7 @@ if __name__ == "__main__":
     output_full_cx_to_netcdf(['ice_area_fraction',
                               'surface_altitude',
                               'surface_pressure'],
-                             ['eastward_wind','northward_wind','theta','specific_humidity',
+                             ['eastward_wind','northward_wind','potential_temperature','specific_humidity',
                               'mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'air_pressure_levels',
@@ -855,7 +855,7 @@ if __name__ == "__main__":
     output_full_cx_to_netcdf(['ice_area_fraction',
                               'surface_altitude',
                               'surface_pressure'],
-                             ['eastward_wind','northward_wind','theta','specific_humidity',
+                             ['eastward_wind','northward_wind','potential_temperature','specific_humidity',
                               'mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'air_pressure_levels',
