@@ -888,9 +888,8 @@ if __name__ == "__main__":
                               'testinput/cx_globalnamelist_groundgps.nc4')
 
     # Surface
-    output_full_cx_to_netcdf(['skin_temperature','surface_altitude','surface_pressure','surface_pressure_at_mean_sea_level',
-                              'uwind_at_10m','vwind_at_10m','surface_temperature','relative_humidity_2m','visibility_1p5m',
-                              'surf_param_a','surf_param_b'],
+    output_full_cx_to_netcdf(['skin_temperature','surface_altitude','surface_pressure','uwind_at_10m',
+                              'vwind_at_10m','surface_temperature','relative_humidity_2m'],
                              ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
                               'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction',
