@@ -887,5 +887,15 @@ if __name__ == "__main__":
                               'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
                               'testinput/cx_globalnamelist_groundgps.nc4')
 
+    # Surface
+    output_full_cx_to_netcdf(['skin_temperature','surface_altitude','surface_pressure','surface_pressure_at_mean_sea_level',
+                              'uwind_at_10m','vwind_at_10m','surface_temperature','relative_humidity_2m','visibility_1p5m',
+                              'surf_param_a','surf_param_b'],
+                             ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction',
+                              'eastward_wind','northward_wind'],
+                              'testinput/cx_globalnamelist_surface.nc4')
+
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
