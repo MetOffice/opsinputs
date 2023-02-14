@@ -325,6 +325,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_scatwind
                 YAML     varobswriter_globalnamelist_scatwind.yaml
                 NAMELIST ../../etc/global/varobs/Scatwind.nl
                 DATA     varobs_globalnamelist_scatwind.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_aircraft
+                YAML     varobswriter_globalnamelist_aircraft.yaml
+                NAMELIST ../../etc/global/varobs/Aircraft.nl
+                DATA     varobs_globalnamelist_aircraft.nc4)
 
 # Tests the UKV namelist files in the etc directory
 
@@ -568,6 +572,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sattcwv
                 YAML     cxwriter_globalnamelist_sattcwv.yaml
                 NAMELIST ../../etc/global/cx/SatTCWV.nl
                 DATA     cx_globalnamelist_sattcwv.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_aircraft
+                YAML     cxwriter_globalnamelist_aircraft.yaml
+                NAMELIST ../../etc/global/cx/Aircraft.nl
+                DATA     cx_globalnamelist_aircraft.nc4 dummy.nc4)
 
 # Tests the ukv namelist files in the etc directory
 
