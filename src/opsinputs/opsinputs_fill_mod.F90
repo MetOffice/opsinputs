@@ -1035,7 +1035,7 @@ end subroutine opsinputs_fill_fillreal
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
-  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetChans)
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, OffsetChans, useActualChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1048,6 +1048,7 @@ integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
+logical, optional, intent(in)                       :: useActualChans
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1076,7 +1077,7 @@ if (present(OffsetChans)) then
     numchans = OffsetChans % size_of_varobs_array
 end if
 
-numchans = OffsetChans % size_of_varobs_array
+!numchans = OffsetChans % size_of_varobs_array
 WRITE(*,*) "NUMCHANS", numchans
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
@@ -1088,19 +1089,24 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
 
     ! Fill the OPS data structures
- !   where (VarValue /= MissingDouble)
- !     Real2(:, iChannel+offset) = VarValue
- !   end where
-    WRITE(*,*) Channels(iChannel)
+
+    WRITE(*,*) "Channels(iChannel)=", Channels(iChannel)
+
+    WRITE(*,*) "What is useActualChans", useActualChans
   !  where (VarValue /= MissingDouble)
   !    Real2(:, Channels(iChannel)) = VarValue
   !  end where
-    if (iChannel > 3) then
+!    if (iChannel > 3) then
 
-      offsetgap = offset+1
-      WRITE(*,*) "offsetgap=", offsetgap
+!      offsetgap = offset+1
+!      WRITE(*,*) "offsetgap=", offsetgap
+!      where (VarValue /= MissingDouble)
+!        Real2(:, iChannel+offsetgap) = VarValue
+!      end where
+    if (useActualChans) then
+      WRITE(*,*) "In useActualChans", Channels(iChannel), shape(Real2)
       where (VarValue /= MissingDouble)
-        Real2(:, iChannel+offsetgap) = VarValue
+        Real2(:, Channels(iChannel)) = VarValue
       end where
     else
      WRITE(*,*) "offset=", offset
@@ -1233,7 +1239,8 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, VarobsLength, JediVarName, JediVarGroup, OffsetChans)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, VarobsLength, JediVarName, JediVarGroup, OffsetChans, &
+  useActualChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1247,6 +1254,7 @@ integer(integer64), intent(in)                      :: VarobsLength
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
+logical, optional, intent(in)                       :: useActualChans
 
 ! Body:
 WRITE(*,*) "JediVarName=", JediVarName
@@ -1257,7 +1265,7 @@ else
   if (Present(OffsetChans)) then
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, OffsetChans)
+      JediVarName, JediVarGroup, OffsetChans, useActualChans)
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &

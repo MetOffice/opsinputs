@@ -192,6 +192,8 @@ private
   
   !this stores the offset for channels when storing britemp
   type(opsinputs_channeloffset) :: channel_offset
+
+  logical :: useActualChannels
   
   type(ufo_geovals), pointer :: GeoVals
   type(ufo_geovals), pointer :: ObsDiags
@@ -310,6 +312,8 @@ call f_conf % get_or_die("channel_offset", self % channel_offset % channel_offse
 ! For atovs, jedi has 20 brightness temperatures but var expects 40.
 ! Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
 call f_conf % get_or_die("size_of_varobs_array", self % channel_offset % size_of_varobs_array)
+
+call f_conf % get_or_die("use_actual_channels", self % useActualChannels)
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
@@ -845,7 +849,8 @@ do iVarField = 1, nVarFields
     case (VarField_britemp)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
-        ObsSpace, self % channels, self % VarobsLength, "brightnessTemperature", "BiasCorrObsValue", self % channel_offset)
+        ObsSpace, self % channels, self % VarobsLength, "brightnessTemperature", "BiasCorrObsValue", self % channel_offset, &
+        self % useActualChannels)
     case (VarField_tskin)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
         Ob % Header % Tskin, "Tskin", Ob % Header % NumObsLocal, Ob % Tskin, &
@@ -1147,7 +1152,7 @@ do iVarField = 1, nVarFields
   if (FillChanNum .or. FillNumChans) then
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, Flags, FillChanNum, & 
-      FillNumChans, self % channel_offset % channel_offset)
+      FillNumChans, self % channel_offset % channel_offset, self % useActualChannels)
   end if
 
 end do
@@ -1193,7 +1198,7 @@ end subroutine opsinputs_varobswriter_fillreportflags
 !> the number of these channels is stored in Ob % NumChans.
 subroutine opsinputs_varobswriter_fillchannumandnumchans( &
   Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans, &
-  OffsetChans)
+  OffsetChans,UseActualChan)
 implicit none
 
 ! Subroutine arguments:
@@ -1203,6 +1208,7 @@ integer(c_int), intent(in)     :: Channels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 integer, intent(in)            :: OffsetChans
+logical, intent(in)            :: UseActualChan
 
 ! Local declarations:
 integer(integer64)             :: NumChannels
@@ -1210,7 +1216,7 @@ integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size
 integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                        :: iChannel
 integer                        :: iObs
-logical                      :: UseActualChan
+
 
 ! Body:
 WRITE(*,*) "In fill_numchan"
@@ -1223,7 +1229,7 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
-  UseActualChan=.true.
+!  UseActualChan=.true.
   if (UseActualChan) then
     do iChannel=1, size(Channels)
       WRITE(*,*) "Setup indices", Channels(iChannel)

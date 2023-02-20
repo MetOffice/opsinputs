@@ -90,6 +90,8 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
 
+  oops::Parameter<bool> use_actual_channels{"use_actual_channels", false, this};
+
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as
   /// "reject_obs_with_all_variables_failing_qc" and channel numbering to work correctly.
