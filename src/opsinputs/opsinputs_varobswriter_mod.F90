@@ -1210,21 +1210,42 @@ integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size
 integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                        :: iChannel
 integer                        :: iObs
+logical                      :: UseActualChan
 
 ! Body:
+WRITE(*,*) "In fill_numchan"
 NumChannels = size(Channels)
 if (NumChannels == 0) return
-
+WRITE(*,*) "Numchans", NumChannels
+WRITE(*,*) "Channels=", Channels
 call opsinputs_varobswriter_findchannelspassingqc( &
   Ob % Header % NumObsLocal, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
+  UseActualChan=.true.
+  if (UseActualChan) then
+    do iChannel=1, size(Channels)
+      WRITE(*,*) "Setup indices", Channels(iChannel)
+      ChannelIndices(:,iChannel) = Channels(iChannel)
+    end do
+  end if
   Ob % ChanNum = ChannelIndices
-  !only apply offset to actual channels in list, not missing data              
-  where (Ob % ChanNum > 0)
-    Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
-  end where
+  WRITE(*,*) "ChannelIndices", shape(ChannelIndices)
+
+  if (UseActualChan) then
+    where (Ob % ChanNum > 0)
+      Ob % ChanNum = Ob % ChanNum
+    end where
+  else
+    !only apply offset to actual channels in list, not missing data
+    where (Ob % ChanNum > 0)
+      Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
+    end where
+    where (Ob % ChanNum > 7)
+      Ob % ChanNum = Ob %ChanNum + int(1)
+    end where
+  end if
 end if
 
 if (FillNumChans) then
