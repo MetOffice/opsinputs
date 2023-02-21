@@ -576,6 +576,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_aircraft
                 YAML     cxwriter_globalnamelist_aircraft.yaml
                 NAMELIST ../../etc/global/cx/Aircraft.nl
                 DATA     cx_globalnamelist_aircraft.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_surface
+                YAML     cxwriter_globalnamelist_surface.yaml
+                NAMELIST ../../etc/global/cx/Surface.nl
+                DATA     cx_globalnamelist_surface.nc4 dummy.nc4)
 
 # Tests the ukv namelist files in the etc directory
 
