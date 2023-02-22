@@ -1,9 +1,8 @@
+---
 name: Check Label
 
 on:
   pull_request:
-  # branches:
-  #   - main
     types:
       - opened
       - labeled
@@ -11,17 +10,11 @@ on:
 
 jobs:
   ready-to-merge:
+    if: "!contains(github.event.pull_request.labels.*.name, 'ready to merge')"
     runs-on: ubuntu-latest
 
     steps:
       - name: Fail if PR is not labelled as ready to merge
-        if: "!contains(github.event.pull_request.labels.*.name, 'ready to merge')"
         run: |
           echo "This PR is not yet ready to merge."
           exit 1
-
-      - name: Pass if PR is labelled as ready to merge
-        if: contains(github.event.pull_request.labels.*.name, 'ready to merge')
-        run: |
-          echo "This PR is ready to merge."
-          exit 0
