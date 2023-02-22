@@ -10,11 +10,11 @@ on:
       - unlabeled
 
 jobs:
-  fail-for-draft:
-    if: '! contains(github.event.pull_request.labels.*.name, 'ready to merge')'
+  ready-to-merge:
+    if: contains(github.event.pull_request.labels.*.name, 'ready to merge')
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if PR is not labelled as ready to merge
+      - name: Pass if PR is labelled as ready to merge
         run: |
-          echo "This PR is not yet ready to merge."
-          exit 1
+          echo "This PR is ready to merge."
+          exit 0
