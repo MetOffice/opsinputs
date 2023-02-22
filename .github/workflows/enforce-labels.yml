@@ -1,0 +1,13 @@
+name: Enforce PR labels
+
+on:
+  pull_request:
+    branches: [develop]
+jobs:
+  enforce-label:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: yogevbd/enforce-label-action@2.1.0
+      with:
+        REQUIRED_LABELS_ALL: "'ready to merge'"
+        REQUIRED_LABELS_ALL_DESCRIPTION: "'ready to merge' must be set before PR can be merged"
