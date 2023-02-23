@@ -2,13 +2,19 @@
 name: Check Label
 
 on:
-  # push:
-  #   branches: [feature/check_label]
+  push:
+    branches: [feature/check_label]
   pull_request:
-    types:
-      - opened
-      - labeled
-      - unlabeled
+    branches: [feature/check_label]
+
+# on:
+#   # push:
+#   #   branches: [feature/check_label]
+#   pull_request:
+#     types:
+#       - opened
+#       - labeled
+#       - unlabeled
 
 jobs:
   ready-to-merge:
