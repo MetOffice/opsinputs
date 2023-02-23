@@ -4,8 +4,13 @@ name: Check Label
 on:
   push:
     branches: [feature/check_label]
+
   pull_request:
     branches: [feature/check_label]
+    types:
+      - opened
+      - labeled
+      - unlabeled
 
 # on:
 #   # push:
