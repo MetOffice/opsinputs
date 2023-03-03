@@ -1105,6 +1105,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
 !      end where
     if (useActualChans) then
       WRITE(*,*) "In useActualChans", Channels(iChannel), shape(Real2)
+      WRITE(*,*) Channels(iChannel), "VarValue=", VarValue
       where (VarValue /= MissingDouble)
         Real2(:, Channels(iChannel)) = VarValue
       end where
@@ -1117,7 +1118,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     end if
 
   end do
-
+  WRITE(*,*) Real2
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillreal2d_norecords
 
@@ -1274,7 +1275,6 @@ else
 end if
 !WRITE(*,*) "Fill real 2d", Real2
 WRITE(*,*) shape(Real2)
-WRITE(*,*) "look at colum", REAL2(10,:)
 end subroutine opsinputs_fill_fillreal2d
 
 ! ------------------------------------------------------------------------------

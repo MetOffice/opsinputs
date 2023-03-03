@@ -1248,9 +1248,9 @@ if (FillChanNum) then
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
     end where
-    where (Ob % ChanNum > 7)
-      Ob % ChanNum = Ob %ChanNum + int(1)
-    end where
+!    where (Ob % ChanNum > 7)
+!      Ob % ChanNum = Ob %ChanNum + int(1)
+!    end where
   end if
 end if
 

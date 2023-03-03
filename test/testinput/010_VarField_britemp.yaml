@@ -59,3 +59,70 @@ observations:
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
+    
+#
+# Now we test effect of actual channel
+#
+  - obs space:
+      name: AMSUB
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: /data/users/olewis/JEDI_branches/jopa_bundle_bb_opsinputs/mo-bundle/opsinputs/test/testinput/010_VarField_britemp.nc4 #Data/010_VarField_britemp.nc4
+      simulated variables: [brightnessTemperature]
+      channels: 1,3
+    obs filters:
+    # Double all observation errors: we want to check if error changes made by filters are
+    # propagated to VarObs files
+    - filter: BlackList
+      action:
+        name: inflate error
+        inflation factor: 2.0
+    # Reject the first level of the first observation and the last level of the last observation
+    - filter: Bounds Check
+      minvalue: 1.15
+      maxvalue: 3.35
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    - filter: VarObs Writer
+      namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
+      general_mode: debug
+      size_of_varobs_array: 3
+      use_actual_channels: true
+ #     output_directory: /data/users/olewis/JEDI_branches/jopa_bundle_bb_opsinputs/
+    - filter: VarObs Checker
+      expected_main_table_columns:
+        # In the arrays below, rows denote locations and columns levels.
+        field:    ["10", "10", "10",
+                   "10", "10", "10",
+                   "10", "10", "10",
+                   "10", "10", "10"]
+        level:    ["1", "2","3",
+                   "1", "2","3",
+                   "1", "2","3",
+                   "1", "2","3"]
+        ob value: ["1.20000","-1073741824.00000","3.11000",
+	           "-1073741824.00000","-1073741824.00000","3.22000",
+		   "1.60000","-1073741824.00000","3.33000",
+		   "1.80000","-1073741824.00000","3.44000"]
+        lat:      ["21.00000", "21.00000","21.00000",
+                   "22.00000", "22.00000","22.00000",
+                   "-23.00000", "-23.00000","-23.00000",
+                   "24.00000", "24.00000","24.00000"]
+        lon:      ["31.00000", "31.00000","31.00000",
+                   "32.00000", "32.00000","32.00000",
+                   "33.00000", "33.00000","33.00000",
+                   "34.00000", "34.00000","34.00000"]
+        time:     ["-3540.00000", "-3540.00000","-3540.00000",
+                   "-3480.00000", "-3480.00000","-3480.00000",
+                   "-3420.00000", "-3420.00000","-3420.00000",
+                   "-3360.00000", "-3360.00000","-3360.00000"]
+        Callsign: ["station_1", "station_1","station_1",
+                   "station_2", "station_2","station_2",
+                   "station_3", "station_3","station_3",
+                   "station_4", "station_4","station_4"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
