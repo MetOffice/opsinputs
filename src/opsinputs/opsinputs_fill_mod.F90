@@ -1057,7 +1057,6 @@ character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(
 integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
-integer                                         :: offsetgap
 
 ! Body:
 
@@ -1070,47 +1069,27 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 !e.g. HIRS in ATOVS stream
 offset = 0
 numchans = size(JediVarNamesWithChannels)
-WRITE(*,*) "NUMCHANS", numchans
 if (present(OffsetChans)) then
   offset = OffsetChans % channel_offset
   if (OffsetChans % size_of_varobs_array > 0) &
     numchans = OffsetChans % size_of_varobs_array
 end if
 
-!numchans = OffsetChans % size_of_varobs_array
-WRITE(*,*) "NUMCHANS", numchans
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  num_levels = int(numchans, kind=integer64))
-  WRITE(*,*) shape(Real2)
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
 
     ! Fill the OPS data structures
 
-    WRITE(*,*) "Channels(iChannel)=", Channels(iChannel)
-
-    WRITE(*,*) "What is useActualChans", useActualChans
-  !  where (VarValue /= MissingDouble)
-  !    Real2(:, Channels(iChannel)) = VarValue
-  !  end where
-!    if (iChannel > 3) then
-
-!      offsetgap = offset+1
-!      WRITE(*,*) "offsetgap=", offsetgap
-!      where (VarValue /= MissingDouble)
-!        Real2(:, iChannel+offsetgap) = VarValue
-!      end where
     if (useActualChans) then
-      WRITE(*,*) "In useActualChans", Channels(iChannel), shape(Real2)
-      WRITE(*,*) Channels(iChannel), "VarValue=", VarValue
       where (VarValue /= MissingDouble)
         Real2(:, Channels(iChannel)) = VarValue
       end where
     else
-     WRITE(*,*) "offset=", offset
      ! Fill the OPS data structures
       where (VarValue /= MissingDouble)
         Real2(:, iChannel+offset) = VarValue
@@ -1118,7 +1097,6 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     end if
 
   end do
-  WRITE(*,*) Real2
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillreal2d_norecords
 
@@ -1258,7 +1236,6 @@ type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
 logical, optional, intent(in)                       :: useActualChans
 
 ! Body:
-WRITE(*,*) "JediVarName=", JediVarName
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
@@ -1273,8 +1250,6 @@ else
       JediVarName, JediVarGroup)
   end if
 end if
-!WRITE(*,*) "Fill real 2d", Real2
-WRITE(*,*) shape(Real2)
 end subroutine opsinputs_fill_fillreal2d
 
 ! ------------------------------------------------------------------------------
@@ -2293,17 +2268,13 @@ integer(c_int), intent(in)                     :: Channels(:)
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
-WRITE(*,*) "In opsinputs_fill_varnames_with_channels"
-WRITE(*,*) size(Channels)
 if (size(Channels) == 0) then
   VarNames(1) = VarName
 else
   do ichan = 1, size(Channels)
-    WRITE(*,*) Varname, Channels(ichan)
     write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
 end if
-WRITE(*,*) VarNames
 end function opsinputs_fill_varnames_with_channels
 
 

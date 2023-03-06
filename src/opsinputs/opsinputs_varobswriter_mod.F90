@@ -1219,11 +1219,9 @@ integer                        :: iObs
 
 
 ! Body:
-WRITE(*,*) "In fill_numchan"
 NumChannels = size(Channels)
 if (NumChannels == 0) return
-WRITE(*,*) "Numchans", NumChannels
-WRITE(*,*) "Channels=", Channels
+
 call opsinputs_varobswriter_findchannelspassingqc( &
   Ob % Header % NumObsLocal, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
 if (FillChanNum) then
@@ -1232,12 +1230,10 @@ if (FillChanNum) then
 !  UseActualChan=.true.
   if (UseActualChan) then
     do iChannel=1, size(Channels)
-      WRITE(*,*) "Setup indices", Channels(iChannel)
       ChannelIndices(:,iChannel) = Channels(iChannel)
     end do
   end if
   Ob % ChanNum = ChannelIndices
-  WRITE(*,*) "ChannelIndices", shape(ChannelIndices)
 
   if (UseActualChan) then
     where (Ob % ChanNum > 0)
@@ -1248,9 +1244,6 @@ if (FillChanNum) then
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
     end where
-!    where (Ob % ChanNum > 7)
-!      Ob % ChanNum = Ob %ChanNum + int(1)
-!    end where
   end if
 end if
 
