@@ -90,6 +90,10 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
 
+  /// This matches the channel number with the array index. This is useful when 
+  /// there are skipped channels. e.g. channels 5,6,7,9,10,11 are required from a possible 12
+  /// channels. This would fill a size 12 array with the array indexes matching the channel number 
+  /// [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN]. 
   oops::Parameter<bool> use_actual_channels{"use_actual_channels", false, this};
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
