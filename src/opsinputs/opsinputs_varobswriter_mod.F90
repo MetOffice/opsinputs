@@ -1217,7 +1217,6 @@ integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                        :: iChannel
 integer                        :: iObs
 
-
 ! Body:
 NumChannels = size(Channels)
 if (NumChannels == 0) return
