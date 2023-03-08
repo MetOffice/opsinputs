@@ -313,7 +313,16 @@ call f_conf % get_or_die("channel_offset", self % channel_offset % channel_offse
 ! Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
 call f_conf % get_or_die("size_of_varobs_array", self % channel_offset % size_of_varobs_array)
 
+! This defines if to use the channel numbers as the indices to fill an array by
+! This prevents channels which are seperated by NaNs from being bunched together in the write
 call f_conf % get_or_die("use_actual_channels", self % useActualChannels)
+
+if ((self % useActualChannels .eqv. .true.) .and. (self % channel_offset % channel_offset/=0)) then
+  write (ErrorMessage, '(A)') "OffsetChans and UseActualChans cannot both be set"
+  call gen_warn(RoutineName, ErrorMessage)
+  opsinputs_varobswriter_create = .false.
+  return
+end if
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
@@ -1208,7 +1217,7 @@ integer(c_int), intent(in)     :: Channels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 integer, intent(in)            :: OffsetChans
-logical, intent(in)            :: UseActualChan
+logical, optional, intent(in)            :: UseActualChan
 
 ! Local declarations:
 integer(integer64)             :: NumChannels
@@ -1216,25 +1225,32 @@ integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size
 integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                        :: iChannel
 integer                        :: iObs
+logical                        :: localUseActualChans
 
 ! Body:
 NumChannels = size(Channels)
 if (NumChannels == 0) return
+
+! Setup for useActualChans for array indices
+localUseActualchans = .false.
+if (Present(UseActualChan)) then
+  localUseActualChans = .true.
+end if
 
 call opsinputs_varobswriter_findchannelspassingqc( &
   Ob % Header % NumObsLocal, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
-!  UseActualChan=.true.
-  if (UseActualChan) then
+
+  if (localUseActualChans) then
     do iChannel=1, size(Channels)
       ChannelIndices(:,iChannel) = Channels(iChannel)
     end do
   end if
   Ob % ChanNum = ChannelIndices
 
-  if (UseActualChan) then
+  if (localUseActualChans) then
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum
     end where

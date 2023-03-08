@@ -1057,6 +1057,7 @@ character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(
 integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
+logical                                         :: localUseActualChans
 
 ! Body:
 
@@ -1075,6 +1076,12 @@ if (present(OffsetChans)) then
     numchans = OffsetChans % size_of_varobs_array
 end if
 
+!Setup for channels neding to match array index
+localUseActualChans = .false.
+if (present(useActualChans)) then
+    localUseActualChans = useActualChans
+end if
+
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
@@ -1085,7 +1092,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
 
     ! Fill the OPS data structures
 
-    if (useActualChans) then
+    if (localUseActualChans) then
       where (VarValue /= MissingDouble)
         Real2(:, Channels(iChannel)) = VarValue
       end where
@@ -1241,6 +1248,10 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
   if (Present(OffsetChans)) then
+    call opsinputs_fill_fillreal2d_norecords( &
+      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+      JediVarName, JediVarGroup, OffsetChans)
+  elseif (Present(useActualChans)) then
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
       JediVarName, JediVarGroup, OffsetChans, useActualChans)
