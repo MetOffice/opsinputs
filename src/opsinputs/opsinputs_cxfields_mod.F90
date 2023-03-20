@@ -18,7 +18,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_unknown = "UNKNOWN"
 character(len=*), parameter, public :: opsinputs_cxfields_Orog = var_sfc_geomz
 character(len=*), parameter, public :: opsinputs_cxfields_pstar = var_ps
 character(len=*), parameter, public :: opsinputs_cxfields_t2 = var_sfc_t2m
-character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_at_two_meters_above_surface"
+character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_2m"
 character(len=*), parameter, public :: opsinputs_cxfields_u10 = var_sfc_u10
 character(len=*), parameter, public :: opsinputs_cxfields_v10 = var_sfc_v10
 character(len=*), parameter, public :: opsinputs_cxfields_vis = opsinputs_cxfields_unknown
