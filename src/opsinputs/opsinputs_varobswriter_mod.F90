@@ -1217,7 +1217,7 @@ integer(c_int), intent(in)     :: Channels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 integer, intent(in)            :: OffsetChans
-logical, optional, intent(in)            :: UseActualChans
+logical, optional, intent(in)  :: UseActualChans
 
 ! Local declarations:
 integer(integer64)             :: NumChannels
@@ -1247,10 +1247,8 @@ if (FillChanNum) then
     do iChannel=1, size(Channels)
       ChannelIndices(:,iChannel) = Channels(iChannel)
     end do
-  end if
-  Ob % ChanNum = ChannelIndices
-
-  if (.NOT. localUseActualChans) then
+    Ob % ChanNum = ChannelIndices
+  else
     !only apply offset to actual channels in list, not missing data
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
