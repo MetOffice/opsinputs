@@ -1091,15 +1091,10 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
 
     ! Fill the OPS data structures
-
     if (localUseActualChans) then
-      write(*,*) "In here"
       where (VarValue /= MissingDouble)
-
         Real2(:, Channels(iChannel)) = VarValue
-
       end where
-      write(*,*) Real2
     else
      ! Fill the OPS data structures
       where (VarValue /= MissingDouble)
@@ -1252,13 +1247,15 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
   if (Present(OffsetChans)) then
-    call opsinputs_fill_fillreal2d_norecords( &
-      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, OffsetChans)
-  elseif (Present(useActualChans)) then
-    call opsinputs_fill_fillreal2d_norecords( &
-      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, OffsetChans, useActualChans)
+    if (Present(useActualChans)) then
+      call opsinputs_fill_fillreal2d_norecords( &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+        JediVarName, JediVarGroup, OffsetChans, useActualChans)
+    else
+      call opsinputs_fill_fillreal2d_norecords( &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+        JediVarName, JediVarGroup, OffsetChans)
+    end if
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
