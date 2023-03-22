@@ -1250,12 +1250,7 @@ if (FillChanNum) then
   end if
   Ob % ChanNum = ChannelIndices
 
-!  if (localUseActualChans) then
-!    where (Ob % ChanNum > 0)
-!      Ob % ChanNum = Ob % ChanNum
-!    end where
-!  else
-   if (.NOT. localUseActualChans) then
+  if (.NOT. localUseActualChans) then
     !only apply offset to actual channels in list, not missing data
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)

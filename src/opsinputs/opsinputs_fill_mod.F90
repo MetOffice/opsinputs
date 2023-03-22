@@ -1262,6 +1262,7 @@ else
       JediVarName, JediVarGroup)
   end if
 end if
+
 end subroutine opsinputs_fill_fillreal2d
 
 ! ------------------------------------------------------------------------------
@@ -2280,6 +2281,7 @@ integer(c_int), intent(in)                     :: Channels(:)
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
+
 if (size(Channels) == 0) then
   VarNames(1) = VarName
 else
