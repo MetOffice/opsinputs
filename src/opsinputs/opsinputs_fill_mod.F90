@@ -1093,9 +1093,13 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     ! Fill the OPS data structures
 
     if (localUseActualChans) then
+      write(*,*) "In here"
       where (VarValue /= MissingDouble)
+
         Real2(:, Channels(iChannel)) = VarValue
+
       end where
+      write(*,*) Real2
     else
      ! Fill the OPS data structures
       where (VarValue /= MissingDouble)

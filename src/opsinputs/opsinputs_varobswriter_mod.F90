@@ -317,7 +317,7 @@ call f_conf % get_or_die("size_of_varobs_array", self % channel_offset % size_of
 ! This prevents channels which are seperated by NaNs from being bunched together in the write
 call f_conf % get_or_die("use_actual_channels", self % useActualChannels)
 
-if ((self % useActualChannels .eqv. .true.) .and. (self % channel_offset % channel_offset/=0)) then
+if ((self % useActualChannels) .and. (self % channel_offset % channel_offset/=0)) then
   write (ErrorMessage, '(A)') "OffsetChans and UseActualChans cannot both be set"
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
@@ -1207,7 +1207,7 @@ end subroutine opsinputs_varobswriter_fillreportflags
 !> the number of these channels is stored in Ob % NumChans.
 subroutine opsinputs_varobswriter_fillchannumandnumchans( &
   Ob, ObsSpace, Channels, Flags, FillChanNum, FillNumChans, &
-  OffsetChans,UseActualChan)
+  OffsetChans,UseActualChans)
 implicit none
 
 ! Subroutine arguments:
@@ -1217,7 +1217,7 @@ integer(c_int), intent(in)     :: Channels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 integer, intent(in)            :: OffsetChans
-logical, optional, intent(in)            :: UseActualChan
+logical, optional, intent(in)            :: UseActualChans
 
 ! Local declarations:
 integer(integer64)             :: NumChannels
@@ -1233,7 +1233,7 @@ if (NumChannels == 0) return
 
 ! Setup for useActualChans for array indices
 localUseActualchans = .false.
-if (Present(UseActualChan)) then
+if (Present(UseActualChans)) then
   localUseActualChans = .true.
 end if
 
@@ -1250,11 +1250,12 @@ if (FillChanNum) then
   end if
   Ob % ChanNum = ChannelIndices
 
-  if (localUseActualChans) then
-    where (Ob % ChanNum > 0)
-      Ob % ChanNum = Ob % ChanNum
-    end where
-  else
+!  if (localUseActualChans) then
+!    where (Ob % ChanNum > 0)
+!      Ob % ChanNum = Ob % ChanNum
+!    end where
+!  else
+   if (.NOT. localUseActualChans) then
     !only apply offset to actual channels in list, not missing data
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
