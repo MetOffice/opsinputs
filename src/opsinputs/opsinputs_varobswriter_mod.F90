@@ -933,7 +933,7 @@ do iVarField = 1, nVarFields
     case (VarField_cloudtopp)
       call opsinputs_fill_fillreal( &
         Ob % Header % CloudTopP, "CloudTopP", JediToOpsLayoutMapping, Ob % CloudTopP, &
-        ObsSpace, "pressureAtTopOfCloud", "OneDVar")
+        ObsSpace, "pressureAtTopOfCloud", "OutputToVAR")
     case (VarField_cloudfrac)
       call opsinputs_fill_fillreal( &
         Ob % Header % CloudFrac, "CloudFrac", JediToOpsLayoutMapping, Ob % CloudFrac, &

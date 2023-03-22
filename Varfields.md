@@ -31,7 +31,7 @@
 | 31 | `VarField_solzenith` | `SolarZenith(:)` | solar zenith angle | `MetaData/solarZenithAngle` | |
 | 32 | `VarField_solazimth` | | | | Implement |
 | 34 | `VarField_iremiss` | `IREmiss(:)` | surface emissivity (satellite 1dvar) | 'Emiss/emissivityIR' | |
-| 35 | `VarField_cloudtopp` | `CloudTopP(:)` | cloud top pressure (hPa) (satellite 1dvar) | `OneDVar/pressureAtTopOfCloud` | |
+| 35 | `VarField_cloudtopp` | `CloudTopP(:)` | cloud top pressure (hPa) (satellite 1dvar) | `OutputToVAR/pressureAtTopOfCloud` | |
 | 36 | `VarField_cloudfrac` | `CloudFrac(:)` | cloud fraction (satellite 1dvar) | `OneDVar/cloudAmount` | |
 | 39 | `VarField_vnatovpp` | | | | Implement |
 | 40 | `VarField_procoption` | | | | Implement |
