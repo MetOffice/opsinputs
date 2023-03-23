@@ -648,7 +648,7 @@ if __name__ == "__main__":
     output_1d_normal_int_var_to_netcdf('satelliteIdentifier', 'MetaData',     'testinput/028_VarField_satid.nc4')
     output_1d_normal_var_to_netcdf   ('solarZenithAngle', 'MetaData', 'testinput/031_VarField_solzenith.nc4')
     output_1d_normal_var_to_netcdf   ('emissivityIR', 'Emiss', 'testinput/034_VarField_iremiss.nc4')
-    output_1d_normal_var_to_netcdf   ('pressureAtTopOfCloud', 'OneDVar', 'testinput/035_VarField_cloudtopp.nc4')
+    output_1d_normal_var_to_netcdf   ('pressureAtTopOfCloud', 'OutputToVAR', 'testinput/035_VarField_cloudtopp.nc4')
     output_1d_normal_var_to_netcdf   ('cloudAmount', 'OneDVar', 'testinput/036_VarField_cloudfrac.nc4')
     output_2d_simulated_var_to_netcdf('windEastward', 'testinput/051_VarField_u10ambwind.nc4', with_bias=True)
     output_2d_simulated_var_to_netcdf('windNorthward', 'testinput/052_VarField_v10ambwind.nc4', with_bias=True)
@@ -747,7 +747,7 @@ if __name__ == "__main__":
     # IASI - this tests the variable_for_quality_control option
     output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude',
                                   'OneDVar/skinTemperature','MetaData/sensorZenithAngle',
-                                  'MetaData/solarZenithAngle','OneDVar/pressureAtTopOfCloud','OneDVar/cloudAmount',
+                                  'MetaData/solarZenithAngle','OutputToVAR/pressureAtTopOfCloud','OneDVar/cloudAmount',
                                   'MetaData/ozoneTotal'],
                                  ['ObsValue/radiance','DerivedObsValue/brightnessTemperature','EffectiveError/brightnessTemperature',
                                   'OneDVar/emissivity', 'BiasCorrObsValue/brightnessTemperature',
