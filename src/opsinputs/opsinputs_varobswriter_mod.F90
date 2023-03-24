@@ -1159,6 +1159,7 @@ do iVarField = 1, nVarFields
   end select
 
   if (FillChanNum .or. FillNumChans) then
+!    write(*,*) "going to opsinputs_varobswriter_fillchannumandnumchans"
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, Flags, FillChanNum, & 
       FillNumChans, self % channel_offset % channel_offset, self % useActualChannels)
@@ -1234,7 +1235,7 @@ if (NumChannels == 0) return
 ! Setup for useActualChans for array indices
 localUseActualchans = .false.
 if (Present(UseActualChans)) then
-  localUseActualChans = .true.
+  localUseActualChans = UseActualChans
 end if
 
 call opsinputs_varobswriter_findchannelspassingqc( &

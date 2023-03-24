@@ -1075,7 +1075,7 @@ if (present(OffsetChans)) then
   if (OffsetChans % size_of_varobs_array > 0) &
     numchans = OffsetChans % size_of_varobs_array
 end if
-
+!write(*,*) "numchans=", numchans
 !Setup for channels neding to match array index
 localUseActualChans = .false.
 if (present(useActualChans)) then
