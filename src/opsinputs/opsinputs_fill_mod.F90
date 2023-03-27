@@ -1075,8 +1075,8 @@ if (present(OffsetChans)) then
   if (OffsetChans % size_of_varobs_array > 0) &
     numchans = OffsetChans % size_of_varobs_array
 end if
-!write(*,*) "numchans=", numchans
-!Setup for channels neding to match array index
+
+!Setup for channels needing to match array index
 localUseActualChans = .false.
 if (present(useActualChans)) then
     localUseActualChans = useActualChans
@@ -1101,7 +1101,6 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         Real2(:, iChannel+offset) = VarValue
       end where
     end if
-
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillreal2d_norecords

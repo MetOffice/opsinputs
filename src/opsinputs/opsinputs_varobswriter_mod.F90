@@ -1159,7 +1159,6 @@ do iVarField = 1, nVarFields
   end select
 
   if (FillChanNum .or. FillNumChans) then
-!    write(*,*) "going to opsinputs_varobswriter_fillchannumandnumchans"
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, Flags, FillChanNum, & 
       FillNumChans, self % channel_offset % channel_offset, self % useActualChannels)
@@ -1250,6 +1249,7 @@ if (FillChanNum) then
     end do
     Ob % ChanNum = ChannelIndices
   else
+    Ob % ChanNum = ChannelIndices
     !only apply offset to actual channels in list, not missing data
     where (Ob % ChanNum > 0)
       Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
@@ -1261,7 +1261,6 @@ if (FillNumChans) then
   call Ops_Alloc(Ob % Header % NumChans, "NumChans", Ob % Header % NumObsLocal, Ob % NumChans)
   Ob % NumChans = ChannelCounts
 end if
-
 end subroutine opsinputs_varobswriter_fillchannumandnumchans
 
 ! ------------------------------------------------------------------------------
