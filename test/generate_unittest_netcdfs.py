@@ -841,8 +841,14 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
                               'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
                               'testinput/cx_globalnamelist_ssmis.nc4')
-                              
-                              
+	
+    # MWSFY3
+    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
+                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
+                             ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                              'testinput/cx_globalnamelist_mwsfy3.nc4')
 
     # GNSS-RO
     output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
