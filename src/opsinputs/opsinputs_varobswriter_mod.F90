@@ -107,7 +107,8 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupScatwind,          &
     ObsGroupSonde,             &
     ObsGroupSurface,           &
-    ObsGroupSatTCWV
+    ObsGroupSatTCWV,           &
+    ObsGroupGMIhigh
 use OpsMod_ObsInfo, only: &
     FinalRejectReport,    &
     LenCallsign,          &
@@ -130,7 +131,8 @@ use OpsMod_Varobs, only: &
 use OpsMod_SatRad_SetUp, only: &
     VarBC
 use OpsMod_ObsTypes, only: &
-    Ops_SubTypeNameToNum
+    Ops_SubTypeNameToNum, &
+    ObsTypeGMIhigh
 
 implicit none
 external gc_init_final
@@ -732,6 +734,9 @@ if (self % FillObsTypeFromOpsSubType) then
    if (obsspace_has(ObsSpace, "MetaData", "observationSubTypeNum")) then
       call opsinputs_fill_fillinteger(Ob % Header % ObsType, "ObsType", JediToOpsLayoutMapping, &
            Ob % ObsType, ObsSpace, "observationSubTypeNum", "MetaData")
+      ! this is to make sure GMIhigh has the correct ObsType in its VarObs file
+      ! instead of that for GMIlow
+      if (Ob % header % ObsGroup == ObsGroupGMIhigh) Ob % ObsType(:) = ObsTypeGMIhigh
    else
       call abor1_ftn("MetaData/observationSubTypeNum is not present")
    end if
