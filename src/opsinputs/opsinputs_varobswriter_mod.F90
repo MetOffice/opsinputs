@@ -743,6 +743,9 @@ if (self % FillObsTypeFromOpsSubType) then
 else
    call Ops_Alloc(Ob % Header % ObsType, "ObsType", Ob % Header % NumObsLocal, Ob % ObsType)
    Ob % ObsType(:) = Ops_SubTypeNameToNum(trim(self % ObsGroupName))
+   ! this is to make sure GMIhigh has the correct ObsType in its VarObs file
+   ! instead of that for GMIlow
+   if (Ob % header % ObsGroup == ObsGroupGMIhigh) Ob % ObsType(:) = ObsTypeGMIhigh
 end if
 
 if (obsspace_has(ObsSpace, "MetaData", "stationIdentification")) then
