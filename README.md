@@ -1,8 +1,8 @@
 [![CI](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml/badge.svg)](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml)
 
-(C) Crown Copyright 2020, the Met Office. All rights reserved.
+&copy; Crown Copyright 2020, the Met Office. All rights reserved.
 
-Refer to COPYRIGHT.txt of this distribution for details.
+Refer to [COPYRIGHT](COPYRIGHT.txt) of this distribution for details.
 
 Overview
 ========
