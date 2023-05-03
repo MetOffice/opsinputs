@@ -60,78 +60,81 @@ Usage
 VarObs and Cx files are written by the `VarObs Writer` and `Cx Writer` observation filters, respectively. See the Doxygen documentation of these filters in the `src/opsinputs/VarObsWriter.h` and `src/opsinputs/CxWriter.h` files (and the accompanying `...Parameters.h` files) for more information. 
 
 The following YAML snippet demonstrates the use of `VarObsWriter`. <ObsGroup> stands for the name of one of the observation groups known to OPS.
-   
-    - ObsSpace:
-        name: <ObsGroup>
-        ObsDataIn:
-          obsfile: observations.nc4
-        simulate:
-          variables: [surface_pressure]        
-    - Filter: VarObs Writer
-        # The filter will output an <ObsGroup>.varobs file
-        # in the directory specified in the output_directory option.
-        output_directory: varobs
-        # By default, the filter will produce a VarObs file containing
-        # the varfields output by default by OPS for the observation
-        # group <ObsGroup>. The list of varfields can be changed by
-        # providing a namelist file <ObsGroup>.nl in the directory
-        # specified in the namelist_directory option. This file should
-        # contain a Fortran namelist in the format accepted by the
-        # Ops_ReadVarobsControlNL function from OPS.
-        namelist_directory: namelists
-        # Output only observations that passed the quality check in all
-        # variables.
-        reject_obs_with_any_variable_failing_qc: true
-        # Values of the following options are written to the UM fixed header
-        # embedded in the output VarObs file. In future (once the UM/LFRic JEDI
-        # interfaces are ready) they will probably be taken directly from
-        # the model. There are more options like this; the full list can be
-        # found in `src/opsinputs/VarObsWriterParameters.h`.
-        IC_XLen: 36
-        IC_YLen: 18
-        IC_PLevels: 8
-        IC_WetLevels: 9
-        RC_LongSpacing: 10
-        RC_LatSpacing: 10
+
+```yaml
+- ObsSpace:
+  name: <ObsGroup>
+  ObsDataIn:
+    obsfile: observations.nc4
+  simulate:
+    variables: [surface_pressure]
+- Filter: VarObs Writer
+  # The filter will output an <ObsGroup>.varobs file
+  # in the directory specified in the output_directory option.
+  output_directory: varobs
+  # By default, the filter will produce a VarObs file containing
+  # the varfields output by default by OPS for the observation
+  # group <ObsGroup>. The list of varfields can be changed by
+  # providing a namelist file <ObsGroup>.nl in the directory
+  # specified in the namelist_directory option. This file should
+  # contain a Fortran namelist in the format accepted by the
+  # Ops_ReadVarobsControlNL function from OPS.
+  namelist_directory: namelists
+  # Output only observations that passed the quality check in all variables.
+  reject_obs_with_any_variable_failing_qc: true
+  # Values of the following options are written to the UM fixed header
+  # embedded in the output VarObs file. In future (once the UM/LFRic JEDI
+  # interfaces are ready) they will probably be taken directly from
+  # the model. There are more options like this; the full list can be
+  # found in `src/opsinputs/VarObsWriterParameters.h`.
+  IC_XLen: 36
+  IC_YLen: 18
+  IC_PLevels: 8
+  IC_WetLevels: 9
+  RC_LongSpacing: 10
+  RC_LatSpacing: 10
+```
 
 And here is a YAML snippet demonstrating the use of `CxWriter`.
 
-    - ObsSpace:
-        name: <ObsGroup>
-        ObsDataIn:
-          obsfile: observations.nc4
-        simulate:
-          variables: [surface_pressure]        
-    - Filter: Cx Writer
-        # The filter will output an <ObsGroup>.cx file
-        # in the directory specified in the output_directory option.
-        output_directory: cx
-        # By default, the filter will produce a Cx file containing
-        # the cxfields output by default by OPS for the observation
-        # group <ObsGroup>. The list of cxfields can be changed by
-        # providing a namelist file <ObsGroup>.nl in the directory
-        # specified in the namelist_directory option. This file should
-        # contain a Fortran namelist in the format accepted by the
-        # Ops_ReadCXControlNL function from OPS.
-        namelist_directory: namelists
-        # Output only model columns corresponding to observations that 
-        # passed the quality check in all variables.
-        reject_obs_with_any_variable_failing_qc: true
-        # Values of the following options are written to the UM fixed header
-        # embedded in the output Cx file. In future (once the UM/LFRic JEDI
-        # interfaces are ready) they will probably be taken directly from
-        # the model. There are more options like this; the full list can be
-        # found in `src/opsinputs/VarObsWriterParameters.h`.
-        IC_XLen: 36
-        IC_YLen: 18
-        IC_PLevels: 3
-        IC_WetLevels: 4
-        RC_LongSpacing: 10
-        RC_LatSpacing: 10
-        # New dynamics vertical coordinate theta (length: IC_PLevels + 1).
-        eta_theta_levels: [300, 290, 280, 270]
-        # New dynamics vertical coordinate rho (length: IC_PLevels).
-        eta_rho_levels: [3, 2, 1]
+```yaml
+- ObsSpace:
+  name: <ObsGroup>
+  ObsDataIn:
+    obsfile: observations.nc4
+  simulate:
+    variables: [surface_pressure]
+- Filter: Cx Writer
+  # The filter will output an <ObsGroup>.cx file
+  # in the directory specified in the output_directory option.
+  output_directory: cx
+  # By default, the filter will produce a Cx file containing
+  # the cxfields output by default by OPS for the observation
+  # group <ObsGroup>. The list of cxfields can be changed by
+  # providing a namelist file <ObsGroup>.nl in the directory
+  # specified in the namelist_directory option. This file should
+  # contain a Fortran namelist in the format accepted by the
+  # Ops_ReadCXControlNL function from OPS.
+  namelist_directory: namelists
+  # Output only model columns corresponding to observations that
+  # passed the quality check in all variables.
+  reject_obs_with_any_variable_failing_qc: true
+  # Values of the following options are written to the UM fixed header
+  # embedded in the output Cx file. In future (once the UM/LFRic JEDI
+  # interfaces are ready) they will probably be taken directly from
+  # the model. There are more options like this; the full list can be
+  # found in `src/opsinputs/VarObsWriterParameters.h`.
+  IC_XLen: 36
+  IC_YLen: 18
+  IC_PLevels: 3
+  IC_WetLevels: 4
+  RC_LongSpacing: 10
+  RC_LatSpacing: 10
+  # New dynamics vertical coordinate theta (length: IC_PLevels + 1).
+  eta_theta_levels: [300, 290, 280, 270]
+  # New dynamics vertical coordinate rho (length: IC_PLevels).
+  eta_rho_levels: [3, 2, 1]
+```
 
 Further YAML files illustrating the use of these filters can be found in the `test/testinput` folder.
 
@@ -149,7 +152,7 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
         ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
 
-   should then be replaced by 
+   should then be replaced by
 
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
