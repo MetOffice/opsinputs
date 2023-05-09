@@ -17,7 +17,7 @@ Refer to COPYRIGHT.txt of this distribution for details.
 | 9 | `VarField_lwp` | | | | Implement |
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `BiasCorrObsValue/brightnessTemperature` | |
 | 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `OneDVar/skinTemperature` | |
-| 12 | `VarField_gpstzdelay` | `gpstzdelay(:)`| Ground based GNSS Total Zenith Delay | BiasCorrObsValue/zenithTotalDelay | |
+| 12 | `VarField_gpstzdelay` | `gpstzdelay(:)`| Ground based GNSS Total Zenith Delay | `BiasCorrObsValue/zenithTotalDelay` | |
 | 15 | `VarField_cloud` | | | | Implement |
 | 16 | `VarField_rainrate` | | | | Implement |
 | 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `Emiss/emissivity` |  |
@@ -36,7 +36,7 @@ Refer to COPYRIGHT.txt of this distribution for details.
 | 30 | `VarField_localazimuth` | | | | Implement |
 | 31 | `VarField_solzenith` | `SolarZenith(:)` | solar zenith angle | `MetaData/solarZenithAngle` | |
 | 32 | `VarField_solazimth` | | | | Implement |
-| 34 | `VarField_iremiss` | `IREmiss(:)` | surface emissivity (satellite 1dvar) | 'Emiss/emissivityIR' | |
+| 34 | `VarField_iremiss` | `IREmiss(:)` | surface emissivity (satellite 1dvar) | `Emiss/emissivityIR` | |
 | 35 | `VarField_cloudtopp` | `CloudTopP(:)` | cloud top pressure (hPa) (satellite 1dvar) | `OutputToVAR/pressureAtTopOfCloud` | |
 | 36 | `VarField_cloudfrac` | `CloudFrac(:)` | cloud fraction (satellite 1dvar) | `OneDVar/cloudAmount` | |
 | 39 | `VarField_vnatovpp` | | | | Implement |
@@ -51,7 +51,7 @@ Refer to COPYRIGHT.txt of this distribution for details.
 | 53 | `VarField_pcorrect` | `AWPriorPCorrect(:,:)` | Probability for ambiguous wind | `ObsValue/probability` |  |
 | 54 | `VarField_NumChans` | `NumChans(:)` \[`INTEGER`\] | number of channels | From obsSpace.obsvariables().channels() and obs flags | |
 | 55 | `VarField_ChanNum` | `ChanNum(:,:)` \[`INTEGER`\] | channel numbers | From obsSpace.obsvariables().channels() and obs flags | |
-| 57 | `VarField_Emissivity` | `Emissivity(:,:)` | surface emissivity (satellite 1dvar) | OneDVar/emissivity | |
+| 57 | `VarField_Emissivity` | `Emissivity(:,:)` | surface emissivity (satellite 1dvar) | `OneDVar/emissivity` | |
 | 58 | `VarField_QCinfo` | `QCinfo(:)` | auxiliary QC variable for satellite observations | From a variable updated by multiple filters. | Specify variable name |
 | 59 | `VarField_refrac` | | | | Implement |
 | 60 | `VarField_z` | | | | Implement |
@@ -61,14 +61,14 @@ Refer to COPYRIGHT.txt of this distribution for details.
 | 64 | `VarField_RadarBeamElev` | | | | Implement |
 | 65 | `VarField_RadarObRange` | | | | Implement |
 | 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `MetaData/radarAzimuth` | |
-| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | MetaData/stationElevation | |
+| 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | `MetaData/stationElevation` | |
 | 68 | `VarField_clw` | | | | Implement |
 | 69 | `VarField_RadIdent` | | | | Implement Implement |
 | 70 | `VarField_Reflectivity` | | | | Implement |
 | 71 | `VarField_BendingAngle` | `BendingAngle(:,:)` or `BendingAngleAll(:,:)` | GPSRO bending angle (L1, L2, LC etc or just LC) | `ObsValue/bendingAngle` | Decide if a separate variable corresponding to BendingAngleAll is needed |
 | 72 | `VarField_ImpactParam` | `ImpactParam(:,:)` or `ImpactParamAll(:,:)` | GPSRO impact parameter (L1, L2, LC etc or just LC) | `ObsValue/impactParameterRO` | Decide if a separate variable corresponding to ImpactParamAll is needed |
 | 73 | `VarField_RO_Rad_Curv` | `RO_Rad_Curv(:)` | GPSRO Earth\'s local radius of curvature (m) | `MetaData/earthRadiusCurvature` | |
-| 74 | `VarField_RO_geoid_und` | `RO_geoid_und(:)` | GPSRO Geoid undulation (above WGS-84 ellipsoid, m) | MetaData/geoidUndulation | |
+| 74 | `VarField_RO_geoid_und` | `RO_geoid_und(:)` | GPSRO Geoid undulation (above WGS-84 ellipsoid, m) | `MetaData/geoidUndulation` | |
 | 75 | `VarField_RadAltAboveMSL` | | | | Implement |
 | 76 | `VarField_BriTempVarError` | `BriTempVarError(:,:)` | scene dependent obs errors for BTs (oblocation, channel) | `ObsErrorData/brightnessTemperature` | |
 | 77 | `VarField_AOD` | `AOD(:,:)` | aerosol optical depth | `ObsValue/aerosolOpticalDepth` | |
