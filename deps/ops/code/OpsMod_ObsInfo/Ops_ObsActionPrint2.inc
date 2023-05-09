@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Performs an action on an observation structure array depending on the value of
 ! module variable Action.  Possible actions are:

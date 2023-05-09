@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Count the number of surface and upper air CX indexes to be written to a CX
 ! file, based on presence, or lack therof, of elements in the CX header.

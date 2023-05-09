@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Horizontal interpolation.  Interpolates by linear interpolation, a 2-d field
 ! to a 2-d set of points.  Input data can be on a sphere or within a rectangular

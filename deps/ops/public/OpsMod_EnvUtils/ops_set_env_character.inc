@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Sets an environment variable to a value.  Any environment variable set this
 ! way will only be effective for the duration of the program; it will not

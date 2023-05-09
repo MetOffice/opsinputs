@@ -1,7 +1,5 @@
 ! *****************************COPYRIGHT*******************************
 ! (C) Crown copyright Met Office. All rights reserved.
-! For further details please refer to the file Copyright
-! which you should have received as part of this distribution.
 ! *****************************COPYRIGHT*******************************
 
 ! Function MPL_Wtime()

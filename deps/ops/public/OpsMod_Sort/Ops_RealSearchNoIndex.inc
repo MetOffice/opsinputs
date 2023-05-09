@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Searches the monotonic real array y for the integer value x
 !

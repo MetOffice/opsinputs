@@ -2,8 +2,6 @@ MODULE OpsMod_BufrDescriptors
 
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-! For further details please refer to the file COPYRIGHT.txt
-! which you should have received as part of this distribution.
 !-------------------------------------------------------------------------------
 ! DESCRIPTION
 !   Contains BUFR descriptors for use in routines for associated data file

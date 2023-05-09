@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Basic setup of an ob_type structure.  Basic grid information comes from the
 ! UM header.  For GRIB types more detailed grid and time information also comes

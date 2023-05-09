@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Set up the COLUMN DEPENDENT CONSTANT part of the varobs header. These
 ! constants are pointers for decoding the varobs information.

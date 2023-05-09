@@ -1,7 +1,6 @@
 /*
  * (C) Crown Copyright 2021, the Met Office. All rights reserved.
  *
- * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #include "opsinputs/instantiateObsFilterFactory.h"

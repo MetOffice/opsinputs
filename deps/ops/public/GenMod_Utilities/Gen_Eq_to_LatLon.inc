@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-----------------------------------------------------------------------
 ! Calculates latitude and longitude on standard grid from input arrays
 ! of latitude and longitude on equatorial latitude-longitude (eq) grid

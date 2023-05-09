@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Horizontal and vertical profile interpolation.  Interpolates by linear
 ! remapping interpolation, a 4-d field to the locations of a set of profiles.

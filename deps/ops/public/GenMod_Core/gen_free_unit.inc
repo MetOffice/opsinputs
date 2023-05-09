@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Frees a fortran or C I/O unit number previously assigned by Gen_GetUnit.
 !-------------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !------------------------------------------------------------------------------
 ! Calculates CX pressures, for both old and new dynamics.
 !

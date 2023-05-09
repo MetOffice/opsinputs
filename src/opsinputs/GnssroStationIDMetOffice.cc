@@ -1,7 +1,6 @@
 /* -----------------------------------------------------------------------------
  * (C) Crown Copyright 2021, the Met Office. All rights reserved.
  *
- * Refer to COPYRIGHT.txt of this distribution for details.
  * -----------------------------------------------------------------------------
  *
  * Find the station ID for GNSS-RO observations used by the Met Office's DA

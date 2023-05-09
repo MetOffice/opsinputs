@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Converts a list of numbers specified in a command line to a simple array of
 ! numbers.  Handles comma separated values and ranges, e.g. a-b -> a,...,b.

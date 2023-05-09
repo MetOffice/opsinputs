@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Called by Ops_CXGenerate to perform horizontal and time interpolation.  Each
 ! level of each field is read in from the dump in turn, at all forecast periods.

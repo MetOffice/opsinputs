@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! This routine completes the back ground error set up code left outstanding by
 ! the routines belonging to the generic UM reading module OpsMod_CXGenerate.

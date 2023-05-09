@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-----------------------------------------------------------------------
 ! Calculates latitude and longitude on equatorial latitude-longitude
 ! (eq) grid used in regional models from input arrays of latitude and

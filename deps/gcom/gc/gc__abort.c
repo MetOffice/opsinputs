@@ -1,8 +1,6 @@
 /*
  *****************************COPYRIGHT*******************************
  (c) CROWN COPYRIGHT, Met Office, All Rights Reserved.
- Please refer to Copyright file in top level GCOM directory
-                 for further details
  *****************************COPYRIGHT*******************************
 
       ******************************************************************

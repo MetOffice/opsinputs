@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Writes columns of CX data to a .cx file.  The Cx data arrays are assumed to be
 ! present and required to be output, if within the Cx structure's header they

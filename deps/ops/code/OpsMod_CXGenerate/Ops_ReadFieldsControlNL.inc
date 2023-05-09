@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Reads a fields control namelist.  The relevant information is read using a
 ! namelist read. If a problem is encountered a flag is raised and a report

@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Splits "input" into a character array, using the characters in
 ! "separator_set" as delimiters. Returns the "output" as a pointer to the

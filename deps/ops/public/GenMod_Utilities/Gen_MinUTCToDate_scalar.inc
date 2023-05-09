@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Calculates date in broken form given date in the form of minutes
 ! since 01/01/1970 00:00Z (Universal co-ordinated time)

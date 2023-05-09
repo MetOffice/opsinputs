@@ -1,7 +1,6 @@
 /*
  * (C) Crown Copyright 2020, the Met Office. All rights reserved.
  *
- * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #ifndef OPSINPUTS_CXWRITER_INTERFACE_H_

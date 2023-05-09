@@ -1,7 +1,6 @@
 <!---
 (C) Crown Copyright 2023, the Met Office. All rights reserved.
 
-Refer to COPYRIGHT.txt of this distribution for details.
 --->
 
 | **Id** | **Varfield** | **Ob_type field** | **Description** | **How to get it from JEDI** | **TODO** |

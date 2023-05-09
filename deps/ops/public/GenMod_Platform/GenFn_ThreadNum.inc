@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Discover current thread number. Seperate routine created as in some
 ! environments omp_get_thread_num can return integer*4 into an integer*8

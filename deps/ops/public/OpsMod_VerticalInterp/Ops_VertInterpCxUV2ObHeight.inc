@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Performs linear vertical interpolation on Cx columns. Taking values from model
 ! heights to observation height.  Sets extrapolated data to zero and sets flag

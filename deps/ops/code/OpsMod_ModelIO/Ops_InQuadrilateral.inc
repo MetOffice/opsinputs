@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Determine whether a point P(x,y) lies within or on the boundary of a
 ! quadrangle (ABCD) of any shape on a plane.

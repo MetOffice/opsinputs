@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Returns the length of data needed to write data of length "in_len" for UM
 ! well-formed IO based on UM_SECTOR_SIZE.

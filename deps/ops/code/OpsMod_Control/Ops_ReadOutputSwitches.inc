@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Reads the operator switches which determine the output files to produce.  The
 ! operator switches are obtained by a series of calls to ops_env_is_true which

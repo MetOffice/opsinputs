@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-----------------------------------------------------------------------
 ! Calculates coefficients used to translate u and v components of wind
 ! between equatorial (eq) latitude-longitude grid and standard

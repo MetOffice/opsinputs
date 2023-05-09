@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Write varobs header and data to an external file.  All output is done on PE 0.
 ! The varobs file is opened then the Varobs header (argument VarobsHeader) is

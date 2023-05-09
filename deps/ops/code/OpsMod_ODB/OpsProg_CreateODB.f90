@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Converts MetDB data to an ODB.  The basic inputs are the same as for
 ! OpsProg_ExtractAndProcess (OPS_CUTOFF, the normal observation group switches,

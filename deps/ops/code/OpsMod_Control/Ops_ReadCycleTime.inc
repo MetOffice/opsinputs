@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Reads the cycle time and run id from the environment variables OPS_CYCLE_TIME
 ! and OPS_RUNID respectively.  OPS_RUNID is optional, OPS_CYCLE_TIME is

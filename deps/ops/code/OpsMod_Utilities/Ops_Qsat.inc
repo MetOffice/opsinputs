@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-----------------------------------------------------------------------
 ! Saturation Specific Humidity Scheme (Qsat): Vapour to Liquid/Ice.
 !

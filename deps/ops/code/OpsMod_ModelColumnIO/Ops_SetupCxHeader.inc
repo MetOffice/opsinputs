@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Write out model columns (Cx data) to a dump.  The Cx data arrays are assumed
 ! to be present and required to be output, if within the Cx structure's header

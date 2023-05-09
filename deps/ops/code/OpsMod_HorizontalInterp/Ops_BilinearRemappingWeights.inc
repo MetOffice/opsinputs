@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Compute the weights for a bilinear remapping interpolation scheme.  This
 ! scheme is appropriate for bilinear interpolation on a general quadrilateral

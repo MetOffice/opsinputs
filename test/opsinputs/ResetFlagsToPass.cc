@@ -1,7 +1,6 @@
 /*
  * (C) Crown Copyright 2020, the Met Office. All rights reserved.
  *
- * Refer to COPYRIGHT.txt of this distribution for details.
  */
 
 #include "../../test/opsinputs/ResetFlagsToPass.h"

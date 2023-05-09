@@ -1,7 +1,6 @@
 !
 ! (C) Crown Copyright 2020, the Met Office. All rights reserved.
 !
-! Refer to COPYRIGHT.txt of this distribution for details.
 
 !> \file Interface for C++ ObsDataVector code called from Fortran
 

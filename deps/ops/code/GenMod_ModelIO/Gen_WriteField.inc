@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-----------------------------------------------------------------------
 ! Writes out one field from file on unit hdr % UnitNum, starting at
 ! field number field.

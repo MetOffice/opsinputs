@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Use data from the Ocean Pre-search grid file ("OceanPresearchGrid_type") to
 ! refine the coordinate search to local gridpoints to each observation. Use this

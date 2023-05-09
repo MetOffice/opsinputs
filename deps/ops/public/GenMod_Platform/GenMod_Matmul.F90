@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Replace intrinsic MATMUL with call to ESSL routine DGEMUL.
 !-------------------------------------------------------------------------------

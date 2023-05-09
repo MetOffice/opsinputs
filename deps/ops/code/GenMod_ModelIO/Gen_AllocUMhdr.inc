@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Allocate space for a header from a UM dump.
 ! Extract and set lengths of all arrays, then ALLOCATE the arrays.

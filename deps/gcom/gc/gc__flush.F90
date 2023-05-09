@@ -1,7 +1,5 @@
 ! *****************************COPYRIGHT*******************************
 ! (C) CROWN COPYRIGHT , MET OFFICE, ALL RIGHTS RESERVED.
-! PLEASE REFER TO COPYRIGHT FILE IN TOP LEVEL GCOM DIRECTORY
-!                 FOR FURTHER DETAILS
 ! *****************************COPYRIGHT*******************************
 
 !=======================================================================

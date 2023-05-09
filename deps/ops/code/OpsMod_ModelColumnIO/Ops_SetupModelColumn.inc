@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Sets up an array containing CX data to be written to a file.  For each of the
 ! indices in OpsMod_CXIndexes the data in the CX structure "Cx" is copied to

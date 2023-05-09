@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Top level routine to read either the BG or BGE from ocean NetCDF files,
 ! perform horizontal and time interpolation of a UM dump, fill an array of CX
