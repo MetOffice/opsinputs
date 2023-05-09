@@ -1,3 +1,7 @@
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+#
+# Refer to COPYRIGHT.txt of this distribution for details.
+
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
   set(ODB_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused")
 elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")

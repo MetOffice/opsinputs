@@ -1,3 +1,7 @@
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+#
+# Refer to COPYRIGHT.txt of this distribution for details.
+
 cmake_minimum_required( VERSION 3.12 FATAL_ERROR )
 
 project( opsinputs-ci VERSION 0.1 LANGUAGES C CXX Fortran )

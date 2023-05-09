@@ -1,7 +1,6 @@
-# (C) Copyright 2021 Met Office.
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
 #
-# This software is licensed under the terms of the Apache Licence Version 2.0
-# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+# Refer to COPYRIGHT.txt of this distribution for details.
 
 # Include macros for creating links and symlinks
 include( opsinputs_functions )

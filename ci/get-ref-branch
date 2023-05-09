@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+#
+# Refer to COPYRIGHT.txt of this distribution for details.
+#
 set -euxo pipefail
 repo="$1"  # expect path to a repo clone
 
