@@ -135,7 +135,7 @@ Development
 VarObs
 ------
 
-Only a subset of varfields recognised by OPS and VAR can currently be output. To add support for a new varfield:
+Only a subset of [varfields](Varfields.md) recognised by OPS and VAR can currently be output. To add support for a new varfield:
 
 1. Determine where the input data will come from (a variable stored in the `ObsSpace` object? a GeoVaL?).
 
@@ -149,7 +149,7 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
           Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
           ObsSpace, Flags, ObsErrors, "logarithmic_visibility")
 
-   If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant subroutines from the `opsinputs_fill_mod.F90` module.
+   If in doubt, look at similar [varfields](Varfields.md) that have already been implemented or read the documentation of relevant subroutines from the `opsinputs_fill_mod.F90` module.
 
 3. Add a unit test for the new varfield:
 
@@ -159,7 +159,7 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
    c. Add a call to the `ADD_WRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
 
-4. Update the list of implemented varfields in `Varfields.md`. 
+4. Update the list of implemented varfields in [Varfields.md](Varfields.md).
 
 Cx
 --
