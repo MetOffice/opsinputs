@@ -541,6 +541,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gmilow
                 YAML     cxwriter_globalnamelist_gmilow.yaml
                 NAMELIST ../../etc/global/cx/GMIlow.nl
                 DATA     cx_globalnamelist_gmilow.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gmihigh
+                YAML     cxwriter_globalnamelist_gmihigh.yaml
+                NAMELIST ../../etc/global/cx/GMIhigh.nl
+                DATA     cx_globalnamelist_gmihigh.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atms
                 YAML     cxwriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/cx/ATMS.nl

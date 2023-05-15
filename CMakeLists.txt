@@ -18,6 +18,7 @@ set( ECBUILD_DEFAULT_BUILD_TYPE Release )
 set( ENABLE_OS_TESTS           OFF CACHE BOOL "Disable OS tests" FORCE )
 set( ENABLE_LARGE_FILE_SUPPORT OFF CACHE BOOL "Disable testing of large file support" FORCE )
 
+find_package( ecbuild 3.3.2 REQUIRED )
 include( ecbuild_system NO_POLICY_SCOPE )
 
 ecbuild_requires_macro_version( 2.7 )
@@ -29,8 +30,6 @@ ecbuild_requires_macro_version( 2.7 )
 ecbuild_declare_project()
 
 ecbuild_enable_fortran( REQUIRED )
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set( OPSINPUTS_LINKER_LANGUAGE CXX )
 
@@ -40,6 +39,7 @@ set( OPSINPUTS_LINKER_LANGUAGE CXX )
 
 ## Dependencies
 find_package( jedicmake QUIET )  # Prefer find modules from jedi-cmake
+find_package( MPI REQUIRED COMPONENTS C CXX Fortran )
 
 # Boost
 include_directories( ${Boost_INCLUDE_DIR} )

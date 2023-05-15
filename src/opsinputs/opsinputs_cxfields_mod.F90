@@ -60,7 +60,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_O3_AQ = opsinputs_cxfi
 character(len=*), parameter, public :: opsinputs_cxfields_NO2_AQ = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CO_AQ = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_BLtype = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_theta = "theta"
+character(len=*), parameter, public :: opsinputs_cxfields_theta = "potential_temperature"
 character(len=*), parameter, public :: opsinputs_cxfields_rh = var_rh
 character(len=*), parameter, public :: opsinputs_cxfields_u = var_u
 character(len=*), parameter, public :: opsinputs_cxfields_v = var_v
@@ -81,12 +81,12 @@ character(len=*), parameter, public :: opsinputs_cxfields_cloud_layer = opsinput
 character(len=*), parameter, public :: opsinputs_cxfields_ozone = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qcf = var_cli
 character(len=*), parameter, public :: opsinputs_cxfields_qcl = var_clw
-character(len=*), parameter, public :: opsinputs_cxfields_cloud_bulk = "cloud_area_fraction_in_atmosphere_layer"
+character(len=*), parameter, public :: opsinputs_cxfields_cloud_bulk = "cloud_volume_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_aerosol_p = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CDNC = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_RH_AMC = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_Cl = "liquid_cloud_fraction"
-character(len=*), parameter, public :: opsinputs_cxfields_Cf = "frozen_cloud_fraction"
+character(len=*), parameter, public :: opsinputs_cxfields_Cl = "liquid_cloud_volume_fraction_in_atmosphere_layer"
+character(len=*), parameter, public :: opsinputs_cxfields_Cf = "ice_cloud_volume_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_qrain = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_RichNumber = opsinputs_cxfields_unknown
