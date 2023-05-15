@@ -855,7 +855,7 @@ if __name__ == "__main__":
                               'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
                              ['theta','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_area_fraction_in_atmosphere_layer','liquid_cloud_fraction','frozen_cloud_fraction'],
+                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
                               'testinput/cx_globalnamelist_mwsfy3.nc4')
 
     # GNSS-RO
