@@ -1,3 +1,6 @@
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+#
+
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
   if("${CMAKE_Fortran_COMPILER_VERSION}" VERSION_GREATER "10.1.0")
     set(OPS_EXTRA_Fortran_FLAGS "-std=f2003 -fallow-argument-mismatch")

@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Distance-weighted interpolation scheme (k2dint = 0).  The interpolation
 ! weights are computed as a weighted sum of the distance between the model grid

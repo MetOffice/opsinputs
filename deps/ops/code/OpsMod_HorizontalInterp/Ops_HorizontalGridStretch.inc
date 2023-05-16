@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! This routine finds the weight and grid indices needed to interpolate a field
 ! defined on a grid with variable latitude and longitude spacing to a set of

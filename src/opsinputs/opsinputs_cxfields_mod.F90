@@ -1,6 +1,5 @@
 ! (C) Crown Copyright 2020, the Met Office. All rights reserved.
 !
-! Refer to COPYRIGHT.txt of this distribution for details.
 
 !> Maps names of fields defined in the Cx_Info type to names of JEDI geovals used to fill
 !> these fields.

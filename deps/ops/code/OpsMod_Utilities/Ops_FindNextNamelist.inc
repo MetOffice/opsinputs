@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Skip namelist comments starting with a '#' or '!'.  Return the type of the
 ! next namelist, with the unit position set to the start of this namelist.

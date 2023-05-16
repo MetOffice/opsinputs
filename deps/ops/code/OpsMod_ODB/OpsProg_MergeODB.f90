@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Program to merge one ODB into another ODB.  Each table from the ODB is read
 ! and written to the ECMA with any special modifications required.

@@ -1,3 +1,6 @@
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+#
+
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -fdefault-real-8 \

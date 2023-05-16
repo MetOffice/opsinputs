@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Contains shared_memory object for storeing the enitire model field. It has
 ! the SAVE attribute so that it remians in memory until it destroyed.

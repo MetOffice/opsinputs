@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Produces weights for a linear interpolation in the vertical from DataIn at RIn
 ! altitudes to DataOut at ROut altitudes.

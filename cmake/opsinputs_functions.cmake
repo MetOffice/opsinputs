@@ -1,3 +1,6 @@
+# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+#
+#
 # Syntax: CREATE_SYMLINKS(src dst)
 #
 # Arguments:

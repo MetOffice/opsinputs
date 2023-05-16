@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-----------------------------------------------------------------------
 ! To set the LBEGIN and LBNREC fields in the LOOKUP Headers for VN 16
 ! Type Dumpfiles - addressed by location and length which are rounded up

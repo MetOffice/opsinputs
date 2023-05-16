@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Reads an environment variable; returne "true" if variable contains a "truthy"
 ! value, false otherwise.  Truthy means containing upper or lower case Y or T.

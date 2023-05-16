@@ -1,6 +1,5 @@
 ! (C) Crown Copyright 2020, the Met Office. All rights reserved.
 !
-! Refer to COPYRIGHT.txt of this distribution for details.
 
 !> Fortran part of CxWriter. It collects data from JEDI and uses OPS functions to output these data
 !> to a Cx file.

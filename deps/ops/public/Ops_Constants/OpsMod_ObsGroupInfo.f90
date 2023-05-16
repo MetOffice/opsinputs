@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Possible settings of ObsGroup in OBheader_type, CXheader_type.  We do not
 ! delete obs group numbers from here even if support is removed from the code.

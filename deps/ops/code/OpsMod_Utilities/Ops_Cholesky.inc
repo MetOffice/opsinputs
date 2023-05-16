@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Solves the Linear equation UQ=V for Q where U is a symmetric positive definite
 ! matrix and U and Q are vectors of length N.  The method follows that in Golub

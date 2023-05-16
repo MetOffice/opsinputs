@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Select and sort observations for duplicate check.  Sorts observations by 1.5
 ! degree latitude band and longitudeLoops through bands/observations (ObA),

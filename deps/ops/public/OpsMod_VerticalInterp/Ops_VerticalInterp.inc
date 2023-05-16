@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Performs linear, cubic Lagrange or quintic lagrange vertical interpolations on
 ! 3D fields. The horizontal location of points must be the same for both the

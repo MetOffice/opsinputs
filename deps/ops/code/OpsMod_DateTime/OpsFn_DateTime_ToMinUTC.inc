@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Returns time in "Minutes UTC", i.e. minutes since 00:00Z 1/1/1970
 ! given input date in the form of yyyy/mm/dd/hh/min

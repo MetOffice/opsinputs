@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! This subroutine returns the value y corresponding to a given value of x using
 ! linear interpolation of a look up table of x-y pairs.  The x-y pairs must be

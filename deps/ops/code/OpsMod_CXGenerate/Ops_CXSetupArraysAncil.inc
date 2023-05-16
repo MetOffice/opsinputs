@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Called by Ops_CXGenerate to set up both the FieldsInfo and CxArrays arrays.
 ! Also allocates arrays in the Cx structure.

@@ -1,6 +1,5 @@
 ! (C) Crown Copyright 2020, the Met Office. All rights reserved.
 !
-! Refer to COPYRIGHT.txt of this distribution for details.
 
 !> Fortran part of VarObsWriter. It collects data from JEDI and uses the functions from the OPS
 !> OpsMod_Varobs module to output them to a VarObs file.

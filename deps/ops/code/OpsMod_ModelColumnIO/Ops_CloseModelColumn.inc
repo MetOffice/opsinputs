@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Closes the Cx file(s) and frees the unit number(s).  The Cx file is closed by
 ! a call to Ops_CloseCFile

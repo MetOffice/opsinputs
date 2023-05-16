@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Performs linear interpolation of a 2-d input field to a 2-d set of points
 ! defined by IOut, JOut and WtLambda, WtPhi taking into account missing data.

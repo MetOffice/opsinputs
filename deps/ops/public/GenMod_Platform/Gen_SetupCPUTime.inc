@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Finds out the scaling factor for CPU time, to allow Gen_CPUTime to return
 ! seconds. CPU time is found from the POSIX sysconv(_SC_CLK_TCK) function.

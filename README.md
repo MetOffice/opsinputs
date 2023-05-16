@@ -1,15 +1,15 @@
 [![CI](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml/badge.svg)](https://github.com/MetOffice/opsinputs/actions/workflows/ci.yml)
 
-(C) Crown Copyright 2020, the Met Office. All rights reserved.
+&copy; Crown Copyright 2020, the Met Office. All rights reserved.
 
-Refer to COPYRIGHT.txt of this distribution for details.
+Refer to [COPYRIGHT](COPYRIGHT.txt) of this distribution for details.
 
 Overview
 ========
 
 This software makes it possible for NG-OPS to write observation data to files in the VarObs format and model data (geovals) to files in the Cx format.
 
-Files in both formats are read as inputs into the VAR data assimilation system at the Met Office. The VarObs file format is described in OTDP 16 (https://www-nwp/~opsrc/OPS/view/ops-latest/doc/OTDP16.html) and the Cx file format is described in OTDP 17 (https://www-nwp/~opsrc/OPS/view/ops-latest/doc/OTDP17.html).
+Files in both formats are read as inputs into the VAR data assimilation system at the Met Office. The VarObs file format is described in [OTDP 16](https://www-nwp/~opsrc/OPS/view/ops-latest/doc/OTDP16.html) and the Cx file format is described in [OTDP 17](https://www-nwp/~opsrc/OPS/view/ops-latest/doc/OTDP17.html).
 
 Dependencies
 ============
@@ -23,34 +23,25 @@ Note that both of the above need to be built with the same compiler and use the 
 Building
 ========
 
-1. Clone the `ufo-bundle` into a folder of your choice. Consider using the `feature/wsmigaj` branch, which contains some Met Office-specific adjustments and includes the ropp-ufo package implementing operators for GNSSRO:
+1. Clone the `mo-bundle` into a folder of your choice.
 
-       git clone https://github.com/JCSDA/ufo-bundle.git -b feature/wsmigaj
-       cd ufo-bundle
-       cp -a ~jopa/jedi_repos/nightly/ropp-ufo .
+       git clone https://github.com/MetOffice/mo-bundle.git
+       cd mo-bundle
 
-2. Open the `CMakeLists.txt` file in the `ufo-bundle` directory and add the following line after all other lines starting with `ecbuild_bundle`:
+2. Open the `CMakeLists.txt` file in the `mo-bundle` directory and comment out the projects not required for opsinputs (i.e., lines beginning with ecbuild_bundle).
+    Note that `opsinputs` depends on `oops`, `ioda`, `ufo` and `ropp-ufo`.
 
-       ecbuild_bundle( PROJECT opsinputs GIT "https://github.com/MetOffice/opsinputs.git" BRANCH develop UPDATE)
 
-3. Run the following commands to set up your build environment:
+3. Run the following commands to set up your build environment (internal):
 
-       module use /home/h03/jopa/modulefiles
-       module load jedi/ufo-bundle-dev-stack
+       module use ~jopa/modulefiles
+       module load bb-env
 
-   (Alternatively, load jedi/ufo-bundle-dev-stack/intel if you want to use the Intel compiler or jedi/ufo-bundle-dev-stack/gnu/7.2.0 to use the GNU 7.2.0 compiler suite.)
+4. Configure and build:
 
-4. Create a build directory next to the `ufo-bundle` directory, enter it and run ecbuild to configure a build:
+       cmake --workflow --preset=vdi_gnu
 
-       ecbuild ../ufo-bundle
-
-5. Run make to build the the bundle:
-
-       make -j4
-
-   Note: if using the gfortran 7.2 compiler in the Debug configuration, you may need to remove the -finit-derived flag from the saber/cmake/compiler_flags_GNU_Fortran.cmake file to avoid an internal compiler error during compilation of some saber source files.
-
-8. Optionally, run tests to verify that components of the `opsinputs` package work correctly:
+5. Optionally, run tests to verify that components of the `opsinputs` package work correctly:
 
        ctest -R opsinputs
 
@@ -60,78 +51,81 @@ Usage
 VarObs and Cx files are written by the `VarObs Writer` and `Cx Writer` observation filters, respectively. See the Doxygen documentation of these filters in the `src/opsinputs/VarObsWriter.h` and `src/opsinputs/CxWriter.h` files (and the accompanying `...Parameters.h` files) for more information. 
 
 The following YAML snippet demonstrates the use of `VarObsWriter`. <ObsGroup> stands for the name of one of the observation groups known to OPS.
-   
-    - ObsSpace:
-        name: <ObsGroup>
-        ObsDataIn:
-          obsfile: observations.nc4
-        simulate:
-          variables: [surface_pressure]        
-    - Filter: VarObs Writer
-        # The filter will output an <ObsGroup>.varobs file
-        # in the directory specified in the output_directory option.
-        output_directory: varobs
-        # By default, the filter will produce a VarObs file containing
-        # the varfields output by default by OPS for the observation
-        # group <ObsGroup>. The list of varfields can be changed by
-        # providing a namelist file <ObsGroup>.nl in the directory
-        # specified in the namelist_directory option. This file should
-        # contain a Fortran namelist in the format accepted by the
-        # Ops_ReadVarobsControlNL function from OPS.
-        namelist_directory: namelists
-        # Output only observations that passed the quality check in all
-        # variables.
-        reject_obs_with_any_variable_failing_qc: true
-        # Values of the following options are written to the UM fixed header
-        # embedded in the output VarObs file. In future (once the UM/LFRic JEDI
-        # interfaces are ready) they will probably be taken directly from
-        # the model. There are more options like this; the full list can be
-        # found in `src/opsinputs/VarObsWriterParameters.h`.
-        IC_XLen: 36
-        IC_YLen: 18
-        IC_PLevels: 8
-        IC_WetLevels: 9
-        RC_LongSpacing: 10
-        RC_LatSpacing: 10
+
+```yaml
+- ObsSpace:
+  name: <ObsGroup>
+  ObsDataIn:
+    obsfile: observations.nc4
+  simulate:
+    variables: [surface_pressure]
+- Filter: VarObs Writer
+  # The filter will output an <ObsGroup>.varobs file
+  # in the directory specified in the output_directory option.
+  output_directory: varobs
+  # By default, the filter will produce a VarObs file containing
+  # the varfields output by default by OPS for the observation
+  # group <ObsGroup>. The list of varfields can be changed by
+  # providing a namelist file <ObsGroup>.nl in the directory
+  # specified in the namelist_directory option. This file should
+  # contain a Fortran namelist in the format accepted by the
+  # Ops_ReadVarobsControlNL function from OPS.
+  namelist_directory: namelists
+  # Output only observations that passed the quality check in all variables.
+  reject_obs_with_any_variable_failing_qc: true
+  # Values of the following options are written to the UM fixed header
+  # embedded in the output VarObs file. In future (once the UM/LFRic JEDI
+  # interfaces are ready) they will probably be taken directly from
+  # the model. There are more options like this; the full list can be
+  # found in `src/opsinputs/VarObsWriterParameters.h`.
+  IC_XLen: 36
+  IC_YLen: 18
+  IC_PLevels: 8
+  IC_WetLevels: 9
+  RC_LongSpacing: 10
+  RC_LatSpacing: 10
+```
 
 And here is a YAML snippet demonstrating the use of `CxWriter`.
 
-    - ObsSpace:
-        name: <ObsGroup>
-        ObsDataIn:
-          obsfile: observations.nc4
-        simulate:
-          variables: [surface_pressure]        
-    - Filter: Cx Writer
-        # The filter will output an <ObsGroup>.cx file
-        # in the directory specified in the output_directory option.
-        output_directory: cx
-        # By default, the filter will produce a Cx file containing
-        # the cxfields output by default by OPS for the observation
-        # group <ObsGroup>. The list of cxfields can be changed by
-        # providing a namelist file <ObsGroup>.nl in the directory
-        # specified in the namelist_directory option. This file should
-        # contain a Fortran namelist in the format accepted by the
-        # Ops_ReadCXControlNL function from OPS.
-        namelist_directory: namelists
-        # Output only model columns corresponding to observations that 
-        # passed the quality check in all variables.
-        reject_obs_with_any_variable_failing_qc: true
-        # Values of the following options are written to the UM fixed header
-        # embedded in the output Cx file. In future (once the UM/LFRic JEDI
-        # interfaces are ready) they will probably be taken directly from
-        # the model. There are more options like this; the full list can be
-        # found in `src/opsinputs/VarObsWriterParameters.h`.
-        IC_XLen: 36
-        IC_YLen: 18
-        IC_PLevels: 3
-        IC_WetLevels: 4
-        RC_LongSpacing: 10
-        RC_LatSpacing: 10
-        # New dynamics vertical coordinate theta (length: IC_PLevels + 1).
-        eta_theta_levels: [300, 290, 280, 270]
-        # New dynamics vertical coordinate rho (length: IC_PLevels).
-        eta_rho_levels: [3, 2, 1]
+```yaml
+- ObsSpace:
+  name: <ObsGroup>
+  ObsDataIn:
+    obsfile: observations.nc4
+  simulate:
+    variables: [surface_pressure]
+- Filter: Cx Writer
+  # The filter will output an <ObsGroup>.cx file
+  # in the directory specified in the output_directory option.
+  output_directory: cx
+  # By default, the filter will produce a Cx file containing
+  # the cxfields output by default by OPS for the observation
+  # group <ObsGroup>. The list of cxfields can be changed by
+  # providing a namelist file <ObsGroup>.nl in the directory
+  # specified in the namelist_directory option. This file should
+  # contain a Fortran namelist in the format accepted by the
+  # Ops_ReadCXControlNL function from OPS.
+  namelist_directory: namelists
+  # Output only model columns corresponding to observations that
+  # passed the quality check in all variables.
+  reject_obs_with_any_variable_failing_qc: true
+  # Values of the following options are written to the UM fixed header
+  # embedded in the output Cx file. In future (once the UM/LFRic JEDI
+  # interfaces are ready) they will probably be taken directly from
+  # the model. There are more options like this; the full list can be
+  # found in `src/opsinputs/VarObsWriterParameters.h`.
+  IC_XLen: 36
+  IC_YLen: 18
+  IC_PLevels: 3
+  IC_WetLevels: 4
+  RC_LongSpacing: 10
+  RC_LatSpacing: 10
+  # New dynamics vertical coordinate theta (length: IC_PLevels + 1).
+  eta_theta_levels: [300, 290, 280, 270]
+  # New dynamics vertical coordinate rho (length: IC_PLevels).
+  eta_rho_levels: [3, 2, 1]
+```
 
 Further YAML files illustrating the use of these filters can be found in the `test/testinput` folder.
 
@@ -141,7 +135,7 @@ Development
 VarObs
 ------
 
-Only a subset of varfields recognised by OPS and VAR can currently be output. To add support for a new varfield:
+Only a subset of [varfields](Varfields.md) recognised by OPS and VAR can currently be output. To add support for a new varfield:
 
 1. Determine where the input data will come from (a variable stored in the `ObsSpace` object? a GeoVaL?).
 
@@ -149,13 +143,13 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
         ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
 
-   should then be replaced by 
+   should then be replaced by
 
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
           ObsSpace, Flags, ObsErrors, "logarithmic_visibility")
 
-   If in doubt, look at similar varfields that have already been implemented or read the documentation of relevant subroutines from the `opsinputs_fill_mod.F90` module.
+   If in doubt, look at similar [varfields](Varfields.md) that have already been implemented or read the documentation of relevant subroutines from the `opsinputs_fill_mod.F90` module.
 
 3. Add a unit test for the new varfield:
 
@@ -165,7 +159,7 @@ Only a subset of varfields recognised by OPS and VAR can currently be output. To
 
    c. Add a call to the `ADD_WRITER_TEST` function in the `test/CMakeLists.txt` file, specifying the name of the test and its input YAML and data files.
 
-4. Update the list of implemented varfields in `Varfields.md`. 
+4. Update the list of implemented varfields in [Varfields.md](Varfields.md).
 
 Cx
 --

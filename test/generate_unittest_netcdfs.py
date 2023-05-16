@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 """Generate NetCDF files required by VarObsWriter and CxWriter tests.
 
-This script must currently be run manually whenever these files need to be regenerated. 
-In principle we could define these files as outputs of a custom CMake target; 
+This script must currently be run manually whenever these files need to be regenerated.
+In principle we could define these files as outputs of a custom CMake target;
 this script would then be run automatically as part of the build process whenever it changed."""
 
 import numpy as np
 import netCDF4 as nc4
 
-# Defined as in oops/util/missingValues.cc 
+# Defined as in oops/util/missingValues.cc
 missing_float = np.finfo(np.float32).min * 0.99
 missing_int = np.iinfo(np.int32).min + 5
 
 # NetCDF missing values
 missing_float_nc = 9.969209968386869e+36
 
+
 def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
-    f = nc4.Dataset(file_name, 'w', format="NETCDF4")  
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
     f.createDimension('Location', nlocs)
@@ -30,8 +31,8 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -49,14 +50,14 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
 
     if with_bias:
         var = f.createVariable('ObsBias/' + var_name, 'f', ('Location'))
-        biasVal = [-0.1,-0.5,-0.01, 0.1]
+        biasVal = [-0.1, -0.5, -0.01, 0.1]
         var[:] = biasVal
         var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('Location'))
         biascorr = np.array(obsVal) - np.array(biasVal)
-	# Check for missing floats, if ObsVal has a missing float then
-	# the bias corrected value will be missing float. If the bias 
-	# correction is missing then no bias correction should be applied to
-	# and the obsVal used. 
+        # Check for missing floats, if ObsVal has a missing float then
+        # the bias corrected value will be missing float. If the bias
+        # correction is missing then no bias correction should be applied to
+        # and the obsVal used.
         for i, val in enumerate(obsVal):
             if obsVal[i] == missing_float:
                 biascorr[i] = missing_float
@@ -66,6 +67,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -82,8 +84,8 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -106,10 +108,10 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     var[:] = [0.11, missing_float, 0.13, 0.14]
     var = f.createVariable('PreQC/' + var_name_2, 'i', ('Location',))
     var[:] = [1, 1, 1, 1]
-
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -146,8 +148,8 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400, 100500, 100600]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute, 5*minute, 6*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute, 5 * minute, 6 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_1", "station_1",
@@ -176,6 +178,7 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
 
     f.close()
 
+
 def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
@@ -191,8 +194,8 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -210,10 +213,10 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
 
     var = f.createVariable(var_group + '/' + var_name, 'f', ('Location',))
     var[:] = [5.1, missing_float, 5.3, 5.4]
-
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -230,8 +233,8 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -249,10 +252,10 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
 
     var = f.createVariable(var_group + '/' + var_name, 'i', ('Location',))
     var[:] = [5, missing_int, 7, 8]
-
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_1d_geoval_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -262,10 +265,10 @@ def output_1d_geoval_to_netcdf(var_name, file_name):
 
     var = f.createVariable(var_name, 'f', ('nlocs',))
     var[:] = [7.1, missing_float, 7.3, 7.4]
-
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with_radar_family=False, add_occulting_satid=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -278,7 +281,7 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
     f.createDimension('nstring', nstring)
 
     var = f.createVariable('Channel', 'i', ('Channel',))
-    var[:] = [1,2,3]
+    var[:] = [1, 2, 3]
 
     var = f.createVariable('MetaData/latitude', 'f', ('Location',))
     var[:] = [21, 22, -23, 24]
@@ -287,8 +290,8 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -303,44 +306,45 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
         var[:] = [3, 3, 5, 720]
 
     # Create Variables
-    var = f.createVariable('ObsValue/' + var_name, 'f', ('Location','Channel'))
-    var[:,:] = [[1.1,2.1,3.1],
-                [missing_float,2.2,3.2],
-                [1.3,2.3,3.3],
-                [1.4,2.4,3.4]]
-    var = f.createVariable('ObsError/' + var_name, 'f', ('Location','Channel'))
-    var[:,:] = [[0.1,1.1,2.1],
-                [missing_float,1.2,2.2],
-                [0.3,1.3,2.3],
-                [0.4,1.4,2.4]]
-    var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('Location','Channel'))
-    var[:,:] = [[0.01,0.11,0.21],
-                [missing_float,0.12,0.22],
-                [0.03,0.13,0.23],
-                [0.04,0.14,0.24]]
-    var = f.createVariable('PreQC/' + var_name, 'i', ('Location','Channel'))
-    var[:,:] = [[1, 1, 1],
-                [1, 1, 1],
-                [1, 1, 1],
-                [1, 1, 1]]
+    var = f.createVariable('ObsValue/' + var_name, 'f', ('Location', 'Channel'))
+    var[:, :] = [[1.1, 2.1, 3.1],
+                 [missing_float, 2.2, 3.2],
+                 [1.3, 2.3, 3.3],
+                 [1.4, 2.4, 3.4]]
+    var = f.createVariable('ObsError/' + var_name, 'f', ('Location', 'Channel'))
+    var[:, :] = [[0.1, 1.1, 2.1],
+                 [missing_float, 1.2, 2.2],
+                 [0.3, 1.3, 2.3],
+                 [0.4, 1.4, 2.4]]
+    var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('Location', 'Channel'))
+    var[:, :] = [[0.01, 0.11, 0.21],
+                 [missing_float, 0.12, 0.22],
+                 [0.03, 0.13, 0.23],
+                 [0.04, 0.14, 0.24]]
+    var = f.createVariable('PreQC/' + var_name, 'i', ('Location', 'Channel'))
+    var[:, :] = [[1, 1, 1],
+                 [1, 1, 1],
+                 [1, 1, 1],
+                 [1, 1, 1]]
     if with_bias:
-        var = f.createVariable('ObsBias/' + var_name, 'f', ('Location','Channel'))
-        var[:,:] = [[-0.1,-0.5,-0.01],
-                    [-0.2,-0.6,-0.02],
-                    [-0.3,-0.7,-0.03],
-                    [-0.4,-0.8,-0.04]]
+        var = f.createVariable('ObsBias/' + var_name, 'f', ('Location', 'Channel'))
+        var[:, :] = [[-0.1, -0.5, -0.01],
+                     [-0.2, -0.6, -0.02],
+                     [-0.3, -0.7, -0.03],
+                     [-0.4, -0.8, -0.04]]
         # BiasCorrObsValue = ObsValue - ObsBias
-        var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('Location','Channel'))
-        var[:,:] = [[1.2,2.6,3.11],
-                    [missing_float, 2.8, 3.22],
-                    [1.6,3.0,3.33],
-                    [1.8,3.2,3.44]]
+        var = f.createVariable('BiasCorrObsValue/' + var_name, 'f', ('Location', 'Channel'))
+        var[:, :] = [[1.2, 2.6, 3.11],
+                     [missing_float, 2.8, 3.22],
+                     [1.6, 3.0, 3.33],
+                     [1.8, 3.2, 3.44]]
 
     f.date_time = 2018010100
 
     f.close()
 
-def output_2d_normal_var_to_netcdf(var_name, var_group, file_name, 
+
+def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
                                    with_radar_family=False, predictors=False,
                                    use_chans=False, use_levs=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -353,7 +357,7 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
     f.createDimension('Channel', nchans)
 
     var = f.createVariable('Channel', 'i', ('Channel',))
-    var[:] = [1,2,3]
+    var[:] = [1, 2, 3]
 
     var = f.createVariable('MetaData/latitude', 'f', ('Location',))
     var[:] = [21, 22, -23, 24]
@@ -362,8 +366,8 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
     var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1/60.
-    var[:] = [1*minute, 2*minute, 3*minute, 4*minute]
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -375,46 +379,46 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
 
     # There must be at least one simulated variable
 
-    var = f.createVariable('ObsValue/dummy', 'f', ('Location','Channel'))
-    var[:,:] = [[1.1,2.1,3.1],
-                [missing_float,2.2,3.2],
-                [1.3,2.3,3.3],
-                [1.4,2.4,3.4]]
-    var = f.createVariable('ObsError/dummy', 'f', ('Location','Channel'))
-    var[:,:] = [[0.1,1.1,2.1],
-                [missing_float,1.2,2.2],
-                [0.3,1.3,2.3],
-                [0.4,1.4,2.4]]
-    var = f.createVariable('GrossErrorProbability/dummy', 'f', ('Location','Channel'))
-    var[:,:] = [[0.01,0.11,0.21],
-                [missing_float,0.12,0.22],
-                [0.03,0.13,0.23],
-                [0.04,0.14,0.24]]
-    var = f.createVariable('PreQC/dummy', 'i', ('Location','Channel'))
-    var[:,:] = [[1,1,1],
-                [1,1,1],
-                [1,1,1],
-                [1,1,1]]
+    var = f.createVariable('ObsValue/dummy', 'f', ('Location', 'Channel'))
+    var[:, :] = [[1.1, 2.1, 3.1],
+                 [missing_float, 2.2, 3.2],
+                 [1.3, 2.3, 3.3],
+                 [1.4, 2.4, 3.4]]
+    var = f.createVariable('ObsError/dummy', 'f', ('Location', 'Channel'))
+    var[:, :] = [[0.1, 1.1, 2.1],
+                 [missing_float, 1.2, 2.2],
+                 [0.3, 1.3, 2.3],
+                 [0.4, 1.4, 2.4]]
+    var = f.createVariable('GrossErrorProbability/dummy', 'f', ('Location', 'Channel'))
+    var[:, :] = [[0.01, 0.11, 0.21],
+                 [missing_float, 0.12, 0.22],
+                 [0.03, 0.13, 0.23],
+                 [0.04, 0.14, 0.24]]
+    var = f.createVariable('PreQC/dummy', 'i', ('Location', 'Channel'))
+    var[:, :] = [[1, 1, 1],
+                 [1, 1, 1],
+                 [1, 1, 1],
+                 [1, 1, 1]]
 
     if type(var_group) != list:
         var_group = [var_group]
     for grp in var_group:
         if (predictors or use_chans):
-            var = f.createVariable(grp + '/' + var_name, 'f', ('Location','Channel'))
-            var[:,:] = [[4.1,5.1,6.1],
-                        [missing_float,5.2,6.2],
-                        [4.3,5.3,6.3],
-                        [4.4,5.4,6.4]]
+            var = f.createVariable(grp + '/' + var_name, 'f', ('Location', 'Channel'))
+            var[:, :] = [[4.1, 5.1, 6.1],
+                         [missing_float, 5.2, 6.2],
+                         [4.3, 5.3, 6.3],
+                         [4.4, 5.4, 6.4]]
             if "5Predictor" in grp:
-                var[:,:] = [[4.1,5.1,6.1],
-                            [missing_float,5.2,6.2],
-                            [4.3,5.3,6.3],
-                            [0.0,0.0,0.0]]
+                var[:, :] = [[4.1, 5.1, 6.1],
+                             [missing_float, 5.2, 6.2],
+                             [4.3, 5.3, 6.3],
+                             [0.0, 0.0, 0.0]]
             if "8Predictor" in grp:
-                var[:,:] = [[0.0,0.0,0.0],
-                            [0.0,0.0,0.0],
-                            [0.0,0.0,0.0],
-                            [4.4,5.4,6.4]]
+                var[:, :] = [[0.0, 0.0, 0.0],
+                             [0.0, 0.0, 0.0],
+                             [0.0, 0.0, 0.0],
+                             [4.4, 5.4, 6.4]]
         elif (use_levs):
             var = f.createVariable(grp + '/' + var_name + '/lev1', 'f', ('Location',))
             var[:] = [1.1, 1.2, 1.3, 1.4]
@@ -427,7 +431,7 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
         else:
             var = f.createVariable(grp + '/' + var_name + '_1', 'f', ('Location',))
             var[:] = [4.1, missing_float, 4.3, 4.4]
-  
+
             var2 = f.createVariable(grp + '/' + var_name + '_2', 'f', ('Location',))
             var2[:] = [5.1, 5.2, 5.3, 5.4]
 
@@ -441,6 +445,7 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_simulated_var_profiles_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -479,7 +484,7 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
               0.31, 0.42, 0.32, missing_float, 0.33, 0.51, 0.52]
     var = f.createVariable('ObsError/' + var_name, 'f', ('Location',))
     var[:] = [0.011, 0.023, 0.012, 0.022, 0.013, missing_float, 0.014,
-             0.031, 0.042, 0.032, 0.041, 0.033, 0.051, 0.052]
+              0.031, 0.042, 0.032, 0.041, 0.033, 0.051, 0.052]
     var = f.createVariable('GrossErrorProbability/' + var_name, 'f', ('Location',))
     var[:] = [0.111, 0.123, 0.112, 0.122, 0.113, 0.121, 0.114,
               0.131, 0.142, 0.132, 0.141, 0.133, 0.151, 0.152]
@@ -488,8 +493,10 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
 
     f.close()
 
+
 def output_2d_geoval_to_netcdf(var_name, file_name):
     return output_2d_geovals_to_netcdf([var_name], file_name)
+
 
 def output_2d_geovals_to_netcdf(var_names, file_name, shift_by_varindex=True):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -500,20 +507,21 @@ def output_2d_geovals_to_netcdf(var_names, file_name, shift_by_varindex=True):
     f.createDimension('nlevs', nlevs)
 
     for var_index, var_name in enumerate(var_names):
-      var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
-      if shift_by_varindex:
-          shift = 10 * var_index
-      else:
-          shift = 0
-      # Assumes the geovals are toptobottom
-      var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
-                [shift + 2.3, missing_float, shift + 2.1],
-                [shift + 3.3, shift + 3.2, shift + 3.1],
-                [shift + 4.3, shift + 4.2, shift + 4.1]]
+        var = f.createVariable(var_name, 'f', ('nlocs', 'nlevs'))
+        if shift_by_varindex:
+            shift = 10 * var_index
+        else:
+            shift = 0
+        # Assumes the geovals are toptobottom
+        var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
+                  [shift + 2.3, missing_float, shift + 2.1],
+                  [shift + 3.3, shift + 3.2, shift + 3.1],
+                  [shift + 4.3, shift + 4.2, shift + 4.1]]
 
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_2d_geoval_for_multi_level_obs_to_netcdf(var_name, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -522,7 +530,7 @@ def output_2d_geoval_for_multi_level_obs_to_netcdf(var_name, file_name):
     nlevs = 3
     f.createDimension('nlocs', nlocs)
     f.createDimension('nlevs', nlevs)
-    var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
+    var = f.createVariable(var_name, 'f', ('nlocs', 'nlevs'))
     # These synthethic GeoVaLs represent two sonde profiles,
     # one with four levels and one with two levels.
     # Each profile has been averaged onto three model levels.
@@ -543,6 +551,7 @@ def output_2d_geoval_for_multi_level_obs_to_netcdf(var_name, file_name):
 
     f.close()
 
+
 def output_full_cx_to_netcdf(oned_var_names, twod_var_names, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
@@ -552,22 +561,23 @@ def output_full_cx_to_netcdf(oned_var_names, twod_var_names, file_name):
     f.createDimension('nlevs', nlevs)
 
     for var_index, var_name in enumerate(twod_var_names):
-      var = f.createVariable(var_name, 'f', ('nlocs','nlevs'))
-      shift = 10 * var_index
-      # Assumes the geovals are toptobottom
-      var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
-                [shift + 2.3, missing_float, shift + 2.1],
-                [shift + 3.3, shift + 3.2, shift + 3.1],
-                [shift + 4.3, shift + 4.2, shift + 4.1]]
+        var = f.createVariable(var_name, 'f', ('nlocs', 'nlevs'))
+        shift = 10 * var_index
+        # Assumes the geovals are toptobottom
+        var[:] = [[shift + 1.3, shift + 1.2, shift + 1.1],
+                  [shift + 2.3, missing_float, shift + 2.1],
+                  [shift + 3.3, shift + 3.2, shift + 3.1],
+                  [shift + 4.3, shift + 4.2, shift + 4.1]]
 
     for var_index, var_name in enumerate(oned_var_names):
-      var = f.createVariable(var_name, 'f', ('nlocs',))
-      shift = 10 * var_index
-      var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
+        var = f.createVariable(var_name, 'f', ('nlocs',))
+        shift = 10 * var_index
+        var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
 
     f.date_time = 2018010100
 
     f.close()
+
 
 def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_int_varnames, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
@@ -580,25 +590,25 @@ def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_
     f.createDimension('nstring', nstring)
 
     var = f.createVariable('Channel', 'i', ('Channel',))
-    var[:] = [1,2,3]
+    var[:] = [1, 2, 3]
 
     for var_index, var_name in enumerate(oned_float_varnames):
-      var = f.createVariable(var_name, 'f', ('Location',))
-      shift = 10 * var_index
-      var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
+        var = f.createVariable(var_name, 'f', ('Location',))
+        shift = 10 * var_index
+        var[:] = [shift + 7.1, missing_float, shift + 7.3, shift + 7.4]
 
     for var_index, var_name in enumerate(twod_float_varnames):
-      var = f.createVariable(var_name, 'f', ('Location','Channel'))
-      shift = 10 * var_index
-      var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
-                [shift + 2.1, missing_float, shift + 2.3],
-                [shift + 3.1, shift + 3.2, shift + 3.3],
-                [shift + 4.1, shift + 4.2, shift + 4.3]]
+        var = f.createVariable(var_name, 'f', ('Location', 'Channel'))
+        shift = 10 * var_index
+        var[:] = [[shift + 1.1, shift + 1.2, shift + 1.3],
+                  [shift + 2.1, missing_float, shift + 2.3],
+                  [shift + 3.1, shift + 3.2, shift + 3.3],
+                  [shift + 4.1, shift + 4.2, shift + 4.3]]
 
     for var_index, var_name in enumerate(oned_int_varnames):
-      var = f.createVariable(var_name, 'i', ('Location',))
-      shift = 10 * var_index
-      var[:] = [shift + 3, missing_int, shift + 7, shift + 9]
+        var = f.createVariable(var_name, 'i', ('Location',))
+        shift = 10 * var_index
+        var[:] = [shift + 3, missing_int, shift + 7, shift + 9]
 
     var = f.createVariable('MetaData/datetime', str, ('Location'))
     for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
@@ -608,6 +618,7 @@ def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_
     f.date_time = 2018010100
 
     f.close()
+
 
 def copy_var_to_var(Group, invarname, outvarname, filename):
     f = nc4.Dataset(filename, 'r+', format="NETCDF4")
@@ -677,24 +688,24 @@ if __name__ == "__main__":
 
     # Varobs full output for an obsgroup testing
     # Arguments are: 1D floats, 2D floats, 1D ints, filename
-    
+
     # ATMS
-    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skinTemperature','MetaData/sensorZenithAngle',
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle'],
-                                 ['ObsValue/brightnessTemperature','ObsError/brightnessTemperature','Emiss/emissivity',
-                                  'BiasCorrObsValue/brightnessTemperature','thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                 ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature', 'Emiss/emissivity',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
-                                 ['MetaData/surfaceQualifier','MetaData/satelliteIdentifier'],
-                                  'testinput/varobs_globalnamelist_atms.nc4')
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_globalnamelist_atms.nc4')
     # ATOVS
-    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude','OneDVar/skinTemperature','MetaData/sensorZenithAngle',
-                                  'MetaData/solarZenithAngle','Emiss/emissivityIR'],
-                                 ['ObsValue/brightnessTemperature','ObsErrorData/brightnessTemperature','Emiss/emissivity',
-                                  'BiasCorrObsValue/brightnessTemperature','thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'Emiss/emissivityIR'],
+                                 ['ObsValue/brightnessTemperature', 'ObsErrorData/brightnessTemperature', 'Emiss/emissivity',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
-                                 ['MetaData/surfaceQualifier','MetaData/satelliteIdentifier'],
-                                  'testinput/varobs_globalnamelist_atovs.nc4')
-                                  
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_globalnamelist_atovs.nc4')
+
     # GNSS-RO
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
@@ -705,70 +716,70 @@ if __name__ == "__main__":
                                   'ObsError/bendingAngle'],
                                  [],
                                  ['MetaData/satelliteIdentifier'],
-                                  'testinput/varobs_globalnamelist_gnssro.nc4')
+                                 'testinput/varobs_globalnamelist_gnssro.nc4')
 
     # Sonde
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
                                   'MetaData/pressure',
-                                  'ObsValue/potentialTemperature','ObsError/potentialTemperature',
-                                  'ObsValue/windEastward','ObsError/windEastward',
-                                  'ObsValue/windNorthward','ObsError/windNorthward',
-                                  'ObsValue/relativeHumidity','ObsError/relativeHumidity'],
+                                  'ObsValue/potentialTemperature', 'ObsError/potentialTemperature',
+                                  'ObsValue/windEastward', 'ObsError/windEastward',
+                                  'ObsValue/windNorthward', 'ObsError/windNorthward',
+                                  'ObsValue/relativeHumidity', 'ObsError/relativeHumidity'],
                                  [],
                                  [],
                                  'testinput/varobs_globalnamelist_sonde.nc4')
     copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_sonde.nc4')
-    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature','testinput/varobs_globalnamelist_sonde.nc4')
+    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_sonde.nc4')
 
     # Sonde - UKV
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
                                   'MetaData/pressure',
-                                  'ObsValue/potentialTemperature','ObsError/potentialTemperature',
-                                  'ObsValue/windEastward','ObsError/windEastward',
-                                  'ObsValue/windNorthward','ObsError/windNorthward',
-                                  'ObsValue/relativeHumidity','ObsError/relativeHumidity'],
+                                  'ObsValue/potentialTemperature', 'ObsError/potentialTemperature',
+                                  'ObsValue/windEastward', 'ObsError/windEastward',
+                                  'ObsValue/windNorthward', 'ObsError/windNorthward',
+                                  'ObsValue/relativeHumidity', 'ObsError/relativeHumidity'],
                                  [],
                                  [],
                                  'testinput/varobs_ukvnamelist_sonde.nc4')
     copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_ukvnamelist_sonde.nc4')
-    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature','testinput/varobs_ukvnamelist_sonde.nc4')
+    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature', 'testinput/varobs_ukvnamelist_sonde.nc4')
 
     # Scatwind
-    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude'],
-                                 ['ObsValue/windEastward','ObsError/windEastward','GrossErrorProbability/windEastward',
-                                  'ObsValue/windNorthward','ObsError/windNorthward','GrossErrorProbability/windNorthward',
-                                  'ObsValue/probability','ObsError/probability','GrossErrorProbability/probability',
-                                  'BiasCorrObsValue/windEastward','BiasCorrObsValue/windNorthward'],
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude'],
+                                 ['ObsValue/windEastward', 'ObsError/windEastward', 'GrossErrorProbability/windEastward',
+                                  'ObsValue/windNorthward', 'ObsError/windNorthward', 'GrossErrorProbability/windNorthward',
+                                  'ObsValue/probability', 'ObsError/probability', 'GrossErrorProbability/probability',
+                                  'BiasCorrObsValue/windEastward', 'BiasCorrObsValue/windNorthward'],
                                  ['MetaData/satelliteIdentifier'],
-                                  'testinput/varobs_globalnamelist_scatwind.nc4')
+                                 'testinput/varobs_globalnamelist_scatwind.nc4')
 
     # IASI - this tests the variable_for_quality_control option
-    output_full_varobs_to_netcdf(['MetaData/latitude','MetaData/longitude',
-                                  'OneDVar/skinTemperature','MetaData/sensorZenithAngle',
-                                  'MetaData/solarZenithAngle','OutputToVAR/pressureAtTopOfCloud','OneDVar/cloudAmount',
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude',
+                                  'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'OutputToVAR/pressureAtTopOfCloud', 'OneDVar/cloudAmount',
                                   'MetaData/ozoneTotal'],
-                                 ['ObsValue/radiance','DerivedObsValue/brightnessTemperature','EffectiveError/brightnessTemperature',
+                                 ['ObsValue/radiance', 'DerivedObsValue/brightnessTemperature', 'EffectiveError/brightnessTemperature',
                                   'OneDVar/emissivity', 'BiasCorrObsValue/brightnessTemperature',
                                   'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
-                                 ['MetaData/surfaceQualifier','MetaData/satelliteIdentifier','MetaData/observationSubTypeNum'],
-                                  'testinput/varobs_globalnamelist_iasi.nc4')
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier', 'MetaData/observationSubTypeNum'],
+                                 'testinput/varobs_globalnamelist_iasi.nc4')
 
     # Aircraft
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
                                   'MetaData/pressure',
-                                  'ObsValue/potentialTemperature','ObsError/potentialTemperature',
-                                  'ObsValue/windEastward','ObsError/windEastward',
-                                  'ObsValue/windNorthward','ObsError/windNorthward',
-                                  'ObsValue/relativeHumidity','ObsError/relativeHumidity'],
+                                  'ObsValue/potentialTemperature', 'ObsError/potentialTemperature',
+                                  'ObsValue/windEastward', 'ObsError/windEastward',
+                                  'ObsValue/windNorthward', 'ObsError/windNorthward',
+                                  'ObsValue/relativeHumidity', 'ObsError/relativeHumidity'],
                                  [],
                                  [],
                                  'testinput/varobs_globalnamelist_aircraft.nc4')
     copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_aircraft.nc4')
-    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature','testinput/varobs_globalnamelist_aircraft.nc4')
+    copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_aircraft.nc4')
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
@@ -801,54 +812,54 @@ if __name__ == "__main__":
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output
-    
+
     # AMSR
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_amsr.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_amsr.nc4')
 
     # GMIlow
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_gmilow.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_gmilow.nc4')
 
     # GMIhigh
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_gmihigh.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_gmihigh.nc4')
 
     # ATMS
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_atms.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_atms.nc4')
 
     # ATOVS
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_atovs.nc4')
-                              
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_atovs.nc4')
+
     # SSMIS
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_ssmis.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_ssmis.nc4')
 	
     # MWSFY3
     output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
@@ -856,21 +867,21 @@ if __name__ == "__main__":
                              ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_mwsfy3.nc4')
+                             'testinput/cx_globalnamelist_mwsfy3.nc4')
 
     # GNSS-RO
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_gnssro.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_gnssro.nc4')
 
     # Sonde
     output_full_cx_to_netcdf(['ice_area_fraction',
                               'surface_altitude',
                               'surface_pressure'],
-                             ['eastward_wind','northward_wind','potential_temperature','specific_humidity',
+                             ['eastward_wind', 'northward_wind', 'potential_temperature', 'specific_humidity',
                               'mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'air_pressure_levels',
@@ -883,7 +894,7 @@ if __name__ == "__main__":
     output_full_cx_to_netcdf(['ice_area_fraction',
                               'surface_altitude',
                               'surface_pressure'],
-                             ['eastward_wind','northward_wind','potential_temperature','specific_humidity',
+                             ['eastward_wind', 'northward_wind', 'potential_temperature', 'specific_humidity',
                               'mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'air_pressure_levels',
@@ -893,33 +904,33 @@ if __name__ == "__main__":
                              'testinput/cx_ukvnamelist_sonde.nc4')
 
     # SatTCWV
-    output_full_cx_to_netcdf(['surface_altitude','surface_pressure','ice_area_fraction','total_cloud_amount'],
-                             ['potential_temperature','specific_humidity','air_pressure_levels','mass_content_of_cloud_ice_in_atmosphere_layer',
+    output_full_cx_to_netcdf(['surface_altitude', 'surface_pressure', 'ice_area_fraction', 'total_cloud_amount'],
+                             ['potential_temperature', 'specific_humidity', 'air_pressure_levels', 'mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
-                              'cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_sattcwv.nc4')
+                              'cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_sattcwv.nc4')
 
     # IASI - this tests the variable_for_quality_control option
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_iasi.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_iasi.nc4')
 
     # GroundGPS
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
-                              'testinput/cx_globalnamelist_groundgps.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_groundgps.nc4')
 
     # Aircraft
     output_full_cx_to_netcdf(['ice_area_fraction',
                               'surface_altitude',
                               'surface_pressure'],
-                             ['eastward_wind','northward_wind','potential_temperature','specific_humidity',
+                             ['eastward_wind', 'northward_wind', 'potential_temperature', 'specific_humidity',
                               'mass_content_of_cloud_ice_in_atmosphere_layer',
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'air_pressure_levels',
@@ -929,13 +940,13 @@ if __name__ == "__main__":
                              'testinput/cx_globalnamelist_aircraft.nc4')
 
     # Surface
-    output_full_cx_to_netcdf(['skin_temperature','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
-                              'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer',
-                              'eastward_wind','northward_wind'],
-                              'testinput/cx_globalnamelist_surface.nc4')
+    output_full_cx_to_netcdf(['skin_temperature', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
+                              'eastward_wind', 'northward_wind'],
+                             'testinput/cx_globalnamelist_surface.nc4')
 
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')

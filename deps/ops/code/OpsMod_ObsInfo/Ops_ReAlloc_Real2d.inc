@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Allocates a pointer array, and sets up the header.  Check the assocation and
 ! allocate if necessary. Initialise contents to missing. Then initialise the

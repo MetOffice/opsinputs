@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Description: This subroutine converts a position given by the Latitude and
 ! Longitude in degrees, to a 3-d vector giving the position in cartesian

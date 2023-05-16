@@ -1,6 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-!     Refer to COPYRIGHT.txt of this distribution for details.
 !-------------------------------------------------------------------------------
 ! Allocate space for ModelOB (Model Ob equivalent) using OB header as input to
 ! determine which fields are likely to be required; copy header and initialise

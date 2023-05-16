@@ -1,7 +1,5 @@
 !-------------------------------------------------------------------------------
 ! (C) Crown copyright Met Office. All rights reserved.
-! For further details please refer to the file COPYRIGHT.txt
-! which you should have received as part of this distribution.
 !-------------------------------------------------------------------------------
 ! Performs action defined by ActionArg on all array elements of CX.  Calls
 ! Ops_ObsAction for every array element.

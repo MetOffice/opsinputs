@@ -1,7 +1,6 @@
 /*
  * (C) Crown Copyright 2021, the Met Office. All rights reserved.
  *
- * Refer to COPYRIGHT.txt of this distribution for details. 
  */
 
 // This rather strange relative path is required by the opsinputs_coding_norms test...
