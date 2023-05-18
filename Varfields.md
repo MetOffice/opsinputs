@@ -17,7 +17,7 @@
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `BiasCorrObsValue/brightnessTemperature` | |
 | 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `OneDVar/skinTemperature` | |
 | 12 | `VarField_gpstzdelay` | `gpstzdelay(:)`| Ground based GNSS Total Zenith Delay | `BiasCorrObsValue/zenithTotalDelay` | |
-| 15 | `VarField_cloud` | | | | Implement |
+| 15 | `VarField_cloud` | `cloud(:,:)` | cloud fraction | `DerivedObsValue/Cloud`| |
 | 16 | `VarField_rainrate` | | | | Implement |
 | 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `Emiss/emissivity` |  |
 | 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) | `MetaData/ozoneTotal` |  |
