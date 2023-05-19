@@ -749,8 +749,7 @@ if __name__ == "__main__":
 
     # SurfaceCloud - UKV
     output_full_varobs_to_netcdf(['MetaData/latitude',
-                                  'MetaData/longitude',
-                                  'ObsValue/stationPressure', 'ObsError/stationPressure'],
+                                  'MetaData/longitude'],
                                  ['DerivedObsValue/Cloud', 'DerivedObsValue/obsError'],
                                  [],
                                  'testinput/varobs_ukvnamelist_surfacecloud.nc4')
