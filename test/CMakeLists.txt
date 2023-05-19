@@ -335,6 +335,10 @@ ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_sonde
                 YAML     varobswriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/varobs/Sonde.nl
                 DATA     varobs_ukvnamelist_sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_surfacecloud
+                YAML     varobswriter_ukvnamelist_surfacecloud.yaml
+                NAMELIST ../../etc/ukv/varobs/SurfaceCloud.nl
+                DATA     varobs_ukvnamelist_surfacecloud.nc4)
 
 ### CxWriter tests
 
@@ -594,6 +598,10 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_sonde
                 YAML     cxwriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/cx/Sonde.nl
                 DATA     cx_ukvnamelist_sonde.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surfacecloud
+                YAML     cxwriter_ukvnamelist_surfacecloud.yaml
+                NAMELIST ../../etc/ukv/cx/SurfaceCloud.nl
+                DATA     cx_ukvnamelist_surfacecloud.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
