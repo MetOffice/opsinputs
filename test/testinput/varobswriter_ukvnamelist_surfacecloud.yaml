@@ -8,8 +8,8 @@ observations:
         engine:
           type: H5File
           obsfile: Data/varobs_ukvnamelist_surfacecloud.nc4
-      simulated variables: [potentialTemperature, windEastward, windNorthward, relativeHumidity]
-      observed variables: [potentialTemperature, windEastward, windNorthward, relativeHumidity]
+      simulated variables: [stationPressure]
+      observed variables: [stationPressure]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
