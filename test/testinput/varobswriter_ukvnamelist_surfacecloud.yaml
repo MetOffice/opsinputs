@@ -10,6 +10,7 @@ observations:
           obsfile: Data/varobs_ukvnamelist_surfacecloud.nc4
       simulated variables: [stationPressure]
       observed variables: [stationPressure]
+      derived variables: [Cloud]
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
     # values are encoded correctly in the VarObsFile.
