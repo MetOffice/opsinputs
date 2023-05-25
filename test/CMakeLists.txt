@@ -144,6 +144,9 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
 ADD_WRITER_TEST(NAME     varobswriter_012_VarField_gpstzdelay
                 YAML     012_VarField_gpstzdelay.yaml
                 DATA     012_VarField_gpstzdelay.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_015_VarField_cloud
+                YAML     015_VarField_cloud.yaml
+                DATA     015_VarField_cloud.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
                 YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
@@ -420,6 +423,10 @@ ADD_WRITER_TEST(NAME     cxwriter_005_UpperAirCxField_q
 ADD_WRITER_TEST(NAME     cxwriter_011_UpperAirCxField_P
                 YAML     011_UpperAirCxField_P.yaml
                 NAMELIST CxWriterNamelists_011_UpperAirCxField_P/AMSUB.nl
+                DATA     011_UpperAirCxField_P.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_015_UpperAirCxField_cloud_layer
+                YAML     015_UpperAirCxField_cloud_layer.yaml
+                NAMELIST CxWriterNamelists_015_UpperAirCxField_cloud_layer/SurfaceCloud.nl
                 DATA     011_UpperAirCxField_P.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_029_UpperAirCxField_qcf
                 YAML     029_UpperAirCxField_qcf.yaml
