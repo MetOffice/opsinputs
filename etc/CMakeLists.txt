@@ -28,8 +28,8 @@ list( APPEND opsinputs_etc
   global/varobs/Scatwind.nl
   global/varobs/Sonde.nl
   ukv/cx/Sonde.nl
-  ukv/varobs/Sonde.nl
   ukv/cx/SurfaceCloud.nl
+  ukv/varobs/Sonde.nl
   ukv/varobs/SurfaceCloud.nl
 )
 
