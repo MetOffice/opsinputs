@@ -24,6 +24,7 @@
 #include "ufo/filters/Variables.h"
 #include "ufo/GeoVaLs.h"
 #include "ufo/ObsDiagnostics.h"
+#include "ufo/ScopedDefaultGeoVaLFormatChange.h"
 
 namespace opsinputs {
 
@@ -91,6 +92,7 @@ VarObsWriter::~VarObsWriter() {
 void VarObsWriter::priorFilter(const ufo::GeoVaLs & gv) {
   oops::Log::trace() << "VarObsWriter priorFilter" << std::endl;
 
+  ufo::ScopedDefaultGeoVaLFormatChange change(gv, ufo::GeoVaLFormat::REDUCED);
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
@@ -103,6 +105,7 @@ void VarObsWriter::postFilter(const ufo::GeoVaLs & gv,
                               const ufo::ObsDiagnostics & obsdiags) {
   oops::Log::trace() << "VarObsWriter postFilter" << std::endl;
 
+  ufo::ScopedDefaultGeoVaLFormatChange change(gv, ufo::GeoVaLFormat::REDUCED);
   LocalEnvironment localEnvironment;
   setupEnvironment(localEnvironment);
 
