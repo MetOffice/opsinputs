@@ -29,7 +29,7 @@ observations:
     - filter: VarObs Writer
       namelist_directory: ../etc/ukv/varobs
       general_mode: debug
-      IC_PLevels: 1
+      IC_PLevels: 3
       reject_obs_with_all_variables_failing_qc: true
     - filter: VarObs Checker
       expected_main_table_columns:
