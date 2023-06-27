@@ -101,7 +101,7 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   oops::Parameter<int> IC_YLen{"IC_YLen", 0, this};
   /// Number of levels (PLEVELS).
   oops::Parameter<int> IC_PLevels{"IC_PLevels", 0, this};
-  /// Number of levels (BLEVELS).
+  /// Number of boundary layer levels (BLEVELS).
   oops::Parameter<int> IC_BLevels{"IC_BLevels", 0, this};
   /// Number of wet levels (QLEVELS).
   oops::Parameter<int> IC_WetLevels{"IC_WetLevels", 0, this};
