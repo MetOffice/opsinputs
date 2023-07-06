@@ -23,7 +23,7 @@ observations:
       IC_PLevels: 5
     - filter: Cx Checker
       expected_surface_variables: ["1","2","3","4","5","6","13","16","17"]
-      expected_upper_air_variables: ["1","5","11","29","30","31"]
+      expected_upper_air_variables: ["1","5","11","29","30","31","34","35"]
       expected_main_table_columns:
       - # batch 1 - 9 1dvalues first ; then 2d values in expected order
         - ["27.10","37.10","67.10","77.10","47.10","57.10","7.10","87.10","17.10","1.10","1.20","1.30","11.10","11.20","11.30","41.10","41.20","41.30","21.10","21.20","21.30","31.10","31.20","31.30","51.10","51.20","51.30"]  # column 1 - 1st observation
