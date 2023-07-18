@@ -317,12 +317,12 @@ call f_conf % get_or_die("size_of_varobs_array", self % channel_offset % size_of
 ! This prevents channels which are seperated by NaNs from being bunched together in the write
 call f_conf % get_or_die("use_actual_channels", self % useActualChannels)
 
-if ((self % useActualChannels) .and. (self % channel_offset % channel_offset/=0)) then
-  write (ErrorMessage, '(A)') "OffsetChans and UseActualChans cannot both be set"
-  call gen_warn(RoutineName, ErrorMessage)
-  opsinputs_varobswriter_create = .false.
-  return
-end if
+!if ((self % useActualChannels) .and. (self % channel_offset % channel_offset/=0)) then
+!  write (ErrorMessage, '(A)') "OffsetChans and UseActualChans cannot both be set"
+!  call gen_warn(RoutineName, ErrorMessage)
+!  opsinputs_varobswriter_create = .false.
+!  return
+!end if
 
 ! Updates the varbc flag passedaround by a module in OPS
 call f_conf % get_or_die("output_varbc_predictors", BoolValue)
@@ -1230,6 +1230,7 @@ integer                        :: iChannel
 integer                        :: iObs
 logical                        :: localUseActualChans
 
+
 ! Body:
 NumChannels = size(Channels)
 if (NumChannels == 0) return
@@ -1240,17 +1241,39 @@ if (Present(UseActualChans)) then
   localUseActualChans = UseActualChans
 end if
 
+
 call opsinputs_varobswriter_findchannelspassingqc( &
   Ob % Header % NumObsLocal, ObsSpace, Channels, Flags, ChannelIndices, ChannelCounts)
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
 
+!  if (localUseActualChans) then
+!    do iChannel=1, size(Channels)
+!      ChannelIndices(:,iChannel) = Channels(iChannel)
+!    end do
+    
   if (localUseActualChans) then
     do iChannel=1, size(Channels)
-      ChannelIndices(:,iChannel) = Channels(iChannel)
+      if (OffsetChans/=0) then
+        ChannelIndices(:,iChannel) = Channels(iChannel+OffsetChans)
+	if ((iChannel+OffsetChans)==size(Channels)) exit
+      else  
+        ChannelIndices(:,iChannel) = Channels(iChannel)
+      end if
     end do
+    
+!    if (OffsetChans/=0) then
+!        Ob % ChanNum = ChannelIndices(:,OffSetChans+1)
+!    else
+!        Ob % ChanNum = ChannelIndices
+!    end if
+
+    WRITE(*,*) "ChannelIndices=", ChannelIndices
+    WRITE(*,*) "##################", ChannelIndices(:, OffSetChans+1)
+
     Ob % ChanNum = ChannelIndices
+    
   else
     Ob % ChanNum = ChannelIndices
     !only apply offset to actual channels in list, not missing data
