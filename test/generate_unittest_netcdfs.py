@@ -651,7 +651,7 @@ if __name__ == "__main__":
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
-    output_2d_normal_var_to_netcdf   ('Cloud', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_levs=True)
+    output_2d_normal_var_to_netcdf   ('Cloud', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
     output_2d_normal_var_to_netcdf   ('emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
     output_1d_normal_var_to_netcdf   ('ozoneTotal', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
     output_1d_normal_var_to_netcdf   ('sensorZenithAngle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
