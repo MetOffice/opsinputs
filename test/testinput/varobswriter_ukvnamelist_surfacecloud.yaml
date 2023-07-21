@@ -35,9 +35,9 @@ observations:
       expected_main_table_columns:
         # Rows are locations, columns are filter variables
         # The blacklist prevents the missing ob from being written out
-        field: [15,
-        15,
-        15]
+        field: [15,15,15,15,
+        15,15,15,15,
+        15,15,15,15]
         ob value: ["97.10000","57.10000","77.10000","37.10000","-3539.00000","7.10000","17.10000",
         "97.30000","57.30000","77.30000","37.30000","-3538.00000","7.30000","17.30000",
         "97.40000","57.40000","77.40000","37.40000","-3478.00000","7.40000","17.40000"]
