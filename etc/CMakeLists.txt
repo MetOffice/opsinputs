@@ -6,6 +6,8 @@ include( opsinputs_functions )
 
 # Add list of resource files
 list( APPEND opsinputs_etc
+  global/cx/ABIClr.nl
+  global/cx/AHIClr.nl
   global/cx/AIRS.nl
   global/cx/AMSR.nl
   global/cx/ATMS.nl
@@ -17,15 +19,19 @@ list( APPEND opsinputs_etc
   global/cx/GroundGPS.nl
   global/cx/IASI.nl
   global/cx/MWRI.nl
+  global/cx/SEVIRIClr.nl
   global/cx/SatTCWV.nl
   global/cx/Sonde.nl
   global/cx/SSMIS.nl
+  global/varobs/ABIClr.nl
+  global/varobs/AHIClr.nl
   global/varobs/AIRS.nl
   global/varobs/ATMS.nl
   global/varobs/ATOVS.nl
   global/varobs/CrIS.nl
   global/varobs/GPSRO.nl
   global/varobs/IASI.nl
+  global/varobs/SEVIRIClr.nl
   global/varobs/Scatwind.nl
   global/varobs/Sonde.nl
   ukv/cx/Sonde.nl
