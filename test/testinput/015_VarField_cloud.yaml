@@ -9,7 +9,6 @@ observations:
           type: H5File
           obsfile: Data/015_VarField_cloud.nc4
       simulated variables: [dummy]
-      derived variables: [Cloud]
       channels: 1-3
     obs filters:
     # Set the flag of observations with missing values to "pass": we want to check if these
@@ -23,9 +22,10 @@ observations:
           name: MetaData/latitude
         minvalue: 0.0
     - filter: VarObs Writer
-      reject_obs_with_all_variables_failing_qc: true
-      namelist_directory: testinput/VarObsWriterNamelists_015_VarField_cloud
-      general_mode: verbose
+      namelist_directory: ../etc/ukv/varobs
+      general_mode: debug
+      IC_PLevels: 3
+      geovals_are_top_to_bottom: false
     - filter: VarObs Checker
       expected_main_table_columns:
       # In the arrays below, rows denote locations and columns channels.
