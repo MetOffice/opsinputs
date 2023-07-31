@@ -94,6 +94,11 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// channels. This would fill a size 12 array with the array indexes matching the channel number
   /// [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN].
   oops::Parameter<bool> use_actual_channels{"use_actual_channels", false, this};
+  
+  
+  oops::Parameter<std::string> jopaChannels{"jopaChannels", "", this};
+  
+  oops::Parameter<std::string> varChannels{"varChannels", "", this};
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as
