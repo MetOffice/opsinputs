@@ -96,9 +96,10 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   oops::Parameter<bool> use_actual_channels{"use_actual_channels", false, this};
   
   
-  oops::Parameter<std::string> jopaChannels{"jopaChannels", "", this};
+ /// oops::Parameter<std::string> jopaChannels{"jopaChannels", "", this};
   
-  oops::Parameter<std::string> varChannels{"varChannels", "", this};
+  oops::Parameter<std::vector<int>> varChannels{"varChannels", {}, this};
+  
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as
