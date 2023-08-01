@@ -187,7 +187,7 @@ private
 
   integer(c_int), allocatable :: channels(:)
  ! integer(c_int), allocatable :: jopaChannels(:)
-  integer(c_int), allocatable :: varChannels(:)
+  integer, allocatable :: varChannels(:)
   
   !this stores the atmospheric levels we wish to pass to varobs
   integer(c_int), allocatable :: modlevs(:) 
@@ -320,6 +320,7 @@ call f_conf % get_or_die("size_of_varobs_array", self % channel_offset % size_of
 call f_conf % get_or_die("use_actual_channels", self % useActualChannels)
 
 call f_conf % get_or_die("varChannels", self % varChannels)
+WRITE(*,*) "get or die varChannels", self % varChannels
 
 !call f_conf % get_or_die("jopaChannels", self % jopaChannels)
 
@@ -1251,10 +1252,12 @@ if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
   WRITE(*,*) "#### In if FillChnaNum"
+  write(*,*) size(channels)
+  write(*,*) size(varChannels)
   if (size(channels) == size(varChannels)) then
     do iChannel=1, NumChannels
-      WRITE(*,*) "VarChannels=", VarChannels(iChannel)
-      ChannelIndices(:,iChannel) = VarChannels(iChannel)
+      WRITE(*,*) "VarChannels=", varChannels(iChannel)
+      ChannelIndices(:,iChannel) = varChannels(iChannel)
     end do
   
     Ob % ChanNum = ChannelIndices

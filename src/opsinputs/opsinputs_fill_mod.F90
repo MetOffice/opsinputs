@@ -1045,7 +1045,7 @@ integer(integer64), intent(in)                      :: NumObs
 real(real64), pointer, intent(out)                  :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
-integer(c_int), intent(in)                          :: varChannels(:)
+integer, intent(in)                          :: varChannels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
@@ -1071,6 +1071,7 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 !e.g. HIRS in ATOVS stream
 offset = 0
 numchans = size(JediVarNamesWithChannels)
+WRITE(*,*) "numchans=", numchans
 if (present(OffsetChans)) then
   offset = OffsetChans % channel_offset
   if (OffsetChans % size_of_varobs_array > 0) &
@@ -1089,6 +1090,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
                  num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
+    WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
     where (VarValue /= MissingDouble)
       Real2(:, varChannels(iChannel)) = VarValue

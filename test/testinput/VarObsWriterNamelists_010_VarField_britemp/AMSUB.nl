@@ -1,3 +1,3 @@
 &VarobsControlNL
-Varfields=10
+Varfields=10,54,55
 /
