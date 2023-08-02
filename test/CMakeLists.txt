@@ -439,7 +439,7 @@ ADD_WRITER_TEST(NAME     cxwriter_011_UpperAirCxField_P
 ADD_WRITER_TEST(NAME     cxwriter_015_UpperAirCxField_cloud_layer
                 YAML     015_UpperAirCxField_cloud_layer.yaml
                 NAMELIST CxWriterNamelists_015_UpperAirCxField_cloud_layer/SurfaceCloud.nl
-                DATA     011_UpperAirCxField_P.nc4 dummy.nc4)
+                DATA     015_UpperAirCxField_cloud_layer.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_029_UpperAirCxField_qcf
                 YAML     029_UpperAirCxField_qcf.yaml
                 NAMELIST CxWriterNamelists_029_UpperAirCxField_qcf/AMSUB.nl
