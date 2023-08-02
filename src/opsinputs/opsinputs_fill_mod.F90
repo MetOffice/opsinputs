@@ -1034,7 +1034,7 @@ end subroutine opsinputs_fill_fillreal
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
-  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, varChannels, JediVarName, &
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, &
   JediVarGroup, OffsetChans, useActualChans)
 implicit none
 
@@ -1045,7 +1045,6 @@ integer(integer64), intent(in)                      :: NumObs
 real(real64), pointer, intent(out)                  :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
-integer, intent(in)                          :: varChannels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 type(opsinputs_channeloffset), optional, intent(in) :: OffsetChans
@@ -1093,7 +1092,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
     where (VarValue /= MissingDouble)
-      Real2(:, varChannels(iChannel)) = VarValue
+      Real2(:, iChannel) = VarValue
     end where
     ! Fill the OPS data structures
 !    if (localUseActualChans) then
@@ -1229,7 +1228,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, varChannels, &
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, &
   VarobsLength, JediVarName, JediVarGroup, OffsetChans, &
   useActualChans)
 implicit none
@@ -1241,7 +1240,6 @@ type(opsinputs_jeditoopslayoutmapping), intent(in)  :: JediToOpsLayoutMapping
 real(real64), pointer, intent(out)                  :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
-integer, intent(in)                          :: varChannels(:)
 integer(integer64), intent(in)                      :: VarobsLength
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
@@ -1257,16 +1255,16 @@ else
     if (Present(useActualChans)) then
       call opsinputs_fill_fillreal2d_norecords( &
         Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-        varChannels, JediVarName, JediVarGroup, OffsetChans, useActualChans)
+        JediVarName, JediVarGroup, OffsetChans, useActualChans)
     else
       call opsinputs_fill_fillreal2d_norecords( &
         Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-        varChannels, JediVarName, JediVarGroup, OffsetChans)
+        JediVarName, JediVarGroup, OffsetChans)
     end if
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      varChannels, JediVarName, JediVarGroup)
+      JediVarName, JediVarGroup)
   end if
 end if
 

@@ -98,7 +98,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   
  /// oops::Parameter<std::string> jopaChannels{"jopaChannels", "", this};
   
-  oops::Parameter<std::vector<int>> varChannels{"varChannels", {}, this};
+ /// oops::Parameter<std::vector<int>> varChannels{"varChannels", {}, this};
+  oops::Parameter<std::string> varChannels{"varChannels", "", this};
+  ///oops::RequiredParameter<std::string> chanlist{"cost channels list", this};
   
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
