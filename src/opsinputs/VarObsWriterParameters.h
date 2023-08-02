@@ -79,21 +79,11 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
-  /// This contains the offset that needs to be added to the channel number in order to
-  /// index the output arrays correctly.
-  oops::Parameter<int> channel_offset{"channel_offset", 0, this};
-
   /// This is the size of the varobs array for output.  The default is zero and the size
   /// of the array will be used.
   /// For atovs, jedi has 20 brightness temperatures but var expects 40.
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
-
-  /// This matches the channel number with the array index. This is useful when
-  /// there are skipped channels. e.g. channels 5,6,7,9,10,11 are required from a possible 12
-  /// channels. This would fill a size 12 array with the array indexes matching the channel number
-  /// [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN].
-  oops::Parameter<bool> use_actual_channels{"use_actual_channels", false, this};
   
   
  /// oops::Parameter<std::string> jopaChannels{"jopaChannels", "", this};
