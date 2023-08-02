@@ -165,7 +165,7 @@ observations:
       namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
       general_mode: debug
     #  size_of_varobs_array: 3
-      varChannels: [5,7] #7, 8
+      varChannels: 7, 8 #[5,7]
       output_directory: /home/h01/olewis/
     - filter: VarObs Checker
       expected_main_table_columns:
