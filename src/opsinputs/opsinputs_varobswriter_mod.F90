@@ -187,7 +187,8 @@ private
 
   integer(c_int), allocatable :: channels(:)
  ! integer(c_int), allocatable :: jopaChannels(:)
-  integer(c_int), allocatable :: varChannels(:)
+ ! integer(c_int), allocatable :: varChannels(:)
+  integer, allocatable :: varChannels(:)
   
   !this stores the atmospheric levels we wish to pass to varobs
   integer(c_int), allocatable :: modlevs(:) 
@@ -1144,10 +1145,10 @@ do iVarField = 1, nVarFields
   end select
 
   if (FillChanNum .or. FillNumChans) then
-    WRITE(*,*) "Call opsinputs_varobswriter_fillchannumandnumchans"
-    WRITE(*,*) size(self % varChannels)
-    WRITE(*,*) self % varChannels
-    WRITE(*,*) size(self % channels)
+!    WRITE(*,*) "Call opsinputs_varobswriter_fillchannumandnumchans"
+!    WRITE(*,*) size(self % varChannels)
+!    WRITE(*,*) self % varChannels
+!    WRITE(*,*) size(self % channels)
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, self % varChannels, Flags, FillChanNum, & 
       FillNumChans)
@@ -1203,7 +1204,8 @@ implicit none
 type(OB_type), intent(inout)   :: Ob
 type(c_ptr), value, intent(in) :: ObsSpace
 integer(c_int), intent(in)     :: channels(:)
-integer(c_int), intent(in)     :: varChannels(:)
+!integer(c_int), intent(in)     :: varChannels(:)
+integer, intent(in)     :: varChannels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 
@@ -1232,8 +1234,9 @@ if (FillChanNum) then
         WRITE(*,*) "VarChannels=", varChannels(iChannel)
         ChannelIndices(:,iChannel) = varChannels(iChannel)
       end do
+      Ob % ChanNum = ChannelIndices
     end if
-    Ob % ChanNum = ChannelIndices
+
  ! else
   !  Ob % ChanNum = ChannelIndices
     !only apply offset to actual channels in list, not missing data

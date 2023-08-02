@@ -87,7 +87,7 @@ class VarObsWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
   oops::Variables extradiagvars_;
   std::shared_ptr<ioda::ObsDataVector<int>> flags_;
   std::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
-  std::vector<int> varchannels_;
+///  std::vector<int> varchannels_;
 
   VarObsWriterParameters parameters_;
 };
