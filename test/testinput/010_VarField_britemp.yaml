@@ -166,7 +166,7 @@ observations:
       general_mode: debug
     #  size_of_varobs_array: 3
       varChannels: 7, 8 #[5,7]
-      output_directory: /home/h01/olewis/
+      output_directory: /home/h01/plevens
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
