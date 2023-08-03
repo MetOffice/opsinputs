@@ -140,7 +140,7 @@ observations:
       obsdataout:
         engine:
           type: H5File
-          obsfile: /home/h01/olewis/map_chans.nc4
+          obsfile: /home/h01/plevens/map_chans.nc4
       simulated variables: [brightnessTemperature]
       channels: 1,3
     obs filters:
