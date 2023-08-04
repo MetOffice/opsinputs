@@ -194,10 +194,10 @@ observations:
                    "-3480.00000", "-3480.00000","-3480.00000",
                    "-3420.00000", "-3420.00000","-3420.00000",
                    "-3360.00000", "-3360.00000","-3360.00000"]
-        Callsign: ["station_1", "station_1","station_1",
-                   "station_2", "station_2","station_2",
-                   "station_3", "station_3","station_3",
-                   "station_4", "station_4","station_4"]
+        Callsign: ["station_1", "station_1","station_1", "station_1","station_1",
+                   "station_2", "station_2","station_2", "station_2","station_2",
+                   "station_3", "station_3","station_3", "station_3","station_3",
+                   "station_4", "station_4","station_4", "station_4","station_4"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
