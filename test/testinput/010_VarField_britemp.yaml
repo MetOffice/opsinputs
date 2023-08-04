@@ -170,10 +170,10 @@ observations:
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
-        field:    ["10", "10", "10",
-                   "10", "10", "10",
-                   "10", "10", "10",
-                   "10", "10", "10"]
+        field:    ["10", "10", "54", "55", "55",
+                   "10", "10", "54", "55", "55",
+                   "10", "10", "54", "55", "55",
+                   "10", "10", "54", "55", "55"]
         level:    ["5", "6","7",
                    "5", "6","7",
                    "5", "6","7",
