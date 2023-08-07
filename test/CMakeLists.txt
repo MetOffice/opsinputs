@@ -300,6 +300,14 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 # Tests the global namelist files in the etc directory
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_abiclr
+                YAML     varobswriter_globalnamelist_abiclr.yaml
+                NAMELIST ../../etc/global/varobs/ABIClr.nl
+                DATA     varobs_globalnamelist_abiclr.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_ahiclr
+                YAML     varobswriter_globalnamelist_ahiclr.yaml
+                NAMELIST ../../etc/global/varobs/AHIClr.nl
+                DATA     varobs_globalnamelist_ahiclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
                 YAML     varobswriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/varobs/ATMS.nl
@@ -316,6 +324,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_iasi
                 YAML     varobswriter_globalnamelist_iasi.yaml
                 NAMELIST ../../etc/global/varobs/IASI.nl
                 DATA     varobs_globalnamelist_iasi.nc4 018_VarField_tcozone_obsdiag.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_seviriclr
+                YAML     varobswriter_globalnamelist_seviriclr.yaml
+                NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
+                DATA     varobs_globalnamelist_seviriclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
@@ -532,6 +544,14 @@ ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 # Tests the global namelist files in the etc directory
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_abiclr
+                YAML     cxwriter_globalnamelist_abiclr.yaml
+                NAMELIST ../../etc/global/cx/ABIClr.nl
+                DATA     cx_globalnamelist_abiclr.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_ahiclr
+                YAML     cxwriter_globalnamelist_ahiclr.yaml
+                NAMELIST ../../etc/global/cx/AHIClr.nl
+                DATA     cx_globalnamelist_ahiclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_asmr
                 YAML     cxwriter_globalnamelist_amsr.yaml
                 NAMELIST ../../etc/global/cx/AMSR.nl
@@ -571,6 +591,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_groundgps
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_iasi
                 YAML     cxwriter_globalnamelist_iasi.yaml
                 DATA     cx_globalnamelist_iasi.nc4 varobs_globalnamelist_iasi.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_seviriclr
+                YAML     cxwriter_globalnamelist_seviriclr.yaml
+                NAMELIST ../../etc/global/cx/SEVIRIClr.nl
+                DATA     cx_globalnamelist_seviriclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sonde
                 YAML     cxwriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/cx/Sonde.nl
