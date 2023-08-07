@@ -651,7 +651,7 @@ if __name__ == "__main__":
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
-    output_2d_normal_var_to_netcdf   ('Cloud', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
+    output_2d_normal_var_to_netcdf   ('cloudAmount', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
     output_2d_normal_var_to_netcdf   ('emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
     output_1d_normal_var_to_netcdf   ('ozoneTotal', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
     output_1d_normal_var_to_netcdf   ('sensorZenithAngle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
@@ -770,7 +770,7 @@ if __name__ == "__main__":
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
                                   'ObsValue/stationPressure'],
-                                 ['DerivedObsValue/Cloud', 'DerivedObsError/CloudError'],
+                                 ['DerivedObsValue/cloudAmount', 'DerivedObsError/cloudAmount'],
                                  [],
                                  'testinput/varobs_ukvnamelist_surfacecloud.nc4')
 
@@ -914,7 +914,7 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_ssmis.nc4')
-	
+        
     # MWSFY3
     output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
                               'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
