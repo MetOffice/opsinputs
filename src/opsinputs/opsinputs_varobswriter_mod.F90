@@ -966,7 +966,7 @@ do iVarField = 1, nVarFields
       call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
         Ob % Header % Cloud, "Cloud", Ob % Header % NumObsLocal, Ob % Cloud, &
         ObsSpace, self % modlevs, "cloudAmount_", "DerivedObsValue", self % GeoVaLsAreTopToBottom, &
-        "cloudAmount_", "DerivedObsError")
+        "cloudAmount_", "ObsErrorData")
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Cloud, "Cloud", Ob % Header % NumObsLocal, Ob % Cloud)
     case (VarField_rainrate)
