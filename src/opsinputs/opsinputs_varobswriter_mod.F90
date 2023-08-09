@@ -188,6 +188,7 @@ private
   integer(c_int), allocatable :: channels(:)
  ! integer(c_int), allocatable :: jopaChannels(:)
   integer(c_int), allocatable :: varChannels(:)
+  integer(integer64) :: size_of_varobs_array
   
   !this stores the atmospheric levels we wish to pass to varobs
   integer(c_int), allocatable :: modlevs(:) 
@@ -300,6 +301,8 @@ call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
 call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_PLevels)
+
+call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 
 call f_conf % get_or_die("varChannels", self % varChannels)
 WRITE(*,*) "get or die varChannels", self % varChannels
