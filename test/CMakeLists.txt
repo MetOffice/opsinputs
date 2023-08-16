@@ -144,6 +144,9 @@ ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
 ADD_WRITER_TEST(NAME     varobswriter_012_VarField_gpstzdelay
                 YAML     012_VarField_gpstzdelay.yaml
                 DATA     012_VarField_gpstzdelay.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_015_VarField_cloud
+                YAML     015_VarField_cloud.yaml
+                DATA     015_VarField_cloud.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
                 YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
@@ -347,6 +350,10 @@ ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_sonde
                 YAML     varobswriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/varobs/Sonde.nl
                 DATA     varobs_ukvnamelist_sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_surfacecloud
+                YAML     varobswriter_ukvnamelist_surfacecloud.yaml
+                NAMELIST ../../etc/ukv/varobs/SurfaceCloud.nl
+                DATA     varobs_ukvnamelist_surfacecloud.nc4)
 
 ### CxWriter tests
 
@@ -429,6 +436,10 @@ ADD_WRITER_TEST(NAME     cxwriter_011_UpperAirCxField_P
                 YAML     011_UpperAirCxField_P.yaml
                 NAMELIST CxWriterNamelists_011_UpperAirCxField_P/AMSUB.nl
                 DATA     011_UpperAirCxField_P.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_015_UpperAirCxField_cloud_layer
+                YAML     015_UpperAirCxField_cloud_layer.yaml
+                NAMELIST CxWriterNamelists_015_UpperAirCxField_cloud_layer/SurfaceCloud.nl
+                DATA     015_UpperAirCxField_cloud_layer.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_029_UpperAirCxField_qcf
                 YAML     029_UpperAirCxField_qcf.yaml
                 NAMELIST CxWriterNamelists_029_UpperAirCxField_qcf/AMSUB.nl
@@ -618,6 +629,10 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_sonde
                 YAML     cxwriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/cx/Sonde.nl
                 DATA     cx_ukvnamelist_sonde.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surfacecloud
+                YAML     cxwriter_ukvnamelist_surfacecloud.yaml
+                NAMELIST ../../etc/ukv/cx/SurfaceCloud.nl
+                DATA     cx_ukvnamelist_surfacecloud.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 

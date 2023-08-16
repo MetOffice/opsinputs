@@ -388,7 +388,7 @@ DO Ivar = 1, NumValidVarFields
       RArrVrbl1d => Ob % AMSUb_Temp
     CASE (VarField_cloud)
       ObHdrVrbl = Ob % header % Cloud
-      ObVrblMulti => Ob % Cloud
+      ObVrblMulti => Ob % Cloud(:,:)
       Pge_2D => Pge % Cloud
     CASE (VarField_rainrate)
       ObHdrVrbl = Ob % header % Rainrate
