@@ -8,7 +8,9 @@
 
 #include <memory>
 #include <ostream>
+#include <set>
 #include <string>
+#include <vector>
 
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"

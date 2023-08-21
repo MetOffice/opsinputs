@@ -91,7 +91,9 @@ observations:
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_055_VarField_channum
       general_mode: debug
-      channel_offset: 15
+     # channel_offset: 15
+      size_of_varobs_array: 2
+      varChannels: 16, 17
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.

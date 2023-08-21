@@ -40,6 +40,14 @@ type, public :: opsinputs_channeloffset
   integer  :: size_of_varobs_array
 end type opsinputs_channeloffset
 
+
+! Type to contain the channels offset when converting from JEDI to VAR.
+type, public :: opsinputs_varchannels
+  ! This is the size of the varobs array for output.  The default is zero and the size of the array will be used.
+  ! For atovs, jedi has 20 brightness temperatures but var expects 40.
+  ! Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
+  integer  :: size_of_varobs_array
+end type opsinputs_varchannels
 ! ------------------------------------------------------------------------------
 contains
 

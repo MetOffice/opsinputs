@@ -35,7 +35,8 @@ use opsinputs_jeditoopslayoutmapping_mod, only: &
     opsinputs_jeditoopslayoutmapping
 use opsinputs_utils_mod, only: &
     max_varname_with_channel_length, &
-    opsinputs_channeloffset
+    opsinputs_channeloffset, &
+    opsinputs_varchannels
 
 use GenMod_Core, only: &
     gen_warn,          &
@@ -1035,7 +1036,7 @@ end subroutine opsinputs_fill_fillreal
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
   Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, &
-  JediVarGroup)
+  JediVarGroup, sizeVarObs, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1047,6 +1048,9 @@ type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
+integer(integer64), optional, intent(in)            :: sizeVarObs
+integer(c_int), optional, intent(in)                :: varChannels(:)
+
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -1057,7 +1061,7 @@ integer                                         :: offset
 integer                                         :: numchans
 
 ! Body:
-
+WRITE(*,*) "opsinputs_fill_mod - no records"
 MissingDouble = missing_value(0.0_c_double)
 
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
@@ -1068,8 +1072,24 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 
 numchans = size(JediVarNamesWithChannels)
 WRITE(*,*) "numchans=", numchans
-
-
+WRITE(*,*) "Present", present(sizeVarObs), sizeVarObs
+if ((present(varChannels)) .and. (size(varChannels) > 0)) then
+  numchans = sizeVarObs
+end if
+WRITE(*,*) "SizeVarObs=", sizeVarObs
+!WRITE(*,*) sizeVarObs == 0
+!WRITE(*,*) sizeVarObs /= 0
+!if (sizeVarObs /= 0) then
+ ! numchans = sizeVarObs
+ ! WRITE(*,*) "Numchan set", numchans
+!end if
+WRITE(*,*) "numchans=", numchans
+if (present(sizeVarObs) )then
+  if (sizeVarObs > 0) then
+    numchans = sizeVarObs
+  end if
+end if
+WRITE(*,*) "numchans=", numchans
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
@@ -1077,11 +1097,29 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
                  num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
-    WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
-    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
-    where (VarValue /= MissingDouble)
-      Real2(:, iChannel) = VarValue
-    end where
+    if (iChannel <= size(JediVarNamesWithChannels)) then
+      WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
+      call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    end if
+
+
+    if (present(varChannels)) then
+      if (size(varChannels) > 0) then
+        WRITE(*,*) "here"
+        if (iChannel <= size(varChannels)) then
+          WRITE(*,*) "here1"
+          where (VarValue /= MissingDouble)
+            Real2(:, varChannels(iChannel)) = VarValue
+          end where
+          WRITE(*,*) "shape of real2", shape(Real2)
+        end if
+      end if
+    else
+      WRITE(*,*) "real2 novar"
+      where (VarValue /= MissingDouble)
+        Real2(:, iChannel) = VarValue
+      end where
+    end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 end subroutine opsinputs_fill_fillreal2d_norecords
@@ -1205,7 +1243,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, &
-  VarobsLength, JediVarName, JediVarGroup)
+  VarobsLength, JediVarName, JediVarGroup, sizeVarObs, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1218,6 +1256,9 @@ integer(c_int), intent(in)                          :: Channels(:)
 integer(integer64), intent(in)                      :: VarobsLength
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
+integer(integer64), optional, intent(in)            :: sizeVarObs
+integer(c_int), optional, intent(in)                :: varChannels(:)
+
 
 
 ! Body:
@@ -1225,9 +1266,18 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
-  call opsinputs_fill_fillreal2d_norecords( &
-    Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-    JediVarName, JediVarGroup)
+  if (size(varChannels) > 0) then
+    WRITE(*,*) "opsinputs_fill_mod - varchannel option"
+    call opsinputs_fill_fillreal2d_norecords( &
+      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+      JediVarName, JediVarGroup, sizeVarObs, varChannels)
+  else
+    WRITE(*,*) "##In no VarChannels"
+    WRITE(*,*) "sizeVarObs", sizeVarObs
+    call opsinputs_fill_fillreal2d_norecords( &
+      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+      JediVarName, JediVarGroup, sizeVarObs)
+  end if
 end if
 
 end subroutine opsinputs_fill_fillreal2d
@@ -1686,6 +1736,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
 
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, String1)
+  WRITE(*,*) "loop nubmers", JediToOpsLayoutMapping % NumOpsObs
   do i = 1, JediToOpsLayoutMapping % NumOpsObs
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
@@ -1694,6 +1745,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
                                 JediToOpsLayoutMapping % RecordStarts(i)))
       end if
     else
+      WRITE(*,*) "VarValue(i)=", VarValue(i), i
       String1(i) = VarValue(i)
     end if
   end do
@@ -2249,13 +2301,38 @@ integer(c_int), intent(in)                     :: Channels(:)
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
 
-if (size(Channels) == 0) then
-  VarNames(1) = VarName
-else
+character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
+
+write(*,*) max_varname_with_channel_length
+WRITE(*,*) "VarNames=", VarNames
+WRITE(*,*) "opsinputs_fill_mod - opsinputs_fill_varnames_with_channels"
+WRITE(*,*) size(Channels), VarName
+
+if (Varname=="emissivity") then
   do ichan = 1, size(Channels)
-    write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+    write(*,*) "here"
+    write(*,*) VarName, Channels(ichan)
+    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+   ! write(*,'(A,"_",I0)') VarName, Channels(ichan)
+   ! write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
+ ! VarNames = VarNames_emis
+else
+  if (size(Channels) == 0) then
+    VarNames(1) = VarName
+  else
+    write(*,*) "start loop"
+    do ichan = 1, size(Channels)
+
+      WRITE(*,*) VarName, Channels(ichan)
+      WRITE(*,*) size(VarNames), VarNames
+      write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+      write(*,*) VarNames(ichan)
+      WRITE(*,*) "In loop", VarNames(ichan)
+    end do
+  end if
 end if
+WRITE(*,*) "opsinputs_fill_mod - opsinputs_fill_varnames_with_channels finished"
 end function opsinputs_fill_varnames_with_channels
 
 

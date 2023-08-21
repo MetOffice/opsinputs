@@ -17,8 +17,8 @@
 #include "ioda/ObsVector.h"
 #include "oops/base/Variables.h"
 #include "oops/mpi/mpi.h"
-#include "oops/util/Logger.h"
 #include "oops/util/IntSetParser.h"
+#include "oops/util/Logger.h"
 #include "opsinputs/LocalEnvironment.h"
 #include "opsinputs/VarObsWriterParameters.h"
 #include "ufo/filters/Variable.h"
@@ -77,6 +77,7 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
   std::set<int> varchanset = oops::parseIntSet(parameters_.varChannels.value());
   varchannels_.assign(varchanset.begin(), varchanset.end());
   conf.set("varChannels", varchannels_);
+  conf.set("NumVarChannels", sizeof(varchannels_));
 
   if (!opsinputs_varobswriter_create_f90(key_, &conf,
                                          fortranMpiCommunicatorIsValid,
