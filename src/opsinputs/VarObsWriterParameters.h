@@ -94,6 +94,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Compress the var channels
   oops::Parameter<bool> compressVarChannels{"compress_var_channels", false, this};
 
+  /// Where to add the extra varobs channel spaces ahead or behind.
+  oops::Parameter<bool> offsetAhead{"offset_ahead", false, this};
+
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as
   /// "reject_obs_with_all_variables_failing_qc" and channel numbering to work correctly.

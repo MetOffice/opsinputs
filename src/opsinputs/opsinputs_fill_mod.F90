@@ -1036,7 +1036,7 @@ end subroutine opsinputs_fill_fillreal
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
   Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, &
-  JediVarGroup, sizeVarObs, varChannels)
+  JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1048,6 +1048,7 @@ type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
+logical, optional, intent(in)                       :: compressVarChannels
 integer(integer64), optional, intent(in)            :: sizeVarObs
 integer(c_int), optional, intent(in)                :: varChannels(:)
 
@@ -1059,11 +1060,14 @@ character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(
 integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
+integer                        :: offsetsize
 
+!compressVarChannels=.TRUE.
 ! Body:
 WRITE(*,*) "opsinputs_fill_mod - no records"
 MissingDouble = missing_value(0.0_c_double)
 
+WRITE(*,*) JediVarName, Channels
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
 !take into account offsetting of 2nd dimension if required
@@ -1097,10 +1101,10 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
                  num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
     ! Retrieve data from JEDI
-    if (iChannel <= size(JediVarNamesWithChannels)) then
-      WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
+   ! if (iChannel <= size(JediVarNamesWithChannels)) then
+   !   WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
       call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
-    end if
+   ! end if
 
 
     if (present(varChannels)) then
@@ -1115,10 +1119,20 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         end if
       end if
     else
-      WRITE(*,*) "real2 novar"
-      where (VarValue /= MissingDouble)
-        Real2(:, iChannel) = VarValue
-      end where
+      if ((present(sizeVarObs)) .and. (sizeVarObs > size(channels))) then
+        if (compressVarChannels) then
+          offsetsize = sizeVarObs - size(channels)
+          WRITE(*,*) "REAL2 with offsetsize"
+          where (VarValue /= MissingDouble)
+            Real2(:, iChannel+offsetsize) = VarValue
+          end where
+        end if
+      else
+        WRITE(*,*) "real2 novar"
+        where (VarValue /= MissingDouble)
+          Real2(:, iChannel) = VarValue
+        end where
+      end if
     end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -1243,7 +1257,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, &
-  VarobsLength, JediVarName, JediVarGroup, sizeVarObs, varChannels)
+  VarobsLength, JediVarName, JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1256,6 +1270,7 @@ integer(c_int), intent(in)                          :: Channels(:)
 integer(integer64), intent(in)                      :: VarobsLength
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
+logical, optional, intent(in)                       :: compressVarChannels
 integer(integer64), optional, intent(in)            :: sizeVarObs
 integer(c_int), optional, intent(in)                :: varChannels(:)
 
@@ -1270,13 +1285,13 @@ else
     WRITE(*,*) "opsinputs_fill_mod - varchannel option"
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, sizeVarObs, varChannels)
+      JediVarName, JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
   else
     WRITE(*,*) "##In no VarChannels"
     WRITE(*,*) "sizeVarObs", sizeVarObs
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, sizeVarObs)
+      JediVarName, JediVarGroup, compressVarChannels, sizeVarObs)
   end if
 end if
 
@@ -2301,23 +2316,27 @@ integer(c_int), intent(in)                     :: Channels(:)
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
 
-character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
+!character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
 
 write(*,*) max_varname_with_channel_length
-WRITE(*,*) "VarNames=", VarNames
+
 WRITE(*,*) "opsinputs_fill_mod - opsinputs_fill_varnames_with_channels"
 WRITE(*,*) size(Channels), VarName
 
-if (Varname=="emissivity") then
-  do ichan = 1, size(Channels)
-    write(*,*) "here"
-    write(*,*) VarName, Channels(ichan)
-    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+
+!allocate(VarNames(max(size(Channels), 1)))
+!deallocate(VarNames)
+!allocate(VarNames(max(size(Channels), 1)))
+!if (Varname=="emissivity") then
+!  do ichan = 1, size(Channels)
+!    write(*,*) "here"
+!    write(*,*) VarName, Channels(ichan)
+!    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
    ! write(*,'(A,"_",I0)') VarName, Channels(ichan)
    ! write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-  end do
+  !end do
  ! VarNames = VarNames_emis
-else
+!else
   if (size(Channels) == 0) then
     VarNames(1) = VarName
   else
@@ -2325,13 +2344,12 @@ else
     do ichan = 1, size(Channels)
 
       WRITE(*,*) VarName, Channels(ichan)
-      WRITE(*,*) size(VarNames), VarNames
+      WRITE(*,*) size(VarNames)
       write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-      write(*,*) VarNames(ichan)
       WRITE(*,*) "In loop", VarNames(ichan)
     end do
   end if
-end if
+!end if
 WRITE(*,*) "opsinputs_fill_mod - opsinputs_fill_varnames_with_channels finished"
 end function opsinputs_fill_varnames_with_channels
 

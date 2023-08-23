@@ -41,6 +41,7 @@ observations:
       reject_obs_with_all_variables_failing_qc: true
       general_mode: verbose
       output_varbc_predictors: true
+      compress_var_channels: true
       size_of_varobs_array: 4
       fill_obstype_from_ops_subtype: true
     - filter: VarObs Checker
