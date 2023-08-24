@@ -26,6 +26,7 @@ observations:
       namelist_directory: testinput/VarObsWriterNamelists_076_VarField_britempvarerror
     #  channel_offset: 1
       varChannels: 2-4
+      compress_var_channels: true
       size_of_varobs_array: 4
       general_mode: verbose
     - filter: VarObs Checker

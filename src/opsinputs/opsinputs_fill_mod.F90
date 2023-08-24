@@ -1056,7 +1056,8 @@ integer(c_int), optional, intent(in)                :: varChannels(:)
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
 real(kind=c_double)                             :: MissingDouble
-character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+!character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=200)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
@@ -1067,7 +1068,7 @@ integer                        :: offsetsize
 WRITE(*,*) "opsinputs_fill_mod - no records"
 MissingDouble = missing_value(0.0_c_double)
 
-WRITE(*,*) JediVarName, Channels
+WRITE(*,*) "JediVarName=", JediVarName, "Channels", Channels
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
 !take into account offsetting of 2nd dimension if required
@@ -1076,17 +1077,7 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 
 numchans = size(JediVarNamesWithChannels)
 WRITE(*,*) "numchans=", numchans
-WRITE(*,*) "Present", present(sizeVarObs), sizeVarObs
-if ((present(varChannels)) .and. (size(varChannels) > 0)) then
-  numchans = sizeVarObs
-end if
-WRITE(*,*) "SizeVarObs=", sizeVarObs
-!WRITE(*,*) sizeVarObs == 0
-!WRITE(*,*) sizeVarObs /= 0
-!if (sizeVarObs /= 0) then
- ! numchans = sizeVarObs
- ! WRITE(*,*) "Numchan set", numchans
-!end if
+
 WRITE(*,*) "numchans=", numchans
 if (present(sizeVarObs) )then
   if (sizeVarObs > 0) then
@@ -1111,6 +1102,15 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
       if (size(varChannels) > 0) then
         WRITE(*,*) "here"
         if (iChannel <= size(varChannels)) then
+          if (compressVarChannels) then
+            offsetsize = abs(varChannels(1) - channels(1))
+            write(*,*) "offsetsize=", offsetsize
+            WRITE(*,*) "REAL2 with offsetsize"
+            where (VarValue /= MissingDouble)
+              Real2(:, iChannel+offsetsize) = VarValue
+            end where
+          end if
+        else
           WRITE(*,*) "here1"
           where (VarValue /= MissingDouble)
             Real2(:, varChannels(iChannel)) = VarValue
@@ -1122,9 +1122,14 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
       if ((present(sizeVarObs)) .and. (sizeVarObs > size(channels))) then
         if (compressVarChannels) then
           offsetsize = sizeVarObs - size(channels)
-          WRITE(*,*) "REAL2 with offsetsize"
+         ! WRITE(*,*) "REAL2 with offsetsize"
           where (VarValue /= MissingDouble)
-            Real2(:, iChannel+offsetsize) = VarValue
+            Real2(:, iChannel) = VarValue
+          end where
+        else
+          WRITE(*,*) "In noncompressed larger size"
+          where (VarValue /= MissingDouble)
+            Real2(:, Channels(iChannel)) = VarValue
           end where
         end if
       else
@@ -1890,7 +1895,8 @@ type(datetime), intent(in)                      :: ReferenceTime
 ! Local declarations:
 integer(c_int64_t)                              :: VarValue(NumObs)
 real(kind=c_double)                             :: MissingDouble
-character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+!character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=200)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
 
 ! Body:
