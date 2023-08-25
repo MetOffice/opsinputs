@@ -1326,7 +1326,6 @@ if (FillChanNum) then
         do iChannel=1,  NumChannels !varObsSize
           WRITE(*,*) "iChannel=", iChannel, size(varChannels)
           if (compressVarChannels) then
-            WRITE(*,*) "here"
             do iObs=1, Ob % Header % NumObsLocal
               WRITE(*,*) "VarChannels=", varChannels(ChannelIndices(iObs,iChannel))
               if (ChannelIndices(iObs,iChannel) /= 0) then

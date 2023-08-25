@@ -1109,13 +1109,14 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
             where (VarValue /= MissingDouble)
               Real2(:, iChannel+offsetsize) = VarValue
             end where
+
+          else
+            WRITE(*,*) "here1"
+            where (VarValue /= MissingDouble)
+              Real2(:, varChannels(iChannel)) = VarValue
+            end where
+            WRITE(*,*) "shape of real2", shape(Real2)
           end if
-        else
-          WRITE(*,*) "here1"
-          where (VarValue /= MissingDouble)
-            Real2(:, varChannels(iChannel)) = VarValue
-          end where
-          WRITE(*,*) "shape of real2", shape(Real2)
         end if
       end if
     else
@@ -1141,6 +1142,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
+WRITE(*,*) "Finished opsinputs_fill_fillreal2d_norecord"
 end subroutine opsinputs_fill_fillreal2d_norecords
 
 ! ------------------------------------------------------------------------------
