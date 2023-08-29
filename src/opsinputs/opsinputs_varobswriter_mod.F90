@@ -192,6 +192,7 @@ private
   integer(integer64) :: NumVarChannels
 
   logical ::compressVarChannels
+  logical :: increaseChanArray
   
   !this stores the atmospheric levels we wish to pass to varobs
   integer(c_int), allocatable :: modlevs(:) 
@@ -241,6 +242,8 @@ allocate(self % varChannels(self % NumVarChannels))
 call f_conf % get_or_die("varChannels", self % varChannels)
 
 call f_conf % get_or_die("compress_var_channels", self % compressVarChannels)
+
+call f_conf % get_or_die("increase_chan_array", self % increaseChanArray)
 ! Setup OPS
 
 call f_conf % get_or_die("general_mode", StringValue)
@@ -1177,7 +1180,8 @@ do iVarField = 1, nVarFields
 
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, self % varChannels, Flags, FillChanNum, &
-      FillNumChans, self % compressVarChannels, self % size_of_varobs_array)
+      FillNumChans, self % compressVarChannels, self % size_of_varobs_array, &
+      self % increaseChanArray)
   end if
 
 end do
@@ -1222,7 +1226,8 @@ end subroutine opsinputs_varobswriter_fillreportflags
 !> e.g. for HIRS & AMSUA 
 !> the number of these channels is stored in Ob % NumChans.
 subroutine opsinputs_varobswriter_fillchannumandnumchans( &
-  Ob, ObsSpace, channels, varChannels, Flags, FillChanNum, FillNumChans, compressVarChannels, varObsSize)
+  Ob, ObsSpace, channels, varChannels, Flags, FillChanNum, FillNumChans, compressVarChannels, &
+  varObsSize, increaseChanArray)
 
 implicit none
 
@@ -1235,11 +1240,13 @@ type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
 logical                     :: compressVarChannels
 integer(integer64), optional, intent(in) :: varObsSize
+logical, optional, intent(in)  :: increaseChanArray
 
 
 ! Local declarations:
 integer(integer64)             :: NumChannels
-integer(integer64)             :: ChannelIndicesVar(Ob % Header % NumObsLocal, size(varChannels)) !varObssize
+!integer(integer64)            :: ChannelIndicesVar(Ob % Header % NumObsLocal, size(varChannels)) !varObssize
+integer(integer64), allocatable            :: ChannelIndicesVar(:,:) !varObssize
 integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size(channels))
 integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                        :: iChannel
@@ -1255,6 +1262,15 @@ MissingDouble = missing_value(0.0_c_double)
 
 NumChannels = size(channels)
 if (NumChannels == 0) return
+
+WRITE(*,*) "increaseChanArray", increaseChanArray
+if (increaseChanArray) then
+  NumChannels = varObsSize
+  allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, varObsSize))
+else
+  allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, size(varChannels)))
+end if
+WRITE(*,*) varObsSize, NumChannels
 
 call opsinputs_varobswriter_findchannelspassingqc( &
   Ob % Header % NumObsLocal, ObsSpace, channels, Flags, ChannelIndices, ChannelCounts)
@@ -1292,8 +1308,13 @@ if (FillChanNum) then
           WRITE(*,*) "Finished VarChannels with compression"
 
         else
+          WRITE(*,*) "NumChannels=", NumChannels
           do iChannel=1,  NumChannels
-            ChannelIndicesVar(:, iChannel) = varChannels(iChannel)
+            if (iChannel > size(varChannels)) then
+              ChannelIndicesVar(:, iChannel) = -32768
+            else
+              ChannelIndicesVar(:, iChannel) = varChannels(iChannel)
+            end if
           end do
           Ob % ChanNum = ChannelIndicesVar
         end if
