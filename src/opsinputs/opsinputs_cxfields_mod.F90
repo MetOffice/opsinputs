@@ -76,7 +76,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_qf_layer = opsinputs_c
 character(len=*), parameter, public :: opsinputs_cxfields_RainRate_layer = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_cloud_conv = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qc_conv = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_cloud_layer = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_cloud_layer = "cloud_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_ozone = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qcf = var_cli
 character(len=*), parameter, public :: opsinputs_cxfields_qcl = var_clw
