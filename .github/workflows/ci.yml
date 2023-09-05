@@ -13,6 +13,14 @@ jobs:
       - name: checkout current repo
         uses: actions/checkout@v3
 
+      - name: checkout jedicmake
+        uses: actions/checkout@v3
+        with:
+          path: ci/jedicmake
+          repository: JCSDA-internal/jedi-cmake
+          submodules: true
+          token: ${{ secrets.GH_PAT }}
+
       - name: checkout ropp-ufo
         uses: actions/checkout@v3
         with:
@@ -29,14 +37,6 @@ jobs:
       - name: matching branch checkout attempt oops ${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./ci/get-ref-branch ./ci/oops
-
-      - name: checkout jedicmake
-        uses: actions/checkout@v3
-        with:
-          path: ci/jedicmake
-          repository: JCSDA-internal/jedi-cmake
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
 
       - name: checkout ioda
         uses: actions/checkout@v3
@@ -57,6 +57,16 @@ jobs:
       - name: matching branch checkout attempt ufo ${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./ci/get-ref-branch ./ci/ufo
+
+      - name: checkout opsinputs
+        uses: actions/checkout@v3
+        with:
+          path: ci/ufo
+          repository: MetOffice/opsinputs
+          # token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt opsinputs ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./ci/get-ref-branch ./ci/opsinputs
 
       - name: build and test
         run: |
