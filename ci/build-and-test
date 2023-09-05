@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# (C) Crown Copyright 2023, the Met Office. All rights reserved.
+#
+#
+set -euo pipefail
+
+finally() {
+    trap '' ERR
+    trap '' EXIT
+    if [[ -d "${WORKD:-}" ]]; then
+        cd /
+        rm -fr "${WORKD}"
+    fi
+}
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+THIS="$(basename "$0")"
+NPROC=${NPROC:-$(nproc)}
+WORKD="$(mktemp -d "${THIS}-XXXXXX" -t)"
+
+trap finally ERR
+trap finally EXIT
+
+cd "${WORKD}"
+
+# - jcsda container requires manual sourcing of spack environment
+# source /etc/profile.d/z10_spack_environment.sh
+
+# rm -f "${HERE}/opsinputs"
+# ln -s '..' "${HERE}/opsinputs"
+# ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
+# make -j "${NPROC}"
+# env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
+#     ctest -j "${NPROC}" --output-on-failure --test-dir './opsinputs'
+
+# exit
+
+rm -f "${HERE}/bundle"
+ln -s '..' "${HERE}/bundle"
+
+# -- Configure & Build
+cmake -B . -S "${HERE}" -DCMAKE_BUILD_TYPE=Debug -DMPI_ARGS="--oversubscribe"
+cmake --build . -j "${NPROC}"
+
+# -- Test
+env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
+    ctest -j "$NPROC" --output-on-failure --test-dir './opsinputs'
+
+exit
