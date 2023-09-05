@@ -21,12 +21,12 @@ jobs:
           submodules: true
           token: ${{ secrets.GH_PAT }}
 
-      - name: checkout ropp-ufo
-        uses: actions/checkout@v3
-        with:
-          path: ci/ropp-ufo
-          repository: MetOffice/ropp-ufo
-          token: ${{ secrets.GH_PAT }}
+      # - name: checkout ropp-ufo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     path: ci/ropp-ufo
+      #     repository: MetOffice/ropp-ufo
+      #     token: ${{ secrets.GH_PAT }}
 
       - name: checkout oops
         uses: actions/checkout@v3
