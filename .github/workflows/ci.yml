@@ -61,7 +61,7 @@ jobs:
       - name: checkout opsinputs
         uses: actions/checkout@v3
         with:
-          path: ci/ufo
+          path: ci/opsinputs
           repository: MetOffice/opsinputs
           # token: ${{ secrets.GH_PAT }}
       - name: matching branch checkout attempt opsinputs ${{ github.head_ref }}
