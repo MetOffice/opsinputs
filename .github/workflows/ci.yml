@@ -1,4 +1,4 @@
-name: UKMO_CI_Az
+name: UKMO_CI_Azure
 
 on:
   push:
