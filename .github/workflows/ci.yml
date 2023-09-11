@@ -13,7 +13,7 @@ jobs:
       - name: checkout current
         uses: actions/checkout@v3
         with:
-          path: ci/ufo
+          path: ci/opsinputs
 
       - name: checkout jedicmake
         uses: actions/checkout@v3
