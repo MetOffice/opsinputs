@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: checkout current
         uses: actions/checkout@v3
+        with:
+          path: ci/ufo
 
       - name: checkout jedicmake
         uses: actions/checkout@v3
