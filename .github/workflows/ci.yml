@@ -1,4 +1,4 @@
-name: CI
+name: UKMO_CI_Az
 
 on:
   push:
@@ -53,15 +53,6 @@ jobs:
         if: github.event_name == 'pull_request'
         run: ./ci/get-ref-branch ./ci/ufo
 
-      # - name: checkout opsinputs
-      #   uses: actions/checkout@v3
-      #   with:
-      #     path: ci/opsinputs
-      #     repository: MetOffice/opsinputs
-      # - name: matching branch checkout attempt opsinputs ${{ github.head_ref }}
-      #   if: github.event_name == 'pull_request'
-      #   run: ./ci/get-ref-branch ./ci/opsinputs
-
       - name: build and test
         run: |
           az acr login --name ngmssboxjediacr
@@ -70,10 +61,3 @@ jobs:
             --workdir=/usr/local/src/opsinputs/ci \
             --volume $PWD:/usr/local/src/opsinputs \
             'ngmssboxjediacr.azurecr.io/jedibase:alma9'
-
-        # run: |
-        #   docker run --rm \
-        #     --entrypoint=/usr/local/src/opsinputs/ci/opsinputs-ci-build \
-        #     --workdir=/usr/local/src/opsinputs/ci \
-        #     --volume $PWD:/usr/local/src/opsinputs \
-        #     'jcsda/docker-gnu-openmpi-dev:latest'
