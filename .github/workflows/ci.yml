@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: jedi-self-hosted-rg
     steps:
-      - name: checkout current repo
+      - name: checkout current
         uses: actions/checkout@v3
 
       - name: checkout jedicmake
@@ -20,13 +20,6 @@ jobs:
           repository: JCSDA-internal/jedi-cmake
           submodules: true
           token: ${{ secrets.GH_PAT }}
-
-      # - name: checkout ropp-ufo
-      #   uses: actions/checkout@v3
-      #   with:
-      #     path: ci/ropp-ufo
-      #     repository: MetOffice/ropp-ufo
-      #     token: ${{ secrets.GH_PAT }}
 
       - name: checkout oops
         uses: actions/checkout@v3
@@ -58,23 +51,22 @@ jobs:
         if: github.event_name == 'pull_request'
         run: ./ci/get-ref-branch ./ci/ufo
 
-      - name: checkout opsinputs
-        uses: actions/checkout@v3
-        with:
-          path: ci/opsinputs
-          repository: MetOffice/opsinputs
-          # token: ${{ secrets.GH_PAT }}
-      - name: matching branch checkout attempt opsinputs ${{ github.head_ref }}
-        if: github.event_name == 'pull_request'
-        run: ./ci/get-ref-branch ./ci/opsinputs
+      # - name: checkout opsinputs
+      #   uses: actions/checkout@v3
+      #   with:
+      #     path: ci/opsinputs
+      #     repository: MetOffice/opsinputs
+      # - name: matching branch checkout attempt opsinputs ${{ github.head_ref }}
+      #   if: github.event_name == 'pull_request'
+      #   run: ./ci/get-ref-branch ./ci/opsinputs
 
       - name: build and test
         run: |
           az acr login --name ngmssboxjediacr
           docker run --rm \
-            --entrypoint=/usr/local/src/opsinputs-ci/ci/build-and-test \
-            --workdir=/usr/local/src/opsinputs-ci/ci \
-            --volume $PWD:/usr/local/src/opsinputs-ci \
+            --entrypoint=/usr/local/src/opsinputs/ci/build-and-test \
+            --workdir=/usr/local/src/opsinputs/ci \
+            --volume $PWD:/usr/local/src/opsinputs \
             'ngmssboxjediacr.azurecr.io/jedibase:alma9'
 
         # run: |
