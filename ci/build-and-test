@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+# (C) Crown Copyright 2023, the Met Office. All rights reserved.
 #
 #
 set -euo pipefail
@@ -24,14 +24,15 @@ trap finally EXIT
 
 cd "${WORKD}"
 
-# - jcsda container requires manual sourcing of spack environment
-source /etc/profile.d/z10_spack_environment.sh
+rm -f "${HERE}/bundle"
+ln -s '..' "${HERE}/bundle"
 
-rm -f "${HERE}/opsinputs"
-ln -s '..' "${HERE}/opsinputs"
-ecbuild -S "${HERE}" -DMPI_ARGS="--oversubscribe"
-make -j "${NPROC}"
+# -- Configure & Build
+cmake -B . -S "${HERE}" -DCMAKE_BUILD_TYPE=Debug -DMPI_ARGS="--oversubscribe"
+cmake --build . -j "${NPROC}"
+
+# -- Test
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j "${NPROC}" --output-on-failure --test-dir './opsinputs'
+    ctest -j "$NPROC" --output-on-failure --test-dir './opsinputs'
 
 exit

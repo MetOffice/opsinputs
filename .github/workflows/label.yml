@@ -25,4 +25,3 @@ jobs:
           github.ref == 'pull_request' &&
             contains(github.event.pull_request.labels.*.name,'ready to merge')
         run: echo "This PR is ready to merge."
-
