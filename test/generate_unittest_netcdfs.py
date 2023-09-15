@@ -668,7 +668,7 @@ if __name__ == "__main__":
     output_2d_normal_var_to_netcdf   ('emissivity', 'OneDVar', 'testinput/057_VarField_emissivity.nc4', use_chans=True)
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radarAzimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
-    output_2d_normal_var_to_netcdf   ('cloudWaterContent', 'OneDVar', 'testinput/068_VarField_clw.nc4', use_levs=True)
+    output_2d_normal_var_to_netcdf   ('liquidWaterContent', 'OneDVar', 'testinput/068_VarField_clw.nc4', use_levs=True)
     output_2d_normal_var_to_netcdf   ('brightnessTemperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
                                                                  'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor',
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',

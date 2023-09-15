@@ -1042,7 +1042,7 @@ do iVarField = 1, nVarFields
     case (VarField_clw)
       call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
         Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, &
-        ObsSpace, self % modlevs, "lev", "OneDVar/cloudWaterContent", self % GeoVaLsAreTopToBottom)
+        ObsSpace, self % modlevs, "lev", "OneDVar/liquidWaterContent", self % GeoVaLsAreTopToBottom)
     case (VarField_refrac)
       ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
