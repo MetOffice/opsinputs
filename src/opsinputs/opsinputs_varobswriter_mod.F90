@@ -577,15 +577,13 @@ JediToOpsLayoutMapping = opsinputs_jeditoopslayoutmapping_create( &
 call opsinputs_varobswriter_allocateobservations(self, ObsSpace, JediToOpsLayoutMapping, Ob)
 call opsinputs_varobswriter_populateobservations(self, ObsSpace, JediToOpsLayoutMapping, &
                                                  Flags, ObsErrors, Ob)
-WRITE(*,*) "Finished populate Ob"
+
 call opsinputs_varobswriter_populatecxheader(self, CxHeader)
-WRITE(*,*) "Finished populate cx"
 
 call Ops_CreateVarobs (Ob,                  & ! in
                        CxHeader,            & ! in
                        AssimDataFormat_VAR, &
                        NumVarobsTotal)
-WRITE(*,*) "Finished CreatVarobs"
 
 call Ob % deallocate()
 call CxHeader % dealloc()
@@ -748,8 +746,6 @@ end if
 if (obsspace_has(ObsSpace, "MetaData", "stationIdentification")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
     LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData")
-  WRITE(*,*) "LenCallSign=", LenCallSign
-  WRITE(*,*) Ob % Callsign
 else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediToOpsLayoutMapping)
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping % NumOpsObs, Ob % Callsign)
@@ -863,7 +859,6 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
     case (VarField_britemp)
-      WRITE(*,*) "At britemp"
       call opsinputs_fill_fillreal2d( &
         Ob % Header % CorBriTemp, "CorBriTemp", JediToOpsLayoutMapping, Ob % CorBriTemp, &
         ObsSpace, self % channels, self % VarobsLength, "brightnessTemperature", "BiasCorrObsValue",  &
@@ -881,7 +876,6 @@ do iVarField = 1, nVarFields
         Ob % Header % Zstation, "Zstation", JediToOpsLayoutMapping, Ob % Zstation, &
         ObsSpace, "stationElevation", "MetaData")
     case (VarField_mwemiss)
-      WRITE(*,*) "At mwemissivity"
       call opsinputs_fill_fillreal2d( &
         Ob % Header % MwEmiss, "MwEmiss", JediToOpsLayoutMapping, Ob % MwEmiss, &
         ObsSpace, self % channels, self % VarobsLength, "emissivity", "Emiss")
@@ -999,7 +993,6 @@ do iVarField = 1, nVarFields
     case (VarField_ChanNum)
       FillChanNum = .true.
     case (VarField_Emissivity)
-      WRITE(*,*) "Case is Emissivity"
       call opsinputs_fill_fillreal2d( &
         Ob % Header % Emissivity, "Emissivity", JediToOpsLayoutMapping, Ob % Emissivity, &
         ObsSpace, self % channels, self % VarobsLength, "emissivity", "OneDVar", &
@@ -1177,10 +1170,6 @@ do iVarField = 1, nVarFields
 
   if (FillChanNum .or. FillNumChans) then
     WRITE(*,*) "Call opsinputs_varobswriter_fillchannumandnumchans"
-    WRITE(*,*) "size(self % varChannels) =", size(self % varChannels)
-    WRITE(*,*) self % varChannels
-    WRITE(*,*) "size(self % channels)=", size(self % channels)
-    WRITE(*,*) self % size_of_varobs_array
 
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, self % varChannels, Flags, FillChanNum, &
@@ -1267,44 +1256,26 @@ MissingDouble = missing_value(0.0_c_double)
 NumChannels = size(channels)
 if (NumChannels == 0) return
 
-WRITE(*,*) "increaseChanArray", increaseChanArray
 if (increaseChanArray) then
   NumChannels = varObsSize
   allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, varObsSize))
 else
   allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, size(varChannels)))
 end if
-WRITE(*,*) varObsSize, NumChannels
 
 call opsinputs_varobswriter_findchannelspassingqc( &
   Ob % Header % NumObsLocal, ObsSpace, channels, Flags, ChannelIndices, ChannelCounts)
-WRITE(*,*) "QC been done"
-WRITE(*,*) "Initial ChannelIndices=", ChannelIndices(:,1)
-WRITE(*,*) "Initial ChannelIndices=", ChannelIndices(:,2)
-
-!Ob % ChanNum = ChannelIndices
-!WRITE(*,*) Ob % ChanNum
-!Ob % ChanNum = Ob % ChanNum + 1
-!WRITE(*,*) Ob % ChanNum
-WRITE(*,*) "compressVarChannels = ", compressVarChannels
 
 ChannelIndicesVar(:,:) = 0
-WRITE(*,*) "orig ChannelIndicesVar", ChannelIndicesVar
-WRITE(*,*) "size of varChannels", size(varChannels)
-!WRITE(*,*) ChannelIndicesVar(:,1)
-WRITE(*,*) "FillChanNum", FillChanNum
-
 
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
-  WRITE(*,*) "In FillChanNum"
   if ((varObsSize /= 0)) then
     if (varObsSize > size(channels)) then
       if (size(varChannels) > 0 .and. (size(channels) == size(varChannels))) then
         if (compressVarChannels) then
           offsetsize = abs(varChannels(1) - channels(1))
-          write(*,*) "offsetsize=", offsetsize
           Ob % ChanNum = ChannelIndices
           where (Ob % ChanNum > 0)
             Ob % ChanNum = Ob % ChanNum + int(offsetsize, kind=integer64)
@@ -1312,7 +1283,6 @@ if (FillChanNum) then
           WRITE(*,*) "Finished VarChannels with compression"
 
         else
-          WRITE(*,*) "NumChannels=", NumChannels
           do iChannel=1,  NumChannels
             if (iChannel > size(varChannels)) then
               ChannelIndicesVar(:, iChannel) = -32768
@@ -1323,10 +1293,6 @@ if (FillChanNum) then
           Ob % ChanNum = ChannelIndicesVar
         end if
 
-        !  WRITE(*,*) "ChannelIndicesVar1=", ChannelIndicesVar(:,1)
-        !  WRITE(*,*) "ChannelIndicesVar2=", ChannelIndicesVar(:,2)
-        !end do
-        !Ob % ChanNum = ChannelIndicesVar
       else
         WRITE(*,*) "No varChannel, varObsSize is greater"
         WRITE(*,*) compressVarChannels
@@ -1335,12 +1301,9 @@ if (FillChanNum) then
           write(*,*) "Compressed var channells"
           Ob % ChanNum = ChannelIndices
         else
-          WRITE(*,*) "Here now"
           do iChannel=1, size(Channels)
             ChannelIndices(:,iChannel) = Channels(iChannel)
           end do
-          WRITE(*,*) ChannelIndices(:,1)
-          WRITE(*,*) ChannelIndices(:,2)
           Ob % ChanNum = ChannelIndices
         end if
       end if
@@ -1349,10 +1312,8 @@ if (FillChanNum) then
       WRITE(*,*) compressVarChannels
       if (size(varChannels) > 0) then
         do iChannel=1,  NumChannels !varObsSize
-          WRITE(*,*) "iChannel=", iChannel, size(varChannels)
           if (compressVarChannels) then
             do iObs=1, Ob % Header % NumObsLocal
-              WRITE(*,*) "VarChannels=", varChannels(ChannelIndices(iObs,iChannel))
               if (ChannelIndices(iObs,iChannel) /= 0) then
                 ChannelIndicesVar(iObs,iChannel) = varChannels(ChannelIndices(iObs,iChannel))
               end if
@@ -1372,125 +1333,11 @@ if (FillChanNum) then
 else
   WRITE(*,*) "Not FillChanNum"
 end if
-!  if (varObsSize /= 0) then
-!    if (varObsSize > size(channels)) then
-!      if (compressVarChannels) then
-!        WRITE(*,*) "Doing offset"
-!        offsetsize = varObsSize - size(channels)
-!        WRITE(*,*) "offsetsize=", offsetsize
-!        Ob % ChanNum = ChannelIndices
-!        WRITE(*,*) ChannelIndices(:,1)
-!        WRITE(*,*) ChannelIndices(:,2)
-!        where (Ob % ChanNum > 0)
-!          Ob % ChanNum = Ob % ChanNum + int(offsetsize, kind=integer64)
-!        end where
-!      else
-!        if (size(varChannels) > 0) then
-!          if (size(channels) == size(varChannels)) then
-!            WRITE(*,*) "Number of channels=", NumChannels
-!            WRITE(*,*) "#varObsSize", varObsSize
-!            WRITE(*,*) Ob % Header % NumObsLocal
-!            do iChannel=1,  NumChannels !varObsSize
-!              WRITE(*,*) "iChannel=", iChannel, size(varChannels)
-!              if (compressVarChannels) then
-!                do iObs=1, Ob % Header % NumObsLocal
-!                  WRITE(*,*) "VarChannels=", varChannels(ChannelIndices(iObs,iChannel))
-!                  if (ChannelIndices(iObs,iChannel) /= 0) then
-!                    ChannelIndicesVar(iObs,iChannel) = varChannels(ChannelIndices(iObs,iChannel))
-!                  end if
-!                end do
-!              else
-!                ChannelIndicesVar(:, iChannel) = varChannels(iChannel)
-!              end if
 
-!               WRITE(*,*) "ChannelIndicesVar1=", ChannelIndicesVar(:,1)
-!               WRITE(*,*) "ChannelIndicesVar2=", ChannelIndicesVar(:,2)
-!           end do
-!           Ob % ChanNum = ChannelIndicesVar
-!         end if
-!       end if
-!     end if
-!   else if (varObsSize == size(channels)) then
-!     WRITE(*,*) "varObsSize==size(channels)"
-!     WRITE(*,*) compressVarChannels
-!     if (size(varChannels) > 0) then
-!       do iChannel=1,  NumChannels !varObsSize
-!         WRITE(*,*) "iChannel=", iChannel, size(varChannels)
-!         if (compressVarChannels) then
-!           WRITE(*,*) "here"
-!           do iObs=1, Ob % Header % NumObsLocal
-!             WRITE(*,*) "VarChannels=", varChannels(ChannelIndices(iObs,iChannel))
-!             if (ChannelIndices(iObs,iChannel) /= 0) then
-!               ChannelIndicesVar(iObs,iChannel) = varChannels(ChannelIndices(iObs,iChannel))
-!             end if
-!           end do
-!         end if
-!       end do
-!       Ob % ChanNum = ChannelIndicesVar
-!     else
-!       WRITE(*,*) "Set ChanNum to ChannelIndices"
-!       Ob % ChanNum = ChannelIndices
-!     end if
-!   end if
-!  else
-!    WRITE(*,*) "The basic case"
-!    Ob % ChanNum = ChannelIndices
-!  end if
-!else
-!  WRITE(*,*) "Not FillChanNum"
-!end if
-!!  WRITE(*,*) "#### In if FillChnaNum"
-!!  if (size(varChannels) > 0) then
-!!    if (size(channels) == size(varChannels)) then
-!!      WRITE(*,*) "Number of channels=", NumChannels
-!!      WRITE(*,*) "#varObsSize", varObsSize
-!!      WRITE(*,*) Ob % Header % NumObsLocal
-!!      do iChannel=1,  NumChannels !varObsSize
-!!        WRITE(*,*) "iChannel=", iChannel, size(varChannels)
-!!      !  if ((iChannel > size(varChannels))) then
-!!      !    WRITE(*,*) "in missing", MissingDouble
-!!      !    ChannelIndicesVar(:, iChannel) = MissingDouble
-!!      !    WRITE(*,*) "Going to continue"
-!!      !    continue
-!!      !  end if
-!!        compressVarChannels=.TRUE.
-!!        if (compressVarChannels) then
-!!          do iObs=1, Ob % Header % NumObsLocal
-!!            WRITE(*,*) "VarChannels=", varChannels(ChannelIndices(iObs,iChannel))
-!!            if (ChannelIndices(iObs,iChannel) /= 0) then
-!!              ChannelIndicesVar(iObs,iChannel) = varChannels(ChannelIndices(iObs,iChannel))
-!!            end if
-!!          end do
-!!        else
-!!          ChannelIndicesVar(:, iChannel) = varChannels(iChannel)
-!!        end if
-
-!!          WRITE(*,*) "ChannelIndicesVar1=", ChannelIndicesVar(:,1)
-!!          WRITE(*,*) "ChannelIndicesVar2=", ChannelIndicesVar(:,2)
-
-!!      end do
-!!      Ob % ChanNum = ChannelIndicesVar
-!!    end if
-!!  else
-!!    WRITE(*,*) "Set ChanNum to ChannelIndices"
-!!    Ob % ChanNum = ChannelIndices
-!!  end if
-! ! else
-!  !  Ob % ChanNum = ChannelIndices
-!    !only apply offset to actual channels in list, not missing data
-!   ! where (Ob % ChanNum > 0)
-!   !   Ob % ChanNum = Ob % ChanNum + int(OffsetChans, kind=integer64)
-!   ! end where
-! ! end if
-!!else
-!!  WRITE(*,*) "Not FillChanNum"
-!!end if
-!!WRITE(*,*) Ob % ChanNum
 if (FillNumChans) then
   call Ops_Alloc(Ob % Header % NumChans, "NumChans", Ob % Header % NumObsLocal, Ob % NumChans)
   Ob % NumChans = ChannelCounts
 end if
-WRITE(*,*) "Finished fillchans"
 end subroutine opsinputs_varobswriter_fillchannumandnumchans
 
 ! ------------------------------------------------------------------------------
