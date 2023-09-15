@@ -651,6 +651,7 @@ if __name__ == "__main__":
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
+    output_2d_normal_var_to_netcdf   ('cloudAmount', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
     output_2d_normal_var_to_netcdf   ('emissivity', 'Emiss', 'testinput/017_VarField_mwemiss.nc4', use_chans=True)
     output_1d_normal_var_to_netcdf   ('ozoneTotal', 'MetaData', 'testinput/018_VarField_tcozone.nc4')
     output_1d_normal_var_to_netcdf   ('sensorZenithAngle', 'MetaData', 'testinput/019_VarField_satzenith.nc4')
@@ -667,7 +668,7 @@ if __name__ == "__main__":
     output_2d_normal_var_to_netcdf   ('emissivity', 'OneDVar', 'testinput/057_VarField_emissivity.nc4', use_chans=True)
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
     output_2d_normal_var_to_netcdf   ('radarAzimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
-    output_2d_normal_var_to_netcdf   ('cloudWaterContent', 'OneDVar', 'testinput/068_VarField_clw.nc4', use_levs=True)
+    output_2d_normal_var_to_netcdf   ('liquidWaterContent', 'OneDVar', 'testinput/068_VarField_clw.nc4', use_levs=True)
     output_2d_normal_var_to_netcdf   ('brightnessTemperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
                                                                  'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor',
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
@@ -689,6 +690,24 @@ if __name__ == "__main__":
     # Varobs full output for an obsgroup testing
     # Arguments are: 1D floats, 2D floats, 1D ints, filename
 
+    # ABIClr
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'Emiss/emissivityIR', 'MetaData/ozoneTotal'],
+                                 ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_globalnamelist_abiclr.nc4')
+
+    # AHIClr
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'Emiss/emissivityIR', 'MetaData/ozoneTotal'],
+                                 ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_globalnamelist_ahiclr.nc4')
+
     # ATMS
     output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle'],
@@ -697,6 +716,7 @@ if __name__ == "__main__":
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
                                  'testinput/varobs_globalnamelist_atms.nc4')
+
     # ATOVS
     output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle', 'Emiss/emissivityIR'],
@@ -746,6 +766,13 @@ if __name__ == "__main__":
     copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_ukvnamelist_sonde.nc4')
     copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature', 'testinput/varobs_ukvnamelist_sonde.nc4')
 
+    # SurfaceCloud - UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude'],
+                                 ['ObsValue/cloud_layer', 'DerivedObsValue/cloudAmount', 'DerivedObsError/cloudAmount'],
+                                 [],
+                                 'testinput/varobs_ukvnamelist_surfacecloud.nc4')
+
     # Scatwind
     output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude'],
                                  ['ObsValue/windEastward', 'ObsError/windEastward', 'GrossErrorProbability/windEastward',
@@ -766,6 +793,15 @@ if __name__ == "__main__":
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier', 'MetaData/observationSubTypeNum'],
                                  'testinput/varobs_globalnamelist_iasi.nc4')
+
+    # SEVIRIClr
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'Emiss/emissivityIR', 'MetaData/ozoneTotal'],
+                                 ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_globalnamelist_seviriclr.nc4')
 
     # Aircraft
     output_full_varobs_to_netcdf(['MetaData/latitude',
@@ -802,6 +838,7 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('specific_humidity',          'testinput/005_UpperAirCxField_q.nc4')
     output_2d_geoval_to_netcdf       ('air_pressure',               'testinput/033_UpperAirCxField_p_bar.nc4')
     output_2d_geoval_to_netcdf       ('air_pressure_levels',        'testinput/011_UpperAirCxField_P.nc4')
+    output_2d_geoval_to_netcdf       ('cloud_layer',                'testinput/015_UpperAirCxField_cloud_layer.nc4')
     output_2d_geoval_to_netcdf       ('mass_content_of_cloud_ice_in_atmosphere_layer', 'testinput/029_UpperAirCxField_qcf.nc4')
     output_2d_geoval_to_netcdf       ('mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'testinput/030_UpperAirCxField_qcl.nc4')
     output_2d_geoval_to_netcdf       ('cloud_volume_fraction_in_atmosphere_layer', 'testinput/031_UpperAirCxField_cloud_bulk.nc4')
@@ -812,6 +849,22 @@ if __name__ == "__main__":
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output
+
+    # ABIClr
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_abiclr.nc4')
+
+    # AHIClr
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_ahiclr.nc4')
 
     # AMSR
     output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
@@ -860,7 +913,7 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_ssmis.nc4')
-	
+        
     # MWSFY3
     output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
                               'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
@@ -903,6 +956,16 @@ if __name__ == "__main__":
                               'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_ukvnamelist_sonde.nc4')
 
+    # SurfaceCloud - UKV
+    output_full_cx_to_netcdf(['surface_altitude',
+                              'surface_pressure',
+                              'ice_area_fraction',
+                              'total_cloud_amount'],
+                             ['potential_temperature', 'specific_humidity', 'air_pressure_levels', 'cloud_layer',
+                              'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
+                             'testinput/cx_ukvnamelist_surfacecloud.nc4')
+
     # SatTCWV
     output_full_cx_to_netcdf(['surface_altitude', 'surface_pressure', 'ice_area_fraction', 'total_cloud_amount'],
                              ['potential_temperature', 'specific_humidity', 'air_pressure_levels', 'mass_content_of_cloud_ice_in_atmosphere_layer',
@@ -917,6 +980,14 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_iasi.nc4')
+
+    # SEVIRIClr
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_seviriclr.nc4')
 
     # GroundGPS
     output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',

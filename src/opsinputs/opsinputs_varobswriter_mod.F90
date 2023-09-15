@@ -173,6 +173,7 @@ private
   integer(integer64) :: IC_XLen
   integer(integer64) :: IC_YLen
   integer(integer64) :: IC_PLevels
+  integer(integer64) :: IC_BLevels
   integer(integer64) :: IC_WetLevels
 
   real(real64)       :: RC_LongSpacing
@@ -461,6 +462,9 @@ self % IC_YLen = IntValue
 
 call f_conf % get_or_die("IC_PLevels", IntValue)
 self % IC_PLevels = IntValue
+
+call f_conf % get_or_die("IC_BLevels", IntValue)
+self % IC_BLevels = IntValue
 
 call f_conf % get_or_die("IC_WetLevels", IntValue)
 self % IC_WetLevels = IntValue
@@ -959,6 +963,10 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % AMSUb_Temp, "AMSUb_Temp", Ob % Header % NumObsLocal, Ob % AMSUb_Temp)
     case (VarField_cloud)
+      call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
+        Ob % Header % Cloud, "Cloud", Ob % Header % NumObsLocal, Ob % Cloud, &
+        ObsSpace, self % modlevs, "cloudAmount_", "DerivedObsValue", self % GeoVaLsAreTopToBottom, &
+        "cloudAmount_", "DerivedObsError")
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % Cloud, "Cloud", Ob % Header % NumObsLocal, Ob % Cloud)
     case (VarField_rainrate)
@@ -1034,7 +1042,7 @@ do iVarField = 1, nVarFields
     case (VarField_clw)
       call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
         Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, &
-        ObsSpace, self % modlevs, "lev", "OneDVar/cloudWaterContent", self % GeoVaLsAreTopToBottom)
+        ObsSpace, self % modlevs, "lev", "OneDVar/liquidWaterContent", self % GeoVaLsAreTopToBottom)
     case (VarField_refrac)
       ! TODO(someone): handle this varfield. Note that its PGEs should not be packed.
       ! call Ops_Alloc(Ob % Header % refrac, "refrac", Ob % Header % NumObsLocal, Ob % refrac)
@@ -1531,6 +1539,7 @@ CxHeader % IntC(IC_GPSRO_Operator_press) = self % IC_GPSRO_Operator_press
 CxHeader % IntC(IC_XLen) = self % IC_XLen
 CxHeader % IntC(IC_YLen) = self % IC_Ylen
 CxHeader % IntC(IC_PLevels) = self % IC_PLevels
+CxHeader % IntC(IC_BLevels) = self % IC_BLevels
 CxHeader % IntC(IC_WetLevels) = self % IC_WetLevels
 
 CxHeader % RealC(RC_LongSpacing) = self % RC_LongSpacing

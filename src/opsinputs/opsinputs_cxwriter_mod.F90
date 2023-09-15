@@ -151,6 +151,7 @@ private
   integer(integer64)                     :: IC_XLen
   integer(integer64)                     :: IC_YLen
   integer(integer64)                     :: IC_PLevels
+  integer(integer64)                     :: IC_BLevels
   integer(integer64)                     :: IC_WetLevels
   integer(integer64)                     :: IC_FirstConstantRhoLevel
 
@@ -362,6 +363,9 @@ self % IC_YLen = IntValue
 
 call f_conf % get_or_die("IC_PLevels", IntValue)
 self % IC_PLevels = IntValue
+
+call f_conf % get_or_die("IC_BLevels", IntValue)
+self % IC_BLevels = IntValue
 
 call f_conf % get_or_die("IC_WetLevels", IntValue)
 self % IC_WetLevels = IntValue
@@ -1416,6 +1420,7 @@ UmHeader % IntC = IMDI
 UmHeader % IntC(IC_XLen) = self % IC_XLen
 UmHeader % IntC(IC_YLen) = self % IC_Ylen
 UmHeader % IntC(IC_PLevels) = self % IC_PLevels
+UmHeader % IntC(IC_BLevels) = self % IC_BLevels
 UmHeader % IntC(IC_WetLevels) = self % IC_WetLevels
 UmHeader % IntC(IC_FirstConstantRhoLevel) = self % IC_FirstConstantRhoLevel
 

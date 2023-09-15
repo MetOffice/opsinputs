@@ -17,7 +17,7 @@
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `BiasCorrObsValue/brightnessTemperature` | |
 | 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `OneDVar/skinTemperature` | |
 | 12 | `VarField_gpstzdelay` | `gpstzdelay(:)`| Ground based GNSS Total Zenith Delay | `BiasCorrObsValue/zenithTotalDelay` | |
-| 15 | `VarField_cloud` | | | | Implement |
+| 15 | `VarField_cloud` | `cloud(:,:)` | cloud fraction | `DerivedObsValue/cloudAmount`| |
 | 16 | `VarField_rainrate` | | | | Implement |
 | 17 | `VarField_mwemiss` | `Emissivity(:,:)` | surface emissivity | `Emiss/emissivity` |  |
 | 18 | `VarField_tcozone` | `TCozone(:)` | total column ozone (Du) | `MetaData/ozoneTotal` |  |
@@ -61,7 +61,7 @@
 | 65 | `VarField_RadarObRange` | | | | Implement |
 | 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `MetaData/radarAzimuth` | |
 | 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | `MetaData/stationElevation` | |
-| 68 | `VarField_clw` | | | | Implement |
+| 68 | `VarField_clw` | CLW(:,:) | retrieved clw from 1Dvar | OneDVar/liquidWaterContent | |
 | 69 | `VarField_RadIdent` | | | | Implement Implement |
 | 70 | `VarField_Reflectivity` | | | | Implement |
 | 71 | `VarField_BendingAngle` | `BendingAngle(:,:)` or `BendingAngleAll(:,:)` | GPSRO bending angle (L1, L2, LC etc or just LC) | `ObsValue/bendingAngle` | Decide if a separate variable corresponding to BendingAngleAll is needed |
