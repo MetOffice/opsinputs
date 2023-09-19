@@ -61,7 +61,7 @@
 | 65 | `VarField_RadarObRange` | | | | Implement |
 | 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `MetaData/radarAzimuth` | |
 | 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | `MetaData/stationElevation` | |
-| 68 | `VarField_clw` | | | | Implement |
+| 68 | `VarField_clw` | CLW(:,:) | retrieved clw from 1Dvar | OneDVar/liquidWaterContent | |
 | 69 | `VarField_RadIdent` | | | | Implement Implement |
 | 70 | `VarField_Reflectivity` | | | | Implement |
 | 71 | `VarField_BendingAngle` | `BendingAngle(:,:)` or `BendingAngleAll(:,:)` | GPSRO bending angle (L1, L2, LC etc or just LC) | `ObsValue/bendingAngle` | Decide if a separate variable corresponding to BendingAngleAll is needed |
