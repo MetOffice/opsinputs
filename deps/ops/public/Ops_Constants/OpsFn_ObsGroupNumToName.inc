@@ -107,6 +107,8 @@ SELECT CASE (ObsGroup)
     OpsFn_ObsGroupNumToName = "SBUV"
   CASE (ObsGroupScatwind)
     OpsFn_ObsGroupNumToName = "Scatwind"
+  CASE (ObsGroupScatwindChosen)
+    OpsFn_ObsGroupNumToName = "ScatwindChosen"
   CASE (ObsGroupSeaIce)
     OpsFn_ObsGroupNumToName = "SeaIce"
   CASE (ObsGroupOceanColour)

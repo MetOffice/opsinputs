@@ -112,6 +112,7 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupSurface,           &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
+    ObsGroupScatwindChosen,    &
     ObsGroupSonde
 use OpsMod_ObsInfo, only: &
     FinalRejectFlag,      &

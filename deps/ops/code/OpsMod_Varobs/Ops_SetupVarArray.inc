@@ -56,6 +56,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupGPSRO,             &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
+    ObsGroupScatwindChosen,    &
     ObsGroupSurface
 
 USE OpsMod_ObsInfo, ONLY: &
@@ -253,7 +254,8 @@ DO Ivar = 1, NumValidVarFields
       END IF
     CASE (VarField_u)
       IF (Ob % header % ObsGroup == ObsGroupSurface .OR. &
-          Ob % header % ObsGroup == ObsGroupScatwind) THEN
+          Ob % header % ObsGroup == ObsGroupScatwind .OR. &
+          Ob % header % ObsGroup == ObsGroupScatwindChosen) THEN
         ObHdrVrbl = Ob % header % u10
         ObVrblSingle => Ob % u10(:)
         Pge_1D => Pge % u10
@@ -264,7 +266,8 @@ DO Ivar = 1, NumValidVarFields
       END IF
     CASE (VarField_v)
       IF (Ob % header % ObsGroup == ObsGroupSurface .OR. &
-          Ob % header % ObsGroup == ObsGroupScatwind) THEN
+          Ob % header % ObsGroup == ObsGroupScatwind .OR. &
+          Ob % header % ObsGroup == ObsGroupScatwindChosen) THEN
         ObHdrVrbl = Ob % header % v10
         ObVrblSingle => Ob % v10(:)
         Pge_1D => Pge % u10
