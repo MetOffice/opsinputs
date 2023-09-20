@@ -12,7 +12,7 @@ IMPLICIT NONE
 INTEGER, INTENT(IN)         :: ObsGroup
 
 ! Function result:
-CHARACTER(len=12)           :: OpsFn_ObsGroupNumToName
+CHARACTER(len=16)           :: OpsFn_ObsGroupNumToName
 
 SELECT CASE (ObsGroup)
   CASE (ObsGroupABIClr)

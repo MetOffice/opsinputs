@@ -124,12 +124,18 @@ ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Surface
 ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Sonde
                 YAML     004_VarField_u_Sonde.yaml
                 DATA     004_VarField_u_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_ScatwindChosen
+                YAML     004_VarField_u_ScatwindChosen.yaml
+                DATA     004_VarField_u_ScatwindChosen.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Surface
                 YAML     005_VarField_v_Surface.yaml
                 DATA     005_VarField_v_Surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Sonde
                 YAML     005_VarField_v_Sonde.yaml
                 DATA     005_VarField_v_Sonde.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_ScatwindChosen
+                YAML     005_VarField_v_ScatwindChosen.yaml
+                DATA     005_VarField_v_ScatwindChosen.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_007_VarField_tcwv
                 YAML     007_VarField_tcwv.yaml
                 DATA     007_VarField_tcwv.nc4)
