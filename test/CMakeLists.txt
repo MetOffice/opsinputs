@@ -628,6 +628,9 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_surface
                 YAML     cxwriter_globalnamelist_surface.yaml
                 NAMELIST ../../etc/global/cx/Surface.nl
                 DATA     cx_globalnamelist_surface.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_scatwind
+                YAML     cxwriter_globalnamelist_scatwind.yaml
+                DATA     cx_globalnamelist_scatwind.nc4 dummy.nc4)
 
 # Tests the ukv namelist files in the etc directory
 

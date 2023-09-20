@@ -1021,5 +1021,14 @@ if __name__ == "__main__":
                               'eastward_wind', 'northward_wind'],
                              'testinput/cx_globalnamelist_surface.nc4')
 
+    # Scatwind
+    output_full_cx_to_netcdf(['friction_velocity_over_water', 'ice_area_fraction', 'obukhov_length', 'relative_humidity_2m', 'skin_temperature',
+                              'surface_altitude', 'surface_pressure', 'surface_pressure_at_mean_sea_level', 'surface_temperature',
+                              'uwind_at_10m', 'vwind_at_10m'],
+                             ['air_pressure_levels', 'cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
+                              'liquid_cloud_volume_fraction_in_atmosphere_layer', 'mass_content_of_cloud_ice_in_atmosphere_layer', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+                              'specific_humidity', 'potential_temperature', 'eastward_wind', 'northward_wind'],
+                             'testinput/cx_globalnamelist_scatwind.nc4')
+
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
