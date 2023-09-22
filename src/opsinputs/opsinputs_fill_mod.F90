@@ -1341,13 +1341,14 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultiLevelObs) then
         Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real1, &
         GeoVals, JediVarName, JediToOpsLayoutMapping)
 else
-  if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-    ! Retrieve GeoVal
-    call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-    if (GeoVal % nval /= 1) then
-      write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
-        &Only the first of these values will be written to the VarObs file")') JediVarName
-      call gen_warn(RoutineName, ErrorMessage)
+    ! Try to retrieve GeoVal
+    call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal, must_be_found = .false.)
+    if (associated(GeoVal)) then
+      if (GeoVal % nval /= 1) then
+        write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
+          &Only the first of these values will be written to the VarObs file")') JediVarName
+        call gen_warn(RoutineName, ErrorMessage)
+      end if
     end if
 
     ! Fill the OPS data structures
@@ -1355,7 +1356,6 @@ else
     where (GeoVal % vals(1,:) /= MissingReal)
       Real1 = GeoVal % vals(1,:)
     end where
-  end if
 end if
 end subroutine opsinputs_fill_fillrealfromgeoval
 
@@ -1404,10 +1404,9 @@ real(kind_real)                                 :: MissingReal
 
 MissingReal = missing_value(0.0_c_float)
 
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
-
+! Try to retrieve GeoVal
+call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal, must_be_found = .false.)
+if (associated(GeoVal)) then
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, num_levels = int(GeoVal % nval, kind = 8))
   where (transpose(GeoVal % vals) /= MissingReal)
@@ -1518,9 +1517,9 @@ integer                                         :: iObs, iJediObs
 
 MissingReal = missing_value(0.0_c_float)
 
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+! Try to retrieve GeoVal
+call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal, must_be_found = .false.)
+if (associated(GeoVal)) then
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real1)
   ! Loop over each multi-level profile
@@ -1583,9 +1582,9 @@ integer                                         :: iObs, iLevel, iJediObs, numLe
 
 MissingReal = missing_value(0.0_c_float)
 
-if (ufo_vars_getindex(GeoVals % variables, JediVarName) > 0) then
-  ! Retrieve GeoVal
-  call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal)
+! Try to retrieve GeoVal
+call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal, must_be_found = .false.)
+if (associated(GeoVal)) then
   ! Determine the number of levels in this GeoVaL. This governs the number of levels in the
   ! output array.
   numLevels = GeoVal % nval
