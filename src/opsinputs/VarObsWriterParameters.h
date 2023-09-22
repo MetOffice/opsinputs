@@ -85,16 +85,13 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
 
-  /// oops::Parameter<std::string> jopaChannels{"jopaChannels", "", this};
-
-  /// oops::Parameter<std::vector<int>> varChannels{"varChannels", {}, this};
+  /// List of channels which are expected for Var.
   oops::Parameter<std::string> varChannels{"varChannels", "", this};
-  /// oops::RequiredParameter<std::string> chanlist{"cost channels list", this};
 
   /// Compress the var channels
   oops::Parameter<bool> compressVarChannels{"compress_var_channels", false, this};
 
-  /// Compress the var channels
+  /// Increase the channel array size to the same size as the varobs array
   oops::Parameter<bool> increaseChanArray{"increase_chan_array", false, this};
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags

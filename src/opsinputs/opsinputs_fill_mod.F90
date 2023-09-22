@@ -1065,10 +1065,9 @@ integer                        :: offsetsize
 
 !compressVarChannels=.TRUE.
 ! Body:
-WRITE(*,*) "opsinputs_fill_mod - no records"
+
 MissingDouble = missing_value(0.0_c_double)
 
-WRITE(*,*) "JediVarName=", JediVarName, "Channels", Channels
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
 !take into account offsetting of 2nd dimension if required
@@ -1076,46 +1075,32 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 !e.g. HIRS in ATOVS stream
 
 numchans = size(JediVarNamesWithChannels)
-WRITE(*,*) "numchans=", numchans
 
-WRITE(*,*) "numchans=", numchans
 if (present(sizeVarObs) )then
   if (sizeVarObs > 0) then
     numchans = sizeVarObs
   end if
 end if
-WRITE(*,*) "numchans=", numchans
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI
-   ! if (iChannel <= size(JediVarNamesWithChannels)) then
-   !   WRITE(*,*) "JediVarNamesWithChannels(iChannel)=", JediVarNamesWithChannels(iChannel)
       call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
-   ! end if
-
 
     if (present(varChannels)) then
       if (size(varChannels) > 0) then
-        WRITE(*,*) "here"
         if (iChannel <= size(varChannels)) then
           if (compressVarChannels) then
             offsetsize = abs(varChannels(1) - channels(1))
-            write(*,*) "offsetsize=", offsetsize
-            WRITE(*,*) "REAL2 with offsetsize"
             where (VarValue /= MissingDouble)
               Real2(:, iChannel+offsetsize) = VarValue
             end where
-
           else
-            WRITE(*,*) "here1"
             where (VarValue /= MissingDouble)
               Real2(:, varChannels(iChannel)) = VarValue
             end where
-            WRITE(*,*) "shape of real2", shape(Real2)
           end if
         end if
       end if
@@ -1123,18 +1108,15 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
       if ((present(sizeVarObs)) .and. (sizeVarObs > size(channels))) then
         if (compressVarChannels) then
           offsetsize = sizeVarObs - size(channels)
-         ! WRITE(*,*) "REAL2 with offsetsize"
           where (VarValue /= MissingDouble)
             Real2(:, iChannel) = VarValue
           end where
         else
-          WRITE(*,*) "In noncompressed larger size"
           where (VarValue /= MissingDouble)
             Real2(:, Channels(iChannel)) = VarValue
           end where
         end if
       else
-        WRITE(*,*) "real2 novar"
         where (VarValue /= MissingDouble)
           Real2(:, iChannel) = VarValue
         end where
@@ -1142,7 +1124,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
     end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
-WRITE(*,*) "Finished opsinputs_fill_fillreal2d_norecord"
+
 end subroutine opsinputs_fill_fillreal2d_norecords
 
 ! ------------------------------------------------------------------------------
@@ -1289,13 +1271,10 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
   if (size(varChannels) > 0) then
-    WRITE(*,*) "opsinputs_fill_mod - varchannel option"
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
       JediVarName, JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
   else
-    WRITE(*,*) "##In no VarChannels"
-    WRITE(*,*) "sizeVarObs", sizeVarObs
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
       JediVarName, JediVarGroup, compressVarChannels, sizeVarObs)
@@ -1758,7 +1737,6 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
 
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, String1)
-  WRITE(*,*) "loop nubmers", JediToOpsLayoutMapping % NumOpsObs
   do i = 1, JediToOpsLayoutMapping % NumOpsObs
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
@@ -1767,7 +1745,6 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
                                 JediToOpsLayoutMapping % RecordStarts(i)))
       end if
     else
-      WRITE(*,*) "VarValue(i)=", VarValue(i), i
       String1(i) = VarValue(i)
     end if
   end do
@@ -2326,15 +2303,8 @@ integer                                        :: ichan
 
 !character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
 
-write(*,*) max_varname_with_channel_length
-
-WRITE(*,*) "opsinputs_fill_mod - opsinputs_fill_varnames_with_channels"
-WRITE(*,*) size(Channels), VarName
 
 
-!allocate(VarNames(max(size(Channels), 1)))
-!deallocate(VarNames)
-!allocate(VarNames(max(size(Channels), 1)))
 !if (Varname=="emissivity") then
 !  do ichan = 1, size(Channels)
 !    write(*,*) "here"
@@ -2348,17 +2318,13 @@ WRITE(*,*) size(Channels), VarName
   if (size(Channels) == 0) then
     VarNames(1) = VarName
   else
-    write(*,*) "start loop"
     do ichan = 1, size(Channels)
 
-      WRITE(*,*) VarName, Channels(ichan)
-      WRITE(*,*) size(VarNames)
       write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-      WRITE(*,*) "In loop", VarNames(ichan)
     end do
   end if
 !end if
-WRITE(*,*) "opsinputs_fill_mod - opsinputs_fill_varnames_with_channels finished"
+
 end function opsinputs_fill_varnames_with_channels
 
 

@@ -24,7 +24,6 @@ observations:
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
       general_mode: debug
-    #  output_directory: /data/users/olewis/
     - filter: VarObs Checker
       expected_main_table_columns:
         # Only levels 1 and 3 are simulated and hence written to the VarObs file.
@@ -60,7 +59,6 @@ observations:
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-
 #
 # Now we test effect of actual channel
 #
@@ -89,10 +87,8 @@ observations:
       flags_to_reset: [10, 15]  # missing, Hfailed
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
-   #   output_directory: /data/users/olewis/
       general_mode: debug
       size_of_varobs_array: 3
-   #   use_actual_channels: true
       compress_var_channels: false
     - filter: VarObs Checker
       expected_main_table_columns:
@@ -128,11 +124,8 @@ observations:
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
-
-
-
 #
-# Now we test effect of actual channel
+# Now we test effect varChannels and compress var channels
 #
   - obs space:
       name: AMSUB
@@ -170,8 +163,6 @@ observations:
       compress_var_channels: true
       size_of_varobs_array: 3
       varChannels: 2, 4 #[5,7]
- #     output_directory: /home/h01/olewis
- #     output_directory: /data/users/olewis/
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
@@ -209,7 +200,7 @@ observations:
 
 
 #
-# Now we test effect of actual channel
+# Now we test effect of var channels
 #
   - obs space:
       name: AMSUB
@@ -247,8 +238,6 @@ observations:
       compress_var_channels: false
       size_of_varobs_array: 4
       varChannels: 2, 4 #[5,7]
- #     output_directory: /home/h01/olewis
- #     output_directory: /data/users/olewis/
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
@@ -286,7 +275,7 @@ observations:
 
 
 #
-# Now we test effect of actual channel
+# Now we test effect of varchannels, compress var cahnnels and increase channel array size.
 #
   - obs space:
       name: AMSUB
@@ -325,8 +314,6 @@ observations:
       size_of_varobs_array: 4
       varChannels: 2, 4 #[5,7]
       increase_chan_array: true
- #     output_directory: /home/h01/olewis
- #     output_directory: /data/users/olewis/
     - filter: VarObs Checker
       expected_main_table_columns:
         # In the arrays below, rows denote locations and columns levels.
