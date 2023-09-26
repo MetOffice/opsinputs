@@ -186,12 +186,11 @@ private
   integer(integer64) :: VarobsLength
 
   integer(c_int), allocatable :: channels(:)
- ! integer(c_int), allocatable :: jopaChannels(:)
   integer(c_int), allocatable :: varChannels(:)
   integer(integer64) :: size_of_varobs_array
   integer(integer64) :: NumVarChannels
 
-  logical ::compressVarChannels
+  logical :: compressVarChannels
   logical :: increaseChanArray
   
   !this stores the atmospheric levels we wish to pass to varobs
@@ -1161,7 +1160,6 @@ do iVarField = 1, nVarFields
   end select
 
   if (FillChanNum .or. FillNumChans) then
-
     call opsinputs_varobswriter_fillchannumandnumchans(  &
       Ob, ObsSpace, self % channels, self % varChannels, Flags, FillChanNum, &
       FillNumChans, self % compressVarChannels, self % size_of_varobs_array, &
@@ -1222,33 +1220,51 @@ integer(c_int), intent(in)     :: channels(:)
 integer(c_int), intent(in)     :: varChannels(:)
 type(c_ptr), value, intent(in) :: Flags
 logical, intent(in)            :: FillChanNum, FillNumChans
-logical                     :: compressVarChannels
+logical, optional, intent(in)  :: compressVarChannels
 integer(integer64), optional, intent(in) :: varObsSize
 logical, optional, intent(in)  :: increaseChanArray
 
 
 ! Local declarations:
-integer(integer64)             :: NumChannels
-integer(integer64), allocatable            :: ChannelIndicesVar(:,:)
-integer(integer64)             :: ChannelIndices(Ob % Header % NumObsLocal, size(channels))
-integer(integer64)             :: ChannelCounts(Ob % Header % NumObsLocal)
-integer                        :: iChannel
-integer                        :: iObs
-real(kind=c_double)                             :: MissingDouble
-integer(integer64)             ::array_loop
-
-integer                        :: offsetsize
+integer(integer64)              :: NumChannels
+integer(integer64), allocatable :: ChannelIndicesVar(:,:)
+integer(integer64)              :: ChannelIndices(Ob % Header % NumObsLocal, size(channels))
+integer(integer64)              :: ChannelCounts(Ob % Header % NumObsLocal)
+integer                         :: iChannel
+integer                         :: iObs
+real(kind=c_double)             :: MissingDouble
+integer(integer64)              :: array_loop
+integer                         :: offsetsize
+logical                         :: compressChannels
+integer(integer64)              :: varObsSize_loc
+logical                         :: increaseChanArray_loc
 
 ! Body:
+
+compressChannels = .false.
+if present(compressVarChannels) then
+  compressChannels = compressVarChannels
+end if
+
+varObsSize_loc = 0
+if present(varObsSize) then
+  varObsSize_loc = varObsSize
+end if
+
+increaseChanArray_loc = .false.
+if present(increaseChanArray) then
+  increaseChanArray_loc = increaseChanArray
+end if
+
 
 MissingDouble = missing_value(0.0_c_double)
 
 NumChannels = size(channels)
 if (NumChannels == 0) return
 
-if (increaseChanArray) then
-  NumChannels = varObsSize
-  allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, varObsSize))
+if (increaseChanArray_loc) then
+  NumChannels = varObsSize_loc
+  allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, varObsSize_loc))
 else
   allocate(ChannelIndicesVar(Ob % Header % NumObsLocal, size(varChannels)))
 end if
@@ -1261,10 +1277,10 @@ ChannelIndicesVar(:,:) = 0
 if (FillChanNum) then
   call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                  num_levels = NumChannels)
-  if ((varObsSize /= 0)) then
-    if (varObsSize > size(channels)) then
+  if ((varObsSize_loc /= 0)) then
+    if (varObsSize_loc > size(channels)) then
       if (size(varChannels) > 0 .and. (size(channels) == size(varChannels))) then
-        if (compressVarChannels) then
+        if (compressChannels) then
           offsetsize = abs(varChannels(1) - channels(1))
           Ob % ChanNum = ChannelIndices
           where (Ob % ChanNum > 0)
@@ -1281,7 +1297,7 @@ if (FillChanNum) then
           Ob % ChanNum = ChannelIndicesVar
         end if
       else
-        if (compressVarChannels) then
+        if (compressChannels) then
           Ob % ChanNum = ChannelIndices
         else
           do iChannel=1, size(Channels)
@@ -1290,10 +1306,10 @@ if (FillChanNum) then
           Ob % ChanNum = ChannelIndices
         end if
       end if
-    else if (varObsSize == size(channels)) then
+    else if (varObsSize_loc == size(channels)) then
       if (size(varChannels) > 0) then
-        do iChannel=1,  NumChannels !varObsSize
-          if (compressVarChannels) then
+        do iChannel=1,  NumChannels
+          if (compressChannels) then
             do iObs=1, Ob % Header % NumObsLocal
               if (ChannelIndices(iObs,iChannel) /= 0) then
                 ChannelIndicesVar(iObs,iChannel) = varChannels(ChannelIndices(iObs,iChannel))

@@ -35,8 +35,7 @@ use opsinputs_jeditoopslayoutmapping_mod, only: &
     opsinputs_jeditoopslayoutmapping
 use opsinputs_utils_mod, only: &
     max_varname_with_channel_length, &
-    opsinputs_channeloffset, &
-    opsinputs_varchannels
+    opsinputs_channeloffset
 
 use GenMod_Core, only: &
     gen_warn,          &
@@ -1056,16 +1055,21 @@ integer(c_int), optional, intent(in)                :: varChannels(:)
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
 real(kind=c_double)                             :: MissingDouble
-character(len=200)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=max_varname_with_channel_lengt)   :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
-integer                        :: offsetsize
+integer                                         :: offsetsize
+logical                                         :: compressChannels
 
-!compressVarChannels=.TRUE.
 ! Body:
 
 MissingDouble = missing_value(0.0_c_double)
+
+compressChannels = .false.
+if present(compressVarChannels) then
+  compressChannels = compressVarChannels
+end if
 
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
 
@@ -1086,12 +1090,17 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
-      call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+
+    ! if VAR channels have been assigned then jopa channels will be mapped to these var channels
+    ! Set up the size of the array, if channels are being pushed together an offset between
+    ! the var and jopa channel numbers is added onto the size of the array.
+    ! If not compressed the positions in the array are based on the actual channel number.
 
     if (present(varChannels)) then
       if (size(varChannels) > 0) then
         if (iChannel <= size(varChannels)) then
-          if (compressVarChannels) then
+          if (compressChannels) then
             offsetsize = abs(varChannels(1) - channels(1))
             where (VarValue /= MissingDouble)
               Real2(:, iChannel+offsetsize) = VarValue
@@ -1104,21 +1113,23 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         end if
       end if
     else
-      if ((present(sizeVarObs)) .and. (sizeVarObs > size(channels))) then
-        if (compressVarChannels) then
-          offsetsize = sizeVarObs - size(channels)
+      if ((present(sizeVarObs)) then
+        if (sizeVarObs > size(channels))) then
+          if (compressChannels) then
+            offsetsize = sizeVarObs - size(channels)
+            where (VarValue /= MissingDouble)
+              Real2(:, iChannel) = VarValue
+            end where
+          else
+            where (VarValue /= MissingDouble)
+              Real2(:, Channels(iChannel)) = VarValue
+            end where
+          end if
+        else
           where (VarValue /= MissingDouble)
             Real2(:, iChannel) = VarValue
           end where
-        else
-          where (VarValue /= MissingDouble)
-            Real2(:, Channels(iChannel)) = VarValue
-          end where
-        end if
-      else
-        where (VarValue /= MissingDouble)
-          Real2(:, iChannel) = VarValue
-        end where
+        end if ! the end
       end if
     end if
   end do
@@ -1262,21 +1273,35 @@ logical, optional, intent(in)                       :: compressVarChannels
 integer(integer64), optional, intent(in)            :: sizeVarObs
 integer(c_int), optional, intent(in)                :: varChannels(:)
 
-
+! local variables
+logical               :: compressChannels
+integer(integer64)    :: sizeVarObs_local
 
 ! Body:
+
+compressChannels = .false.
+if present(compressVarChannels) then
+  compressChannels = compressVarChannels
+end if
+
+sizeVarobs_local = 0
+if present(sizeVarObs) then
+  sizeVarObs_local = sizeVarObs
+end if
+
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
-  if (size(varChannels) > 0) then
-    call opsinputs_fill_fillreal2d_norecords( &
-      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
+  if (present(varChannels)) then
+    if (size(varChannels) > 0) then
+      call opsinputs_fill_fillreal2d_norecords( &
+        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+        JediVarName, JediVarGroup, compressChannels, sizeVarObs_lcoal, varChannels)
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, compressVarChannels, sizeVarObs)
+      JediVarName, JediVarGroup, compressChannels, sizeVarObs_local)
   end if
 end if
 
@@ -1872,8 +1897,7 @@ type(datetime), intent(in)                      :: ReferenceTime
 ! Local declarations:
 integer(c_int64_t)                              :: VarValue(NumObs)
 real(kind=c_double)                             :: MissingDouble
-!character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
-character(len=200)  :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
 
 ! Body:

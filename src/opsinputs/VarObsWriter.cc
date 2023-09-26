@@ -72,6 +72,7 @@ VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
   // Avoid passing a null pointer to Fortran.
   const int *channelsData = channels.empty() ? &fallbackChannels : channels.data();
 
+  // Want to also set up an ordered list of channels numbered for VAR.
   std::set<int> varchanset = oops::parseIntSet(parameters_.varChannels.value());
   varchannels_.assign(varchanset.begin(), varchanset.end());
   conf.set("varChannels", varchannels_);
