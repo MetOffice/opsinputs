@@ -1067,7 +1067,7 @@ logical                                         :: compressChannels
 MissingDouble = missing_value(0.0_c_double)
 
 compressChannels = .false.
-if present(compressVarChannels) then
+if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
 
