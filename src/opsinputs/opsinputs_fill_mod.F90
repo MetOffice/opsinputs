@@ -1055,7 +1055,7 @@ integer(c_int), optional, intent(in)                :: varChannels(:)
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
 real(kind=c_double)                             :: MissingDouble
-character(len=max_varname_with_channel_lengt)   :: JediVarNamesWithChannels(max(size(Channels), 1))
+character(len=max_varname_with_channel_length)  :: JediVarNamesWithChannels(max(size(Channels), 1))
 integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
