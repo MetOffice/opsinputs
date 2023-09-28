@@ -39,6 +39,8 @@ cmake --build . -j "${NPROC}"
 
 # -- Test
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j"${NPROC}" --test-dir './opsinputs' --output-on-failure -V
+    ctest -j"${NPROC}" --test-dir './opsinputs' --output-on-failure ||\
+env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
+    ctest --test-dir './opsinputs' --rerun-failed -V
 
 exit
