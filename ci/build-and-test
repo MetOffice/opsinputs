@@ -24,15 +24,23 @@ trap finally EXIT
 
 cd "${WORKD}"
 
-rm -f "${HERE}/bundle"
-ln -s '..' "${HERE}/bundle"
+GENERATOR=Unix\ Makefiles
+if command -v ninja; then GENERATOR=Ninja; fi
 
-# -- Configure & Build
-cmake -B . -S "${HERE}" -DCMAKE_BUILD_TYPE=Debug -DMPI_ARGS="--oversubscribe"
-cmake --build . -j "${NPROC}"
+# -- Configure
+(   set -x;
+    cmake -B . -S "${HERE}" -G "$GENERATOR" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DMPI_ARGS="--oversubscribe"
+
+
+# -- Build
+    cmake --build . -j "${NPROC}"
+
 
 # -- Test
-env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j "$NPROC" --output-on-failure --test-dir './opsinputs'
+    env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
+    ctest -j "$NPROC" --test-dir './opsinputs' --output-on-failure
+)
 
 exit
