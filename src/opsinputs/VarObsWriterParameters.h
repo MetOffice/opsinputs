@@ -89,7 +89,7 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   oops::Parameter<std::string> varChannels{"varChannels", "", this};
 
   /// Compress the var channels
-  oops::Parameter<bool> compressVarChannels{"compress_var_channels", false, this};
+  oops::Parameter<bool> compressVarChannels{"compress_var_channels", true, this};
 
   /// Increase the channel array size to the same size as the varobs array
   oops::Parameter<bool> increaseChanArray{"increase_chan_array", false, this};

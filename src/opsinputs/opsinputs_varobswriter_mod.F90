@@ -1241,7 +1241,7 @@ logical                         :: increaseChanArray_loc
 
 ! Body:
 
-compressChannels = .false.
+compressChannels = .true.
 if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if

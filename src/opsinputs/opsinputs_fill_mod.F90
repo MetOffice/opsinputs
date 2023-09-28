@@ -1066,7 +1066,7 @@ logical                                         :: compressChannels
 
 MissingDouble = missing_value(0.0_c_double)
 
-compressChannels = .false.
+compressChannels = .true.
 if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
@@ -1280,7 +1280,7 @@ integer(c_int), allocatable :: localvarChannels(:)
 
 ! Body:
 
-compressChannels = .false.
+compressChannels = .true.
 if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if

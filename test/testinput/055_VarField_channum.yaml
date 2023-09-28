@@ -91,7 +91,6 @@ observations:
     - filter: VarObs Writer
       namelist_directory: testinput/VarObsWriterNamelists_055_VarField_channum
       general_mode: debug
-      compress_var_channels: true
       size_of_varobs_array: 2
       varChannels: 16, 17
     - filter: VarObs Checker

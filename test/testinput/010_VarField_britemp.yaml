@@ -156,7 +156,6 @@ observations:
           channels: 1,3
       namelist_directory: testinput/VarObsWriterNamelists_010_VarField_britemp
       general_mode: debug
-      compress_var_channels: true
       size_of_varobs_array: 3
       varChannels: 2, 4 #[5,7]
     - filter: VarObs Checker
