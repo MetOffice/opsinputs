@@ -1079,7 +1079,7 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 
 numchans = size(JediVarNamesWithChannels)
 
-if (present(sizeVarObs) )then
+if (present(sizeVarObs)) then
   if (sizeVarObs > 0) then
     numchans = sizeVarObs
   end if
@@ -1113,8 +1113,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         end if
       end if
     else
-      if ((present(sizeVarObs)) then
-        if (sizeVarObs > size(channels))) then
+      if (present(sizeVarObs)) then
+        if (sizeVarObs > size(channels)) then
           if (compressChannels) then
             offsetsize = sizeVarObs - size(channels)
             where (VarValue /= MissingDouble)
@@ -1276,16 +1276,22 @@ integer(c_int), optional, intent(in)                :: varChannels(:)
 ! local variables
 logical               :: compressChannels
 integer(integer64)    :: sizeVarObs_local
+integer(c_int), allocatable :: localvarChannels(:)
 
 ! Body:
 
 compressChannels = .false.
-if present(compressVarChannels) then
+if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
 
+if (present(varChannels)) then
+  allocate(localvarChannels(size(varChannels)))
+  localvarChannels = varChannels
+end if
+
 sizeVarobs_local = 0
-if present(sizeVarObs) then
+if (present(sizeVarObs)) then
   sizeVarObs_local = sizeVarObs
 end if
 
@@ -1293,11 +1299,10 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillreal2d_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, VarobsLength, JediVarName, JediVarGroup)
 else
-  if (present(varChannels)) then
-    if (size(varChannels) > 0) then
-      call opsinputs_fill_fillreal2d_norecords( &
-        Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-        JediVarName, JediVarGroup, compressChannels, sizeVarObs_lcoal, varChannels)
+  if (allocated(localvarChannels)) then
+    call opsinputs_fill_fillreal2d_norecords( &
+      Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
+      JediVarName, JediVarGroup, compressChannels, sizeVarObs_local, varChannels)
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &

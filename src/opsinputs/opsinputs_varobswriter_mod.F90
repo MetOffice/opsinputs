@@ -1242,17 +1242,17 @@ logical                         :: increaseChanArray_loc
 ! Body:
 
 compressChannels = .false.
-if present(compressVarChannels) then
+if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
 
 varObsSize_loc = 0
-if present(varObsSize) then
+if (present(varObsSize)) then
   varObsSize_loc = varObsSize
 end if
 
 increaseChanArray_loc = .false.
-if present(increaseChanArray) then
+if (present(increaseChanArray)) then
   increaseChanArray_loc = increaseChanArray
 end if
 
