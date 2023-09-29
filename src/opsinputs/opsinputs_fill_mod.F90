@@ -2345,8 +2345,6 @@ character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channel
 if (Varname=="emissivity") then
   do ichan = 1, size(Channels)
     write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-    write(*,'(A,"_",I0)') VarName, Channels(ichan)
-    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
   VarNames = VarNames_emis
 else
