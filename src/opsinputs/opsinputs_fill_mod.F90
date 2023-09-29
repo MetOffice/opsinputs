@@ -1135,10 +1135,13 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
               Real2(:, Channels(iChannel)) = VarValue
             end where
           end if
+<<<<<<< HEAD
 	else
 	  where (VarValue /= MissingDouble)
             Real2(:, iChannel) = VarValue
           end where
+=======
+>>>>>>> f3f53ea0ba0b487e89e4fc31b6683f5f57e421ab
 	end if
       else
         where (VarValue /= MissingDouble)
