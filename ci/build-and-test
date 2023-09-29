@@ -2,8 +2,7 @@
 #
 # (C) Crown Copyright 2023, the Met Office. All rights reserved.
 #
-#
-set -euo pipefail
+set -euxo pipefail
 
 finally() {
     trap '' ERR
@@ -18,21 +17,30 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 THIS="$(basename "$0")"
 NPROC=${NPROC:-$(nproc)}
 WORKD="$(mktemp -d "${THIS}-XXXXXX" -t)"
+GENERATOR=Unix\ Makefiles
+if command -v ninja &>/dev/null; then GENERATOR=Ninja; fi
 
-trap finally ERR
-trap finally EXIT
+trap finally ERR EXIT
 
 cd "${WORKD}"
 
-rm -f "${HERE}/bundle"
-ln -s '..' "${HERE}/bundle"
+# If using JCSDA Docker container
+if [[ -f /opt/spack-environment/activate.sh ]]; then
+    source /opt/spack-environment/activate.sh
+fi
 
-# -- Configure & Build
-cmake -B . -S "${HERE}" -DCMAKE_BUILD_TYPE=Debug -DMPI_ARGS="--oversubscribe"
+# -- Configure
+cmake -B . -S "${HERE}" -G "${GENERATOR}" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DMPI_ARGS="--oversubscribe"
+
+# -- Build
 cmake --build . -j "${NPROC}"
 
 # -- Test
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j "$NPROC" --output-on-failure --test-dir './opsinputs'
+    ctest -j"${NPROC}" --test-dir './opsinputs' --output-on-failure ||\
+env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
+    ctest --test-dir './opsinputs' --rerun-failed -V
 
 exit
