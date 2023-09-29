@@ -13,12 +13,15 @@ finally() {
     fi
 }
 
+# HERE is /usr/local/src/<REPONAME>/pr-<#> (cf ../.github/workflow/ci.yml)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 THIS="$(basename "$0")"
 NPROC=${NPROC:-$(nproc)}
 WORKD="$(mktemp -d "${THIS}-XXXXXX" -t)"
 GENERATOR=Unix\ Makefiles
 if command -v ninja &>/dev/null; then GENERATOR=Ninja; fi
+BASE="${HERE%/*}"
+TESTDIR="${BASE##*/}"
 
 trap finally ERR EXIT
 
@@ -39,8 +42,8 @@ cmake --build . -j "${NPROC}"
 
 # -- Test
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j"${NPROC}" --test-dir './opsinputs' --output-on-failure ||\
+    ctest -j"${NPROC}" --test-dir "${TESTDIR}" || \
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest --test-dir './opsinputs' --rerun-failed -V
+    ctest --test-dir "${TESTDIR}" --rerun-failed -V
 
 exit
