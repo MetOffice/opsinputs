@@ -1066,7 +1066,7 @@ logical                                         :: compressChannels
 
 MissingDouble = missing_value(0.0_c_double)
 
-compressChannels = .false.
+compressChannels = .true.
 if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
@@ -1111,6 +1111,16 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
             end where
           end if
         end if
+      else 
+	if (compressChannels) then 
+	  where (VarValue /= MissingDouble)
+            Real2(:, iChannel) = VarValue
+          end where
+	else
+	  where (VarValue /= MissingDouble)
+            Real2(:, Channels(iChannel)) = VarValue
+          end where
+	end if
       end if
     else
       if (present(sizeVarObs)) then
@@ -1125,12 +1135,12 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
               Real2(:, Channels(iChannel)) = VarValue
             end where
           end if
-        else
-          where (VarValue /= MissingDouble)
-            Real2(:, iChannel) = VarValue
-          end where
-        end if ! the end
-      end if
+	end if
+      else
+        where (VarValue /= MissingDouble)
+          Real2(:, iChannel) = VarValue
+        end where
+      end if ! the end     
     end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
@@ -1280,7 +1290,7 @@ integer(c_int), allocatable :: localvarChannels(:)
 
 ! Body:
 
-compressChannels = .false.
+compressChannels = .true.
 if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
@@ -2334,10 +2344,6 @@ character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channel
 
 if (Varname=="emissivity") then
   do ichan = 1, size(Channels)
-    write(*,*) "here"
-    write(*,*) VarName, Channels(ichan)
-    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-    write(*,'(A,"_",I0)') VarName, Channels(ichan)
     write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
   VarNames = VarNames_emis
