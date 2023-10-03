@@ -2,7 +2,7 @@
 #
 # (C) Crown Copyright 2023, the Met Office. All rights reserved.
 #
-set -euxo pipefail
+set -euo pipefail
 
 finally() {
     trap '' ERR
@@ -13,7 +13,7 @@ finally() {
     fi
 }
 
-# HERE is /usr/local/src/<REPONAME>/pr-<#> (cf ../.github/workflow/ci.yml)
+# -- HERE is /usr/local/src/<REPONAME>/pr-<#> (cf ../.github/workflow/ci.yml)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 THIS="$(basename "$0")"
 NPROC=${NPROC:-$(nproc)}
@@ -28,7 +28,7 @@ trap finally ERR EXIT
 
 cd "${WORKD}"
 
-# If using JCSDA Docker container
+# -- Activate spack env if using JCSDA Docker container
 if [[ -f /opt/spack-environment/activate.sh ]]; then
     source /opt/spack-environment/activate.sh
 fi
