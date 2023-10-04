@@ -2,7 +2,6 @@
 #
 # (C) Crown Copyright 2023, the Met Office. All rights reserved.
 #
-#
 set -euo pipefail
 
 finally() {
@@ -14,25 +13,36 @@ finally() {
     fi
 }
 
+# -- HERE is /usr/local/src/<REPONAME>/pr-<#> (cf ../.github/workflow/ci.yml)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 THIS="$(basename "$0")"
 NPROC=${NPROC:-$(nproc)}
 WORKD="$(mktemp -d "${THIS}-XXXXXX" -t)"
+GENERATOR=Unix\ Makefiles
+if command -v ninja &>/dev/null; then GENERATOR=Ninja; fi
+BASE="${HERE%/*}"
+TESTDIR="${BASE##*/}"
+export OMPI_MCA_rmaps_base_oversubscribe=true
 
-trap finally ERR
-trap finally EXIT
+trap finally ERR EXIT
 
 cd "${WORKD}"
 
-rm -f "${HERE}/bundle"
-ln -s '..' "${HERE}/bundle"
+# -- Activate spack env if using JCSDA Docker container
+if [[ -f /opt/spack-environment/activate.sh ]]; then
+    source /opt/spack-environment/activate.sh
+fi
 
-# -- Configure & Build
-cmake -B . -S "${HERE}" -DCMAKE_BUILD_TYPE=Debug -DMPI_ARGS="--oversubscribe"
+# -- Configure
+cmake -B . -S "${HERE}" -G "${GENERATOR}" -DCMAKE_BUILD_TYPE=Debug
+
+# -- Build
 cmake --build . -j "${NPROC}"
 
 # -- Test
 env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j "$NPROC" --output-on-failure --test-dir './opsinputs'
+    ctest -j"${NPROC}" --test-dir "${TESTDIR}" || \
+env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
+    ctest --test-dir "${TESTDIR}" --rerun-failed -V
 
 exit
