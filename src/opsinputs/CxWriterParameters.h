@@ -58,6 +58,14 @@ class CxWriterParameters : public oops::ObsFilterParametersBase {
   /// default is true.
   oops::Parameter<bool> geoValsAreTopToBottom{"geovals_are_top_to_bottom", true, this};
 
+  /// Fill radiosonde CX columns using H(x) values rather than GeoVaLs.
+  /// This can be used to produce a set of CX columns (which are used as H(x) in VAR)
+  /// that correspond closely to the H(x) produced by JADA.
+  /// In other words it enables a 'JADA compatibility mode' for VAR.
+  /// This option only has an effect for airTemperature, potentialTemperature, windEastward,
+  /// windNorthward and relativeHumidity.
+  oops::Parameter<bool> writeHofXIntoCX{"write_hofx_into_cx", false, this};
+
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as
   /// "reject_obs_with_all_variables_failing_qc" and channel numbering to work correctly.
