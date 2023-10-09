@@ -1123,7 +1123,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
 	end if
       end if
     else
-      if (present(sizeVarObs)) then
+      if (present(sizeVarObs)) then      
         if (sizeVarObs > size(channels)) then
           if (compressChannels) then
             offsetsize = sizeVarObs - size(channels)
@@ -1135,12 +1135,12 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
               Real2(:, Channels(iChannel)) = VarValue
             end where
           end if
+	else
+	  where (VarValue /= MissingDouble)
+            Real2(:, iChannel) = VarValue
+          end where
 	end if
-      else
-        where (VarValue /= MissingDouble)
-          Real2(:, iChannel) = VarValue
-        end where
-      end if ! the end     
+      end if ! the end    
     end if
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
