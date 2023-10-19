@@ -1,4 +1,5 @@
-name: UKMO_CI_Azure
+---
+name: CI
 
 on:
   push:
@@ -6,58 +7,191 @@ on:
   pull_request:
     branches: [develop]
 
+env:
+  REPO: ${{ github.event.repository.name }}
+  BUNDLE: pr-${{ github.event.number }}
+
 jobs:
-  build:
+  build1:
+    name: gnu 11.3.1 (UKMO)
+    if: github.repository_owner == 'MetOffice'
     runs-on: jedi-self-hosted-rg
+    
     steps:
+      - name: pre-submit cleanup
+        run: |
+          ls -la ./
+          rm -fr ./${{ env.BUNDLE }} || true
+          ls -la ./
       - name: checkout current
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          path: ci/opsinputs
+          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
+      - name: initiate bundle
+        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
 
       - name: checkout jedicmake
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          path: ci/jedicmake
+          path: ./${{ env.BUNDLE }}/jedicmake
           repository: JCSDA-internal/jedi-cmake
           submodules: true
           token: ${{ secrets.GH_PAT }}
 
       - name: checkout oops
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          path: ci/oops
+          path: ./${{ env.BUNDLE }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
       - name: matching branch checkout attempt oops ${{ github.head_ref }}
         if: github.event_name == 'pull_request'
-        run: ./ci/get-ref-branch ./ci/oops
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
 
       - name: checkout ioda
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          path: ci/ioda
+          path: ./${{ env.BUNDLE }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
       - name: matching branch checkout attempt ioda ${{ github.head_ref }}
         if: github.event_name == 'pull_request'
-        run: ./ci/get-ref-branch ./ci/ioda
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
 
       - name: checkout ufo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          path: ci/ufo
+          path: ./${{ env.BUNDLE }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
       - name: matching branch checkout attempt ufo ${{ github.head_ref }}
         if: github.event_name == 'pull_request'
-        run: ./ci/get-ref-branch ./ci/ufo
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
 
       - name: build and test
         run: |
           az acr login --name ngmssboxjediacr
           docker run --rm \
-            --entrypoint=/usr/local/src/opsinputs/ci/build-and-test \
-            --workdir=/usr/local/src/opsinputs/ci \
-            --volume $PWD:/usr/local/src/opsinputs \
-            'ngmssboxjediacr.azurecr.io/jedibase:alma9'
+            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
+            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
+            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
+            'ngmssboxjediacr.azurecr.io/jedibase:alma9' \
+          && rm -fr ${{github.workspace}}/${{env.BUNDLE}}
+
+  build2:
+    name: gnu 9.4.0 (JCSDA)
+    if: github.repository_owner == 'MetOffice'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout current
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
+      - name: initiate bundle
+        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
+
+      - name: checkout jedicmake
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/jedicmake
+          repository: JCSDA-internal/jedi-cmake
+          submodules: true
+          token: ${{ secrets.GH_PAT }}
+
+      - name: checkout oops
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/oops
+          repository: JCSDA-internal/oops
+          token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt oops ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
+
+      - name: checkout ioda
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/ioda
+          repository: JCSDA-internal/ioda
+          token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt ioda ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
+
+      - name: checkout ufo
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/ufo
+          repository: JCSDA-internal/ufo
+          token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt ufo ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
+
+      - name: build and test
+        run: |
+          docker run --rm \
+            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
+            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
+            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
+            'jcsda/docker-gnu-openmpi-dev:latest'
+
+  build3:
+    name: clang 10.0.0 (JCSDA)
+    if: github.repository_owner == 'MetOffice'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout current
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
+      - name: initiate bundle
+        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
+
+      - name: checkout jedicmake
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/jedicmake
+          repository: JCSDA-internal/jedi-cmake
+          submodules: true
+          token: ${{ secrets.GH_PAT }}
+
+      - name: checkout oops
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/oops
+          repository: JCSDA-internal/oops
+          token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt oops ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
+
+      - name: checkout ioda
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/ioda
+          repository: JCSDA-internal/ioda
+          token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt ioda ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
+
+      - name: checkout ufo
+        uses: actions/checkout@v4
+        with:
+          path: ./${{ env.BUNDLE }}/ufo
+          repository: JCSDA-internal/ufo
+          token: ${{ secrets.GH_PAT }}
+      - name: matching branch checkout attempt ufo ${{ github.head_ref }}
+        if: github.event_name == 'pull_request'
+        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
+
+      - name: build and test
+        run: |
+          docker run --rm \
+            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
+            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
+            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
+            'jcsda/docker-clang-mpich-dev:latest'
