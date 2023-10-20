@@ -85,10 +85,15 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
 
-  /// List of channels which are expected for Var.
+  /// List of channels which are expected for Var. This enables mapping of JOPA
+  /// channel numbers to VAR numbers. Default is empty and the JOPA channels will be used.
   oops::Parameter<std::string> varChannels{"varChannels", "", this};
 
-  /// Compress the var channels
+  /// If set to false (default true) this matches the channel number with the array index.
+  /// This is useful when there are skipped channels. e.g. channels 5,6,7,9,10,11 are
+  /// required from a possible 12 channels. This would fill a size 12 array with the array
+  /// indexes matching the channel number [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN].
+  /// Compressed example could be [2,8,50,100], no missin values between channel numbers.
   oops::Parameter<bool> compressVarChannels{"compress_var_channels", true, this};
 
   /// Increase the channel array size to the same size as the varobs array
