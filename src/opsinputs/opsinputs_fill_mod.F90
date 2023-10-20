@@ -1061,6 +1061,7 @@ integer                                         :: iChannel
 integer                                         :: offset
 integer                                         :: numchans
 integer                                         :: offsetsize
+integer                                         :: arrayindex
 logical                                         :: compressChannels
 
 ! Body:
@@ -1092,6 +1093,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
                  num_levels = int(numchans, kind=integer64))
   do iChannel = 1, size(JediVarNamesWithChannels)
     call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    arrayindex = iChannel
 
     ! if VAR channels have been assigned then jopa channels will be mapped to these var channels
     ! Set up the size of the array, if channels are being pushed together an offset between
@@ -1103,46 +1105,28 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         if (iChannel <= size(varChannels)) then
           if (compressChannels) then
             offsetsize = abs(varChannels(1) - channels(1))
-            where (VarValue /= MissingDouble)
-              Real2(:, iChannel+offsetsize) = VarValue
-            end where
+            arrayindex = arrayindex + offsetsize
           else
-            where (VarValue /= MissingDouble)
-              Real2(:, varChannels(iChannel)) = VarValue
-            end where
+            arrayindex = varChannels(iChannel)
           end if
         end if
       else 
-	if (compressChannels) then 
-	  where (VarValue /= MissingDouble)
-            Real2(:, iChannel) = VarValue
-          end where
-	else
-	  where (VarValue /= MissingDouble)
-            Real2(:, Channels(iChannel)) = VarValue
-          end where
-	end if
+        if (.not. compressChannels) then
+          arrayindex = Channels(iChannel)
+        end if
       end if
     else
-      if (present(sizeVarObs)) then      
+      if (present(sizeVarObs)) then
         if (sizeVarObs > size(channels)) then
-          if (compressChannels) then
-            offsetsize = sizeVarObs - size(channels)
-            where (VarValue /= MissingDouble)
-              Real2(:, iChannel) = VarValue
-            end where
-          else
-            where (VarValue /= MissingDouble)
-              Real2(:, Channels(iChannel)) = VarValue
-            end where
+          if (.not. compressChannels) then
+            arrayindex = Channels(iChannel)
           end if
-	else
-	  where (VarValue /= MissingDouble)
-            Real2(:, iChannel) = VarValue
-          end where
-	end if
-      end if ! the end    
+        end if
+      end if ! the end
     end if
+    where (VarValue /= MissingDouble)
+      Real2(:, arrayindex) = VarValue
+    end where
   end do
 end if ! Data not present? OPS will produce a warning -- we don't need to duplicate it.
 
