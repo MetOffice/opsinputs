@@ -80,8 +80,8 @@ jobs:
             'ngmssboxjediacr.azurecr.io/jedibase:alma9'
 
       - name: Cleanup workspace
-          working-directory: ${{github.workspace}}
-          run: rm -fr ${{ env.BUNDLE }} || true
+        working-directory: ${{github.workspace}}
+        run: rm -fr ${{ env.BUNDLE }} || true
 
   build2:
     name: gnu 9.4.0 (JCSDA)
