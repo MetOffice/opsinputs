@@ -26,11 +26,11 @@ jobs:
         run: |
           rm -fr ./${{ env.BUNDLE }} || true
           ls -lgo ./
-      - name: checkout current
+      - name: Checkout current
         uses: actions/checkout@v4
         with:
           path: ./${{ env.BUNDLE }}/${{ env.REPO }}
-      - name: initiate bundle
+      - name: Initiate bundle
         run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
 
       - name: Checkout jedicmake
@@ -47,7 +47,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for oops ${{ github.head_ref }}
+      - name: Checkout attempt for oops@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
 
@@ -57,7 +57,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for ioda ${{ github.head_ref }}
+      - name: Checkout attempt for ioda@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
 
@@ -67,7 +67,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for ufo ${{ github.head_ref }}
+      - name: Checkout attempt for ufo@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
 
@@ -111,7 +111,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for oops ${{ github.head_ref }}
+      - name: Checkout attempt for oops@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
 
@@ -121,7 +121,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for ioda ${{ github.head_ref }}
+      - name: Checkout attempt for ioda@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
 
@@ -131,7 +131,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for ufo ${{ github.head_ref }}
+      - name: Checkout attempt for ufo@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
 
@@ -170,7 +170,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for oops ${{ github.head_ref }}
+      - name: Checkout attempt for oops@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
 
@@ -180,7 +180,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for ioda ${{ github.head_ref }}
+      - name: Checkout attempt for ioda@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
 
@@ -190,7 +190,7 @@ jobs:
           path: ./${{ env.BUNDLE }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout matching branch for ufo ${{ github.head_ref }}
+      - name: Checkout attempt for ufo@${{ github.head_ref }}
         if: github.event_name == 'pull_request'
         run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
 
