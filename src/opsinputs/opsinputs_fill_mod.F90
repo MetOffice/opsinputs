@@ -1036,7 +1036,7 @@ end subroutine opsinputs_fill_fillreal
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
   Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, &
-  JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
+  JediVarGroup, compressVarChannels, sizeOfVarobsArray, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1049,7 +1049,7 @@ integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 logical, optional, intent(in)                       :: compressVarChannels
-integer(integer64), optional, intent(in)            :: sizeVarObs
+integer(integer64), optional, intent(in)            :: sizeOfVarobsArray
 integer(c_int), optional, intent(in)                :: varChannels(:)
 
 
@@ -1080,10 +1080,11 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 !e.g. HIRS in ATOVS stream
 
 numchans = size(JediVarNamesWithChannels)
-
-if (present(sizeVarObs)) then
-  if (sizeVarObs > 0) then
-    numchans = sizeVarObs
+!sizeOfVarobsArray comes from intitial setting of size_of_varobs_array 
+! used to define the size of the channel array to fill. 
+if (present(sizeOfVarobsArray)) then
+  if (sizeOfVarobsArray > 0) then
+    numchans = sizeOfVarobsArray
   end if
 end if
 
@@ -1116,8 +1117,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         end if
       end if
     else
-      if (present(sizeVarObs)) then
-        if (sizeVarObs > size(channels)) then
+      if (present(sizeOfVarobsArray)) then
+        if (sizeOfVarobsArray > size(channels)) then
           if (.not. compressChannels) then
             arrayindex = Channels(iChannel)
           end if
@@ -1251,7 +1252,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, &
-  VarobsLength, JediVarName, JediVarGroup, compressVarChannels, sizeVarObs, varChannels)
+  VarobsLength, JediVarName, JediVarGroup, compressVarChannels, sizeOfVarobsArray, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1265,12 +1266,12 @@ integer(integer64), intent(in)                      :: VarobsLength
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
 logical, optional, intent(in)                       :: compressVarChannels
-integer(integer64), optional, intent(in)            :: sizeVarObs
+integer(integer64), optional, intent(in)            :: sizeOfVarobsArray
 integer(c_int), optional, intent(in)                :: varChannels(:)
 
 ! local variables
 logical               :: compressChannels
-integer(integer64)    :: sizeVarObs_local
+integer(integer64)    :: sizeOfVarobsArray_local
 integer(c_int), allocatable :: localvarChannels(:)
 
 ! Body:
@@ -1285,9 +1286,9 @@ if (present(varChannels)) then
   localvarChannels = varChannels
 end if
 
-sizeVarobs_local = 0
-if (present(sizeVarObs)) then
-  sizeVarObs_local = sizeVarObs
+sizeOfVarobsArray_local = 0
+if (present(sizeOfVarobsArray)) then
+  sizeOfVarobsArray_local = sizeOfVarobsArray
 end if
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
@@ -1297,11 +1298,11 @@ else
   if (allocated(localvarChannels)) then
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, compressChannels, sizeVarObs_local, varChannels)
+      JediVarName, JediVarGroup, compressChannels, sizeOfVarobsArray_local, varChannels)
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, compressChannels, sizeVarObs_local)
+      JediVarName, JediVarGroup, compressChannels, sizeOfVarobsArray_local)
   end if
 end if
 
@@ -2423,8 +2424,6 @@ character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1
 integer                                        :: ichan
 
 character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
-
-
 
 if (Varname=="emissivity") then
   do ichan = 1, size(Channels)

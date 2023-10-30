@@ -40,8 +40,6 @@ type, public :: opsinputs_channeloffset
   integer  :: size_of_varobs_array
 end type opsinputs_channeloffset
 
-
-
 ! ------------------------------------------------------------------------------
 contains
 

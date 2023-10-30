@@ -93,7 +93,7 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// This is useful when there are skipped channels. e.g. channels 5,6,7,9,10,11 are
   /// required from a possible 12 channels. This would fill a size 12 array with the array
   /// indexes matching the channel number [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN].
-  /// Compressed example could be [2,8,50,100], no missin values between channel numbers.
+  /// Compressed example could be [2,8,50,100], no missing values between channel numbers.
   oops::Parameter<bool> compressVarChannels{"compress_var_channels", true, this};
 
   /// Increase the channel array size to the same size as the varobs array
