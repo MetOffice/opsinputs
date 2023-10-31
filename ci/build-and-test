@@ -2,6 +2,8 @@
 #
 # (C) Crown Copyright 2023, the Met Office. All rights reserved.
 #
+# shellcheck disable=SC2317
+# shellcheck source=/dev/null
 set -euo pipefail
 
 finally() {
@@ -10,6 +12,10 @@ finally() {
     if [[ -d "${WORKD:-}" ]]; then
         cd /
         rm -fr "${WORKD}"
+    fi
+    if [[ -d ${BASE:-} ]]; then
+        cd /
+        rm -fr "$BASE" 2>/dev/null || true
     fi
 }
 
