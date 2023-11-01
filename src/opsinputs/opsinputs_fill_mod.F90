@@ -1030,6 +1030,12 @@ end subroutine opsinputs_fill_fillreal
 !>   of variables with suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
 !>   Group of the JEDI variable used to populate \p Real2.
+!> \param[in] compressVarChannels
+!>   Whether to apply var channel compression (No NaN spaces between channels)
+!> \param[in] sizeOfVarobsArray
+!>   The size of the varobs array which the output data will be stored in.
+!> \param[in] varChannels
+!>   A list of the var channel numbers which the channels will be mapped to.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -2423,21 +2429,12 @@ integer(c_int), intent(in)                     :: Channels(:)
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
 
-character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
-
-if (Varname=="emissivity") then
-  do ichan = 1, size(Channels)
-    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-  end do
-  VarNames = VarNames_emis
+if (size(Channels) == 0) then
+  VarNames(1) = VarName
 else
-  if (size(Channels) == 0) then
-    VarNames(1) = VarName
-  else
-    do ichan = 1, size(Channels)
-      write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
-    end do
-  end if
+  do ichan = 1, size(Channels)
+    write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+  end do
 end if
 
 end function opsinputs_fill_varnames_with_channels
