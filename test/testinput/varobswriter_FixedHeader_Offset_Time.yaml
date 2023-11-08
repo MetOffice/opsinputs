@@ -1,5 +1,6 @@
-window begin: 2017-12-31T17:59:59Z
-window end: 2018-01-01T05:59:59Z
+time window:
+  begin: 2017-12-31T17:59:59Z
+  end: 2018-01-01T05:59:59Z
 
 observations:
   - obs space:
@@ -14,8 +15,10 @@ observations:
       namelist_directory: &namelist testinput/VarObsWriterNamelists_028_VarField_satid
     - filter: VarObs Checker
       expected_header_fields:
-        # Offset to window begin is 1 second
-        # Midpoint window begin--end: year, month, day, hour, minute, second
+        # Offset to time window:
+   begin is 1 second
+        # Midpoint time window:
+   begin--end: year, month, day, hour, minute, second
         Data Time:     "2018      1      1      0      0      0      0"
         Validity Time: "2018      1      1      0      0      0      0"
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.

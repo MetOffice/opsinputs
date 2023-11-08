@@ -1,8 +1,9 @@
 # OPS does not make it possible to output individual dust geovals; instead, all these geovals
 # (either 2 or 6, depending on the num_dust_bins option), if required, must be output together.
 
-window begin: 2018-01-01T00:00:00Z
-window end: 2018-01-01T01:00:00Z
+time window:
+  begin: 2018-01-01T00:00:00Z
+  end: 2018-01-01T01:00:00Z
 
 observations:
   - obs space:
