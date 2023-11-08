@@ -19,8 +19,7 @@ observations:
       IC_PLevels: 5
     - filter: Cx Checker
       expected_header_fields:
-        # Midpoint time window:
-   begin--end: year, month, day, hour, minute, second
+        # Midpoint window begin--end: year, month, day, hour, minute, second
         Data Time:     "2018      1      1      6      0      0 -32768"
         Validity Time: "2018      1      1      6      0      0 -32768"
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
