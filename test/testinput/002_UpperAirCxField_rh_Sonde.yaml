@@ -48,3 +48,52 @@ observations:
     HofX: HofX
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0
+
+# Same as above but writing H(x) into CX for relativeHumidity (as opposed to the default
+# behaviour of writing GeoVaLs into CX). This is 'JADA compatibility mode'.
+  - obs space:
+      name: Sonde
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/relative_humidity_Sonde.nc4
+        obsgrouping:
+          group variables: [ "stationIdentification" ]
+          sort variable: "pressure"
+          sort order: "descending"
+      simulated variables: [relativeHumidity]
+      extension:
+        allocate companion records with length: 3
+    geovals:
+      filename: Data/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10]  # missing
+    # Blacklist all entries in the original profiles.
+    # This must be run after the Reset Flags to Pass filter,
+    # which sets the flags of any missing values in the original profiles
+    # to 'pass'. Therefore this filter is run with the 'defer to post' option set to true.
+    - filter: BlackList
+      where:
+      - variable:
+          name: MetaData/extendedObsSpace
+        is_in: 0
+      defer to post: true
+    - filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_002_UpperAirCxField_rh
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+      IC_PLevels: 5
+      write_hofx_into_cx: true
+    - filter: Cx Checker
+      expected_surface_variables: []
+      expected_upper_air_variables: ["2"] # IndexCxrh
+      expected_main_table_columns:
+      - # batch 1
+        - ["1.25", "1.35", "1.45"]       # column 1
+        - ["1.55", "1.65", "1.75"]       # column 2
+    HofX: HofX
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
