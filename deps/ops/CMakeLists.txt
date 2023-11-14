@@ -28,8 +28,8 @@ set(OPS_SOURCE_FILES
   code/OpsMod_ModelColumnIO/OpsMod_ModelColumnIO.f90
   code/OpsMod_ModelIO/OpsMod_ModelIO.f90
   code/OpsMod_ModelObInfo/OpsMod_ModelObInfo.f90
-  code/OpsMod_ODB/OpsMod_ODBKinds.f90
-  code/OpsMod_ODB/OpsMod_ODBTypes.f90
+  stubs/OpsMod_ODB/OpsMod_ODBKinds.f90
+  stubs/OpsMod_ODB/OpsMod_ODBTypes.f90
   code/OpsMod_ObTypeUtils/OpsMod_ObTypeUtils.f90
   code/OpsMod_ObsInfo/OpsMod_MiscTypes.f90
   code/OpsMod_ObsInfo/OpsMod_ObsInfo.f90
@@ -41,7 +41,7 @@ set(OPS_SOURCE_FILES
   code/OpsMod_UMImport/ops_portio2a.c
   code/OpsMod_UMImport/ops_portutils.c
   code/OpsMod_Utilities/OpsMod_Utilities.f90
-  code/OpsMod_Varobs/OpsMod_Varobs.f90
+  stubs/OpsMod_Varobs/OpsMod_Varobs.f90
   code/OpsMod_VarobsLib/OpsMod_VarobsLib.f90
   code/OpsProg_Utils/OpsMod_UtilsProgs.f90
   public/GenMod_Control/GenMod_Control.F90
@@ -66,19 +66,19 @@ set(OPS_SOURCE_FILES
   public/OpsMod_Sort/OpsMod_Sort.f90
   public/OpsMod_UMInterface/OpsMod_UMInterface.f90
   public/OpsMod_VerticalInterp/OpsMod_VerticalInterp.f90
-  public/Ops_Constants/GenMod_CLookAdd.f90
-  public/Ops_Constants/GenMod_Constants.f90
-  public/Ops_Constants/GenMod_MiscUMScienceConstants.f90
-  public/Ops_Constants/GenMod_UMHeaderConstants.f90
-  public/Ops_Constants/OpsMod_Ancil.f90
-  public/Ops_Constants/OpsMod_CXIndexes.f90
-  public/Ops_Constants/OpsMod_Constants.f90
-  public/Ops_Constants/OpsMod_Kinds.F90
-  public/Ops_Constants/OpsMod_ObsGroupInfo.f90
-  public/Ops_Constants/OpsMod_ObsTypes.f90
-  public/Ops_Constants/OpsMod_SatIds.f90
-  public/Ops_Constants/OpsMod_Stash.f90
-  public/Ops_Constants/OpsMod_Varfields.f90
+  stubs/Ops_Constants/GenMod_CLookAdd.f90
+  stubs/Ops_Constants/GenMod_Constants.f90
+  stubs/Ops_Constants/GenMod_MiscUMScienceConstants.f90
+  stubs/Ops_Constants/GenMod_UMHeaderConstants.f90
+  stubs/Ops_Constants/OpsMod_Ancil.f90
+  stubs/Ops_Constants/OpsMod_CXIndexes.f90
+  stubs/Ops_Constants/OpsMod_Constants.f90
+  stubs/Ops_Constants/OpsMod_Kinds.F90
+  stubs/Ops_Constants/OpsMod_ObsGroupInfo.f90
+  stubs/Ops_Constants/OpsMod_ObsTypes.f90
+  stubs/Ops_Constants/OpsMod_SatIds.f90
+  stubs/Ops_Constants/OpsMod_Stash.f90
+  stubs/Ops_Constants/OpsMod_Varfields.f90
   stubs/OpsMod_AODGeneral/OpsMod_AODGeneral.f90
   stubs/OpsMod_GPSRO/OpsMod_GPSRO.f90
   stubs/OpsMod_GPSRO/OpsMod_GPSROInfo.f90
