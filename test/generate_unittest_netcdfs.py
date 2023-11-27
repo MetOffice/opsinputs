@@ -1019,5 +1019,8 @@ if __name__ == "__main__":
                               'eastward_wind', 'northward_wind'],
                              'testinput/cx_globalnamelist_surface.nc4')
 
+    # Unrotate 10m winds
+    output_full_cx_to_netcdf         (['uwind_at_10m', 'vwind_at_10m'],[], 'testinput/CxWriter_UnRotateWinds10M.nc4')
+
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
