@@ -38,7 +38,8 @@ USE OpsMod_MiscTypes, ONLY: &
 
 USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupSurface,           &
-    ObsGroupScatwind
+    ObsGroupScatwind,          &
+    ObsGroupScatwindChosen
 
 USE OpsMod_ObsInfo, ONLY: &
     OB_type
@@ -113,14 +114,16 @@ DO Ivar = 1, ActualMaxVarfield
       END IF
     CASE (VarField_u)
       IF (Ob % header % ObsGroup == ObsGroupSurface .OR. &
-          Ob % header % ObsGroup == ObsGroupScatwind) THEN
+          Ob % header % ObsGroup == ObsGroupScatwind .OR. &
+          Ob % header % ObsGroup == ObsGroupScatwindChosen) THEN
         ObHdrVrbl = Ob % header % u10
       ELSE
         ObHdrVrbl = Ob % header % u
       END IF
     CASE (VarField_v)
       IF (Ob % header % ObsGroup == ObsGroupSurface .OR. &
-          Ob % header % ObsGroup == ObsGroupScatwind) THEN
+          Ob % header % ObsGroup == ObsGroupScatwind .OR. &
+          Ob % header % ObsGroup == ObsGroupScatwindChosen) THEN
         ObHdrVrbl = Ob % header % v10
       ELSE
         ObHdrVrbl = Ob % header % v

@@ -931,7 +931,7 @@ SELECT CASE (Obs % Header % ObsGroup)
         END IF
       END DO
     END IF
-  CASE (ObsGroupScatwind)
+  CASE (ObsGroupScatwind, ObsGroupScatwindChosen)
     IF (Obs % Header % Satid % Present) THEN
       DO i = ob_start, ob_end
         IF (Obs % Satid(i) == SatId_MetopB) THEN
@@ -963,7 +963,8 @@ SELECT CASE (Obs % Header % ObsGroup)
         ELSE
           found_report_type = .FALSE.
           DO j = 1, SIZE (map, DIM = 1)
-            IF (map(j,1) == ObsGroupScatwind .AND. map(j,2) == Obs % Satid(i)) THEN
+            IF ((map(j,1) == ObsGroupScatwind .AND. map(j,2) == Obs % Satid(i)) .OR. &
+                (map(j,1) == ObsGroupScatwindChosen .AND. map(j,2) == Obs % Satid(i))) THEN
               report_types(i - ob_start + 1) = map(j,3)
               found_report_type = .TRUE.
               EXIT

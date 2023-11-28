@@ -29,6 +29,7 @@ USE GenMod_MiscUMScienceConstants, ONLY: &
 USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupSurface,           &
     ObsGroupScatwind,          &
+    ObsGroupScatwindChosen,    &
     ObsGroupSatwind,           &
     ObsGroupAircraft,          &
     ObsGroupSonde,             &
@@ -115,7 +116,7 @@ SELECT CASE (Observations % header % ObsGroup)
     ObsLevelType = 0.0
     NumLevelLevs = 1
 
-  CASE (ObsGroupScatwind)
+  CASE (ObsGroupScatwind, ObsGroupScatwindChosen)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1
