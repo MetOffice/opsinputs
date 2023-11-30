@@ -1289,7 +1289,7 @@ if (FillChanNum) then
         else
           do iChannel=1,  NumChannels
             if (iChannel > size(varChannels)) then
-              ChannelIndicesVar(:, iChannel) = -32768
+              ChannelIndicesVar(:, iChannel) = IMDI
             else
               ChannelIndicesVar(:, iChannel) = varChannels(iChannel)
             end if
