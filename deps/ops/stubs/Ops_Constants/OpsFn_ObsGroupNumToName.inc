@@ -12,7 +12,7 @@ IMPLICIT NONE
 INTEGER, INTENT(IN)         :: ObsGroup
 
 ! Function result:
-CHARACTER(len=12)           :: OpsFn_ObsGroupNumToName
+CHARACTER(len=16)           :: OpsFn_ObsGroupNumToName
 
 SELECT CASE (ObsGroup)
   CASE (ObsGroupABIClr)
@@ -107,6 +107,8 @@ SELECT CASE (ObsGroup)
     OpsFn_ObsGroupNumToName = "SBUV"
   CASE (ObsGroupScatwind)
     OpsFn_ObsGroupNumToName = "Scatwind"
+  CASE (ObsGroupScatwindChosen)
+    OpsFn_ObsGroupNumToName = "ScatwindChosen"
   CASE (ObsGroupSeaIce)
     OpsFn_ObsGroupNumToName = "SeaIce"
   CASE (ObsGroupOceanColour)
