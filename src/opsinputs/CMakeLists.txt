@@ -50,7 +50,7 @@ set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
 # In addition, we need to add the folder with these *.inc files to the
 # include path used when compiling that module.
 set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
-                            INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/ops/code/OpsMod_CXGenerate)
+                            INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/ops/stubs/OpsMod_CXGenerate)
 
 ecbuild_add_library( TARGET   opsinputs
                      SOURCES  ${opsinputs_src_files}

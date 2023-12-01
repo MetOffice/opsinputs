@@ -240,6 +240,8 @@ SELECT CASE (ObsGroup)
     Varfields(1:1) = (/VarField_SBUVozone/)
   CASE (ObsGroupScatwind)
     Varfields(1:3) = (/Varfield_u10ambwind,varfield_v10ambwind,Varfield_pcorrect/)
+  CASE (ObsGroupScatwindChosen)
+    Varfields(1:2) = (/Varfield_u,varfield_v/)
   CASE (ObsGroupSEVIRIClr)
     Varfields(1:12) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
                         Varfield_solzenith,Varfield_tskin,Varfield_tcozone, &

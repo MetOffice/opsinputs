@@ -104,6 +104,7 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupGPSRO,             &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
+    ObsGroupScatwindChosen,    &
     ObsGroupSonde,             &
     ObsGroupSurface,           &
     ObsGroupSatTCWV
@@ -820,6 +821,10 @@ do iVarField = 1, nVarFields
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
           ObsSpace, Flags, ObsErrors, "windEastwardAt10M", "ObsValue")
+      else if (Ob % Header % ObsGroup == ObsGroupScatwindChosen) then
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+          Ob % Header % u10, "u10", Ob % Header % NumObsLocal, Ob % u10, &
+          ObsSpace, Flags, ObsErrors, "windEastwardAt10M", "BiasCorrObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % u, "u", JediToOpsLayoutMapping, Ob % u, &
@@ -831,6 +836,10 @@ do iVarField = 1, nVarFields
         call opsinputs_fill_fillelementtypefromsimulatedvariable( &
           Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
           ObsSpace, Flags, ObsErrors, "windNorthwardAt10M", "ObsValue")
+      else if (Ob % Header % ObsGroup == ObsGroupScatwindChosen) then
+        call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+          Ob % Header % v10, "v10", Ob % Header % NumObsLocal, Ob % v10, &
+          ObsSpace, Flags, ObsErrors, "windNorthwardAt10M", "BiasCorrObsValue")
       else
         call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
           Ob % Header % v, "v", JediToOpsLayoutMapping, Ob % v, &
