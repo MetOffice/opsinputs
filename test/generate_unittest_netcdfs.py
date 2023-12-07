@@ -1029,6 +1029,8 @@ if __name__ == "__main__":
                               'liquid_cloud_volume_fraction_in_atmosphere_layer', 'mass_content_of_cloud_ice_in_atmosphere_layer', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
                               'specific_humidity', 'potential_temperature', 'eastward_wind', 'northward_wind'],
                              'testinput/cx_globalnamelist_scatwind.nc4')
-
+    # Unrotate 10m winds
+    output_full_cx_to_netcdf         (['uwind_at_10m', 'vwind_at_10m'],[], 'testinput/CxWriter_UnRotateWinds10M.nc4')
+    
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
