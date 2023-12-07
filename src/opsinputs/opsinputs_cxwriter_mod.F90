@@ -1291,13 +1291,17 @@ character(len=*), parameter             :: RoutineName = "opsinputs_cxwriter_unr
 character(len=80)                       :: ErrorMessage
 integer(integer64)                      :: CxFields(MaxModelCodes)
 
-integer                   :: Ilev         ! Loop variable
-real(real64), allocatable :: EqLat(:)     ! Latitudes on equatorial grid
-real(real64), allocatable :: EqLon(:)     ! Longitudes on equatorial grid
-real(real64), allocatable :: Coeff1(:)    ! Coefficients for rotation
-real(real64), allocatable :: Coeff2(:)    ! Coefficients for rotation
-real(real64), allocatable :: Uunrot(:)    ! Array for unrotated wind u component
-real(real64), allocatable :: Vunrot(:)    ! Array for unrotated wind v component
+integer                   :: Ilev                    ! Loop variable
+real(real64), allocatable :: EqLat(:)                ! Latitudes on equatorial grid
+real(real64), allocatable :: EqLon(:)                ! Longitudes on equatorial grid
+real(real64), allocatable :: Coeff1(:)               ! Coefficients for rotation
+real(real64), allocatable :: Coeff2(:)               ! Coefficients for rotation
+real(real64), allocatable :: Uunrot(:)               ! Array for unrotated wind u component
+real(real64), allocatable :: Vunrot(:)               ! Array for unrotated wind v component
+real(real64), allocatable :: U10unrot(:)             ! Array for unrotated wind u10 component
+real(real64), allocatable :: V10unrot(:)             ! Array for unrotated wind v10 component
+logical                   :: UpperWinds   = .false.  ! Upper air wind u and v components present
+logical                   :: SurfaceWinds = .false.  ! Surface wind u and v components present
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
@@ -1308,61 +1312,91 @@ if (.not. Cx % header % rotated) then
 end if
 
 ! Require both wind components to be present.
-if (all(CxFields /= StashItem_u) .and. all(CxFields /= StashItem_v)) then
-   return
+if (any(CxFields == StashItem_u) .and. any(CxFields == StashItem_v)) then
+  UpperWinds = .true.
+end if
+if (any(CxFields == StashCode_u10) .and. any(CxFields == StashCode_v10)) then
+  SurfaceWinds = .true.
 end if
 
-! Code initially taken from Ops_RotateWinds.
-! The rotation matrix has been modified to perform an un-rotation of the winds.
-if (Cx % header % NumLocal > 0) then
-  allocate (Coeff1(Cx % header % NumLocal))
-  allocate (Coeff2(Cx % header % NumLocal))
-  allocate (EqLon(Cx % header % NumLocal))
-  allocate (EqLat(Cx % header % NumLocal))
-  allocate (Uunrot(Cx % header % NumLocal))
-  allocate (Vunrot(Cx % header % NumLocal))
+if (UpperWinds .or. SurfaceWinds) then
+  ! Code initially taken from Ops_RotateWinds.
+  ! The rotation matrix has been modified to perform an un-rotation of the winds.
+  if (Cx % header % NumLocal > 0) then
+    allocate (Coeff1(Cx % header % NumLocal))
+    allocate (Coeff2(Cx % header % NumLocal))
+    allocate (EqLon(Cx % header % NumLocal))
+    allocate (EqLat(Cx % header % NumLocal))
+    if (UpperWinds) then
+      allocate (Uunrot(Cx % header % NumLocal))
+      allocate (Vunrot(Cx % header % NumLocal))
+    end if
+    if (SurfaceWinds) then
+      allocate (U10unrot(Cx % header % NumLocal))
+      allocate (V10unrot(Cx % header % NumLocal))
+    end if
 
-  ! Calculate longitudes on equatorial grid
-  call Gen_LatLon_to_Eq (Ob % latitude,      & ! in
-                         Ob % longitude,     & ! in
-                         EqLat(:),           & ! out
-                         EqLon(:),           & ! out
-                         self % RC_PoleLat,  & ! in
-                         self % RC_PoleLong)   ! in
+    ! Calculate longitudes on equatorial grid
+    call Gen_LatLon_to_Eq (Ob % latitude,      & ! in
+                           Ob % longitude,     & ! in
+                           EqLat(:),           & ! out
+                           EqLon(:),           & ! out
+                           self % RC_PoleLat,  & ! in
+                           self % RC_PoleLong)   ! in
 
-  deallocate (EqLat) ! Don't need latitudes
+    deallocate (EqLat) ! Don't need latitudes
 
-  ! Get rotation coefficients for winds
-  call Ops_WCoeff (Coeff1(:),              & ! out
-                   Coeff2(:),              & ! out
-                   Ob % longitude,         & ! in
-                   EqLon(:),               & ! in
-                   self % RC_PoleLat,      & ! in
-                   self % RC_PoleLong,     & ! in
-                   Cx % header % NumLocal)   ! in
+    ! Get rotation coefficients for winds
+    call Ops_WCoeff (Coeff1(:),              & ! out
+                     Coeff2(:),              & ! out
+                     Ob % longitude,         & ! in
+                     EqLon(:),               & ! in
+                     self % RC_PoleLat,      & ! in
+                     self % RC_PoleLong,     & ! in
+                     Cx % header % NumLocal)   ! in
 
-  deallocate (EqLon)
+    deallocate (EqLon)
 
-  ! Unrotate model level wind components.
-  ! Note minus sign in front of Coeff2, which reverses the previous rotation.
-  do Ilev = 1, Cx % Header % u % NumLev
-     call Ops_WEq_to_ll (Coeff1(:), & ! in
-          -Coeff2(:),               & ! in
-          Cx % u(:,Ilev),           & ! in
-          Cx % v(:,Ilev),           & ! in
-          Uunrot(:),                & ! out
-          Vunrot(:),                & ! out
-          Cx % header % NumLocal,   & ! in
-          Cx % header % NumLocal)     ! in
-     ! Put unrotated values into Cx structure
-     Cx % u(:,ILev) = Uunrot(:)
-     Cx % v(:,Ilev) = Vunrot(:)
-  end do
+    ! Unrotate model level wind components.
+    ! Note minus sign in front of Coeff2, which reverses the previous rotation.
+    if (UpperWinds) then
+      do Ilev = 1, Cx % Header % u % NumLev
+         call Ops_WEq_to_ll (Coeff1(:), & ! in
+              -Coeff2(:),               & ! in
+              Cx % u(:,Ilev),           & ! in
+              Cx % v(:,Ilev),           & ! in
+              Uunrot(:),                & ! out
+              Vunrot(:),                & ! out
+              Cx % header % NumLocal,   & ! in
+              Cx % header % NumLocal)     ! in
+         ! Put unrotated values into Cx structure
+         Cx % u(:,ILev) = Uunrot(:)
+         Cx % v(:,Ilev) = Vunrot(:)
+      end do
 
-  deallocate (Vunrot)
-  deallocate (Uunrot)
-  deallocate (Coeff2)
-  deallocate (Coeff1)
+      deallocate (Vunrot)
+      deallocate (Uunrot)
+    end if
+
+    if (SurfaceWinds) then
+      call Ops_WEq_to_ll (Coeff1(:), & ! in
+           -Coeff2(:),               & ! in
+           Cx % u10(:),              & ! in
+           Cx % v10(:),              & ! in
+           U10unrot(:),              & ! out
+           V10unrot(:),              & ! out
+           Cx % header % NumLocal,   & ! in
+           Cx % header % NumLocal)     ! in
+      ! Put unrotated values into Cx structure
+      Cx % u10(:) = U10unrot(:)
+      Cx % v10(:) = V10unrot(:)
+      deallocate (V10unrot)
+      deallocate (U10unrot)
+    end if
+
+    deallocate (Coeff2)
+    deallocate (Coeff1)
+  end if
 end if
 
 end subroutine opsinputs_cxwriter_unrotatewinds
