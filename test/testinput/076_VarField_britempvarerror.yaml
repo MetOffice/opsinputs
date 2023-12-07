@@ -24,7 +24,7 @@ observations:
     - filter: VarObs Writer
       reject_obs_with_all_variables_failing_qc: true
       namelist_directory: testinput/VarObsWriterNamelists_076_VarField_britempvarerror
-      channel_offset: 1
+      varChannels: 2-4
       size_of_varobs_array: 4
       general_mode: verbose
     - filter: VarObs Checker
