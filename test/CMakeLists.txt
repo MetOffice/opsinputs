@@ -486,6 +486,10 @@ ADD_WRITER_TEST(NAME     cxwriter_UnRotateWinds
                 YAML     CxWriter_UnRotateWinds.yaml
                 NAMELIST CxWriterNamelists_UnRotateWinds/Sonde.nl
                 DATA     CxWriter_UnRotateWinds.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_UnRotateWinds10M
+                YAML     CxWriter_UnRotateWinds10M.yaml
+                NAMELIST CxWriterNamelists_UnRotateWinds10M/Scatwind.nl
+                DATA     CxWriter_UnRotateWinds10M.nc4 dummy.nc4)
 
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
