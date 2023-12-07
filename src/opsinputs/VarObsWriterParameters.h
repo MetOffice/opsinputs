@@ -79,21 +79,25 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 
-  /// This contains the offset that needs to be added to the channel number in order to
-  /// index the output arrays correctly.
-  oops::Parameter<int> channel_offset{"channel_offset", 0, this};
-
   /// This is the size of the varobs array for output.  The default is zero and the size
   /// of the array will be used.
   /// For atovs, jedi has 20 brightness temperatures but var expects 40.
   /// Therefore for atovs brightness_tmperatuere => size_of_varobs_array = 40.
   oops::Parameter<int> size_of_varobs_array{"size_of_varobs_array", 0, this};
 
-  /// This matches the channel number with the array index. This is useful when
-  /// there are skipped channels. e.g. channels 5,6,7,9,10,11 are required from a possible 12
-  /// channels. This would fill a size 12 array with the array indexes matching the channel number
-  /// [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN].
-  oops::Parameter<bool> use_actual_channels{"use_actual_channels", false, this};
+  /// List of channels which are expected for Var. This enables mapping of JOPA
+  /// channel numbers to VAR numbers. Default is empty and the JOPA channels will be used.
+  oops::Parameter<std::string> varChannels{"varChannels", "", this};
+
+  /// If set to false (default true) this matches the channel number with the array index.
+  /// This is useful when there are skipped channels. e.g. channels 5,6,7,9,10,11 are
+  /// required from a possible 12 channels. This would fill a size 12 array with the array
+  /// indexes matching the channel number [NaN,NaN,NaN,Nan,5,6,7,Nan,9,10,11,NaN].
+  /// Compressed example could be [2,8,50,100], no missing values between channel numbers.
+  oops::Parameter<bool> compressVarChannels{"compress_var_channels", true, this};
+
+  /// Increase the channel array size to the same size as the varobs array
+  oops::Parameter<bool> increaseChanArray{"increase_chan_array", false, this};
 
   /// If this list of ufo::variable is defined in the yaml a subset of the flags
   /// will be made with just these variables present.  This will allow Fortran calls such-as

@@ -8,7 +8,9 @@
 
 #include <memory>
 #include <ostream>
+#include <set>
 #include <string>
+#include <vector>
 
 #include "ioda/ObsDataVector.h"
 #include "oops/base/Variables.h"
@@ -87,6 +89,7 @@ class VarObsWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
   oops::Variables extradiagvars_;
   std::shared_ptr<ioda::ObsDataVector<int>> flags_;
   std::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
+  std::vector<int> varchannels_;
 
   VarObsWriterParameters parameters_;
 };
