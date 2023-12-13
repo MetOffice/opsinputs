@@ -2429,12 +2429,21 @@ integer(c_int), intent(in)                     :: Channels(:)
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
 
-if (size(Channels) == 0) then
-  VarNames(1) = VarName
-else
+character(len=max_varname_with_channel_length) :: VarNames_emis(max(size(Channels), 1))
+
+if (Varname=="emissivity") then
   do ichan = 1, size(Channels)
-    write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+    write (VarNames_emis(ichan),'(A,"_",I0)') VarName, Channels(ichan)
   end do
+  VarNames = VarNames_emis
+else
+  if (size(Channels) == 0) then
+    VarNames(1) = VarName
+  else
+    do ichan = 1, size(Channels)
+      write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)
+    end do
+  end if
 end if
 
 end function opsinputs_fill_varnames_with_channels
