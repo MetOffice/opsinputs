@@ -1116,6 +1116,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
           else
             arrayindex = varChannels(iChannel)
           end if
+	else
+	  exit
         end if
       else 
         if (.not. compressChannels) then
