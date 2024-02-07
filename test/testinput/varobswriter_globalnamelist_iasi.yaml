@@ -33,7 +33,7 @@ observations:
       where:
       - variable:
           name: MetaData/latitude #ensures ob2 is failed
-        is_not_defined:
+        value: is_not_valid
     - filter: VarObs Writer
       namelist_directory: ../etc/global/varobs
       variables_for_quality_control:

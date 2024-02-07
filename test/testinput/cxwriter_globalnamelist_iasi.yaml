@@ -35,7 +35,7 @@ observations:
       where:
       - variable:
           name: MetaData/latitude #ensures ob2 is failed
-        is_not_defined:
+        value: is_not_valid
     - filter: Cx Writer
       variables_for_quality_control:
       - name: brightnessTemperature

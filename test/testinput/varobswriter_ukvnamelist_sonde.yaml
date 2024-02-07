@@ -24,7 +24,7 @@ observations:
       where:
       - variable:
           name: MetaData/latitude
-        is_not_defined:
+        value: is_not_valid
       defer to post: true
     - filter: VarObs Writer
       namelist_directory: ../etc/ukv/varobs
