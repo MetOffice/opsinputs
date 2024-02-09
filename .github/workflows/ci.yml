@@ -6,6 +6,7 @@ on:
     branches: [develop]
   pull_request:
     branches: [develop]
+    types: [labeled]
 
 concurrency:
   group: ${{ github.ref }}
@@ -17,8 +18,9 @@ env:
 
 jobs:
   build1:
-    name: gnu 11.3.1 (UKMO)
+    # if: false
     if: github.repository_owner == 'MetOffice'
+    name: gnu-openmpi (UKMO)
     runs-on: jedi-self-hosted-rg
 
     steps:
