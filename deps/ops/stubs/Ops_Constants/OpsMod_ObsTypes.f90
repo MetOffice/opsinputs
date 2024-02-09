@@ -244,6 +244,8 @@ INTEGER, PARAMETER :: ObsTypeSEVIRICTPUK  = 24670   ! => SEVIRI AUTOSAT
                                                       !    MSGCTP data for UK area
 INTEGER, PARAMETER :: ObsTypeSEVIRICTPFD  = 24680   ! => SEVIRI AUTOSAT
                                                       !    MSGCTP data for full disc
+INTEGER, PARAMETER :: ObsTypeFCIEUMASR    = 24690   ! => FCI EUMETSAT radiance from ASR product
+INTEGER, PARAMETER :: ObsTypeFCIAUTOUK    = 24691   ! => FCI AUTOSATradiance for UK area
 INTEGER, PARAMETER :: ObsTypeAIRSMS       = 24700   ! => AIRS Clearest MODIS FOV
 INTEGER, PARAMETER :: ObsTypeWINDSAT      = 24800   ! => WINDSAT BUFR
 INTEGER, PARAMETER :: ObsTypeAMSR2        = 25000   ! => AMSR2 radiances

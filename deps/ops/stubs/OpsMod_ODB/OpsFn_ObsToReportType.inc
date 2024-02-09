@@ -105,6 +105,7 @@ USE OpsMod_Satids, ONLY:    &
   SatId_Meteosat9,          &
   SatId_Meteosat10,         &
   SatId_Meteosat11,         &
+  SatId_Meteosat12,         &
   SatId_MetopA,             &
   SatId_MetopB,             &
   SatId_MetopC,             &
@@ -419,6 +420,25 @@ SELECT CASE (Obs % Header % ObsGroup)
     END IF
   CASE (ObsGroupCOMSMIClr)
     report_types = rep_type_kma_geos_rad
+  CASE (ObsGroupFCIClr, ObsGroupFCIASR)
+    IF (Obs % Header % Satid % Present) THEN
+      DO i = ob_start, ob_end
+        IF (Obs % Satid(i) == SatId_Meteosat12) THEN
+          report_types(i - ob_start + 1) = rep_type_meteosat_12_geos_rad
+        ELSE
+          found_report_type = .FALSE.
+          DO j = 1, SIZE (map, DIM = 1)
+            IF ((map(j,1) == ObsGroupFCIClr .AND. map(j,2) == Obs % Satid(i)) .OR. &
+                (map(j,1) == ObsGroupFCIASR .AND. map(j,2) == Obs % Satid(i))) THEN
+              report_types(i - ob_start + 1) = map(j,3)
+              found_report_type = .TRUE.
+              EXIT
+            END IF
+          END DO
+          CALL update_unrecognized_satids (Obs % Satid(i))
+        END IF
+      END DO
+    END IF
   CASE (ObsGroupMWSFY3B)
     report_types = rep_type_fy3b
   CASE (ObsGroupGeoCloud)

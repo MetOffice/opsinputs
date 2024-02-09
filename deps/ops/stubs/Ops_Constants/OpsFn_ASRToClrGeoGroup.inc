@@ -16,6 +16,8 @@ INTEGER             :: OpsFn_ASRToClrGeoGroup
 SELECT CASE (obsgroup)
   CASE (ObsGroupAHIASR)
     OpsFn_ASRToClrGeoGroup = ObsGroupAHIClr
+  CASE (ObsGroupFCIASR)
+    OpsFn_ASRToClrGeoGroup = ObsGroupFCIClr
   CASE (ObsGroupSEVIRIASR)
     OpsFn_ASRToClrGeoGroup = ObsGroupSEVIRIClr
   CASE DEFAULT
