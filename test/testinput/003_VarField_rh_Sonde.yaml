@@ -21,7 +21,7 @@ observations:
       where:
       - variable:
           name: ObsErrorData/relativeHumidity
-        is_defined:
+        value: is_valid
       action:
         name: inflate error
         inflation factor: 2.0
