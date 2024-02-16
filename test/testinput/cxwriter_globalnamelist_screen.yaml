@@ -1,0 +1,52 @@
+time window:
+  begin: 2018-01-01T00:00:00Z
+  end: 2018-01-01T01:00:00Z
+
+observations:
+  - obs space:
+      name: Surface  # Screen observations are processed using the name Surface
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
+    geovals:
+      filename: Data/cx_globalnamelist_screen.nc4
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: MetaData/latitude
+        minvalue: 0.0
+    - filter: Cx Writer
+      namelist_directory: ../etc/global/cx/screen  # There is a custom location for the screen CX namelist
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+      IC_PLevels: 5
+    - filter: Cx Checker
+      expected_surface_variables: ["1", "2", "3", "4", "5", "6", "8", "13", "16", "17", "22", "23", "24"]
+      expected_upper_air_variables: ["1", "3", "4", "5", "11", "30"]
+      expected_main_table_columns:
+      - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
+        - ["7.10","37.10","67.10","77.10","47.10","57.10",
+        "87.10","17.10","107.10","27.10","117.10","127.10",
+        "97.10","1.10","1.20","1.30","11.10","11.20","11.30",
+        "21.10","21.20","21.30","31.10","31.20","31.30",
+        "41.10","41.20","41.30","51.10","51.20","51.30"] # column 1 - 1st observation
+        - ["**********","**********","**********","**********","**********","**********","**********",
+        "**********","**********","**********","**********","**********","**********","2.10","**********",
+        "2.30","12.10","**********","12.30","22.10","**********","22.30","32.10","**********","32.30",
+        "42.10","**********","42.30","52.10","**********","52.30"] # column 2 - 2nd observation
+        - ["7.40","37.40","67.40","77.40","47.40","57.40","87.40",
+        "17.40","107.40","27.40","117.40","127.40","97.40","4.10",
+        "4.20","4.30","14.10","14.20","14.30","24.10","24.20",
+        "24.30","34.10","34.20","34.30","44.10","44.20","44.30",
+        "54.10","54.20","54.30"] # column 3 - observation 4
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
