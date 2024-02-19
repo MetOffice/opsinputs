@@ -388,6 +388,10 @@ ADD_WRITER_TEST(NAME     cxwriter_006_SurfaceCxField_v10
                 YAML     006_SurfaceCxField_v10.yaml
                 NAMELIST CxWriterNamelists_006_SurfaceCxField_v10/AMSUB.nl
                 DATA     006_SurfaceCxField_v10.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_008_SurfaceCxField_visibility_1p5m
+                YAML     008_SurfaceCxField_visibility_1p5m.yaml
+                NAMELIST CxWriterNamelists_008_SurfaceCxField_visibility_1p5m/Surface.nl
+                DATA     008_SurfaceCxField_visibility_1p5m.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_013_SurfaceCxField_TskinSea
                 YAML     013_SurfaceCxField_TskinSea.yaml
                 NAMELIST CxWriterNamelists_013_SurfaceCxField_TskinSea/AMSUB.nl
@@ -400,6 +404,14 @@ ADD_WRITER_TEST(NAME     cxwriter_017_SurfaceCxField_SeaIce
                 YAML     017_SurfaceCxField_SeaIce.yaml
                 NAMELIST CxWriterNamelists_017_SurfaceCxField_SeaIce/AMSUB.nl
                 DATA     017_SurfaceCxField_SeaIce.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_022_SurfaceCxField_surf_param_a
+                YAML     022_SurfaceCxField_surf_param_a.yaml
+                NAMELIST CxWriterNamelists_022_SurfaceCxField_surf_param_a/Surface.nl
+                DATA     022_SurfaceCxField_surf_param_a.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_023_SurfaceCxField_surf_param_b
+                YAML     023_SurfaceCxField_surf_param_b.yaml
+                NAMELIST CxWriterNamelists_023_SurfaceCxField_surf_param_b/Surface.nl
+                DATA     023_SurfaceCxField_surf_param_b.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_024_SurfaceCxField_CloudAmount
                 YAML     024_SurfaceCxField_CloudAmount.yaml
                 NAMELIST CxWriterNamelists_024_SurfaceCxField_CloudAmount/SatTCWV.nl
