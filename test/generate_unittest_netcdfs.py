@@ -827,9 +827,12 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('relative_humidity_2m',       'testinput/004_SurfaceCxField_rh2.nc4')
     output_1d_geoval_to_netcdf       ('uwind_at_10m',               'testinput/005_SurfaceCxField_u10.nc4')
     output_1d_geoval_to_netcdf       ('vwind_at_10m',               'testinput/006_SurfaceCxField_v10.nc4')
+    output_1d_geoval_to_netcdf       ('visibility_1p5m',            'testinput/008_SurfaceCxField_visibility_1p5m.nc4')
     output_1d_geoval_to_netcdf       ('skin_temperature',           'testinput/013_SurfaceCxField_TskinSea.nc4')
     output_1d_geoval_to_netcdf       ('surface_pressure_at_mean_sea_level', 'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
+    output_1d_geoval_to_netcdf       ('surf_param_a',               'testinput/022_SurfaceCxField_surf_param_a.nc4')
+    output_1d_geoval_to_netcdf       ('surf_param_b',               'testinput/023_SurfaceCxField_surf_param_b.nc4')
     output_1d_geoval_to_netcdf       ('total_cloud_amount', 'testinput/024_SurfaceCxField_CloudAmount.nc4')
     output_1d_geoval_to_netcdf       ('obukhov_length',             'testinput/056_SurfaceCxField_obukhov_length.nc4')
     output_1d_geoval_to_netcdf       ('friction_velocity_over_water', 'testinput/057_SurfaceCxField_friction_velocity_over_water.nc4')
@@ -1031,6 +1034,14 @@ if __name__ == "__main__":
                              'testinput/cx_globalnamelist_scatwind.nc4')
     # Unrotate 10m winds
     output_full_cx_to_netcdf         (['uwind_at_10m', 'vwind_at_10m'],[], 'testinput/CxWriter_UnRotateWinds10M.nc4')
-    
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
+
+    # Screen
+    output_full_cx_to_netcdf(['surface_altitude', 'skin_temperature', 'ice_area_fraction', 'surface_pressure',
+                              'uwind_at_10m', 'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m',
+                              'visibility_1p5m', 'total_cloud_amount', 'surface_pressure_at_mean_sea_level',
+                              'surf_param_a', 'surf_param_b'],
+                             ['potential_temperature', 'eastward_wind', 'northward_wind', 'specific_humidity',
+                              'air_pressure_levels', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_screen.nc4')
