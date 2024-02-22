@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# (C) Crown Copyright 2023, the Met Office. All rights reserved.
+# (C) Crown Copyright 2024, the Met Office. All rights reserved.
 #
 # shellcheck disable=SC2317
 # shellcheck source=/dev/null
@@ -28,6 +28,8 @@ GENERATOR=Unix\ Makefiles
 if command -v ninja &>/dev/null; then GENERATOR=Ninja; fi
 BASE="${HERE%/*}"
 TESTDIR="${BASE##*/}"
+export OMPI_ALLOW_RUN_AS_ROOT=1
+export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 export OMPI_MCA_rmaps_base_oversubscribe=true
 
 trap finally ERR EXIT
@@ -40,15 +42,13 @@ if [[ -f /opt/spack-environment/activate.sh ]]; then
 fi
 
 # -- Configure
-cmake -B . -S "${HERE}" -G "${GENERATOR}" -DCMAKE_BUILD_TYPE=Debug
+cmake -B . -S "${HERE}" -G "${GENERATOR}" -DCMAKE_BUILD_TYPE=Release
 
 # -- Build
 cmake --build . -j "${NPROC}"
 
 # -- Test
-env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest -j"${NPROC}" --test-dir "${TESTDIR}" || \
-env OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-    ctest --test-dir "${TESTDIR}" --rerun-failed -V
+ctest -j"${NPROC}" --test-dir "${TESTDIR}" || \
+ctest --test-dir "${TESTDIR}" --rerun-failed -V
 
 exit
