@@ -20,7 +20,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_t2 = var_sfc_t2m
 character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_2m"
 character(len=*), parameter, public :: opsinputs_cxfields_u10 = var_sfc_u10
 character(len=*), parameter, public :: opsinputs_cxfields_v10 = var_sfc_v10
-character(len=*), parameter, public :: opsinputs_cxfields_vis = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_vis = "visibility_1p5m"
 character(len=*), parameter, public :: opsinputs_cxfields_WAVE_HGHT = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_WIND_SPED = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SeaHeight = opsinputs_cxfields_unknown
@@ -31,8 +31,8 @@ character(len=*), parameter, public :: opsinputs_cxfields_SeaIce = var_sfc_ifrac
 character(len=*), parameter, public :: opsinputs_cxfields_SnowAmount = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_qt2 = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_aerosol = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamA = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamB = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamA = "surf_param_a"
+character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamB = "surf_param_b"
 character(len=*), parameter, public :: opsinputs_cxfields_LapseRate = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CloudAmount = "total_cloud_amount"
 character(len=*), parameter, public :: opsinputs_cxfields_ConvCloudAmount = opsinputs_cxfields_unknown

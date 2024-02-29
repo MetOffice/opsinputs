@@ -17,76 +17,8 @@ env:
 
 jobs:
   build1:
-    name: gnu 11.3.1 (UKMO)
     if: github.repository_owner == 'MetOffice'
-    runs-on: jedi-self-hosted-rg
-
-    steps:
-      - name: Pre-submit cleanup
-        run: |
-          rm -fr ./${{ env.BUNDLE }} || true
-          ls -lgo ./
-      - name: Checkout current
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
-      - name: Initiate bundle
-        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
-
-      - name: Checkout jedicmake
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.BUNDLE }}/jedicmake
-          repository: JCSDA-internal/jedi-cmake
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Checkout oops
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.BUNDLE }}/oops
-          repository: JCSDA-internal/oops
-          token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for oops@${{ github.head_ref }}
-        if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
-
-      - name: Checkout ioda
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.BUNDLE }}/ioda
-          repository: JCSDA-internal/ioda
-          token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ioda@${{ github.head_ref }}
-        if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
-
-      - name: Checkout ufo
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.BUNDLE }}/ufo
-          repository: JCSDA-internal/ufo
-          token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ufo@${{ github.head_ref }}
-        if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
-
-      - name: Build and Test
-        run: |
-          az acr login --name ngmssboxjediacr
-          docker run --rm \
-            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
-            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
-            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
-            'ngmssboxjediacr.azurecr.io/jedibase:alma9'
-
-      - name: Cleanup workspace
-        working-directory: ${{github.workspace}}
-        run: rm -fr ${{ env.BUNDLE }} || true
-
-  build2:
-    name: gnu 9.4.0 (JCSDA)
-    if: github.repository_owner == 'MetOffice'
+    name: gnu-openmpi (JCSDA)
     runs-on: ubuntu-latest
 
     steps:
@@ -143,9 +75,9 @@ jobs:
             --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
             'jcsda/docker-gnu-openmpi-dev:latest'
 
-  build3:
-    name: clang 10.0.0 (JCSDA)
+  build2:
     if: github.repository_owner == 'MetOffice'
+    name: clang-mpich (JCSDA)
     runs-on: ubuntu-latest
 
     steps:
