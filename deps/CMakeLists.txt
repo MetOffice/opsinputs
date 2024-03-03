@@ -44,6 +44,15 @@ ${CMAKE_Fortran_FLAGS}"
 -check uninit \
 ${CMAKE_Fortran_DEBUG_FLAGS}"
   )
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  set(OPS_DEFAULT_Fortran_FLAGS "\
+-double \
+${CMAKE_Fortran_FLAGS}"
+#-Wp,-P \
+  )
+  set(CMAKE_Fortran_DEBUG_FLAGS "\
+${CMAKE_Fortran_DEBUG_FLAGS}"
+  )
 endif()
 
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
