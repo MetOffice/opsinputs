@@ -13,8 +13,7 @@ endif()
 
 set(CMAKE_Fortran_FLAGS "\
 ${OPS_DEFAULT_Fortran_FLAGS} \
-${GCOM_EXTRA_Fortran_FLAGS} \
-${CMAKE_Fortran_FLAGS}")
+${GCOM_EXTRA_Fortran_FLAGS}")
 
 set(GCOM_SOURCE_FILES
   gc/gc__abort.c
@@ -213,9 +212,16 @@ set(GCOM_SOURCE_DIRS
 
 # Setup the parallel version of the gcom library
 
-ecbuild_add_library(
-  TARGET gcom
-  SOURCES ${GCOM_SOURCE_FILES})
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_library(
+    TARGET gcom
+    SOURCES ${GCOM_SOURCE_FILES}
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_library(
+    TARGET gcom
+    SOURCES ${GCOM_SOURCE_FILES})
+endif()
  
 target_compile_definitions(gcom PRIVATE 
   GC_VERSION="'7.2'" 
@@ -240,9 +246,16 @@ target_include_directories(gcom
 
 # Setup the serial version of the gcom library
 
-ecbuild_add_library(
-  TARGET gcom_serial
-  SOURCES ${GCOM_SOURCE_FILES})
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_library(
+    TARGET gcom_serial
+    SOURCES ${GCOM_SOURCE_FILES}
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_library(
+    TARGET gcom_serial
+    SOURCES ${GCOM_SOURCE_FILES})
+endif()
 
 # For the serial version, skip the MPI_SRC symbol...
 target_compile_definitions(gcom_serial PRIVATE

@@ -43,6 +43,8 @@ if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-real-8 -fdefault-integer-8")
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-integer-size 64 -real-size 64")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-double")
 endif()
 set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                             COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")

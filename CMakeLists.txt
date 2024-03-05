@@ -69,6 +69,9 @@ include_directories( ${IODA_INCLUDE_DIRS} )
 find_package( oops REQUIRED )
 include_directories( ${OOPS_INCLUDE_DIRS} )
 
+find_package(SHUM REQUIRED)
+include_directories( ${SHUM_INCLUDE_DIR} )
+
 ################################################################################
 # Export package info
 ################################################################################
