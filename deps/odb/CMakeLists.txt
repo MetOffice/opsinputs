@@ -9,17 +9,23 @@ endif()
 
 set(CMAKE_Fortran_FLAGS "\
 ${OPS_DEFAULT_Fortran_FLAGS} \
-${ODB_EXTRA_Fortran_FLAGS} \
-${CMAKE_Fortran_FLAGS}")
+${ODB_EXTRA_Fortran_FLAGS}")
 
 set(ODB_SOURCE_FILES
   stubs/parkind1.F90
   stubs/yomhook.F90
 )
 
-ecbuild_add_library(
-  TARGET odb
-  SOURCES ${ODB_SOURCE_FILES})
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_library(
+    TARGET odb
+    SOURCES ${ODB_SOURCE_FILES}
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_library(
+    TARGET odb
+    SOURCES ${ODB_SOURCE_FILES})
+endif()
 
 get_target_property(ODB_Fortran_MODULE_DIRECTORY odb Fortran_MODULE_DIRECTORY)
 

@@ -13,8 +13,7 @@ endif()
 
 set(CMAKE_Fortran_FLAGS "\
 ${OPS_DEFAULT_Fortran_FLAGS} \
-${OPS_EXTRA_Fortran_FLAGS} \
-${CMAKE_Fortran_FLAGS}")
+${OPS_EXTRA_Fortran_FLAGS}")
 
 set(OPS_SOURCE_FILES
   code/GenMod_ModelIO/GenMod_ModelIO.F90
@@ -111,6 +110,7 @@ foreach (file ${OPS_SOURCE_FILES})
   list(APPEND OPS_SOURCE_DIRS "${dir}")
 endforeach()
 list(REMOVE_DUPLICATES OPS_SOURCE_DIRS)
+include_directories( ${OPS_SOURCE_DIRS} )
 
 # Find extra dependencies
 
@@ -119,8 +119,14 @@ find_package(SHUM REQUIRED)
 
 # Setup the parallel version of the ops library
 
-ecbuild_add_library(TARGET ops
-  SOURCES ${OPS_SOURCE_FILES})
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_library(TARGET ops
+    SOURCES ${OPS_SOURCE_FILES}
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_library(TARGET ops
+    SOURCES ${OPS_SOURCE_FILES})
+endif()
 
 target_compile_definitions(ops PRIVATE 
   EXTERNAL_GCOM
@@ -163,8 +169,14 @@ target_include_directories(ops
 
 # Setup the serial version of the ops library, linked to gcom_serial
 
-ecbuild_add_library(TARGET ops_serial
-  SOURCES ${OPS_SOURCE_FILES})
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_library(TARGET ops_serial
+    SOURCES ${OPS_SOURCE_FILES}
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_library(TARGET ops_serial
+    SOURCES ${OPS_SOURCE_FILES})
+endif()
 
 target_compile_definitions(ops_serial PRIVATE
   EXTERNAL_GCOM
@@ -212,16 +224,32 @@ target_include_directories(ops_serial
 
 set(CMAKE_EXECUTABLE_SUFFIX .exe)
 
-ecbuild_add_executable(TARGET OpsProg_PrintCXFile
-  SOURCES
-  code/OpsProg_Utils/OpsMod_PrintCX.f90
-  code/OpsProg_Utils/OpsProg_PrintCXFile.F90)
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_executable(TARGET OpsProg_PrintCXFile
+    SOURCES
+    code/OpsProg_Utils/OpsMod_PrintCX.f90
+    code/OpsProg_Utils/OpsProg_PrintCXFile.F90
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_executable(TARGET OpsProg_PrintCXFile
+    SOURCES
+    code/OpsProg_Utils/OpsMod_PrintCX.f90
+    code/OpsProg_Utils/OpsProg_PrintCXFile.F90)
+endif()
 target_link_libraries(OpsProg_PrintCXFile
   PRIVATE ops_serial)
 
-ecbuild_add_executable(TARGET OpsProg_PrintVarobs
-  SOURCES
-  code/OpsProg_Utils/OpsMod_PrintVarobs.f90
-  code/OpsProg_Utils/OpsProg_PrintVarobs.F90)
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+  ecbuild_add_executable(TARGET OpsProg_PrintVarobs
+    SOURCES
+    code/OpsProg_Utils/OpsMod_PrintVarobs.f90
+    code/OpsProg_Utils/OpsProg_PrintVarobs.F90
+    LINKER_LANGUAGE CXX)
+else()
+  ecbuild_add_executable(TARGET OpsProg_PrintVarobs
+    SOURCES
+    code/OpsProg_Utils/OpsMod_PrintVarobs.f90
+    code/OpsProg_Utils/OpsProg_PrintVarobs.F90)
+endif()
 target_link_libraries(OpsProg_PrintVarobs
   PRIVATE ops_serial)
