@@ -1487,17 +1487,17 @@ integer(kind=4), allocatable    :: UniqueSatIds(:)
 integer                         :: ii, jj
 integer, parameter              :: maxpred = 31
 character(len=*), parameter     :: PredictorBaseName(1:maxpred) = (/ &
-              "constant                  ", &
-              "thickness_850_300hPa      ", &
-              "thickness_200_50hPa       ", &
-              "Tskin                     ", &
-              "total_column_water        ", &
-              "legendre_order_1          ", &
-              "legendre_order_2          ", &
-              "legendre_order_3          ", &
-              "legendre_order_4          ", &
-              "legendre_order_5          ", &
-              "legendre_order_6          ", &
+              "constant                          ", &
+              "thickness_850_300hPa              ", &
+              "thickness_200_50hPa               ", &
+              "Tskin                             ", &
+              "total_column_water                ", &
+              "legendre_order_1                  ", &
+              "legendre_order_2                  ", &
+              "legendre_order_3                  ", &
+              "legendre_order_4                  ", &
+              "legendre_order_5                  ", &
+              "legendre_order_6                  ", &
               "satelliteOrbitalAngle_order_1_cos ", &
               "satelliteOrbitalAngle_order_1_sin ", &
               "satelliteOrbitalAngle_order_2_cos ", &
