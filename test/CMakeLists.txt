@@ -662,6 +662,10 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surfacecloud
                 YAML     cxwriter_ukvnamelist_surfacecloud.yaml
                 NAMELIST ../../etc/ukv/cx/SurfaceCloud.nl
                 DATA     cx_ukvnamelist_surfacecloud.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surface
+                YAML     cxwriter_ukvnamelist_surface.yaml
+                NAMELIST ../../etc/ukv/cx/Surface.nl
+                DATA     cx_ukvnamelist_surface.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
