@@ -1782,9 +1782,9 @@ character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 
 ! Local declarations:
-integer(kind=4)                                    :: VarValue(JediToOpsLayoutMapping % NumJediObs)
-integer(kind=4)                                    :: CurrentVarValue
-integer(kind=4)                                    :: MissingInt
+integer(kind=c_int)                                :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+integer(kind=c_int)                                :: CurrentVarValue
+integer(kind=c_int)                                :: MissingInt
 integer                                            :: i
 
 ! Body:
@@ -1864,7 +1864,7 @@ integer                                            :: i
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   ! Retrieve data from JEDI
   call opsinputs_obsspace_get_db_string(ObsSpace, JediVarGroup, JediVarName, &
-                                        int(StringLen, kind=4), VarValue)
+                                        int(StringLen, kind=c_int), VarValue)
 
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, String1)
