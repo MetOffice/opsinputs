@@ -37,6 +37,12 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
 ${CMAKE_Fortran_FLAGS}"
 #-Wp,-P \
   )
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
+  set(OPS_DEFAULT_Fortran_FLAGS "\
+-fdefault-integer-8 -fdefault-real-8 \
+${CMAKE_Fortran_FLAGS}"
+#-Wp,-P \
+  )
   set(CMAKE_Fortran_DEBUG_FLAGS "\
 -check bounds \
 -check format \
