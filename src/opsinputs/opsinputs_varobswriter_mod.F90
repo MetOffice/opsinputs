@@ -1479,45 +1479,45 @@ character(len=*), intent(in)                    :: JediVarName
 
 ! Local arguments:
 character(len=max_varname_with_channel_length) :: JediVarNamesWithChannels(max(size(Channels), 1))
-character(len=MAXVARLEN)        :: satidname
-real(kind=c_double)             :: VarValue(NumObs)
-real(kind=c_double)             :: MissingDouble
-integer(kind=4)                 :: SatIdValue(NumObs)
-integer(kind=4), allocatable    :: UniqueSatIds(:)
-integer                         :: ii, jj
-integer, parameter              :: maxpred = 31
-character(len=*), parameter     :: PredictorBaseName(1:maxpred) = (/ &
-              "constant                  ", &
-              "thickness_850_300hPa      ", &
-              "thickness_200_50hPa       ", &
-              "Tskin                     ", &
-              "total_column_water        ", &
-              "Legendre_order_1          ", &
-              "Legendre_order_2          ", &
-              "Legendre_order_3          ", &
-              "Legendre_order_4          ", &
-              "Legendre_order_5          ", &
-              "Legendre_order_6          ", &
-              "orbital_angle_order_1_cos ", &
-              "orbital_angle_order_1_sin ", &
-              "orbital_angle_order_2_cos ", &
-              "orbital_angle_order_2_sin ", &
-              "orbital_angle_order_3_cos ", &
-              "orbital_angle_order_3_sin ", &
-              "orbital_angle_order_4_cos ", &
-              "orbital_angle_order_4_sin ", &
-              "orbital_angle_order_5_cos ", &
-              "orbital_angle_order_5_sin ", &
-              "orbital_angle_order_6_cos ", &
-              "orbital_angle_order_6_sin ", &
-              "orbital_angle_order_7_cos ", &
-              "orbital_angle_order_7_sin ", &
-              "orbital_angle_order_8_cos ", &
-              "orbital_angle_order_8_sin ", &
-              "orbital_angle_order_9_cos ", &
-              "orbital_angle_order_9_sin ", &
-              "orbital_angle_order_10_cos", &
-              "orbital_angle_order_10_sin" /)
+character(len=MAXVARLEN)         :: satidname
+real(kind=c_double)              :: VarValue(NumObs)
+real(kind=c_double)              :: MissingDouble
+integer(kind=c_int)              :: SatIdValue(NumObs)
+integer(kind=c_int), allocatable :: UniqueSatIds(:)
+integer                          :: ii, jj
+integer, parameter               :: maxpred = 31
+character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
+              "constant                          ", &
+              "thickness_850_300hPa              ", &
+              "thickness_200_50hPa               ", &
+              "Tskin                             ", &
+              "total_column_water                ", &
+              "legendre_order_1                  ", &
+              "legendre_order_2                  ", &
+              "legendre_order_3                  ", &
+              "legendre_order_4                  ", &
+              "legendre_order_5                  ", &
+              "legendre_order_6                  ", &
+              "satelliteOrbitalAngle_order_1_cos ", &
+              "satelliteOrbitalAngle_order_1_sin ", &
+              "satelliteOrbitalAngle_order_2_cos ", &
+              "satelliteOrbitalAngle_order_2_sin ", &
+              "satelliteOrbitalAngle_order_3_cos ", &
+              "satelliteOrbitalAngle_order_3_sin ", &
+              "satelliteOrbitalAngle_order_4_cos ", &
+              "satelliteOrbitalAngle_order_4_sin ", &
+              "satelliteOrbitalAngle_order_5_cos ", &
+              "satelliteOrbitalAngle_order_5_sin ", &
+              "satelliteOrbitalAngle_order_6_cos ", &
+              "satelliteOrbitalAngle_order_6_sin ", &
+              "satelliteOrbitalAngle_order_7_cos ", &
+              "satelliteOrbitalAngle_order_7_sin ", &
+              "satelliteOrbitalAngle_order_8_cos ", &
+              "satelliteOrbitalAngle_order_8_sin ", &
+              "satelliteOrbitalAngle_order_9_cos ", &
+              "satelliteOrbitalAngle_order_9_sin ", &
+              "satelliteOrbitalAngle_order_10_cos", &
+              "satelliteOrbitalAngle_order_10_sin" /)
 character(len=150) :: JediVarGroupWithSatId
 
 ! Body:
@@ -1628,11 +1628,11 @@ end subroutine opsinputs_varobswriter_populatecxheader
 subroutine unique_values(input, output, positive)
 implicit none
 
-integer(kind=4), intent(in)               :: input(:)
-integer(kind=4), allocatable, intent(out) :: output(:)
-logical, optional, intent(in)             :: positive
+integer(kind=c_int), intent(in)               :: input(:)
+integer(kind=c_int), allocatable, intent(out) :: output(:)
+logical, optional, intent(in)                 :: positive
 
-integer(kind=4), allocatable :: unique(:)
+integer(kind=c_int), allocatable :: unique(:)
 integer :: i, j, k
 
 if (size(input) > 0) then
