@@ -674,7 +674,7 @@ if __name__ == "__main__":
     output_2d_normal_var_to_netcdf   ('brightnessTemperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
                                                                  'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor',
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
-                                                                 'Legendre_order_1_satid_5Predictor',    'Legendre_order_1_satid_8Predictor'],
+                                                                 'legendre_order_1_satid_5Predictor',    'legendre_order_1_satid_8Predictor'],
                                       'testinput/080_VarField_biaspredictors.nc4', predictors=True)
     output_2d_simulated_var_to_netcdf('bendingAngle',              'testinput/071_VarField_bendingangle.nc4', add_occulting_satid=True)
     output_2d_normal_var_to_netcdf('impactParameterRO', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
