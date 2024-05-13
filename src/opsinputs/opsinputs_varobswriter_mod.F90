@@ -316,8 +316,6 @@ call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_
 
 call f_conf % get_or_die("station_ID_int_to_string", self % StationIDIntToString)
 
-write(*, *) "!! StationIDIntToString: ", self % StationIDIntToString
-
 call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 
 call f_conf % get_or_die("compress_var_channels", self % compressVarChannels)
