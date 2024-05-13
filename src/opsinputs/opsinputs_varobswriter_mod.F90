@@ -155,6 +155,7 @@ private
   logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
   logical            :: VarobsLengthIsIC_PLevels
+  logical            :: StationIDIntToString
 
   character(len=100) :: latitudeName
   character(len=100) :: longitudeName
@@ -312,6 +313,10 @@ call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
 call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_PLevels)
+
+call f_conf % get_or_die("station_ID_int_to_string", self % StationIDIntToString)
+
+write(*, *) "!! StationIDIntToString: ", self % StationIDIntToString
 
 call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 
@@ -738,7 +743,8 @@ end if
 
 if (obsspace_has(ObsSpace, "MetaData", "stationIdentification")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
-    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData")
+    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData", &
+    self % StationIDIntToString)
 else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediToOpsLayoutMapping)
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping % NumOpsObs, Ob % Callsign)

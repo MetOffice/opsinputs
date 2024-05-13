@@ -106,6 +106,9 @@ set_tests_properties(test_opsinputs_varobswriter_setup PROPERTIES FIXTURES_SETUP
 ADD_WRITER_TEST(NAME     varobswriter_001_VarField_pstar
                 YAML     001_VarField_pstar.yaml
                 DATA     001_VarField_pstar.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_001_VarField_pstar_stationID_integer
+                YAML     001_VarField_pstar_stationID_integer.yaml
+                DATA     001_VarField_pstar_stationID_integer.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_Surface
                 YAML     002_VarField_temperature_Surface.yaml
                 DATA     002_VarField_temperature_Surface.nc4)
