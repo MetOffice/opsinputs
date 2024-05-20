@@ -24,7 +24,7 @@ int opsinputs_obsdatavector_nlocs_f(const ioda::ObsDataVector<T> &vec) {
 }
 
 template <typename T>
-const oops::Variables * opsinputs_obsdatavector_varnames_f(
+const oops::ObsVariables * opsinputs_obsdatavector_varnames_f(
     const ioda::ObsDataVector<T> &vec) {
   return &vec.varnames();
 }
@@ -50,7 +50,7 @@ int opsinputs_obsdatavector_int_nlocs_f(const ioda::ObsDataVector<int> &vec) {
   return opsinputs_obsdatavector_nlocs_f(vec);
 }
 
-const oops::Variables * opsinputs_obsdatavector_int_varnames_f(
+const oops::ObsVariables * opsinputs_obsdatavector_int_varnames_f(
     const ioda::ObsDataVector<int> &vec) {
   return opsinputs_obsdatavector_varnames_f(vec);
 }
@@ -70,7 +70,7 @@ int opsinputs_obsdatavector_float_nlocs_f(const ioda::ObsDataVector<float> &vec)
   return opsinputs_obsdatavector_nlocs_f(vec);
 }
 
-const oops::Variables * opsinputs_obsdatavector_float_varnames_f(
+const oops::ObsVariables * opsinputs_obsdatavector_float_varnames_f(
     const ioda::ObsDataVector<float> &vec) {
   return opsinputs_obsdatavector_varnames_f(vec);
 }

@@ -25,6 +25,7 @@ use obsspace_mod, only:  &
     obsspace_get_gnlocs, &
     obsspace_get_nlocs,  &
     obsspace_has
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use opsinputs_fill_mod, only: &
     opsinputs_fill_fillcoord2d, &
@@ -218,7 +219,7 @@ logical(c_bool), intent(in)                :: comm_is_valid
 integer(gc_int_kind), intent(in)           :: comm
 integer(c_int), intent(in)                 :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
-type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
+type(obs_variables), intent(inout)         :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
@@ -619,7 +620,7 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(oops_variables), intent(inout)      :: diagvars
+type(obs_variables), intent(inout)       :: diagvars
 
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
