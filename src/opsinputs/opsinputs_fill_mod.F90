@@ -1838,12 +1838,14 @@ end subroutine opsinputs_fill_fillinteger
 !>   Name of the JEDI variable used to populate \p String1.
 !> \param[in] JediGroup
 !>   Group of the JEDI variable used to populate \p String1.
-!>
+!> \param[in] ConvertIntToSTring
+!>   Convert an integer-valued ObsSpace vector to a string.
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillstring( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, StringLen, String1, ObsSpace, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, StringLen, String1, ObsSpace, JediVarName, JediVarGroup, &
+  ConvertIntToSTring)
 implicit none
 
 ! Subroutine arguments:
@@ -1855,17 +1857,33 @@ character(len=StringLen), pointer                  :: String1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
+logical, optional, intent(in)                      :: ConvertIntToString
 
 ! Local declarations:
 character(len=StringLen)                           :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+integer(integer64)                                 :: IntVarValue(JediToOpsLayoutMapping % NumJediObs)
 integer                                            :: i
+logical                                            :: IntToString
+character(len=20)                                  :: IntAsString
 
 ! Body:
 
+
+
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
+  if (present(ConvertIntToString)) then
+    IntToString = ConvertIntToString
+  else
+    IntToString = .false.
+  end if
+
   ! Retrieve data from JEDI
-  call opsinputs_obsspace_get_db_string(ObsSpace, JediVarGroup, JediVarName, &
-                                        int(StringLen, kind=c_int), VarValue)
+  if (IntToString) then
+    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, IntVarValue)
+  else
+    call opsinputs_obsspace_get_db_string(ObsSpace, JediVarGroup, JediVarName, &
+         int(StringLen, kind=c_int), VarValue)
+  end if
 
   ! Fill the OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, String1)
@@ -1873,11 +1891,23 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
     if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
       if (JediToOpsLayoutMapping % RecordStarts(i + 1) > JediToOpsLayoutMapping % RecordStarts(i)) then
         ! This record is non-empty. Use the first location from that record.
-        String1(i) = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
-                                JediToOpsLayoutMapping % RecordStarts(i)))
+        if (IntToString) then
+           write(IntAsString,"(I0)") &
+             IntVarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+             JediToOpsLayoutMapping % RecordStarts(i)))
+          String1(i) = IntAsString
+        else
+          String1(i) = VarValue(JediToOpsLayoutMapping % LocationsOrderedByRecord( &
+               JediToOpsLayoutMapping % RecordStarts(i)))
+        end if
       end if
     else
-      String1(i) = VarValue(i)
+      if (IntToString) then
+        write(IntAsString,"(I0)") IntVarValue(i)
+        String1(i) = IntAsString
+      else
+        String1(i) = VarValue(i)
+      end if
     end if
   end do
 end if
