@@ -7,6 +7,7 @@
 #define OPSINPUTS_CXWRITER_INTERFACE_H_
 
 #include "ioda/ObsSpace.h"
+#include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
 #include "ufo/Fortran.h"
 
@@ -37,7 +38,7 @@ extern "C" {
                                    const ufo::F90goms &,
                                    const ioda::ObsDataVector<int> &flags,
                                    const int &nvars, const int &nlocs,
-                                   const oops::Variables &varnames, const double *hofx);
+                                   const oops::ObsVariables &varnames, const double *hofx);
 }  // extern C
 
 }  // namespace opsinputs

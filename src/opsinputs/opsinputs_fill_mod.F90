@@ -17,6 +17,7 @@ use missing_values_mod, only: missing_value
 use obsspace_mod, only: &
     obsspace_has,         &
     obsspace_get_db
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use ufo_geovals_mod, only: &
     ufo_geoval,            &
@@ -1487,7 +1488,7 @@ logical, intent(in)                                :: GeoVaLsAreTopToBottom
 character(len=*), intent(in)                       :: JediVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(c_double), intent(in)                         :: hofx(:, :)
-type(oops_variables), intent(in)                   :: varnames
+type(obs_variables), intent(in)                    :: varnames
 character(len=*), intent(in), optional             :: JediObsName
 logical, intent(in), optional                      :: WriteHofXIntoCX
 
