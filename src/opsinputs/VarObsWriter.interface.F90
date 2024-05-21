@@ -44,6 +44,7 @@ function opsinputs_varobswriter_create_c(c_self, c_conf, c_comm_is_valid, c_comm
                                          c_varlist, c_varlist_diags) &
   bind(c,name='opsinputs_varobswriter_create_f90')
 use oops_variables_mod
+use obs_variables_mod
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
@@ -61,14 +62,14 @@ type(opsinputs_varobswriter), pointer :: self
 type(fckit_configuration) :: f_conf
 integer(gc_int_kind) :: f_comm
 type(oops_variables) :: f_varlist
-type(oops_variables) :: f_varlist_diags
+type(obs_variables)  :: f_varlist_diags
 
 call opsinputs_varobswriter_registry%setup(c_self, self)
 
 f_conf = fckit_configuration(c_conf)
 f_comm = c_comm
 f_varlist = oops_variables(c_varlist)
-f_varlist_diags = oops_variables(c_varlist_diags)
+f_varlist_diags = obs_variables(c_varlist_diags)
 if (opsinputs_varobswriter_create(self, f_conf, c_comm_is_valid, f_comm, c_channels, &
                                   f_varlist, f_varlist_diags)) then
   opsinputs_varobswriter_create_c = 1

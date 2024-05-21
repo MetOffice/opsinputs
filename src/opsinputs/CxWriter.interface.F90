@@ -10,6 +10,7 @@ use, intrinsic :: iso_c_binding, only: &
   c_bool,                              &
   c_int,                               &
   c_ptr
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use opsinputs_cxwriter_mod, only:  &
   opsinputs_cxwriter,              &
@@ -112,13 +113,13 @@ real(c_double), intent(in)     :: c_hofx(c_nvars, c_nlocs)
 
 type(opsinputs_cxwriter), pointer :: self
 type(ufo_geovals), pointer :: geovals
-type(oops_variables) :: f_varnames
+type(obs_variables) :: f_varnames
 
 call opsinputs_cxwriter_registry%get(c_self, self)
 call ufo_geovals_registry%get(c_geovals, geovals)
 
 ! Obtain simulated variable names.
-f_varnames = oops_variables(c_varnames)
+f_varnames = obs_variables(c_varnames)
 
 call opsinputs_cxwriter_post(self, c_obspace, geovals, c_flags, &
                              f_varnames, c_hofx)

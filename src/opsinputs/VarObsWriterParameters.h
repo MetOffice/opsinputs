@@ -76,6 +76,9 @@ class VarObsWriterParameters : public oops::ObsFilterParametersBase {
   /// length of each output profile is set to the length of the profiles in the ObsSpace.
   oops::Parameter<bool> varobsLengthIsIC_PLevels{"varobs_length_is_IC_PLevels", false, this};
 
+  /// Set to true if MetaData/stationIdentification is an integer instead of a string.
+  oops::Parameter<bool> StationIDIntToString{"station_ID_int_to_string", false, this};
+
   /// Update OPS flag to output the varbc predictors
   oops::Parameter<bool> outputVarBCPredictors{"output_varbc_predictors", false, this};
 

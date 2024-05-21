@@ -9,7 +9,6 @@
 
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
-#include "oops/base/Variables.h"
 #include "oops/util/IntSetParser.h"  // for contains()
 #include "oops/util/Logger.h"
 #include "ufo/filters/QCflags.h"
