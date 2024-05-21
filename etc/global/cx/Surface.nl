@@ -39,8 +39,11 @@
 ! 11         IndexCxp                407                   Yes
 ! 29         IndexCxqcf              12                    Yes
 ! 30         IndexCxqcl              254                   Yes
+! 31         IndexCxcloud_bulk       266                   Yes
+! 34         IndexCxCf               267                   Yes
+! 35         IndexCxCl               268                   Yes
 ! 36         IndexCxRichNumber       3208                  No
 ! 37         IndexCxSoilMoisture     8223                  No
 ! 38         IndexCxSoilTemp         8225                  No
-CxFields=33,1,3236,3245,3209,3210,24,4,2,3,10,407,12,254
+CxFields=33,1,3236,3245,3209,3210,24,4,2,3,10,407,12,254,266,267,268
 /
