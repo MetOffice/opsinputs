@@ -11,7 +11,7 @@
 !  4         IndexCxrh2              3245                  Yes
 !  5         IndexCxu10              3209                  Yes
 !  6         IndexCxv10              3210                  Yes
-!  8         IndexCxvis              3247                  No
+!  8         IndexCxvis              3247                  Yes
 ! 13         IndexCxTskinSea         24                    Yes
 ! 16         IndexCxpmsl             16222                 No
 ! 17         IndexCxSeaIce           31                    No
@@ -42,5 +42,5 @@
 ! 36         IndexCxRichNumber       3208                  No
 ! 37         IndexCxSoilMoisture     8223                  No
 ! 38         IndexCxSoilTemp         8225                  No
-CxFields=33,1,3236,3245,3209,3210,24,4,2,3,10,407,12,254
+CxFields=33,1,3236,3245,3209,3210,3247,24,4,2,3,10,407,12,254
 /
