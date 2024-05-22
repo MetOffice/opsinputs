@@ -15,12 +15,11 @@
 ! 13         IndexCxTskinSea         24                    Yes
 ! 16         IndexCxpmsl             16222                 No
 ! 17         IndexCxSeaIce           31                    No
-! 20         IndexCxqt2              3255                  No
-! 21         IndexCxaerosol          90                    No
 ! 22         IndexCxPSurfParamA      20000                 No
 ! 23         IndexCxPSurfParamB      20001                 No
 ! 24         IndexCxCloudAmount      9217                  No
 ! 42         IndexCxSnowAmount       23                    No
+! 45         IndexCxSWradiation      1235                  No
 ! 46         IndexCxBLheight         25                    No
 ! 48         IndexCxLowCloudAmount   9203                  No
 ! 49         IndexCxMedCloudAmount   9204                  No
