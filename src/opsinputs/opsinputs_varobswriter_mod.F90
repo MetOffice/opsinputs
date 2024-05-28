@@ -102,6 +102,7 @@ use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
     ObsGroupGPSRO,             &
+    ObsGroupOceanWinds,        &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
     ObsGroupScatwindChosen,    &
@@ -854,8 +855,11 @@ do iVarField = 1, nVarFields
         ObsSpace, Flags, ObsErrors, "precipitableWater", "ObsValue")
       end if
     case (VarField_windspeed)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed)
+      if (Ob % Header % ObsGroup == ObsGroupOceanWinds) then
+        call opsinputs_fill_fillelementtypefromsimulatedvariable(&
+        Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed, &
+        ObsSpace, Flags, ObsErrors, "windSpeed", "ObsValue")
+      end if
     case (VarField_lwp)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)

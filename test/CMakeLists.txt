@@ -139,6 +139,9 @@ ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_ScatwindChosen
 ADD_WRITER_TEST(NAME     varobswriter_007_VarField_tcwv
                 YAML     007_VarField_tcwv.yaml
                 DATA     007_VarField_tcwv.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_008_VarField_WindSpeed
+                YAML     008_VarField_WindSpeed.yaml
+                DATA     008_VarField_WindSpeed.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_010_VarField_britemp
                 YAML     010_VarField_britemp.yaml
                 NAMELIST VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
