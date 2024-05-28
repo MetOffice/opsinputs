@@ -9,6 +9,7 @@
 #include <mpi.h>
 
 #include "ioda/ObsSpace.h"
+#include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
 #include "ufo/Fortran.h"
 
@@ -34,7 +35,7 @@ extern "C" {
                                         const MPI_Fint &comm,
                                         const int &nchannels,
                                         const int *channels,
-                                        oops::Variables &, oops::Variables &);
+                                        oops::Variables &, oops::ObsVariables &);
   void opsinputs_varobswriter_delete_f90(F90check &);
   void opsinputs_varobswriter_prior_f90(const F90check &, const ioda::ObsSpace &,
                                        const ufo::F90goms &);

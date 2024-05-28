@@ -25,6 +25,7 @@ use obsspace_mod, only:  &
     obsspace_get_gnlocs, &
     obsspace_get_nlocs,  &
     obsspace_has
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use opsinputs_fill_mod, only: &
     opsinputs_fill_fillcoord2d, &
@@ -155,6 +156,7 @@ private
   logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
   logical            :: VarobsLengthIsIC_PLevels
+  logical            :: StationIDIntToString
 
   character(len=100) :: latitudeName
   character(len=100) :: longitudeName
@@ -218,7 +220,7 @@ logical(c_bool), intent(in)                :: comm_is_valid
 integer(gc_int_kind), intent(in)           :: comm
 integer(c_int), intent(in)                 :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
-type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
+type(obs_variables), intent(inout)         :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
@@ -312,6 +314,8 @@ call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
 call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_PLevels)
+
+call f_conf % get_or_die("station_ID_int_to_string", self % StationIDIntToString)
 
 call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 
@@ -619,7 +623,7 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(oops_variables), intent(inout)      :: diagvars
+type(obs_variables), intent(inout)       :: diagvars
 
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
@@ -738,7 +742,8 @@ end if
 
 if (obsspace_has(ObsSpace, "MetaData", "stationIdentification")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
-    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData")
+    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData", &
+    self % StationIDIntToString)
 else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediToOpsLayoutMapping)
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping % NumOpsObs, Ob % Callsign)

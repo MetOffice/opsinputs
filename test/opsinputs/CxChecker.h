@@ -14,6 +14,7 @@
 
 #include "../opsinputs/CxCheckerParameters.h"
 #include "ioda/ObsDataVector.h"
+#include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
 #include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
@@ -70,7 +71,7 @@ class CxChecker : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
   void checkFilterData(const oops::FilterStage filterStage) override {}
 
   oops::Variables requiredVars() const override {return geovars_;}
-  oops::Variables requiredHdiagnostics() const override {return extradiagvars_;}
+  oops::ObsVariables requiredHdiagnostics() const override {return extradiagvars_;}
 
  private:
   struct PrintCxFileOutput;
@@ -94,7 +95,7 @@ class CxChecker : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
 
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
-  oops::Variables extradiagvars_;
+  oops::ObsVariables extradiagvars_;
   std::shared_ptr<ioda::ObsDataVector<int>> flags_;
   std::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
 
