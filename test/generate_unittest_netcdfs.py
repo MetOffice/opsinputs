@@ -700,6 +700,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('windNorthward',          'testinput/005_VarField_v_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_1d_simulated_var_to_netcdf('windSpeed',                    'testinput/008_VarField_WindSpeed.nc4')
+    output_1d_simulated_var_to_netcdf('horizontalVisibility',         'testinput/009_VarField_horizontalVisibility.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('cloudAmount', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
