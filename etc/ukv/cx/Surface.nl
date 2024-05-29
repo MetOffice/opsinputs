@@ -15,8 +15,8 @@
 ! 13         IndexCxTskinSea         24                    Yes
 ! 16         IndexCxpmsl             16222                 No
 ! 17         IndexCxSeaIce           31                    No
-! 20         IndexCxqt2              3255                  No
-! 21         IndexCxaerosol          90                    No
+! 20         IndexCxqt2              3255                  Yes
+! 21         IndexCxaerosol          90                    Yes
 ! 22         IndexCxPSurfParamA      20000                 No
 ! 23         IndexCxPSurfParamB      20001                 No
 ! 24         IndexCxCloudAmount      9217                  No
@@ -42,5 +42,5 @@
 ! 36         IndexCxRichNumber       3208                  No
 ! 37         IndexCxSoilMoisture     8223                  No
 ! 38         IndexCxSoilTemp         8225                  No
-CxFields=33,1,3236,3245,3209,3210,3247,24,4,2,3,10,407,12,254
+CxFields=33,1,3236,3245,3209,3210,3247,24,3255,90,4,2,3,10,407,12,254
 /
