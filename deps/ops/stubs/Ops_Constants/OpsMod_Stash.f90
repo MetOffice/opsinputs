@@ -165,6 +165,7 @@ INTEGER, PARAMETER :: StashCode_t2 = 3236
 INTEGER, PARAMETER :: StashCode_WIND_SPED = 6017
 INTEGER, PARAMETER :: StashCode_WAVE_HGHT = 6001
 INTEGER, PARAMETER :: StashCode_qt2 = 3255
+INTEGER, PARAMETER :: StashCode_aerosol = 90
 INTEGER, PARAMETER :: StashCode_ObukhovLength = 3464 ! Obukhov length
 INTEGER, PARAMETER :: StashCode_FrictionVel = 3465   ! Friction velocity
 INTEGER, PARAMETER :: StashCode_BLtype = 3476   ! Boundary layer type
