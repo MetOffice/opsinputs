@@ -1365,7 +1365,7 @@ integer(integer64), intent(out) :: ChannelCounts(NumObs)
 
 ! Local declarations:
 integer                         :: NumChannels
-type(oops_variables)            :: Variables
+type(obs_variables)             :: Variables
 character(max_varname_length)   :: VariableName
 integer                         :: NumVariables, NumMultichannelVariables
 integer                         :: iMultichannelVariable, iChannel, iVariable, iObs
