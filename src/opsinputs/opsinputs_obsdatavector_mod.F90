@@ -6,7 +6,7 @@
 
 module opsinputs_obsdatavector_mod
 
-use oops_variables_mod, only: oops_variables
+use obs_variables_mod, only: obs_variables
 use string_f_c_mod, only: f_c_string
 use, intrinsic :: iso_c_binding, only: c_char, c_int, c_float, c_ptr, c_size_t
 
@@ -38,13 +38,13 @@ end function opsinputs_obsdatavector_int_nlocs
 
 !> Return an object wrapping the list of names of variables held in this ObsDataVector<int> object.
 
-type(oops_variables) function opsinputs_obsdatavector_int_varnames(c_vec)
+type(obs_variables) function opsinputs_obsdatavector_int_varnames(c_vec)
   !use, intrinsic :: iso_c_binding, only: c_ptr
-  !use oops_variables_mod
+  !use obs_variables_mod
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
 
-  opsinputs_obsdatavector_int_varnames = oops_variables(c_opsinputs_obsdatavector_int_varnames(c_vec))
+  opsinputs_obsdatavector_int_varnames = obs_variables(c_opsinputs_obsdatavector_int_varnames(c_vec))
 end function opsinputs_obsdatavector_int_varnames
 
 !> Return true if this ObsDataVector<int> object contains a given variable.
@@ -93,14 +93,14 @@ end function opsinputs_obsdatavector_float_nlocs
 
 !> Return an object wrapping the list of names of variables held in this ObsDataVector<int> object.
 
-type(oops_variables) function opsinputs_obsdatavector_float_varnames(c_vec)
+type(obs_variables) function opsinputs_obsdatavector_float_varnames(c_vec)
   !use, intrinsic :: iso_c_binding
-  use oops_variables_mod
+  use obs_variables_mod
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
 
   opsinputs_obsdatavector_float_varnames = &
-    oops_variables(c_opsinputs_obsdatavector_float_varnames(c_vec))
+    obs_variables(c_opsinputs_obsdatavector_float_varnames(c_vec))
 end function opsinputs_obsdatavector_float_varnames
 
 !> Return true if this ObsDataVector<float> object contains a given variable.
