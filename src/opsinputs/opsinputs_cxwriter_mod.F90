@@ -643,7 +643,7 @@ do i = 1, size(CxFields)
       GeoVarName = opsinputs_cxfields_SnowAmount
     case (StashCode_qt2) ! IndexCxqt2
       GeoVarName = opsinputs_cxfields_qt2
-    case (StashCode_aerosol) ! IndexCxaerosol
+    case (StashItem_aerosol) ! IndexCxaerosol
      GeoVarName = opsinputs_cxfields_aerosol
     case (StashCode_PsurfParamA) ! IndexCxPsurfParamA
       GeoVarName = opsinputs_cxfields_PSurfParamA
@@ -973,7 +973,7 @@ do iCxField = 1, size(CxFields)
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % qt2, "qt2", Cx % Header % NumLocal, Cx % qt2, &
         self % GeoVals, opsinputs_cxfields_qt2, self % JediToOpsLayoutMapping)
-    case (StashCode_aerosol) ! IndexCxaerosol
+    case (StashItem_aerosol) ! IndexCxaerosol
        if (Cx % Header % ObsGroup == ObsGroupSurface) then
          call opsinputs_fill_fillrealfromgeoval( &
            Cx % Header % logm, "logm", Cx % Header % NumLocal, Cx % logm, &
