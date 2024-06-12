@@ -976,9 +976,9 @@ do iCxField = 1, size(CxFields)
     case (StashCode_aerosol) ! IndexCxaerosol
        if (Cx % Header % ObsGroup == ObsGroupSurface) then
          call opsinputs_fill_fillrealfromgeoval( &
-           Cx % Header % aerosol, "aerosol", Cx % Header % NumLocal, Cx % aerosol, &
+           Cx % Header % logm, "logm", Cx % Header % NumLocal, Cx % logm, &
            self % GeoVals, opsinputs_cxfields_aerosol, self % JediToOpsLayoutMapping)
-       end if
+       end if ! note named logm rather than aerosol
     case (StashCode_PsurfParamA) ! IndexCxPsurfParamA
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % PSurfParamA, "PSurfParamA", Cx % Header % NumLocal, Cx % PSurfParamA, &
