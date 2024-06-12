@@ -158,9 +158,6 @@ DO iGroup = -1, SIZE (Obs)
   CALL Ops_CXAddField (StashCode_qt2,     &
                        Cx % Header % qt2, &
                        R1 = CX % qt2)
-  CALL Ops_CXAddField (StashCode_aerosol,     &
-                       Cx % Header % logm, &
-                       R1 = CX % logm) ! note called logm not aerosol
   CALL Ops_CXAddField (StashItem_SnowAmount,     &
                        Cx % Header % SnowAmount, &
                        R1 = CX % SnowAmount)
