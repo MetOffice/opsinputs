@@ -63,7 +63,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_theta = "potential_tem
 character(len=*), parameter, public :: opsinputs_cxfields_rh = var_rh
 character(len=*), parameter, public :: opsinputs_cxfields_u = var_u
 character(len=*), parameter, public :: opsinputs_cxfields_v = var_v
-character(len=*), parameter, public :: opsinputs_cxfields_w = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_w = var_w
 character(len=*), parameter, public :: opsinputs_cxfields_q = var_q
 character(len=*), parameter, public :: opsinputs_cxfields_qc = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_p_bar = var_prs

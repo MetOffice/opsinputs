@@ -65,6 +65,7 @@ public :: opsinputs_fill_fillcoord2d, &
           opsinputs_fill_fillelementtypefromsimulatedvariable, &
           opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
           opsinputs_fill_fillinteger, &
+          opsinputs_fill_fillinteger2d, &
           opsinputs_fill_fillreal, &
           opsinputs_fill_fillreal2d, &
           opsinputs_fill_fillrealfromgeoval, &
@@ -1235,7 +1236,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> \param[inout] Hdr
 !>   Header to be populated.
 !> \param[in] OpsVarName
-!>   Name of the OB_type field to which \p Real1 corresponds.
+!>   Name of the OB_type field to which \p Real2 corresponds.
 !> \param[in] JediToOpsLayoutMapping
 !>   Data needed to map JEDI locations stored on the current PE to OPS observations.
 !> \param[inout] Real2
@@ -1816,6 +1817,87 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
   end do
 end if
 end subroutine opsinputs_fill_fillinteger
+
+
+! ------------------------------------------------------------------------------
+!> Populate a 2D array of integers and its header from a JEDI variable.
+!>
+!> \param[inout] Hdr
+!>   Header to be populated.
+!> \param[in] OpsVarName
+!>   Name of the OB_type field to which \p Int2 corresponds.
+!> \param[in] JediToOpsLayoutMapping
+!>   Data needed to map JEDI locations stored on the current PE to OPS observations.
+!> \param[inout] Int2
+!>   Pointer to the array to be populated.
+!> \param[in] ObsSpace
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
+!>   have either no channel suffix (in which case \p Int2 will have only a single row) or suffixes
+!>   representing the indices specified in \p Channels.
+!> \param[in] Channels
+!>   Indices returned by ioda::ObsSpace::obsvariables().channels().
+!> \param[in] VarobsLength
+!>   Length of varobs profile.
+!> \param[in] JediVarName
+!>   Name of the JEDI variable used to populate \p Int2. If each JEDI location needs to be mapped
+!>   to a separate OPS observation, this can represent either a single variable with no channel
+!>   suffix (in which case \p Int2 will have only a single row) or a set of variables with
+!>   suffixes corresponding to the indices specified in \p Channels.
+!> \param[in] JediGroup
+!>   Group of the JEDI variable used to populate \p Int2.
+!>
+!> \note This function returns early (without a warning) if the specified JEDI variable is not found.
+!> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
+!> are not found.
+subroutine opsinputs_fill_fillinteger2d( &
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Int2, ObsSpace, Channels, &
+  VarobsLength, JediVarName, JediVarGroup)
+implicit none
+
+! Subroutine arguments:
+type(ElementHeader_Type), intent(inout)            :: Hdr
+character(len=*), intent(in)                       :: OpsVarName
+type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
+integer(integer64), pointer, intent(out)           :: Int2(:,:)
+type(c_ptr), value, intent(in)                     :: ObsSpace
+integer(c_int), intent(in)                         :: Channels(:)
+integer(integer64), intent(in)                     :: VarobsLength
+character(len=*), intent(in)                       :: JediVarName
+character(len=*), intent(in)                       :: JediVarGroup
+! todo(someone): add optional arguments used in opsinputs_fill_fillreal2d if there is a need.
+
+! Local declarations:
+integer(kind=c_int)                                :: VarValue(JediToOpsLayoutMapping % NumJediObs)
+integer(kind=c_int)                                :: CurrentVarValue
+integer(kind=c_int)                                :: MissingInt
+integer                                            :: i
+integer                                            :: numchans
+
+! Body:
+
+MissingInt = missing_value(0_c_int32_t)
+
+! todo(someone): add this if needed
+if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
+   call abor1_ftn("must extend opsinputs_fill_fillreal2d to deal with multi-level observations")
+end if
+
+! todo(someone): make this configurable if required
+numchans = 1
+
+if (obsspace_has(ObsSpace, JediVarGroup, JediVarName)) then
+  ! Retrieve data from JEDI
+  call obsspace_get_db(ObsSpace, JediVarGroup, JediVarName, VarValue)
+
+  ! Fill the OPS data structures
+  call Ops_Alloc(Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Int2, &
+       num_levels = int(numchans, kind=integer64))
+  do i = 1, JediToOpsLayoutMapping % NumOpsObs
+     CurrentVarValue = VarValue(i)
+     if (CurrentVarValue /= MissingInt) Int2(i, 1) = CurrentVarValue
+  end do
+end if
+end subroutine opsinputs_fill_fillinteger2d
 
 ! ------------------------------------------------------------------------------
 

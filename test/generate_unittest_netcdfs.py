@@ -844,6 +844,21 @@ if __name__ == "__main__":
     copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_aircraft.nc4')
     copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_aircraft.nc4')
 
+    # Radar doppler wind - UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude',
+                                  'MetaData/beamTiltAngle',
+                                  'MetaData/gateRange',
+                                  'MetaData/beamAzimuthAngle',
+                                  'MetaData/stationElevation',
+                                  'ObsValue/radialVelocity', 'ObsError/radialVelocity'],
+                                 [],
+                                 ['MetaData/stationIdentification'],
+                                 'testinput/varobs_ukvnamelist_radar_doppler_wind.nc4')
+
+
+
+
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
     output_1d_geoval_to_netcdf       ('surface_altitude',           'testinput/001_SurfaceCxField_Orog.nc4')
@@ -1079,3 +1094,8 @@ if __name__ == "__main__":
                              ['potential_temperature', 'eastward_wind', 'northward_wind', 'specific_humidity',
                               'air_pressure_levels', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_screen.nc4')
+
+    # Radar doppler wind - UKV
+    output_full_cx_to_netcdf(['surface_altitude'],
+                             ['eastward_wind', 'northward_wind', 'upward_air_velocity'],
+                             'testinput/cx_ukvnamelist_radar_doppler_wind.nc4')

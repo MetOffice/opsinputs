@@ -1,0 +1,41 @@
+time window:
+  begin: 2018-01-01T00:00:00Z
+  end: 2018-01-01T01:00:00Z
+
+observations:
+  - obs space:
+      name: Radar
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
+    geovals:
+      filename: Data/cx_ukvnamelist_radar_doppler_wind.nc4
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10]  # missing
+    # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: MetaData/latitude
+        minvalue: 0.0
+    - filter: Cx Writer
+      namelist_directory: ../etc/ukv/cx
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+      geovals_are_top_to_bottom: false
+    - filter: Cx Checker
+      expected_surface_variables: ["1"]
+      expected_upper_air_variables: ["3","4","32"]
+      expected_main_table_columns:
+      - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
+        - ["7.10","1.30","1.20","1.10","11.30","11.20","11.10","21.30","21.20","21.10"]
+        - ["**********","2.30","**********","2.10","12.30","**********","12.10","22.30","**********","22.10"]
+        - ["7.40","4.30","4.20","4.10","14.30","14.20","14.10","24.30","24.20","24.10"]
+    HofX: ObsValue # just a placeholder -- not used""but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

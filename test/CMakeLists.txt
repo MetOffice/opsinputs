@@ -363,6 +363,10 @@ ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_surfacecloud
                 YAML     varobswriter_ukvnamelist_surfacecloud.yaml
                 NAMELIST ../../etc/ukv/varobs/SurfaceCloud.nl
                 DATA     varobs_ukvnamelist_surfacecloud.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_doppler_wind
+                YAML     varobswriter_ukvnamelist_radar_doppler_wind.yaml
+                NAMELIST ../../etc/ukv/varobs/Radar.nl
+                DATA     varobs_ukvnamelist_radar_doppler_wind.nc4)
 
 ### CxWriter tests
 
@@ -669,6 +673,10 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surface
                 YAML     cxwriter_ukvnamelist_surface.yaml
                 NAMELIST ../../etc/ukv/cx/Surface.nl
                 DATA     cx_ukvnamelist_surface.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_doppler_wind
+                YAML     cxwriter_ukvnamelist_radar_doppler_wind.yaml
+                NAMELIST ../../etc/ukv/cx/Radar.nl
+                DATA     cx_ukvnamelist_radar_doppler_wind.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
