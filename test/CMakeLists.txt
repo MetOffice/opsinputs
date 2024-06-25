@@ -217,9 +217,10 @@ ADD_WRITER_TEST(NAME     varobswriter_057_VarField_emissivity
                 YAML     057_VarField_emissivity.yaml
                 NAMELIST VarObsWriterNamelists_057_VarField_emissivity/IASI.nl
                 DATA     057_VarField_emissivity.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
-                YAML     066_VarField_radarobazim.yaml
-                DATA     066_VarField_radarobazim.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_063_VarField_radialVelocity
+                YAML     063_VarField_radialVelocity.yaml
+                NAMELIST VarObsWriterNamelists_063_VarField_radialVelocity/Radar.nl
+                DATA     063_VarField_radialVelocity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_067_VarField_GPS_Station_Height
                 YAML     067_VarField_GPS_Station_Height.yaml
                 DATA     067_VarField_GPS_Station_Height.nc4)
