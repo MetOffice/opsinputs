@@ -36,9 +36,13 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
 
     # Station ID
     if radar_doppler_wind:
+        # The radar Doppler wind processing uses integers for station identification because
+        # `MetaData/stationIdentification` is mapped to the ODB variable `rad_ident`,
+        # which is an integer.
         var = f.createVariable('MetaData/stationIdentification', 'i', ('Location'))
         var[:] = [1, 2, 3, 4]
     else:
+        # In all other cases, `MetaData/stationIdentification` is a string.
         var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
         for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
             var[i] = s

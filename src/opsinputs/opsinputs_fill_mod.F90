@@ -581,11 +581,11 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
 !> \param[in] JediValueGroup
-!>   Group of the JEDI variable containing observation values.
+!>   Group name of the JEDI variable containing observation values.
 !> \param[in] JediErrorVarName
 !>   (Optional) Name of the JEDI variable containing observation errors.
 !> \param[in] JediErrorGroup
-!>   (Optional) Group of the JEDI variable containing observation errors.
+!>   (Optional) Group name of the JEDI variable containing observation errors.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -694,11 +694,11 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
 !> \param[in] JediValueGroup
-!>   Group of the JEDI variable containing observation values.
+!>   Group name of the JEDI variable containing observation values.
 !> \param[in] JediErrorVarName
 !>   (Optional) Name of the JEDI variable containing observation errors.
 !> \param[in] JediErrorGroup
-!>   (Optional) Group of the JEDI variable containing observation errors.
+!>   (Optional) Group name of the JEDI variable containing observation errors.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -830,13 +830,13 @@ end subroutine opsinputs_fill_fillelementtype2dfromnormalvariable
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
 !> \param[in] JediValueGroup
-!>   Group of the JEDI variable containing observation values.
+!>   Group name of the JEDI variable containing observation values.
 !> \param[in] LevelsAreTopToBottom
 !>   A logical to specify if the levels being passed in are top to bottom in the atmosphere.
 !> \param[in] JediErrorVarName
 !>   (Optional) Name of the JEDI variable containing observation errors.
 !> \param[in] JediErrorGroup
-!>   (Optional) Group of the JEDI variable containing observation errors.
+!>   (Optional) Group name of the JEDI variable containing observation errors.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -951,7 +951,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real1.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real1.
+!>   Group name of the JEDI variable used to populate \p Real1.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -1031,7 +1031,7 @@ end subroutine opsinputs_fill_fillreal
 !>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
 !>   of variables with suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
+!>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] compressVarChannels
 !>   Whether to apply var channel compression (No NaN spaces between channels)
 !> \param[in] sizeOfVarobsArray
@@ -1166,7 +1166,7 @@ end subroutine opsinputs_fill_fillreal2d_norecords
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
+!>   Group name of the JEDI variable used to populate \p Real2.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -1255,7 +1255,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !>   suffix (in which case \p Real2 will have only a single row) or a set of variables with
 !>   suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
+!>   Group name of the JEDI variable used to populate \p Real2.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -1765,7 +1765,7 @@ end subroutine opsinputs_fill_fillreal2dfromgeovalformultilevelobs
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Int1.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Int1.
+!>   Group name of the JEDI variable used to populate \p Int1.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -1844,7 +1844,7 @@ end subroutine opsinputs_fill_fillinteger
 !>   suffix (in which case \p Int2 will have only a single row) or a set of variables with
 !>   suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Int2.
+!>   Group name of the JEDI variable used to populate \p Int2.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -1919,7 +1919,7 @@ end subroutine opsinputs_fill_fillinteger2d
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p String1.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p String1.
+!>   Group name of the JEDI variable used to populate \p String1.
 !> \param[in] ConvertIntToSTring
 !>   Convert an integer-valued ObsSpace vector to a string.
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
@@ -2016,7 +2016,7 @@ end subroutine opsinputs_fill_fillstring
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real1.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real1.
+!>   Group name of the JEDI variable used to populate \p Real1.
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
 !>
@@ -2092,7 +2092,7 @@ end subroutine opsinputs_fill_filltimeoffsets
 !>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
 !>   of variables with suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
+!>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
 !>
@@ -2167,7 +2167,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_norecords
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
+!>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
 !>
@@ -2263,7 +2263,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !>   suffix (in which case \p Real2 will have only a single row) or a set of variables with
 !>   suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Real2.
+!>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
 !>
@@ -2331,7 +2331,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d
 !>   variable with no channel suffix (in which case \p Coord2 will have only a single row) or a set
 !>   of variables with suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Coord2.
+!>   Group name of the JEDI variable used to populate \p Coord2.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -2400,7 +2400,7 @@ end subroutine opsinputs_fill_fillcoord2d_norecords
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Coord2.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Coord2.
+!>   Group name of the JEDI variable used to populate \p Coord2.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -2472,7 +2472,7 @@ end subroutine opsinputs_fill_fillcoord2d_records
 !>   suffix (in which case \p Coord2 will have only a single row) or a set of variables with
 !>   suffixes corresponding to the indices specified in \p Channels.
 !> \param[in] JediGroup
-!>   Group of the JEDI variable used to populate \p Coord2.
+!>   Group name of the JEDI variable used to populate \p Coord2.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
