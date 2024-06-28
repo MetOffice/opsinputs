@@ -25,6 +25,7 @@ use obsspace_mod, only:  &
     obsspace_get_gnlocs, &
     obsspace_get_nlocs,  &
     obsspace_has
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use opsinputs_fill_mod, only: &
     opsinputs_fill_fillcoord2d, &
@@ -156,6 +157,7 @@ private
   logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
   logical            :: VarobsLengthIsIC_PLevels
+  logical            :: StationIDIntToString
 
   character(len=100) :: latitudeName
   character(len=100) :: longitudeName
@@ -219,7 +221,7 @@ logical(c_bool), intent(in)                :: comm_is_valid
 integer(gc_int_kind), intent(in)           :: comm
 integer(c_int), intent(in)                 :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
-type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
+type(obs_variables), intent(inout)         :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
@@ -313,6 +315,8 @@ call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
 call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_PLevels)
+
+call f_conf % get_or_die("station_ID_int_to_string", self % StationIDIntToString)
 
 call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 
@@ -620,7 +624,7 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(oops_variables), intent(inout)      :: diagvars
+type(obs_variables), intent(inout)       :: diagvars
 
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
@@ -739,7 +743,8 @@ end if
 
 if (obsspace_has(ObsSpace, "MetaData", "stationIdentification")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
-    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData")
+    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData", &
+    self % StationIDIntToString)
 else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediToOpsLayoutMapping)
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping % NumOpsObs, Ob % Callsign)
@@ -1364,7 +1369,7 @@ integer(integer64), intent(out) :: ChannelCounts(NumObs)
 
 ! Local declarations:
 integer                         :: NumChannels
-type(oops_variables)            :: Variables
+type(obs_variables)             :: Variables
 character(max_varname_length)   :: VariableName
 integer                         :: NumVariables, NumMultichannelVariables
 integer                         :: iMultichannelVariable, iChannel, iVariable, iObs
@@ -1491,37 +1496,37 @@ integer(kind=c_int), allocatable :: UniqueSatIds(:)
 integer                          :: ii, jj
 integer, parameter               :: maxpred = 31
 character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
-              "constant                  ", &
-              "thickness_850_300hPa      ", &
-              "thickness_200_50hPa       ", &
-              "Tskin                     ", &
-              "total_column_water        ", &
-              "Legendre_order_1          ", &
-              "Legendre_order_2          ", &
-              "Legendre_order_3          ", &
-              "Legendre_order_4          ", &
-              "Legendre_order_5          ", &
-              "Legendre_order_6          ", &
-              "orbital_angle_order_1_cos ", &
-              "orbital_angle_order_1_sin ", &
-              "orbital_angle_order_2_cos ", &
-              "orbital_angle_order_2_sin ", &
-              "orbital_angle_order_3_cos ", &
-              "orbital_angle_order_3_sin ", &
-              "orbital_angle_order_4_cos ", &
-              "orbital_angle_order_4_sin ", &
-              "orbital_angle_order_5_cos ", &
-              "orbital_angle_order_5_sin ", &
-              "orbital_angle_order_6_cos ", &
-              "orbital_angle_order_6_sin ", &
-              "orbital_angle_order_7_cos ", &
-              "orbital_angle_order_7_sin ", &
-              "orbital_angle_order_8_cos ", &
-              "orbital_angle_order_8_sin ", &
-              "orbital_angle_order_9_cos ", &
-              "orbital_angle_order_9_sin ", &
-              "orbital_angle_order_10_cos", &
-              "orbital_angle_order_10_sin" /)
+              "constant                          ", &
+              "thickness_850_300hPa              ", &
+              "thickness_200_50hPa               ", &
+              "Tskin                             ", &
+              "total_column_water                ", &
+              "legendre_order_1                  ", &
+              "legendre_order_2                  ", &
+              "legendre_order_3                  ", &
+              "legendre_order_4                  ", &
+              "legendre_order_5                  ", &
+              "legendre_order_6                  ", &
+              "satelliteOrbitalAngle_order_1_cos ", &
+              "satelliteOrbitalAngle_order_1_sin ", &
+              "satelliteOrbitalAngle_order_2_cos ", &
+              "satelliteOrbitalAngle_order_2_sin ", &
+              "satelliteOrbitalAngle_order_3_cos ", &
+              "satelliteOrbitalAngle_order_3_sin ", &
+              "satelliteOrbitalAngle_order_4_cos ", &
+              "satelliteOrbitalAngle_order_4_sin ", &
+              "satelliteOrbitalAngle_order_5_cos ", &
+              "satelliteOrbitalAngle_order_5_sin ", &
+              "satelliteOrbitalAngle_order_6_cos ", &
+              "satelliteOrbitalAngle_order_6_sin ", &
+              "satelliteOrbitalAngle_order_7_cos ", &
+              "satelliteOrbitalAngle_order_7_sin ", &
+              "satelliteOrbitalAngle_order_8_cos ", &
+              "satelliteOrbitalAngle_order_8_sin ", &
+              "satelliteOrbitalAngle_order_9_cos ", &
+              "satelliteOrbitalAngle_order_9_sin ", &
+              "satelliteOrbitalAngle_order_10_cos", &
+              "satelliteOrbitalAngle_order_10_sin" /)
 character(len=150) :: JediVarGroupWithSatId
 
 ! Body:

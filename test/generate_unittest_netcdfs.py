@@ -69,6 +69,30 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     f.close()
 
 
+def output_1d_simulated_var_to_netcdf_stationID_integer(var_name, file_name):
+    f = nc4.Dataset(file_name, 'w', format="NETCDF4")
+
+    nlocs = 4
+    f.createDimension('Location', nlocs)
+
+    var = f.createVariable('MetaData/latitude', 'f', ('Location',))
+    var[:] = [21, 22, -23, 24]
+    var = f.createVariable('MetaData/longitude', 'f', ('Location',))
+    var[:] = [31, 32, 33, 34]
+    var = f.createVariable('MetaData/time', 'f', ('Location',))
+    minute = 1 / 60.
+    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/stationIdentification', 'i', ('Location',))
+    var[:] = [1, 2, 3, 4]
+    var = f.createVariable('ObsValue/' + var_name, 'f', ('Location',))
+    obsVal = [1.1, missing_float, 1.3, 1.4]
+    var[:] = obsVal
+    var = f.createVariable('ObsError/' + var_name, 'f', ('Location',))
+    var[:] = [0.1, missing_float, 0.3, 0.4]
+    f.date_time = 2018010100
+
+    f.close()
+
 def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
@@ -640,6 +664,7 @@ def copy_var_to_var(Group, invarname, outvarname, filename):
 if __name__ == "__main__":
     # VarObs
     output_1d_simulated_var_to_netcdf('surfacePressure',             'testinput/001_VarField_pstar.nc4') # Surface
+    output_1d_simulated_var_to_netcdf_stationID_integer('surfacePressure', 'testinput/001_VarField_pstar_stationID_integer.nc4')
     output_1d_simulated_var_to_netcdf('airTemperatureAt2M',           'testinput/002_VarField_temperature_Surface.nc4')
     output_2d_simulated_var_to_netcdf('airTemperature',               'testinput/002_VarField_temperature_RadarZ.nc4')
     output_1d_simulated_var_to_netcdf('relativeHumidityAt2M',         'testinput/003_VarField_rh_Surface.nc4')
@@ -675,7 +700,7 @@ if __name__ == "__main__":
     output_2d_normal_var_to_netcdf   ('brightnessTemperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
                                                                  'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor',
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
-                                                                 'Legendre_order_1_satid_5Predictor',    'Legendre_order_1_satid_8Predictor'],
+                                                                 'legendre_order_1_satid_5Predictor',    'legendre_order_1_satid_8Predictor'],
                                       'testinput/080_VarField_biaspredictors.nc4', predictors=True)
     output_2d_simulated_var_to_netcdf('bendingAngle',              'testinput/071_VarField_bendingangle.nc4', add_occulting_satid=True)
     output_2d_normal_var_to_netcdf('impactParameterRO', 'MetaData', 'testinput/072_VarField_impactparam.nc4')

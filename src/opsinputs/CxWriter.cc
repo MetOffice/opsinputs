@@ -13,7 +13,6 @@
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
 #include "ioda/ObsVector.h"
-#include "oops/base/Variables.h"
 #include "oops/util/Logger.h"
 #include "opsinputs/CxWriterParameters.h"
 #include "opsinputs/LocalEnvironment.h"
@@ -93,7 +92,7 @@ void CxWriter::postFilter(const ufo::GeoVaLs & gv,
     ufo::Variables filtervars;
     for (const ufo::Variable &var : parameters_.variables_for_qc.value().get())
       filtervars += var;
-    ioda::ObsDataVector<int> flags(obsdb_, filtervars.toOopsVariables());
+    ioda::ObsDataVector<int> flags(obsdb_, filtervars.toOopsObsVariables());
     for (int ivar = 0; ivar < flags.nvars(); ivar++) {
       const std::string varname = flags.varnames()[ivar];
       flags[varname] = flags_->operator[](varname);
