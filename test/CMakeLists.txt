@@ -410,6 +410,10 @@ ADD_WRITER_TEST(NAME     cxwriter_017_SurfaceCxField_SeaIce
                 YAML     017_SurfaceCxField_SeaIce.yaml
                 NAMELIST CxWriterNamelists_017_SurfaceCxField_SeaIce/AMSUB.nl
                 DATA     017_SurfaceCxField_SeaIce.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_019_SurfaceCxField_WINDSPED
+                YAML     019_SurfaceCxField_WINDSPED.yaml
+                NAMELIST CxWriterNamelists_019_SurfaceCxField_WINDSPED/Oceanwinds.nl
+                DATA     019_SurfaceCxField_WINDSPED.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_022_SurfaceCxField_surf_param_a
                 YAML     022_SurfaceCxField_surf_param_a.yaml
                 NAMELIST CxWriterNamelists_022_SurfaceCxField_surf_param_a/Surface.nl
