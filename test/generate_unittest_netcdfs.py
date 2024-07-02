@@ -857,7 +857,6 @@ if __name__ == "__main__":
     output_1d_geoval_to_netcdf       ('skin_temperature',           'testinput/013_SurfaceCxField_TskinSea.nc4')
     output_1d_geoval_to_netcdf       ('surface_pressure_at_mean_sea_level', 'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
-    output_1d_geoval_to_netcdf       ('windSpeed',                  'testinput/019_SurfaceCxField_WINDSPED.nc4')
     output_1d_geoval_to_netcdf       ('surf_param_a',               'testinput/022_SurfaceCxField_surf_param_a.nc4')
     output_1d_geoval_to_netcdf       ('surf_param_b',               'testinput/023_SurfaceCxField_surf_param_b.nc4')
     output_1d_geoval_to_netcdf       ('total_cloud_amount', 'testinput/024_SurfaceCxField_CloudAmount.nc4')

@@ -22,7 +22,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_u10 = var_sfc_u10
 character(len=*), parameter, public :: opsinputs_cxfields_v10 = var_sfc_v10
 character(len=*), parameter, public :: opsinputs_cxfields_vis = "visibility_1p5m"
 character(len=*), parameter, public :: opsinputs_cxfields_WAVE_HGHT = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_WIND_SPED = var_sfc_wspeed
+character(len=*), parameter, public :: opsinputs_cxfields_WIND_SPED = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SeaHeight = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_TskinSea = var_sfc_tskin
 character(len=*), parameter, public :: opsinputs_cxfields_TropPres = opsinputs_cxfields_unknown
