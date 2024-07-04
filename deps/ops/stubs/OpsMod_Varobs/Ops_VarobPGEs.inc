@@ -421,21 +421,23 @@ IF (Obs % header % AWPriorPcorrect % Present) THEN
 END IF
 
 ! Doppler radar radial velocity
-! Modified compared to OPS:
-! - RadWind_SuperOb is always false in opsinputs (unlike in OPS).
-!   Therefore the test on that value is removed.
-! - Due to the way the arrays are set up in the VarObs Writer,
-!   Obs % header % RadialVelocSO is present and
-!   Obs % header % RadialVelocity is not present.
-! - Therefore VarobPGEs % RadialVelocity is filled from Obs % RadialVelocSO % PGEFinal.
-CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
-                ' VarobPGEs % RadialVelocity',       &
-                NumObsLocal,                         &
-                Real2 =  VarobPGEs % RadialVelocity)
-
-IF (Obs % header % RadialVelocSO % Present) THEN
-   VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocSO(:,:) % PGEFinal
-end if
+IF (RadWind_SuperOb) THEN
+  CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
+                  ' VarobPGEs % RadialVelocity',       &
+                  NumObsLocal,                         &
+                  Real2 =  VarobPGEs % RadialVelocity)
+  IF (Obs % header % RadialVelocSO % Present) THEN
+    VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocSO(:,:) % PGEFinal
+  END IF
+ELSE
+  CALL Ops_Alloc (VarobPGEs % Header % RadialVelocity, &
+                  ' VarobPGEs % RadialVelocity',       &
+                  NumObsLocal,                         &
+                  Real2 =  VarobPGEs % RadialVelocity)
+  IF (Obs % header % RadialVelocity % Present) THEN
+    VarobPGEs % RadialVelocity(:,:) =  Obs % RadialVelocity(:,:) % PGEFinal
+  END IF
+END IF
 
 ! Radar reflectivity
 IF (RadPerformSuperObservation) THEN

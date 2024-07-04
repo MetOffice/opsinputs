@@ -1014,8 +1014,16 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % SBUVozone, "SBUVozone", Ob % Header % NumObsLocal, Ob % SBUVozone)
     case (VarField_RadialVelocity)
+      ! Write DerivedObsValue/radialVelocity to both Ob % RadialVelocSO and Ob % RadialVelocity.
+      ! This ensures that the code in deps/ops/stubs/OpsMod_Varobs/Ops_VarobPGEs.inc works correctly.
+      ! The logical `RadWind_SuperOb` is always false in opsinputs, but is true in operational OPS.
+      ! By default that results in PGEs not being filled correctly. Writing out both OPS variables
+      ! fixes the problem.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % RadialVelocSO, "RadialVelocSO", JediToOpsLayoutMapping, Ob % RadialVelocSO, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % RadialVelocity, "RadialVelocity", JediToOpsLayoutMapping, Ob % RadialVelocity, &
          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
     case (VarField_Reflectivity)
       ! TODO(someone): handle this varfield
