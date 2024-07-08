@@ -16,7 +16,7 @@ missing_int = np.iinfo(np.int32).min + 5
 missing_float_nc = 9.969209968386869e+36
 
 
-def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
+def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, radar_doppler_wind=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
@@ -34,9 +34,31 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
     minute = 1 / 60.
     var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
-    var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
-    for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
-        var[i] = s
+    # Station ID
+    if radar_doppler_wind:
+        # The radar Doppler wind processing uses integers for station identification because
+        # `MetaData/stationIdentification` is mapped to the ODB variable `rad_ident`,
+        # which is an integer.
+        var = f.createVariable('MetaData/stationIdentification', 'i', ('Location'))
+        var[:] = [1, 2, 3, 4]
+    else:
+        # In all other cases, `MetaData/stationIdentification` is a string.
+        var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
+        for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
+            var[i] = s
+
+    # Extra variables for radar
+    if radar_doppler_wind:
+        var = f.createVariable('MetaData/radar_family', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
+        var = f.createVariable('MetaData/beamTiltAngle', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
+        var = f.createVariable('MetaData/gateRange', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
+        var = f.createVariable('MetaData/beamAzimuthAngle', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
+        var = f.createVariable('MetaData/stationElevation', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
 
     var = f.createVariable('ObsValue/' + var_name, 'f', ('Location',))
     obsVal = [1.1, missing_float, 1.3, 1.4]
@@ -64,6 +86,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False):
             if biasVal[i] == missing_float:
                 biascorr[i] = obsVal[i]
         var[:] = biascorr
+
     f.date_time = 2018010100
 
     f.close()
@@ -694,7 +717,7 @@ if __name__ == "__main__":
     output_2d_simulated_var_to_netcdf('probability', 'testinput/053_VarField_awpriorpcorrect.nc4')
     output_2d_normal_var_to_netcdf   ('emissivity', 'OneDVar', 'testinput/057_VarField_emissivity.nc4', use_chans=True)
     # 54 VarField_NumChans and 55 VarField_ChanNum: separate files not necessary
-    output_2d_normal_var_to_netcdf   ('radarAzimuth', 'MetaData',  'testinput/066_VarField_radarobazim.nc4', with_radar_family=True)
+    output_1d_simulated_var_to_netcdf   ('radialVelocity',  'testinput/063_VarField_radialVelocity.nc4', radar_doppler_wind=True)
     output_2d_normal_var_to_netcdf   ('liquidWaterContent', 'OneDVar', 'testinput/068_VarField_clw.nc4', use_levs=True)
     output_2d_normal_var_to_netcdf   ('brightnessTemperature', ['constant_satid_5Predictor',            'constant_satid_8Predictor',
                                                                  'thickness_850_300hPa_satid_5Predictor','thickness_850_300hPa_satid_8Predictor',
@@ -843,6 +866,21 @@ if __name__ == "__main__":
                                  'testinput/varobs_globalnamelist_aircraft.nc4')
     copy_var_to_var('ObsValue', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_aircraft.nc4')
     copy_var_to_var('ObsError', 'potentialTemperature', 'airTemperature', 'testinput/varobs_globalnamelist_aircraft.nc4')
+
+    # Radar doppler wind - UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude',
+                                  'MetaData/beamTiltAngle',
+                                  'MetaData/gateRange',
+                                  'MetaData/beamAzimuthAngle',
+                                  'MetaData/stationElevation',
+                                  'ObsValue/radialVelocity', 'ObsError/radialVelocity'],
+                                 [],
+                                 ['MetaData/stationIdentification'],
+                                 'testinput/varobs_ukvnamelist_radar_doppler_wind.nc4')
+
+
+
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
@@ -1079,3 +1117,8 @@ if __name__ == "__main__":
                              ['potential_temperature', 'eastward_wind', 'northward_wind', 'specific_humidity',
                               'air_pressure_levels', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_screen.nc4')
+
+    # Radar doppler wind - UKV
+    output_full_cx_to_netcdf(['surface_altitude'],
+                             ['eastward_wind', 'northward_wind', 'upward_air_velocity'],
+                             'testinput/cx_ukvnamelist_radar_doppler_wind.nc4')
