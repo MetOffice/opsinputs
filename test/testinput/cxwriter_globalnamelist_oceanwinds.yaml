@@ -1,0 +1,43 @@
+time window:
+  begin: 2018-01-01T00:00:00Z
+  end: 2018-01-01T01:00:00Z
+
+observations:
+  - obs space:
+      name: Oceanwinds
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
+    geovals:
+      filename: Data/cx_globalnamelist_oceanwinds.nc4
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the Cx file.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the Cx file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: MetaData/latitude
+        minvalue: 0.0
+    - filter: Cx Writer
+      namelist_directory: ../etc/global/cx
+      reject_obs_with_any_variable_failing_qc: true
+      general_mode: debug
+      IC_PLevels: 5
+    - filter: Cx Checker
+      expected_surface_variables: ["1","2","5","6","11","16","17"]
+      expected_upper_air_variables: []
+      expected_main_table_columns:
+      - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
+        - ["7.10","17.10","27.10","37.10","47.10","57.10","67.10"] # column 1 - 1st observation
+        - ["-3.368795e+38","-3.368795e+38","-3.368795e+38",
+           "-3.368795e+38","-3.368795e+38","-3.368795e+38",
+           "-3.368795e+38"] # column 2 - 2nd observation
+        - ["7.40","17.40","27.40","37.40","47.40","57.40","67.40"] # column 3 - 4th observation
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0
