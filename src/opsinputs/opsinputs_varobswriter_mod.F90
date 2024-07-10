@@ -35,6 +35,7 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
     opsinputs_fill_fillinteger, &
+    opsinputs_fill_fillinteger2d, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
@@ -1017,8 +1018,17 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % SBUVozone, "SBUVozone", Ob % Header % NumObsLocal, Ob % SBUVozone)
     case (VarField_RadialVelocity)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadialVelocSO, "RadialVelocSO", Ob % Header % NumObsLocal, Ob % RadialVelocSO)
+      ! Write DerivedObsValue/radialVelocity to both Ob % RadialVelocSO and Ob % RadialVelocity.
+      ! This ensures that the code in deps/ops/stubs/OpsMod_Varobs/Ops_VarobPGEs.inc works correctly.
+      ! The logical `RadWind_SuperOb` is always false in opsinputs, but is true in operational OPS.
+      ! By default that results in PGEs not being filled correctly. Writing out both OPS variables
+      ! fixes the problem.
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % RadialVelocSO, "RadialVelocSO", JediToOpsLayoutMapping, Ob % RadialVelocSO, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % RadialVelocity, "RadialVelocity", JediToOpsLayoutMapping, Ob % RadialVelocity, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
     case (VarField_Reflectivity)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivitySO, "ReflectivitySO", Ob % Header % NumObsLocal, Ob % ReflectivitySO)
@@ -1029,21 +1039,25 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivityI, "ReflectivityI", Ob % Header % NumObsLocal, Ob % ReflectivityI)
     case (VarField_RadarBeamElev)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadarBeamElev, "RadarBeamElev", Ob % Header % NumObsLocal, Ob % RadarBeamElev)
+      call opsinputs_fill_fillreal2d( &
+         Ob % Header % RadarBeamElev, "RadarBeamElev", JediToOpsLayoutMapping, Ob % RadarBeamElev, &
+         ObsSpace, self % channels, self % VarobsLength, "beamTiltAngle", "MetaData")
     case (VarField_RadarObRange)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
+      call opsinputs_fill_fillreal2d( &
+         Ob % Header % RadarObRange, "RadarObRange", JediToOpsLayoutMapping, Ob % RadarObRange, &
+         ObsSpace, self % channels, self % VarobsLength, "gateRange", "MetaData")
     case (VarField_RadarObAzim)
       call opsinputs_fill_fillreal2d( &
-        Ob % Header % RadarObAzim, "RadarObAzim", JediToOpsLayoutMapping, Ob % RadarObAzim, &
-        ObsSpace, self % channels, self % VarobsLength, "radarAzimuth", "MetaData")
+         Ob % Header % RadarObAzim, "RadarObAzim", JediToOpsLayoutMapping, Ob % RadarObAzim, &
+         ObsSpace, self % channels, self % VarobsLength, "beamAzimuthAngle", "MetaData")
     case (VarField_RadIdent)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
+      call opsinputs_fill_fillinteger2d( &
+         Ob % Header % RadIdent, "RadIdent", JediToOpsLayoutMapping, Ob % RadIdent, &
+         ObsSpace, self % channels, self % VarobsLength, "stationIdentification", "MetaData")
     case (VarField_RadAltAboveMSL)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadAltAboveMSL, "RadAltAboveMSL", Ob % Header % NumObsLocal, Ob % RadAltAboveMSL)
+      call opsinputs_fill_fillreal2d( &
+         Ob % Header % RadAltAboveMSL, "RadAltAboveMSL", JediToOpsLayoutMapping, Ob % RadAltAboveMSL, &
+         ObsSpace, self % channels, self % VarobsLength, "stationElevation", "MetaData")
     case (VarField_RadNoiseLvl)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadNoiseLvl, "RadNoiseLvl", Ob % Header % NumObsLocal, Ob % RadNoiseLvl)
