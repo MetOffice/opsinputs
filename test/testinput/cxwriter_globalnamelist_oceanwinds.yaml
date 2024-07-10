@@ -4,7 +4,7 @@ time window:
 
 observations:
   - obs space:
-      name: Oceanwinds
+      name: OceanWinds
       obsdatain:
         engine:
           type: H5File
@@ -29,15 +29,13 @@ observations:
       general_mode: debug
       IC_PLevels: 5
     - filter: Cx Checker
-      expected_surface_variables: ["1","2","5","6","11","16","17"]
-      expected_upper_air_variables: []
+      expected_surface_variables: ["1","2","5","6","13","17"] # "16"
+      expected_upper_air_variables: [11]
       expected_main_table_columns:
       - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
-        - ["7.10","17.10","27.10","37.10","47.10","57.10","67.10"] # column 1 - 1st observation
-        - ["-3.368795e+38","-3.368795e+38","-3.368795e+38",
-           "-3.368795e+38","-3.368795e+38","-3.368795e+38",
-           "-3.368795e+38"] # column 2 - 2nd observation
-        - ["7.40","17.40","27.40","37.40","47.40","57.40","67.40"] # column 3 - 4th observation
+        - ["27.10","37.10","47.10","57.10","7.10","17.10","1.10","1.20","1.30"] # column 1 - 1st observation
+        - ["**********","**********","**********","**********","**********","**********","2.10","**********","2.30"] # column 2 - 2nd observation
+        - ["27.40","37.40","47.40","57.40","7.40","17.40","4.10","4.20","4.30"] # column 3 - 4th observation
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

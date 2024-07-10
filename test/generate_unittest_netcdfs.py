@@ -1083,6 +1083,6 @@ if __name__ == "__main__":
 
     # Oceanwinds
     output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 
-                              'surface_pressure_at_mean_sea_level', 'uwind_at_10m', 'vwind_at_10m'],
-                             [],
+                              'uwind_at_10m', 'vwind_at_10m'],
+                             ['air_pressure_levels'],
                              'testinput/cx_globalnamelist_oceanwinds.nc4')
