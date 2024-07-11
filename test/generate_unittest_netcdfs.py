@@ -853,6 +853,26 @@ if __name__ == "__main__":
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
                                  'testinput/varobs_globalnamelist_seviriclr.nc4')
 
+    # SEVIRIClr UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'Emiss/emissivityIR', 'MetaData/ozoneTotal'],
+                                 ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightnessTemperature',
+                                  'ObsValue/cloud_amount', 'ObsValue/cloud_top_temperature', 'ObsValue/lower_layer_pressure'],
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_ukvnamelist_seviriclr.nc4')
+
+    # SEVIRIASR UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'Emiss/emissivityIR', 'MetaData/ozoneTotal'],
+                                 ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature',
+                                  'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightnessTemperature',
+                                  'ObsValue/cloud_amount', 'ObsValue/cloud_top_temperature', 'ObsValue/lower_layer_pressure'],
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
+                                 'testinput/varobs_ukvnamelist_seviriasr.nc4')
+
     # Aircraft
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
@@ -1056,6 +1076,22 @@ if __name__ == "__main__":
                               'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_seviriclr.nc4')
+
+    # SEVIRIClr UKV
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_ukvnamelist_seviriclr.nc4')
+
+    # SEVIRIASR UKV
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
+                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
+                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_ukvnamelist_seviriasr.nc4')
 
     # GroundGPS
     output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
