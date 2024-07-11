@@ -217,9 +217,10 @@ ADD_WRITER_TEST(NAME     varobswriter_057_VarField_emissivity
                 YAML     057_VarField_emissivity.yaml
                 NAMELIST VarObsWriterNamelists_057_VarField_emissivity/IASI.nl
                 DATA     057_VarField_emissivity.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_066_VarField_radarobazim
-                YAML     066_VarField_radarobazim.yaml
-                DATA     066_VarField_radarobazim.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_063_VarField_radialVelocity
+                YAML     063_VarField_radialVelocity.yaml
+                NAMELIST VarObsWriterNamelists_063_VarField_radialVelocity/Radar.nl
+                DATA     063_VarField_radialVelocity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_067_VarField_GPS_Station_Height
                 YAML     067_VarField_GPS_Station_Height.yaml
                 DATA     067_VarField_GPS_Station_Height.nc4)
@@ -363,6 +364,10 @@ ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_surfacecloud
                 YAML     varobswriter_ukvnamelist_surfacecloud.yaml
                 NAMELIST ../../etc/ukv/varobs/SurfaceCloud.nl
                 DATA     varobs_ukvnamelist_surfacecloud.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_doppler_wind
+                YAML     varobswriter_ukvnamelist_radar_doppler_wind.yaml
+                NAMELIST ../../etc/ukv/varobs/Radar.nl
+                DATA     varobs_ukvnamelist_radar_doppler_wind.nc4)
 
 ### CxWriter tests
 
@@ -669,6 +674,10 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surface
                 YAML     cxwriter_ukvnamelist_surface.yaml
                 NAMELIST ../../etc/ukv/cx/Surface.nl
                 DATA     cx_ukvnamelist_surface.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_doppler_wind
+                YAML     cxwriter_ukvnamelist_radar_doppler_wind.yaml
+                NAMELIST ../../etc/ukv/cx/Radar.nl
+                DATA     cx_ukvnamelist_radar_doppler_wind.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
