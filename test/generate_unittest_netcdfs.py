@@ -699,6 +699,7 @@ if __name__ == "__main__":
     output_1d_simulated_var_to_netcdf('windNorthwardAt10M',           'testinput/005_VarField_v_ScatwindChosen.nc4', with_bias=True)
     output_simulated_var_profiles_to_netcdf('windNorthward',          'testinput/005_VarField_v_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
+    output_1d_simulated_var_to_netcdf('windSpeed',                    'testinput/008_VarField_WindSpeed.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('cloudAmount', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
@@ -1118,7 +1119,14 @@ if __name__ == "__main__":
                               'air_pressure_levels', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_screen.nc4')
 
+    # Oceanwinds
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 
+                              'uwind_at_10m', 'vwind_at_10m'],
+                             ['air_pressure_levels'],
+                             'testinput/cx_globalnamelist_oceanwinds.nc4')
+
     # Radar doppler wind - UKV
     output_full_cx_to_netcdf(['surface_altitude'],
                              ['eastward_wind', 'northward_wind', 'upward_air_velocity'],
                              'testinput/cx_ukvnamelist_radar_doppler_wind.nc4')
+

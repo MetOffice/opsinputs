@@ -142,6 +142,9 @@ ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_ScatwindChosen
 ADD_WRITER_TEST(NAME     varobswriter_007_VarField_tcwv
                 YAML     007_VarField_tcwv.yaml
                 DATA     007_VarField_tcwv.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_008_VarField_WindSpeed
+                YAML     008_VarField_WindSpeed.yaml
+                DATA     008_VarField_WindSpeed.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_010_VarField_britemp
                 YAML     010_VarField_britemp.yaml
                 NAMELIST VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
@@ -659,6 +662,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_screen
                 YAML     cxwriter_globalnamelist_screen.yaml
                 NAMELIST ../../etc/global/cx/screen/Surface.nl
                 DATA     cx_globalnamelist_screen.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_oceanwinds
+                YAML     cxwriter_globalnamelist_oceanwinds.yaml
+                NAMELIST ../../etc/global/cx/Oceanwinds.nl
+                DATA     cx_globalnamelist_oceanwinds.nc4 dummy.nc4)
 
 # Tests the ukv namelist files in the etc directory
 
