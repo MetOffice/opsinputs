@@ -25,7 +25,7 @@ observations:
       where:
       - variable:
           name: MetaData/latitude
-        is_not_defined:
+        value: is_invalid
     - filter: VarObs Writer
       namelist_directory: ../etc/ukv/varobs
       general_mode: debug
@@ -77,7 +77,7 @@ observations:
       where:
       - variable:
           name: MetaData/latitude
-        is_not_defined:
+        value: is_invalid
     - filter: VarObs Writer
       namelist_directory: ../etc/ukv/varobs
       general_mode: debug
