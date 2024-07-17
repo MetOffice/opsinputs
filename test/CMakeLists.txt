@@ -359,6 +359,14 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_aircraft
 
 # Tests the UKV namelist files in the etc directory
 
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviasr
+                YAML     varobswriter_ukvnamelist_seviriasr.yaml
+                NAMELIST ../../etc/ukv/varobs/SEVIRIASR.nl
+                DATA     varobs_ukvnamelist_seviriasr.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviclr
+                YAML     varobswriter_ukvnamelist_seviriclr.yaml
+                NAMELIST ../../etc/ukv/varobs/SEVIRIClr.nl
+                DATA     varobs_ukvnamelist_seviriclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_sonde
                 YAML     varobswriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/varobs/Sonde.nl
@@ -669,6 +677,14 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_oceanwinds
 
 # Tests the ukv namelist files in the etc directory
 
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_seviriasr
+                YAML     cxwriter_ukvnamelist_seviriasr.yaml
+                NAMELIST ../../etc/ukv/cx/SEVIRIASR.nl
+                DATA     cx_ukvnamelist_seviriasr.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_seviriclr
+                YAML     cxwriter_ukvnamelist_seviriclr.yaml
+                NAMELIST ../../etc/ukv/cx/SEVIRIClr.nl
+                DATA     cx_ukvnamelist_seviriclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_sonde
                 YAML     cxwriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/cx/Sonde.nl
