@@ -29,7 +29,7 @@ observations:
       general_mode: debug
       IC_PLevels: 5
     - filter: Cx Checker
-      expected_surface_variables: ["1","2","5","6","13","17"] # "16"
+      expected_surface_variables: ["1","2","5","6","13","17"]
       expected_upper_air_variables: [11]
       expected_main_table_columns:
       - # observation 3 is rejected by the tests above hence only 3 (1,2,4) columns
