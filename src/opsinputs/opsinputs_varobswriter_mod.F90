@@ -194,6 +194,7 @@ private
   integer(c_int), allocatable :: varChannels(:)
   integer(integer64) :: size_of_varobs_array
   integer(integer64) :: NumVarChannels
+  integer            :: GeneralMode ! Local scope to ensure it propogates correctly
 
   logical :: compressVarChannels
   logical :: increaseChanArray
@@ -272,6 +273,7 @@ case default
   opsinputs_varobswriter_create = .false.
   return
 end select
+self % GeneralMode = GeneralMode
 
 if (comm_is_valid .and. comm /= mpl_comm_world) then
   call gc_init_final(mype, nproc, comm)
@@ -565,7 +567,10 @@ type(UM_header_type)                        :: CxHeader
 integer(integer64)                          :: NumVarObsTotal
 
 ! Body:
+GeneralMode = self % GeneralMode
 self % ObsDiags => obsdiags
+
+write(*,*) "GeneralMode in opsinputs_varobswriter_post = ", GeneralMode
 
 ! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
 ! it should be treated as a single (multi-level) ob in the OPS data structures.

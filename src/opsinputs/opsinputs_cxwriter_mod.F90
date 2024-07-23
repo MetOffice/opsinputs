@@ -157,6 +157,7 @@ private
   integer(integer64)                     :: IC_BLevels
   integer(integer64)                     :: IC_WetLevels
   integer(integer64)                     :: IC_FirstConstantRhoLevel
+  integer                                :: GeneralMode ! Local scope to ensure it propogates correctly
 
   real(real64)                           :: RC_LongSpacing
   real(real64)                           :: RC_LatSpacing
@@ -230,6 +231,7 @@ case default
   opsinputs_cxwriter_create = .false.
   return
 end select
+self % GeneralMode = GeneralMode
 
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
@@ -510,10 +512,12 @@ logical                                :: ConvertRecordsToMultilevelObs
 type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
-
+GeneralMode = self % GeneralMode
 self % GeoVals => GeoVals
 self % varnames = varnames
 self % hofx => hofx
+
+write(*,*) "GeneralMode in opsinputs_cxwriter_post = ", GeneralMode
 
 ! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
 ! it should be treated as a single (multi-level) ob in the OPS data structures.
