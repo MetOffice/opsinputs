@@ -517,8 +517,6 @@ self % GeoVals => GeoVals
 self % varnames = varnames
 self % hofx => hofx
 
-write(*,*) "GeneralMode in opsinputs_cxwriter_post = ", GeneralMode
-
 ! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
 ! it should be treated as a single (multi-level) ob in the OPS data structures.
 ! There may be other obs groups requiring similar treatment -- if so, edit the line below.

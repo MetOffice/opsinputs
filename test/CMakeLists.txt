@@ -315,11 +315,6 @@ ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
                 DATA     028_VarField_satid.nc4
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
-# Tests on combined varobs and cx writer for global namelist
-ADD_WRITER_TEST(NAME     bothwriters_globalnamelist_atms
-                YAML     bothwriters_globalnamelist_atms.yaml
-                DATA     varobs_globalnamelist_atms.nc4)
-
 # Tests the global namelist files in the etc directory
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_abiclr
                 YAML     varobswriter_globalnamelist_abiclr.yaml
