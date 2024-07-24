@@ -11,7 +11,7 @@ concurrency:
 
 env:
   REPO: ${{ github.event.repository.name }}
-  BUNDLE: pr-${{ github.event.number }}
+  PR: pr-${{ github.event.number }}
 
 jobs:
   build1:
@@ -22,19 +22,19 @@ jobs:
     steps:
       - name: Pre-submit cleanup
         run: |
-          rm -fr ./${{ env.BUNDLE }} || true
+          rm -fr ./${{ env.PR }} || true
           ls -lgo ./
       - name: Checkout current
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
+          path: ./${{ env.PR }}/${{ env.REPO }}
       - name: Initiate bundle
-        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
+        run: cp ./${{ env.PR }}/${{ env.REPO }}/ci/* ./${{ env.PR }}/
 
       - name: Checkout jedicmake
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/jedicmake
+          path: ./${{ env.PR }}/jedicmake
           repository: JCSDA-internal/jedi-cmake
           submodules: true
           token: ${{ secrets.GH_PAT }}
@@ -42,42 +42,47 @@ jobs:
       - name: Checkout oops
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/oops
+          path: ./${{ env.PR }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for oops@${{ github.head_ref }}
+      - name: Check build-group for oops
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/oops
 
       - name: Checkout ioda
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/ioda
+          path: ./${{ env.PR }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ioda@${{ github.head_ref }}
+      - name: Check build-group for ioda
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ioda
 
       - name: Checkout ufo
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/ufo
+          path: ./${{ env.PR }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ufo@${{ github.head_ref }}
+      - name: Check build-group for ufo
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ufo
 
       - name: Build and Test
+        env:
+          # Container environment
+          WORKDIR: /var/tmp/${{ env.REPO}}/${{ env.PR }}
+
         run: |
           az acr login --name ngmssboxjediacr
           docker run --rm \
-            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
-            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
-            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
+            --name ${REPO}_${PR}_${GITHUB_SHA::7} \
+            --volume ${{ github.workspace }}/${PR}:${WORKDIR} \
+            --workdir=${WORKDIR} \
+            --entrypoint=${WORKDIR}/build-and-test \
             'ngmssboxjediacr.azurecr.io/jedibase:alma9'
 
       - name: Cleanup workspace
         working-directory: ${{github.workspace}}
-        run: rm -fr ${{ env.BUNDLE }} || true
+        run: rm -fr ${{ env.PR }} || true
