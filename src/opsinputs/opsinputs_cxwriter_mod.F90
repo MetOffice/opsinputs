@@ -22,6 +22,7 @@ use, intrinsic :: iso_c_binding, only: &
 use obsspace_mod, only: &
     obsspace_get_db,    &
     obsspace_get_nlocs
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use opsinputs_cxfields_mod
 use opsinputs_fill_mod, only:                 &
@@ -156,6 +157,7 @@ private
   integer(integer64)                     :: IC_BLevels
   integer(integer64)                     :: IC_WetLevels
   integer(integer64)                     :: IC_FirstConstantRhoLevel
+  integer                                :: GeneralMode ! Local scope to ensure it propogates correctly
 
   real(real64)                           :: RC_LongSpacing
   real(real64)                           :: RC_LatSpacing
@@ -173,7 +175,7 @@ private
 
   type(ufo_geovals), pointer             :: GeoVals
   type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
-  type(oops_variables)                   :: varnames
+  type(obs_variables)                    :: varnames
   real(c_double), pointer                :: hofx(:, :)
 end type opsinputs_cxwriter
 
@@ -229,6 +231,7 @@ case default
   opsinputs_cxwriter_create = .false.
   return
 end select
+self % GeneralMode = GeneralMode
 
 call Gen_SetupControl(DefaultDocURL)
 call Ops_InitMPI
@@ -501,7 +504,7 @@ type(opsinputs_cxwriter), intent(inout) :: self
 type(c_ptr), value, intent(in)          :: ObsSpace
 type(ufo_geovals), intent(in), pointer  :: GeoVals
 type(c_ptr), value, intent(in)          :: Flags
-type(oops_variables), intent(in)        :: varnames
+type(obs_variables), intent(in)         :: varnames
 real(c_double), intent(in), target      :: hofx(:, :)
 
 ! Local declarations:
@@ -509,7 +512,7 @@ logical                                :: ConvertRecordsToMultilevelObs
 type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
 
 ! Body:
-
+GeneralMode = self % GeneralMode
 self % GeoVals => GeoVals
 self % varnames = varnames
 self % hofx => hofx

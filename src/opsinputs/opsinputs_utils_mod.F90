@@ -6,7 +6,7 @@
 module opsinputs_utils_mod
 
 use, intrinsic :: iso_c_binding, only: c_int32_t
-use oops_variables_mod, only: oops_variables
+use obs_variables_mod, only: obs_variables
 use ufo_vars_mod, only: MAXVARLEN
 use opsinputs_obsdatavector_mod, only:    &
     opsinputs_obsdatavector_int_varnames, &
@@ -62,7 +62,7 @@ logical, intent(in)                                :: RejectObsWithAllVariablesF
 integer(kind=integer64), intent(out)               :: ReportFlags(:)
 
 ! Local declarations:
-type(oops_variables)                               :: ObsVariables
+type(obs_variables)                                :: ObsVariables
 character(max_varname_length)                      :: VarName
 integer                                            :: NumObsVariables
 integer                                            :: iVar, iOpsObs, iJediObsInRecord, iJediObs

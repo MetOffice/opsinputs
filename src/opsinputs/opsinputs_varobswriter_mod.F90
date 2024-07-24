@@ -25,6 +25,7 @@ use obsspace_mod, only:  &
     obsspace_get_gnlocs, &
     obsspace_get_nlocs,  &
     obsspace_has
+use obs_variables_mod, only: obs_variables
 use oops_variables_mod, only: oops_variables
 use opsinputs_fill_mod, only: &
     opsinputs_fill_fillcoord2d, &
@@ -34,6 +35,7 @@ use opsinputs_fill_mod, only: &
     opsinputs_fill_fillelementtypefromsimulatedvariable, &
     opsinputs_fill_fillelementtype2dfromsimulatedvariable, &
     opsinputs_fill_fillinteger, &
+    opsinputs_fill_fillinteger2d, &
     opsinputs_fill_fillreal, &
     opsinputs_fill_fillreal2d, &
     opsinputs_fill_fillrealfromgeoval, &
@@ -102,6 +104,7 @@ use OpsMod_ObsGroupInfo, only: &
     OpsFn_ObsGroupNameToNum,   &
     ObsGroupAircraft,          &
     ObsGroupGPSRO,             &
+    ObsGroupOceanWinds,        &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
     ObsGroupScatwindChosen,    &
@@ -155,6 +158,7 @@ private
   logical            :: RequireTForTheta
   logical            :: FillObsTypeFromOpsSubType
   logical            :: VarobsLengthIsIC_PLevels
+  logical            :: StationIDIntToString
 
   character(len=100) :: latitudeName
   character(len=100) :: longitudeName
@@ -190,6 +194,7 @@ private
   integer(c_int), allocatable :: varChannels(:)
   integer(integer64) :: size_of_varobs_array
   integer(integer64) :: NumVarChannels
+  integer            :: GeneralMode ! Local scope to ensure it propogates correctly
 
   logical :: compressVarChannels
   logical :: increaseChanArray
@@ -218,7 +223,7 @@ logical(c_bool), intent(in)                :: comm_is_valid
 integer(gc_int_kind), intent(in)           :: comm
 integer(c_int), intent(in)                 :: channels(:)
 type(oops_variables), intent(inout)        :: geovars  ! GeoVaLs required by the VarObsWriter.
-type(oops_variables), intent(inout)        :: diagvars ! HofXDiags required by the VarObsWriter.
+type(obs_variables), intent(inout)         :: diagvars ! HofXDiags required by the VarObsWriter.
 logical                                    :: opsinputs_varobswriter_create
 
 ! Local declarations:
@@ -268,6 +273,7 @@ case default
   opsinputs_varobswriter_create = .false.
   return
 end select
+self % GeneralMode = GeneralMode
 
 if (comm_is_valid .and. comm /= mpl_comm_world) then
   call gc_init_final(mype, nproc, comm)
@@ -312,6 +318,8 @@ call f_conf % get_or_die("require_T_for_theta_varfield", self % RequireTforTheta
 call f_conf % get_or_die("fill_obstype_from_ops_subtype", self % FillObsTypeFromOpsSubType)
 
 call f_conf % get_or_die("varobs_length_is_IC_PLevels", self % VarobsLengthIsIC_PLevels)
+
+call f_conf % get_or_die("station_ID_int_to_string", self % StationIDIntToString)
 
 call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 
@@ -559,6 +567,7 @@ type(UM_header_type)                        :: CxHeader
 integer(integer64)                          :: NumVarObsTotal
 
 ! Body:
+GeneralMode = self % GeneralMode
 self % ObsDiags => obsdiags
 
 ! For sondes, each profile is stored in a separate record of the JEDI ObsSpace, but
@@ -619,7 +628,7 @@ implicit none
 
 ! Subroutine arguments:
 type(opsinputs_varobswriter), intent(in) :: self
-type(oops_variables), intent(inout)      :: diagvars
+type(obs_variables), intent(inout)       :: diagvars
 
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
@@ -738,7 +747,8 @@ end if
 
 if (obsspace_has(ObsSpace, "MetaData", "stationIdentification")) then
   call opsinputs_fill_fillstring(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping, &
-    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData")
+    LenCallSign, Ob % Callsign, ObsSpace, "stationIdentification", "MetaData", &
+    self % StationIDIntToString)
 else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call opsinputs_varobswriter_fillsatid(Ob, ObsSpace, JediToOpsLayoutMapping)
   call Ops_Alloc(Ob % Header % Callsign, "Callsign", JediToOpsLayoutMapping % NumOpsObs, Ob % Callsign)
@@ -854,8 +864,11 @@ do iVarField = 1, nVarFields
         ObsSpace, Flags, ObsErrors, "precipitableWater", "ObsValue")
       end if
     case (VarField_windspeed)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed)
+      if (Ob % Header % ObsGroup == ObsGroupOceanWinds) then
+        call opsinputs_fill_fillelementtypefromsimulatedvariable(&
+        Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed, &
+        ObsSpace, Flags, ObsErrors, "windSpeed", "ObsValue")
+      end if
     case (VarField_lwp)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % lwp, "LWP", Ob % Header % NumObsLocal, Ob % lwp)
@@ -1008,8 +1021,17 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % SBUVozone, "SBUVozone", Ob % Header % NumObsLocal, Ob % SBUVozone)
     case (VarField_RadialVelocity)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadialVelocSO, "RadialVelocSO", Ob % Header % NumObsLocal, Ob % RadialVelocSO)
+      ! Write DerivedObsValue/radialVelocity to both Ob % RadialVelocSO and Ob % RadialVelocity.
+      ! This ensures that the code in deps/ops/stubs/OpsMod_Varobs/Ops_VarobPGEs.inc works correctly.
+      ! The logical `RadWind_SuperOb` is always false in opsinputs, but is true in operational OPS.
+      ! By default that results in PGEs not being filled correctly. Writing out both OPS variables
+      ! fixes the problem.
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % RadialVelocSO, "RadialVelocSO", JediToOpsLayoutMapping, Ob % RadialVelocSO, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % RadialVelocity, "RadialVelocity", JediToOpsLayoutMapping, Ob % RadialVelocity, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
     case (VarField_Reflectivity)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivitySO, "ReflectivitySO", Ob % Header % NumObsLocal, Ob % ReflectivitySO)
@@ -1020,21 +1042,25 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivityI, "ReflectivityI", Ob % Header % NumObsLocal, Ob % ReflectivityI)
     case (VarField_RadarBeamElev)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadarBeamElev, "RadarBeamElev", Ob % Header % NumObsLocal, Ob % RadarBeamElev)
+      call opsinputs_fill_fillreal2d( &
+         Ob % Header % RadarBeamElev, "RadarBeamElev", JediToOpsLayoutMapping, Ob % RadarBeamElev, &
+         ObsSpace, self % channels, self % VarobsLength, "beamTiltAngle", "MetaData")
     case (VarField_RadarObRange)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadarObRange, "RadarObRange", Ob % Header % NumObsLocal, Ob % RadarObRange)
+      call opsinputs_fill_fillreal2d( &
+         Ob % Header % RadarObRange, "RadarObRange", JediToOpsLayoutMapping, Ob % RadarObRange, &
+         ObsSpace, self % channels, self % VarobsLength, "gateRange", "MetaData")
     case (VarField_RadarObAzim)
       call opsinputs_fill_fillreal2d( &
-        Ob % Header % RadarObAzim, "RadarObAzim", JediToOpsLayoutMapping, Ob % RadarObAzim, &
-        ObsSpace, self % channels, self % VarobsLength, "radarAzimuth", "MetaData")
+         Ob % Header % RadarObAzim, "RadarObAzim", JediToOpsLayoutMapping, Ob % RadarObAzim, &
+         ObsSpace, self % channels, self % VarobsLength, "beamAzimuthAngle", "MetaData")
     case (VarField_RadIdent)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadIdent, "RadIdent", Ob % Header % NumObsLocal, Ob % RadIdent)
+      call opsinputs_fill_fillinteger2d( &
+         Ob % Header % RadIdent, "RadIdent", JediToOpsLayoutMapping, Ob % RadIdent, &
+         ObsSpace, self % channels, self % VarobsLength, "stationIdentification", "MetaData")
     case (VarField_RadAltAboveMSL)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadAltAboveMSL, "RadAltAboveMSL", Ob % Header % NumObsLocal, Ob % RadAltAboveMSL)
+      call opsinputs_fill_fillreal2d( &
+         Ob % Header % RadAltAboveMSL, "RadAltAboveMSL", JediToOpsLayoutMapping, Ob % RadAltAboveMSL, &
+         ObsSpace, self % channels, self % VarobsLength, "stationElevation", "MetaData")
     case (VarField_RadNoiseLvl)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadNoiseLvl, "RadNoiseLvl", Ob % Header % NumObsLocal, Ob % RadNoiseLvl)
@@ -1360,7 +1386,7 @@ integer(integer64), intent(out) :: ChannelCounts(NumObs)
 
 ! Local declarations:
 integer                         :: NumChannels
-type(oops_variables)            :: Variables
+type(obs_variables)             :: Variables
 character(max_varname_length)   :: VariableName
 integer                         :: NumVariables, NumMultichannelVariables
 integer                         :: iMultichannelVariable, iChannel, iVariable, iObs
@@ -1479,45 +1505,45 @@ character(len=*), intent(in)                    :: JediVarName
 
 ! Local arguments:
 character(len=max_varname_with_channel_length) :: JediVarNamesWithChannels(max(size(Channels), 1))
-character(len=MAXVARLEN)        :: satidname
-real(kind=c_double)             :: VarValue(NumObs)
-real(kind=c_double)             :: MissingDouble
-integer(kind=4)                 :: SatIdValue(NumObs)
-integer(kind=4), allocatable    :: UniqueSatIds(:)
-integer                         :: ii, jj
-integer, parameter              :: maxpred = 31
-character(len=*), parameter     :: PredictorBaseName(1:maxpred) = (/ &
-              "constant                  ", &
-              "thickness_850_300hPa      ", &
-              "thickness_200_50hPa       ", &
-              "Tskin                     ", &
-              "total_column_water        ", &
-              "Legendre_order_1          ", &
-              "Legendre_order_2          ", &
-              "Legendre_order_3          ", &
-              "Legendre_order_4          ", &
-              "Legendre_order_5          ", &
-              "Legendre_order_6          ", &
-              "orbital_angle_order_1_cos ", &
-              "orbital_angle_order_1_sin ", &
-              "orbital_angle_order_2_cos ", &
-              "orbital_angle_order_2_sin ", &
-              "orbital_angle_order_3_cos ", &
-              "orbital_angle_order_3_sin ", &
-              "orbital_angle_order_4_cos ", &
-              "orbital_angle_order_4_sin ", &
-              "orbital_angle_order_5_cos ", &
-              "orbital_angle_order_5_sin ", &
-              "orbital_angle_order_6_cos ", &
-              "orbital_angle_order_6_sin ", &
-              "orbital_angle_order_7_cos ", &
-              "orbital_angle_order_7_sin ", &
-              "orbital_angle_order_8_cos ", &
-              "orbital_angle_order_8_sin ", &
-              "orbital_angle_order_9_cos ", &
-              "orbital_angle_order_9_sin ", &
-              "orbital_angle_order_10_cos", &
-              "orbital_angle_order_10_sin" /)
+character(len=MAXVARLEN)         :: satidname
+real(kind=c_double)              :: VarValue(NumObs)
+real(kind=c_double)              :: MissingDouble
+integer(kind=c_int)              :: SatIdValue(NumObs)
+integer(kind=c_int), allocatable :: UniqueSatIds(:)
+integer                          :: ii, jj
+integer, parameter               :: maxpred = 31
+character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
+              "constant                          ", &
+              "thickness_850_300hPa              ", &
+              "thickness_200_50hPa               ", &
+              "Tskin                             ", &
+              "total_column_water                ", &
+              "legendre_order_1                  ", &
+              "legendre_order_2                  ", &
+              "legendre_order_3                  ", &
+              "legendre_order_4                  ", &
+              "legendre_order_5                  ", &
+              "legendre_order_6                  ", &
+              "satelliteOrbitalAngle_order_1_cos ", &
+              "satelliteOrbitalAngle_order_1_sin ", &
+              "satelliteOrbitalAngle_order_2_cos ", &
+              "satelliteOrbitalAngle_order_2_sin ", &
+              "satelliteOrbitalAngle_order_3_cos ", &
+              "satelliteOrbitalAngle_order_3_sin ", &
+              "satelliteOrbitalAngle_order_4_cos ", &
+              "satelliteOrbitalAngle_order_4_sin ", &
+              "satelliteOrbitalAngle_order_5_cos ", &
+              "satelliteOrbitalAngle_order_5_sin ", &
+              "satelliteOrbitalAngle_order_6_cos ", &
+              "satelliteOrbitalAngle_order_6_sin ", &
+              "satelliteOrbitalAngle_order_7_cos ", &
+              "satelliteOrbitalAngle_order_7_sin ", &
+              "satelliteOrbitalAngle_order_8_cos ", &
+              "satelliteOrbitalAngle_order_8_sin ", &
+              "satelliteOrbitalAngle_order_9_cos ", &
+              "satelliteOrbitalAngle_order_9_sin ", &
+              "satelliteOrbitalAngle_order_10_cos", &
+              "satelliteOrbitalAngle_order_10_sin" /)
 character(len=150) :: JediVarGroupWithSatId
 
 ! Body:
@@ -1628,11 +1654,11 @@ end subroutine opsinputs_varobswriter_populatecxheader
 subroutine unique_values(input, output, positive)
 implicit none
 
-integer(kind=4), intent(in)               :: input(:)
-integer(kind=4), allocatable, intent(out) :: output(:)
-logical, optional, intent(in)             :: positive
+integer(kind=c_int), intent(in)               :: input(:)
+integer(kind=c_int), allocatable, intent(out) :: output(:)
+logical, optional, intent(in)                 :: positive
 
-integer(kind=4), allocatable :: unique(:)
+integer(kind=c_int), allocatable :: unique(:)
 integer :: i, j, k
 
 if (size(input) > 0) then

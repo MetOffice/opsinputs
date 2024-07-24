@@ -15,6 +15,7 @@ namespace ioda {
 }  // namespace ioda
 
 namespace oops {
+  class ObsVariables;
   class Variables;
 }  // namespace oops
 
@@ -22,7 +23,7 @@ namespace opsinputs {
 
 extern "C" {
   int opsinputs_obsdatavector_int_nlocs_f(const ioda::ObsDataVector<int> &vec);
-  const oops::Variables * opsinputs_obsdatavector_int_varnames_f(
+  const oops::ObsVariables * opsinputs_obsdatavector_int_varnames_f(
       const ioda::ObsDataVector<int> &vec);
   bool opsinputs_obsdatavector_int_has_f(const ioda::ObsDataVector<int> &vec,
                                         const char *variable);
@@ -31,7 +32,7 @@ extern "C" {
                                         const size_t &length, int* data);
 
   int opsinputs_obsdatavector_float_nlocs_f(const ioda::ObsDataVector<float> &vec);
-  const oops::Variables * opsinputs_obsdatavector_float_varnames_f(
+  const oops::ObsVariables * opsinputs_obsdatavector_float_varnames_f(
       const ioda::ObsDataVector<float> &vec);
   bool opsinputs_obsdatavector_float_has_f(const ioda::ObsDataVector<float> &vec,
                                           const char *variable);

@@ -19,7 +19,6 @@
 
 #include "ioda/ObsDataVector.h"
 #include "ioda/ObsSpace.h"
-#include "oops/base/Variables.h"
 #include "oops/mpi/mpi.h"
 #include "oops/util/Logger.h"
 
