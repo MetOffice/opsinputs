@@ -13,11 +13,12 @@ concurrency:
 
 env:
   REPO: ${{ github.event.repository.name }}
-  BUNDLE: pr-${{ github.event.number }}
+  PR: pr-${{ github.event.number }}
 
 jobs:
   build1:
-    if: github.repository_owner == 'MetOffice'
+    if: |
+      ( github.repository_owner == 'MetOffice' && github.event.pull_request.draft == false )
     name: gnu-openmpi (JCSDA)
     runs-on: ubuntu-latest
 
@@ -25,58 +26,59 @@ jobs:
       - name: Checkout current
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
-      - name: initiate bundle
-        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
+          path: ./${{ env.PR }}/${{ env.REPO }}
+      - name: Initiate bundle
+        run: cp ./${{ env.PR }}/${{ env.REPO }}/ci/* ./${{ env.PR }}/
 
       - name: Checkout jedicmake
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/jedicmake
+          path: ./${{ env.PR }}/jedicmake
           repository: JCSDA-internal/jedi-cmake
-          submodules: true
+          submodules: recursive
           token: ${{ secrets.GH_PAT }}
 
       - name: Checkout oops
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/oops
+          path: ./${{ env.PR }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for oops@${{ github.head_ref }}
+      - name: Check build-group for oops
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/oops
 
       - name: Checkout ioda
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/ioda
+          path: ./${{ env.PR }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ioda@${{ github.head_ref }}
+      - name: Check build-group for ioda
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ioda
 
       - name: Checkout ufo
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/ufo
+          path: ./${{ env.PR }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ufo@${{ github.head_ref }}
+      - name: Check build-group for ufo
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ufo
 
       - name: build and test
         run: |
           docker run --rm \
-            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
-            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
-            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
+            --entrypoint=/usr/local/src/${REPO}/${PR}/build-and-test \
+            --workdir=/usr/local/src/${REPO}/${PR} \
+            --volume ${PWD}/${PR}:/usr/local/src/${REPO}/${PR} \
             'jcsda/docker-gnu-openmpi-dev:latest'
 
   build2:
-    if: github.repository_owner == 'MetOffice'
+    if:
+      ( github.repository_owner == 'MetOffice' && github.event.pull_request.draft == false )
     name: clang-mpich (JCSDA)
     runs-on: ubuntu-latest
 
@@ -84,14 +86,14 @@ jobs:
       - name: Checkout current
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/${{ env.REPO }}
-      - name: initiate bundle
-        run: cp ./${{ env.BUNDLE }}/${{ env.REPO }}/ci/* ./${{ env.BUNDLE }}/
+          path: ./${{ env.PR }}/${{ env.REPO }}
+      - name: Initiate bundle
+        run: cp ./${{ env.PR }}/${{ env.REPO }}/ci/* ./${{ env.PR }}/
 
       - name: Checkout jedicmake
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/jedicmake
+          path: ./${{ env.PR }}/jedicmake
           repository: JCSDA-internal/jedi-cmake
           submodules: true
           token: ${{ secrets.GH_PAT }}
@@ -99,37 +101,37 @@ jobs:
       - name: Checkout oops
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/oops
+          path: ./${{ env.PR }}/oops
           repository: JCSDA-internal/oops
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for oops@${{ github.head_ref }}
+      - name: Check build-group for oops
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/oops
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/oops
 
       - name: Checkout ioda
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/ioda
+          path: ./${{ env.PR }}/ioda
           repository: JCSDA-internal/ioda
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ioda@${{ github.head_ref }}
+      - name: Check build-group for ioda
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ioda
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ioda
 
       - name: Checkout ufo
         uses: actions/checkout@v4
         with:
-          path: ./${{ env.BUNDLE }}/ufo
+          path: ./${{ env.PR }}/ufo
           repository: JCSDA-internal/ufo
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout attempt for ufo@${{ github.head_ref }}
+      - name: Check build-group for ufo
         if: github.event_name == 'pull_request'
-        run: ./${{ env.BUNDLE }}/get-ref-branch ./${{ env.BUNDLE }}/ufo
+        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ufo
 
       - name: Build and Test
         run: |
           docker run --rm \
-            --entrypoint=/usr/local/src/${REPO}/${BUNDLE}/build-and-test \
-            --workdir=/usr/local/src/${REPO}/${BUNDLE} \
-            --volume ${PWD}/${BUNDLE}:/usr/local/src/${REPO}/${BUNDLE} \
+            --entrypoint=/usr/local/src/${REPO}/${PR}/build-and-test \
+            --workdir=/usr/local/src/${REPO}/${PR} \
+            --volume ${PWD}/${PR}:/usr/local/src/${REPO}/${PR} \
             'jcsda/docker-clang-mpich-dev:latest'
