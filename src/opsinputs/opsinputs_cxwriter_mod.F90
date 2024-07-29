@@ -974,11 +974,15 @@ do iCxField = 1, size(CxFields)
         Cx % Header % qt2, "qt2", Cx % Header % NumLocal, Cx % qt2, &
         self % GeoVals, opsinputs_cxfields_qt2, self % JediToOpsLayoutMapping)
     case (StashItem_aerosol) ! IndexCxaerosol
-       if (Cx % Header % ObsGroup == ObsGroupSurface) then
-         call opsinputs_fill_fillrealfromgeoval( &
-           Cx % Header % aerosol, "aerosol", Cx % Header % NumLocal, Cx % aerosol, &
-           self % GeoVals, opsinputs_cxfields_aerosol, self % JediToOpsLayoutMapping)
-       end if
+      print *, "Extracting aerosol with stash code.", StashItem_aerosol
+      call opsinputs_fill_fillrealfromgeoval( &
+        Cx % Header % aerosol, "aerosol", Cx % Header % NumLocal, Cx % aerosol, &
+        self % GeoVals, opsinputs_cxfields_aerosol, self % JediToOpsLayoutMapping)
+      print *, "Extracted aerosol with stash code!", StashItem_aerosol
+      !  if (Cx % Header % ObsGroup == ObsGroupSurface) then
+      !    call opsinputs_fill_fillrealfromgeoval( &
+      !      Cx % Header % aerosol, "aerosol", Cx % Header % NumLocal, Cx % aerosol, &
+      !      self % GeoVals, opsinputs_cxfields_aerosol, self % JediToOpsLayoutMapping)
     case (StashCode_PsurfParamA) ! IndexCxPsurfParamA
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % PSurfParamA, "PSurfParamA", Cx % Header % NumLocal, Cx % PSurfParamA, &
