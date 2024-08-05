@@ -12,6 +12,7 @@ concurrency:
 env:
   REPO: ${{ github.event.repository.name }}
   PR: pr-${{ github.event.number }}
+  GH_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
   build1:
