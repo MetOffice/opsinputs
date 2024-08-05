@@ -78,7 +78,7 @@ jobs:
             'jcsda/docker-gnu-openmpi-dev:latest'
 
   build2:
-    if:
+    if: |
       ( github.repository_owner == 'MetOffice' && github.event.pull_request.draft == false )
     name: clang-mpich (JCSDA)
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
         with:
           path: ./${{ env.PR }}/jedicmake
           repository: JCSDA-internal/jedi-cmake
-          submodules: true
+          submodules: recursive
           token: ${{ secrets.GH_PAT }}
 
       - name: Checkout oops
