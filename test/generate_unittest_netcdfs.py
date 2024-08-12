@@ -1127,11 +1127,11 @@ if __name__ == "__main__":
 
     # Surface - UKV
     output_full_cx_to_netcdf(['skin_temperature', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'visibility_1p5m','qt_1p5m','aerosol'],
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'visibility_1p5m','qt_1p5m'],
                              ['potential_temperature', 'specific_humidity', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
-                              'eastward_wind', 'northward_wind'],
+                              'eastward_wind', 'northward_wind', 'aerosol'],
                              'testinput/cx_ukvnamelist_surface.nc4')
 
     # Scatwind
