@@ -1380,16 +1380,26 @@ else
     call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal, must_be_found = .false.)
     if (associated(GeoVal)) then
       if (GeoVal % nval /= 1) then
-        write (ErrorMessage, '("GeoVal ",A," contains ",I0," values per location. &
-          &Only the first of these values will be written to the VarObs file")') JediVarName, GeoVal % nval
-        call gen_warn(RoutineName, ErrorMessage)
+        if (JediVarName /= "aerosol") then ! special case - see below
+          write (ErrorMessage, '("GeoVal ",A," contains ",I0," values per location. &
+            &Only the first of these values will be written to the VarObs file")') JediVarName, GeoVal % nval
+          call gen_warn(RoutineName, ErrorMessage)
+        end if
       end if
     end if
 
     ! Fill the OPS data structures
     call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
     if (JediVarName == "aerosol") then
-      Real1 = GeoVal % vals(70,:)
+      ! This field "Total Aerosol (for Vis)" exists on 70 levels, but OPS only
+      ! outputs (and VAR expects) a single value at the surface (GeoVal level
+      ! 70 or cx level 1) for the calculation of visibility. See
+      ! Ops_BGEandCXCreate.inc line 166 and Ops_CxComplete.inc line 299. This
+      ! field is only used for surface visibility calculations so no further
+      ! specific handling is required.
+      where (GeoVal % vals(70,:) /= MissingReal)
+        Real1 = GeoVal % vals(70,:)
+      end where
     else
       where (GeoVal % vals(1,:) /= MissingReal)
         Real1 = GeoVal % vals(1,:)
