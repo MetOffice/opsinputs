@@ -1363,7 +1363,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
 integer(integer64), dimension(2)                :: GeoValShape
-integer(integer64)                              :: NumLevs
+integer(integer64)                              :: LvlIdx
 
 character(len=*), parameter                     :: &
   RoutineName = "opsinputs_fill_fillrealfromgeoval"
@@ -1400,15 +1400,14 @@ else
       ! field is only used for surface visibility calculations so no further
       ! specific handling is required.
       GeoValShape = shape(GeoVaL % vals)
-      NumLevs = GeoValShape(1)
-      where (GeoVal % vals(NumLevs,:) /= MissingReal)
-        Real1 = GeoVal % vals(NumLevs,:)
-      end where
+      LvlIdx = GeoValShape(1)  ! Usually 70
     else
-      where (GeoVal % vals(1,:) /= MissingReal)
-        Real1 = GeoVal % vals(1,:)
-      end where
+      LvlIdx = 1
     end if
+
+    where (GeoVal % vals(LvlIdx,:) /= MissingReal)
+      Real1 = GeoVal % vals(LvlIdx,:)
+    end where
 end if
 end subroutine opsinputs_fill_fillrealfromgeoval
 
