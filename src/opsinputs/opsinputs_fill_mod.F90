@@ -1362,6 +1362,7 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
+integer(integer64), dimension(2)                :: GeoValShape
 integer(integer64)                              :: LvlIdx
 
 character(len=*), parameter                     :: &
@@ -1398,7 +1399,8 @@ else
       ! Ops_BGEandCXCreate.inc line 166 and Ops_CxComplete.inc line 299. This
       ! field is only used for surface visibility calculations so no further
       ! specific handling is required.
-      LvlIdx = shape(GeoVaL % vals, dim=1)  ! Usually 70
+      GeoValShape = shape(GeoVaL % vals)
+      LvlIdx = GeoValShape(1)  ! Usually 70
     else
       LvlIdx = 1
     end if
