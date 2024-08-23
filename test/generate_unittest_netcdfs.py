@@ -16,7 +16,8 @@ missing_int = np.iinfo(np.int32).min + 5
 missing_float_nc = 9.969209968386869e+36
 
 
-def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, radar_doppler_wind=False):
+def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False,
+                                      radar_doppler_wind=False, radar_reflectivity=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
@@ -35,10 +36,10 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
     var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     # Station ID
-    if radar_doppler_wind:
-        # The radar Doppler wind processing uses integers for station identification because
-        # `MetaData/stationIdentification` is mapped to the ODB variable `rad_ident`,
-        # which is an integer.
+    if radar_doppler_wind or radar_reflectivity:
+        # The radar Doppler wind and reflectivity processing both use integers for
+        # station identification because `MetaData/stationIdentification` is mapped
+        # to the ODB variable `rad_ident`, which is an integer.
         var = f.createVariable('MetaData/stationIdentification', 'i', ('Location'))
         var[:] = [1, 2, 3, 4]
     else:
@@ -48,7 +49,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
             var[i] = s
 
     # Extra variables for radar
-    if radar_doppler_wind:
+    if radar_doppler_wind or radar_reflectivity:
         var = f.createVariable('MetaData/radar_family', 'i', ('Location',))
         var[:] = [11, 12, 13, 14]
         var = f.createVariable('MetaData/beamTiltAngle', 'i', ('Location',))
@@ -58,6 +59,9 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
         var = f.createVariable('MetaData/beamAzimuthAngle', 'i', ('Location',))
         var[:] = [11, 12, 13, 14]
         var = f.createVariable('MetaData/stationElevation', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
+    if radar_reflectivity:
+        var = f.createVariable('QualityInformation/reflectivity', 'i', ('Location',))
         var[:] = [11, 12, 13, 14]
 
     var = f.createVariable('ObsValue/' + var_name, 'f', ('Location',))
@@ -725,6 +729,7 @@ if __name__ == "__main__":
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
                                                                  'legendre_order_1_satid_5Predictor',    'legendre_order_1_satid_8Predictor'],
                                       'testinput/080_VarField_biaspredictors.nc4', predictors=True)
+    output_1d_simulated_var_to_netcdf   ('reflectivity',  'testinput/070_VarField_reflectivity.nc4', radar_reflectivity=True)
     output_2d_simulated_var_to_netcdf('bendingAngle',              'testinput/071_VarField_bendingangle.nc4', add_occulting_satid=True)
     output_2d_normal_var_to_netcdf('impactParameterRO', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
     output_1d_normal_var_to_netcdf('earthRadiusCurvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
@@ -900,6 +905,18 @@ if __name__ == "__main__":
                                  ['MetaData/stationIdentification'],
                                  'testinput/varobs_ukvnamelist_radar_doppler_wind.nc4')
 
+    # Radar reflectivity - UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude',
+                                  'MetaData/beamTiltAngle',
+                                  'MetaData/gateRange',
+                                  'MetaData/beamAzimuthAngle',
+                                  'MetaData/stationElevation',
+                                  'ObsValue/reflectivity', 'ObsError/reflectivity'],
+                                 [],
+                                 ['MetaData/stationIdentification', 'QualityInformation/reflectivity',],
+                                 'testinput/varobs_ukvnamelist_radar_reflectivity.nc4')
+
 
 
 
@@ -935,6 +952,8 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('liquid_cloud_volume_fraction_in_atmosphere_layer',      'testinput/035_UpperAirCxField_Cl.nc4')
     output_2d_geovals_to_netcdf      (['mass_fraction_of_dust00%s_in_air' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
     output_2d_geovals_to_netcdf      (['eastward_wind', 'northward_wind'], 'testinput/CxWriter_UnRotateWinds.nc4', shift_by_varindex=False)
+    output_2d_geoval_to_netcdf       ('exner',      'testinput/039_UpperAirCxField_Exner.nc4')
+    output_2d_geoval_to_netcdf       ('qrain',      'testinput/040_UpperAirCxField_Qrain.nc4')
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output
@@ -1165,4 +1184,12 @@ if __name__ == "__main__":
     output_full_cx_to_netcdf(['surface_altitude'],
                              ['eastward_wind', 'northward_wind', 'upward_air_velocity'],
                              'testinput/cx_ukvnamelist_radar_doppler_wind.nc4')
+
+    # Radar reflectivity - UKV
+    output_full_cx_to_netcdf(['surface_altitude'],
+                             ['potential_temperature', 'specific_humidity', 'air_pressure_levels',
+                              'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'exner', 'qrain'],
+                             'testinput/cx_ukvnamelist_radar_reflectivity.nc4')
 

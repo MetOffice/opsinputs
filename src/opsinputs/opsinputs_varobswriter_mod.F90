@@ -105,6 +105,7 @@ use OpsMod_ObsGroupInfo, only: &
     ObsGroupAircraft,          &
     ObsGroupGPSRO,             &
     ObsGroupOceanWinds,        &
+    ObsGroupRadarZ,            &
     ObsGroupSatwind,           &
     ObsGroupScatwind,          &
     ObsGroupScatwindChosen,    &
@@ -707,7 +708,7 @@ integer(integer64)                                    :: VarFields(ActualMaxVarf
 integer                                               :: nVarFields
 integer                                               :: iVarField
 integer                                               :: iobs
-
+character(len=200)                                    :: varname
 logical                                               :: FillChanNum = .false.
 logical                                               :: FillNumChans = .false.
 
@@ -1033,8 +1034,14 @@ do iVarField = 1, nVarFields
          Ob % Header % RadialVelocity, "RadialVelocity", JediToOpsLayoutMapping, Ob % RadialVelocity, &
          ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
     case (VarField_Reflectivity)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % ReflectivitySO, "ReflectivitySO", Ob % Header % NumObsLocal, Ob % ReflectivitySO)
+       ! Write DerivedObsValue/reflectivity to both Ob % ReflectivitySO and Ob % Reflectivity.
+       ! See the explanation given for RadialVelocity above.
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % ReflectivitySO, "ReflectivitySO", JediToOpsLayoutMapping, Ob % ReflectivitySO, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue")
+      call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
+         Ob % Header % Reflectivity, "Reflectivity", JediToOpsLayoutMapping, Ob % Reflectivity, &
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue")
     case (VarField_ReflectivityR)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivityR, "ReflectivityR", Ob % Header % NumObsLocal, Ob % ReflectivityR)
@@ -1065,8 +1072,14 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadNoiseLvl, "RadNoiseLvl", Ob % Header % NumObsLocal, Ob % RadNoiseLvl)
     case (VarField_RadFlag)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % RadFlag, "RadFlag", Ob % Header % NumObsLocal, Ob % RadFlag)
+      if (Ob % header % ObsGroup == ObsGroupRadarZ) then
+         varname = "reflectivity"
+      else
+         call gen_fail(RoutineName, "Invalid observation name for RadFlag")
+      end if
+      call opsinputs_fill_fillinteger2d( &
+         Ob % Header % RadFlag, "RadFlag", JediToOpsLayoutMapping, Ob % RadFlag, &
+         ObsSpace, self % channels, self % VarobsLength, trim(varname), "QualityInformation")
     case (VarField_clw)
       call opsinputs_fill_fillelementtype2dfromnormalvariablewithlevels( &
         Ob % Header % CLW , "CLW" , Ob % Header % NumObsLocal, ob % CLW, &
