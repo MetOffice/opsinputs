@@ -856,8 +856,9 @@ do iVarField = 1, nVarFields
           ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "windNorthward", "ObsValue")
       end if
     case (VarField_logvis)
-      ! TODO(someone): handle this varfield
-      ! call Ops_Alloc(Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis)
+      call opsinputs_fill_fillelementtypefromsimulatedvariable( &
+        Ob % Header % logvis, "logvis", Ob % Header % NumObsLocal, Ob % logvis, &
+        ObsSpace, Flags, ObsErrors, "horizontalVisibility", "ObsValue")
     case (VarField_tcwv)
       if (Ob % Header % ObsGroup == ObsGroupSatTCWV) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable(Ob % Header % tcwv, "TCWV", Ob % Header % NumObsLocal, Ob % tcwv, &

@@ -700,6 +700,7 @@ if __name__ == "__main__":
     output_simulated_var_profiles_to_netcdf('windNorthward',          'testinput/005_VarField_v_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
     output_1d_simulated_var_to_netcdf('windSpeed',                    'testinput/008_VarField_WindSpeed.nc4')
+    output_1d_simulated_var_to_netcdf('horizontalVisibility',         'testinput/009_VarField_horizontalVisibility.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('cloudAmount', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
@@ -1126,11 +1127,11 @@ if __name__ == "__main__":
 
     # Surface - UKV
     output_full_cx_to_netcdf(['skin_temperature', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m'],
+                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'visibility_1p5m','qt_1p5m'],
                              ['potential_temperature', 'specific_humidity', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
-                              'eastward_wind', 'northward_wind'],
+                              'eastward_wind', 'northward_wind', 'aerosol'],
                              'testinput/cx_ukvnamelist_surface.nc4')
 
     # Scatwind
@@ -1156,7 +1157,7 @@ if __name__ == "__main__":
                              'testinput/cx_globalnamelist_screen.nc4')
 
     # Oceanwinds
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 
+    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure',
                               'uwind_at_10m', 'vwind_at_10m'],
                              ['air_pressure_levels'],
                              'testinput/cx_globalnamelist_oceanwinds.nc4')
