@@ -10,7 +10,7 @@
 | 3 | `VarField_rh` | `rh2(:)` or `rh(:,:)` | relative humidity | `ObsValue/relativeHumidity` (`ObsValue/relativeHumidityAt2M` for rh2) | |
 | 4 | `VarField_u` | `u10(:)` or `u(:,:)` | eastward wind | `ObsValue/windEastward` (`ObsValue/windEastwardAt10M` for u10) | |
 | 5 | `VarField_v` | `v10(:)` or `v(:,:)` | northward wind | `ObsValue/windNorthward` (`ObsValue/windNorthwardAt10M` for u10) | |
-| 6 | `VarField_logvis` | | | | Implement |
+| 6 | `VarField_logvis` | `logvis(:)` | Base 10 log of horizontal visibility (m) | `ObsValue/horizonalVisibility` | |
 | 7 | `VarField_tcwv` | `TCWV(:)` | total column water vapour | `ObsValue/precipitableWater` | |
 | 8 | `VarField_windspeed` | `WindSpeed(:)` | 10 metre windspeed | `ObsValue/WindSpeed` | |
 | 9 | `VarField_lwp` | | | | Implement |

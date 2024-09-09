@@ -29,8 +29,8 @@ character(len=*), parameter, public :: opsinputs_cxfields_TropPres = opsinputs_c
 character(len=*), parameter, public :: opsinputs_cxfields_pmsl = var_pmsl
 character(len=*), parameter, public :: opsinputs_cxfields_SeaIce = var_sfc_ifrac
 character(len=*), parameter, public :: opsinputs_cxfields_SnowAmount = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_qt2 = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_aerosol = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_qt2 = "qt_1p5m"
+character(len=*), parameter, public :: opsinputs_cxfields_aerosol = "aerosol"
 character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamA = "surf_param_a"
 character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamB = "surf_param_b"
 character(len=*), parameter, public :: opsinputs_cxfields_LapseRate = opsinputs_cxfields_unknown
