@@ -87,7 +87,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_RH_AMC = opsinputs_cxf
 character(len=*), parameter, public :: opsinputs_cxfields_Cl = "liquid_cloud_volume_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_Cf = "ice_cloud_volume_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_qrain = "qrain"
-character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = "exner"
+character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = "exner_levels"
 character(len=*), parameter, public :: opsinputs_cxfields_RichNumber = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SoilMoisture = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SoilTemp = opsinputs_cxfields_unknown

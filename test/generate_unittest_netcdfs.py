@@ -953,7 +953,7 @@ if __name__ == "__main__":
     output_2d_geoval_to_netcdf       ('liquid_cloud_volume_fraction_in_atmosphere_layer',      'testinput/035_UpperAirCxField_Cl.nc4')
     output_2d_geovals_to_netcdf      (['mass_fraction_of_dust00%s_in_air' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
     output_2d_geovals_to_netcdf      (['eastward_wind', 'northward_wind'], 'testinput/CxWriter_UnRotateWinds.nc4', shift_by_varindex=False)
-    output_2d_geoval_to_netcdf       ('exner',      'testinput/039_UpperAirCxField_Exner.nc4')
+    output_2d_geoval_to_netcdf       ('exner_levels', 'testinput/039_UpperAirCxField_Exner.nc4')
     output_2d_geoval_to_netcdf       ('qrain',      'testinput/040_UpperAirCxField_Qrain.nc4')
 
     # Cx full output for an obsgroup testing
@@ -1191,6 +1191,6 @@ if __name__ == "__main__":
                              ['potential_temperature', 'specific_humidity', 'air_pressure_levels',
                               'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
-                              'exner', 'qrain'],
+                              'exner_levels', 'qrain'],
                              'testinput/cx_ukvnamelist_radar_reflectivity.nc4')
 
