@@ -56,19 +56,19 @@
 | 60 | `VarField_z` | | | | Implement |
 | 61 | `VarField_SBUVozone` | | | | Implement |
 | 62 | `VarField_GeoBriTemp` | | | | Implement |
-| 63 | `VarField_RadialVelocity` | | | | Implement |
-| 64 | `VarField_RadarBeamElev` | | | | Implement |
-| 65 | `VarField_RadarObRange` | | | | Implement |
-| 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Azimut of radar ob | `MetaData/radarAzimuth` | |
+| 63 | `VarField_RadialVelocity` | `RadialVelocSO(:,:)` | Radar radial velocity | `ObsValue/radialVelocity` | |
+| 64 | `VarField_RadarBeamElev` | `RadarBeamElev(:,:)` | Radar beam tilt | `MetaData/beamTiltAngle` | |
+| 65 | `VarField_RadarObRange` | `RadarObRange(:,:)` | Radar gate range | `MetaData/gateRange` | |
+| 66 | `VarField_RadarObAzim` | `RadarObAzim(:,:)` | Radar beam azimuth | `MetaData/beamAzimuthAngle` | |
 | 67 | `VarField_GPS_Station_Height` | `GPS_Station_Height(:)`| Height of the Ground GNSS stations | `MetaData/stationElevation` | |
 | 68 | `VarField_clw` | CLW(:,:) | retrieved clw from 1Dvar | OneDVar/liquidWaterContent | |
-| 69 | `VarField_RadIdent` | | | | Implement Implement |
-| 70 | `VarField_Reflectivity` | | | | Implement |
+| 69 | `VarField_RadIdent` | `RadIdent(:)` | Radar numerical identifier | `MetaData/stationIdentification` | |
+| 70 | `VarField_Reflectivity` | `ReflectivitySO(:,:)` | Radar reflectivity | `ObsValue/reflectivity` | |
 | 71 | `VarField_BendingAngle` | `BendingAngle(:,:)` or `BendingAngleAll(:,:)` | GPSRO bending angle (L1, L2, LC etc or just LC) | `ObsValue/bendingAngle` | Decide if a separate variable corresponding to BendingAngleAll is needed |
 | 72 | `VarField_ImpactParam` | `ImpactParam(:,:)` or `ImpactParamAll(:,:)` | GPSRO impact parameter (L1, L2, LC etc or just LC) | `ObsValue/impactParameterRO` | Decide if a separate variable corresponding to ImpactParamAll is needed |
 | 73 | `VarField_RO_Rad_Curv` | `RO_Rad_Curv(:)` | GPSRO Earth\'s local radius of curvature (m) | `MetaData/earthRadiusCurvature` | |
 | 74 | `VarField_RO_geoid_und` | `RO_geoid_und(:)` | GPSRO Geoid undulation (above WGS-84 ellipsoid, m) | `MetaData/geoidUndulation` | |
-| 75 | `VarField_RadAltAboveMSL` | | | | Implement |
+| 75 | `VarField_RadAltAboveMSL` | `RadAltAboveMSL(:,:)` | Radar station elevation above mean sea level | `MetaData/stationElevation` | |
 | 76 | `VarField_BriTempVarError` | `BriTempVarError(:,:)` | scene dependent obs errors for BTs (oblocation, channel) | `ObsErrorData/brightnessTemperature` | |
 | 77 | `VarField_AOD` | `AOD(:,:)` | aerosol optical depth | `ObsValue/aerosolOpticalDepth` | |
 | 78 | `VarField_Theta` | `theta(:,:)` | potential temperature | `ObsValue/airTemperature` | |
@@ -97,4 +97,4 @@
 | 101 | `VarField_dWinddP` | | | | Implement |
 | 102 | `VarField_AzimuthCOG` | | | | Implement |
 | 103 | `VarField_HeightCOG` | | | | Implement |
-| 104 | `VarField_RadFlag` | | | | | | Implement |
+| 104 | `VarField_RadFlag` | `RadFlag(:,:)` | Radar preprocessing flag | `QualityInformation/reflectivity` | |
