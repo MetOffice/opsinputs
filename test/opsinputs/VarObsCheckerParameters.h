@@ -11,15 +11,15 @@
 #include <vector>
 
 #include "eckit/exception/Exceptions.h"
-#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/RequiredParameter.h"
+#include "ufo/ObsFilterParametersBase.h"
 
 namespace opsinputs {
 
 /// \brief VarObsChecker options.
-class VarObsCheckerParameters : public oops::ObsFilterParametersBase {
+class VarObsCheckerParameters : public ufo::ObsFilterParametersBase {
   OOPS_CONCRETE_PARAMETERS(VarObsCheckerParameters, ObsFilterParametersBase)
 
  public:

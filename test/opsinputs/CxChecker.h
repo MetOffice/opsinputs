@@ -16,8 +16,8 @@
 #include "ioda/ObsDataVector.h"
 #include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
+#include "ufo/ObsFilterBase.h"
 #include "ufo/ObsTraits.h"
 
 namespace eckit {
@@ -48,7 +48,7 @@ namespace test {
 /// from that output.
 ///
 /// See CxCheckerParameters for a list of available options.
-class CxChecker : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+class CxChecker : public ufo::ObsFilterBase,
                   private util::ObjectCounter<CxChecker> {
  public:
   static const std::string classname() {return "opsinputs::test::CxChecker";}
