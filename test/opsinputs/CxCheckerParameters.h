@@ -11,9 +11,9 @@
 #include <vector>
 
 #include "eckit/exception/Exceptions.h"
-#include "ufo/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
+#include "ufo/ObsFilterParametersBase.h"
 
 namespace opsinputs {
 
