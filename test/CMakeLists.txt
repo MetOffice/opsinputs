@@ -234,6 +234,10 @@ ADD_WRITER_TEST(NAME     varobswriter_068_VarField_clw
                 YAML     068_VarField_clw.yaml
                 NAMELIST VarObsWriterNamelists_068_VarField_clw/AMSUB.nl
                 DATA     068_VarField_clw.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_070_VarField_reflectivity
+                YAML     070_VarField_reflectivity.yaml
+                NAMELIST VarObsWriterNamelists_070_VarField_reflectivity/RadarZ.nl
+                DATA     070_VarField_reflectivity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_071_VarField_bendingangle
                 YAML     071_VarField_bendingangle.yaml
                 DATA     071_VarField_bendingangle.nc4)
@@ -382,6 +386,10 @@ ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_doppler_wind
                 YAML     varobswriter_ukvnamelist_radar_doppler_wind.yaml
                 NAMELIST ../../etc/ukv/varobs/Radar.nl
                 DATA     varobs_ukvnamelist_radar_doppler_wind.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_reflectivity
+                YAML     varobswriter_ukvnamelist_radar_reflectivity.yaml
+                NAMELIST ../../etc/ukv/varobs/RadarZ.nl
+                DATA     varobs_ukvnamelist_radar_reflectivity.nc4)
 
 ### CxWriter tests
 
@@ -504,7 +512,14 @@ ADD_WRITER_TEST(NAME     cxwriter_035_UpperAirCxField_Cl
                 YAML     035_UpperAirCxField_Cl.yaml
                 NAMELIST CxWriterNamelists_035_UpperAirCxField_Cl/AMSUB.nl
                 DATA     035_UpperAirCxField_Cl.nc4 dummy.nc4)
-
+ADD_WRITER_TEST(NAME     cxwriter_039_UpperAirCxField_Exner
+                YAML     039_UpperAirCxField_Exner.yaml
+                NAMELIST CxWriterNamelists_039_UpperAirCxField_Exner/RadarZ.nl
+                DATA     039_UpperAirCxField_Exner.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_040_UpperAirCxField_Qrain
+                YAML     040_UpperAirCxField_Qrain.yaml
+                NAMELIST CxWriterNamelists_040_UpperAirCxField_Qrain/RadarZ.nl
+                DATA     040_UpperAirCxField_Qrain.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_041-042_UpperAirCxField_dust1-dust2
                 YAML     041-042_UpperAirCxField_dust1-dust2.yaml
                 NAMELIST CxWriterNamelists_041-042_UpperAirCxField_dust1-dust2/AOD.nl
@@ -704,6 +719,10 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_doppler_wind
                 YAML     cxwriter_ukvnamelist_radar_doppler_wind.yaml
                 NAMELIST ../../etc/ukv/cx/Radar.nl
                 DATA     cx_ukvnamelist_radar_doppler_wind.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_reflectivity
+                YAML     cxwriter_ukvnamelist_radar_reflectivity.yaml
+                NAMELIST ../../etc/ukv/cx/RadarZ.nl
+                DATA     cx_ukvnamelist_radar_reflectivity.nc4 dummy.nc4)
 
 ### Tests of auxiliary classes
 
