@@ -59,7 +59,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_O3_AQ = opsinputs_cxfi
 character(len=*), parameter, public :: opsinputs_cxfields_NO2_AQ = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CO_AQ = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_BLtype = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_theta = "potential_temperature"
+character(len=*), parameter, public :: opsinputs_cxfields_theta = "air_potential_temperature"
 character(len=*), parameter, public :: opsinputs_cxfields_rh = var_rh
 character(len=*), parameter, public :: opsinputs_cxfields_u = var_u
 character(len=*), parameter, public :: opsinputs_cxfields_v = var_v
