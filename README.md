@@ -58,7 +58,7 @@ The following YAML snippet demonstrates the use of `VarObsWriter`. <ObsGroup> st
   ObsDataIn:
     obsfile: observations.nc4
   simulate:
-    variables: [surface_pressure]
+    variables: [air_pressure_at_surface]
 - Filter: VarObs Writer
   # The filter will output an <ObsGroup>.varobs file
   # in the directory specified in the output_directory option.
@@ -94,7 +94,7 @@ And here is a YAML snippet demonstrating the use of `CxWriter`.
   ObsDataIn:
     obsfile: observations.nc4
   simulate:
-    variables: [surface_pressure]
+    variables: [air_pressure_at_surface]
 - Filter: Cx Writer
   # The filter will output an <ObsGroup>.cx file
   # in the directory specified in the output_directory option.
