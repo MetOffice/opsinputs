@@ -64,7 +64,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_rh = var_rh
 character(len=*), parameter, public :: opsinputs_cxfields_u = var_u
 character(len=*), parameter, public :: opsinputs_cxfields_v = var_v
 character(len=*), parameter, public :: opsinputs_cxfields_w = var_w
-character(len=*), parameter, public :: opsinputs_cxfields_q = var_qcon
+character(len=*), parameter, public :: opsinputs_cxfields_q = var_q
 character(len=*), parameter, public :: opsinputs_cxfields_qc = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_p_bar = var_prs
 character(len=*), parameter, public :: opsinputs_cxfields_cloud = opsinputs_cxfields_unknown
