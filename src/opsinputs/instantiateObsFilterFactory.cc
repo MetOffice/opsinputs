@@ -5,17 +5,16 @@
 
 #include "opsinputs/instantiateObsFilterFactory.h"
 
-#include "oops/interface/ObsFilterBase.h"
 #include "opsinputs/CxWriter.h"
 #include "opsinputs/VarObsWriter.h"
-#include "ufo/ObsTraits.h"
+#include "ufo/ObsFilterBase.h"
 
 namespace opsinputs {
 
 void instantiateObsFilterFactory() {
-  static oops::interface::FilterMaker<ufo::ObsTraits, VarObsWriter>
+  static ufo::FilterMaker<VarObsWriter>
     makerVarObsWriter_("VarObs Writer");
-  static oops::interface::FilterMaker<ufo::ObsTraits, CxWriter>
+  static ufo::FilterMaker<CxWriter>
     makerCxWriter_("Cx Writer");
 }
 

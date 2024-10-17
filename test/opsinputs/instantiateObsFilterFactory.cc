@@ -9,18 +9,18 @@
 #include "../opsinputs/CxChecker.h"
 #include "../opsinputs/ResetFlagsToPass.h"
 #include "../opsinputs/VarObsChecker.h"
-#include "oops/interface/ObsFilterBase.h"
+#include "ufo/ObsFilterBase.h"
 #include "ufo/ObsTraits.h"
 
 namespace opsinputs {
 namespace test {
 
 void instantiateObsFilterFactory() {
-  static oops::interface::FilterMaker<ufo::ObsTraits, VarObsChecker>
+  static ufo::FilterMaker<VarObsChecker>
     varObsCheckerMaker("VarObs Checker");
-  static oops::interface::FilterMaker<ufo::ObsTraits, CxChecker>
+  static ufo::FilterMaker<CxChecker>
     cxCheckerMaker("Cx Checker");
-  static oops::interface::FilterMaker<ufo::ObsTraits, ResetFlagsToPass>
+  static ufo::FilterMaker<ResetFlagsToPass>
     resetFlagsToPassMaker("Reset Flags to Pass");
 }
 

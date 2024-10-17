@@ -8,13 +8,13 @@
 
 #include <vector>
 
-#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/Parameter.h"
+#include "ufo/ObsFilterParametersBase.h"
 
 namespace opsinputs {
 
 /// \brief ResetFlagsToPass filter's options.
-class ResetFlagsToPassParameters : public oops::ObsFilterParametersBase {
+class ResetFlagsToPassParameters : public ufo::ObsFilterParametersBase {
   OOPS_CONCRETE_PARAMETERS(ResetFlagsToPassParameters, ObsFilterParametersBase)
 
  public:

@@ -13,11 +13,10 @@
 #include "ioda/ObsDataVector.h"
 #include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
 #include "opsinputs/CxWriter.interface.h"
 #include "opsinputs/CxWriterParameters.h"
-#include "ufo/ObsTraits.h"
+#include "ufo/ObsFilterBase.h"
 
 namespace eckit {
   class Configuration;
@@ -42,7 +41,7 @@ class LocalEnvironment;
 /// Most of the implementation is in Fortran (opsinputs_cxwriter_mod.F90).
 ///
 /// \see CxWriterParameters for the list of accepted configuration parameters.
-class CxWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+class CxWriter : public ufo::ObsFilterBase,
                  private util::ObjectCounter<CxWriter> {
  public:
   static const std::string classname() {return "opsinputs::CxWriter";}
@@ -62,7 +61,7 @@ class CxWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
                   const ioda::ObsVector &hofx,
                   const ioda::ObsVector &bias,
                   const ufo::ObsDiagnostics & diags) override;
-  void checkFilterData(const oops::FilterStage filterStage) override {}
+  void checkFilterData(const ufo::FilterStage filterStage) override {}
 
   oops::Variables requiredVars() const override {return geovars_;}
   oops::ObsVariables requiredHdiagnostics() const override {return extradiagvars_;}
