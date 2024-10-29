@@ -9,16 +9,16 @@
 #include <string>
 #include <vector>
 
-#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
+#include "ufo/ObsFilterParametersBase.h"
 #include "ufo/utils/parameters/ParameterTraitsVariable.h"
 
 namespace opsinputs {
 
 /// \brief CxWriter options.
-class CxWriterParameters : public oops::ObsFilterParametersBase {
-  OOPS_CONCRETE_PARAMETERS(CxWriterParameters, oops::ObsFilterParametersBase)
+class CxWriterParameters : public ufo::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(CxWriterParameters, ufo::ObsFilterParametersBase)
 
  public:
   /// Determines OPS verbosity.
