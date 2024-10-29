@@ -15,12 +15,11 @@
 #include "ioda/ObsDataVector.h"
 #include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
 #include "oops/util/Printable.h"
 #include "opsinputs/VarObsWriter.interface.h"
 #include "opsinputs/VarObsWriterParameters.h"
-#include "ufo/ObsTraits.h"
+#include "ufo/ObsFilterBase.h"
 
 namespace eckit {
   class Configuration;
@@ -51,7 +50,7 @@ class LocalEnvironment;
 /// Ops_WriteVarobs).
 ///
 /// \see VarObsWriterParameters for the list of accepted configuration parameters.
-class VarObsWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+class VarObsWriter : public ufo::ObsFilterBase,
                      private util::ObjectCounter<VarObsWriter> {
  public:
   static const std::string classname() {return "opsinputs::VarObsWriter";}
@@ -71,7 +70,7 @@ class VarObsWriter : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
                   const ioda::ObsVector &hofx,
                   const ioda::ObsVector &bias,
                   const ufo::ObsDiagnostics &diags) override;
-  void checkFilterData(const oops::FilterStage filterStage) override {}
+  void checkFilterData(const ufo::FilterStage filterStage) override {}
 
   oops::Variables requiredVars() const override {return geovars_;}
   oops::ObsVariables requiredHdiagnostics() const override {return extradiagvars_;}

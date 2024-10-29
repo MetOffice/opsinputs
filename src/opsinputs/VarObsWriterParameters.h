@@ -10,18 +10,18 @@
 #include <vector>
 
 #include "eckit/exception/Exceptions.h"
-#include "oops/generic/ObsFilterParametersBase.h"
 #include "oops/util/parameters/OptionalParameter.h"
 #include "oops/util/parameters/Parameter.h"
 #include "oops/util/parameters/RequiredParameter.h"
 #include "ufo/filters/Variable.h"
+#include "ufo/ObsFilterParametersBase.h"
 #include "ufo/utils/parameters/ParameterTraitsVariable.h"
 
 namespace opsinputs {
 
 /// \brief VarObsWriter options.
-class VarObsWriterParameters : public oops::ObsFilterParametersBase {
-  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, oops::ObsFilterParametersBase)
+class VarObsWriterParameters : public ufo::ObsFilterParametersBase {
+  OOPS_CONCRETE_PARAMETERS(VarObsWriterParameters, ufo::ObsFilterParametersBase)
 
  public:
   /// Determines OPS verbosity.

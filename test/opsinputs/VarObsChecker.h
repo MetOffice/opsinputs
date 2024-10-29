@@ -15,8 +15,8 @@
 #include "ioda/ObsDataVector.h"
 #include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
+#include "ufo/ObsFilterBase.h"
 #include "ufo/ObsTraits.h"
 
 namespace eckit {
@@ -47,7 +47,7 @@ namespace test {
 /// from that output.
 ///
 /// See VarObsCheckerParameters for a list of available options.
-class VarObsChecker : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+class VarObsChecker : public ufo::ObsFilterBase,
                       private util::ObjectCounter<VarObsChecker> {
  public:
   static const std::string classname() {return "opsinputs::test::VarObsChecker";}
@@ -67,7 +67,7 @@ class VarObsChecker : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
                   const ioda::ObsVector &hofx,
                   const ioda::ObsVector &bias,
                   const ufo::ObsDiagnostics &) override;
-  void checkFilterData(const oops::FilterStage filterStage) override {}
+  void checkFilterData(const ufo::FilterStage filterStage) override {}
 
   oops::Variables requiredVars() const override {return geovars_;}
   oops::ObsVariables requiredHdiagnostics() const override {return extradiagvars_;}
