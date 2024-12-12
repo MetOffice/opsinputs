@@ -12,7 +12,7 @@
 | 5 | `VarField_v` | `v10(:)` or `v(:,:)` | northward wind | `ObsValue/windNorthward` (`ObsValue/windNorthwardAt10M` for u10) | |
 | 6 | `VarField_logvis` | `logvis(:)` | Base 10 log of horizontal visibility (m) | `ObsValue/horizonalVisibility` | |
 | 7 | `VarField_tcwv` | `TCWV(:)` | total column water vapour | `ObsValue/precipitableWater` | |
-| 8 | `VarField_windspeed` | `WindSpeed(:)` | 10 metre windspeed | `ObsValue/WindSpeed` | |
+| 8 | `VarField_windspeed` | `WindSpeed(:)` | 10 metre windspeed | `BiasCorrObsValue/windSpeed` | |
 | 9 | `VarField_lwp` | | | | Implement |
 | 10 | `VarField_britemp` | `CorBriTemp(:,:)` | bias-corrected brightness temperatures | `BiasCorrObsValue/brightnessTemperature` | |
 | 11 | `VarField_tskin` | `Tskin(:)` | skin temperature | `OneDVar/skinTemperature` | |
