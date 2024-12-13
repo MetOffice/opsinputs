@@ -20,7 +20,6 @@ set(OPS_SOURCE_FILES
   code/OpsMod_AirQuality/OpsMod_AirQuality.f90
   code/OpsMod_Argument/OpsMod_Argument.f90
   code/OpsMod_CXInfo/OpsMod_CXInfo.f90
-  code/OpsMod_Control/OpsMod_Control.f90
   code/OpsMod_DateTime/OpsMod_DateTime.f90
   code/OpsMod_GatherSpread/OpsMod_GatherSpread.F90
   code/OpsMod_HorizontalInterp/OpsMod_HorizontalInterp.f90
@@ -88,6 +87,7 @@ set(OPS_SOURCE_FILES
   stubs/OpsMod_Varobs/OpsMod_Varobs.f90
   stubs/Ops_SatRad_Info/OpsMod_SatRad_RTmodel.f90
   stubs/Ops_SatRad_SetUp/OpsMod_SatRad_SetUp.f90
+  stubs/OpsMod_Control/OpsMod_Control.f90
 )
 
 # Intel inserts lines in the source during pre-processing that contain the source file path, if the pathname
