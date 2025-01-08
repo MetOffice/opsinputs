@@ -869,7 +869,7 @@ do iVarField = 1, nVarFields
       if (Ob % Header % ObsGroup == ObsGroupOceanWinds) then
         call opsinputs_fill_fillelementtypefromsimulatedvariable(&
         Ob % Header % WindSpeed, "WindSpeed", Ob % Header % NumObsLocal, Ob % WindSpeed, &
-        ObsSpace, Flags, ObsErrors, "windSpeed", "ObsValue")
+        ObsSpace, Flags, ObsErrors, "windSpeed", "BiasCorrObsValue")
       end if
     case (VarField_lwp)
       ! TODO(someone): handle this varfield
