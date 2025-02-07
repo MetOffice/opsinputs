@@ -1088,8 +1088,8 @@ JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Ch
 !e.g. HIRS in ATOVS stream
 
 numchans = size(JediVarNamesWithChannels)
-!sizeOfVarobsArray comes from intitial setting of size_of_varobs_array 
-! used to define the size of the channel array to fill. 
+!sizeOfVarobsArray comes from intitial setting of size_of_varobs_array
+! used to define the size of the channel array to fill.
 if (present(sizeOfVarobsArray)) then
   if (sizeOfVarobsArray > 0) then
     numchans = sizeOfVarobsArray
@@ -1121,7 +1121,7 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
 	else
 	  exit
         end if
-      else 
+      else
         if (.not. compressChannels) then
           arrayindex = Channels(iChannel)
         end if
@@ -1362,6 +1362,8 @@ type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 ! Local declarations:
 type(ufo_geoval), pointer                       :: GeoVal
 real(kind_real)                                 :: MissingReal
+integer(integer64), dimension(2)                :: GeoValShape
+integer(integer64)                              :: LvlIdx
 
 character(len=*), parameter                     :: &
   RoutineName = "opsinputs_fill_fillrealfromgeoval"
@@ -1380,16 +1382,31 @@ else
     call ufo_geovals_get_var(GeoVals, JediVarName, GeoVal, must_be_found = .false.)
     if (associated(GeoVal)) then
       if (GeoVal % nval /= 1) then
-        write (ErrorMessage, '("GeoVal ",A," contains more than one value per location. &
-          &Only the first of these values will be written to the VarObs file")') JediVarName
-        call gen_warn(RoutineName, ErrorMessage)
+        if (JediVarName /= "aerosol") then ! special case - see below
+          write (ErrorMessage, '("GeoVal ",A," contains ",I0," values per location. &
+            &Only the first of these values will be written to the VarObs file")') JediVarName, GeoVal % nval
+          call gen_warn(RoutineName, ErrorMessage)
+        end if
       end if
     end if
 
     ! Fill the OPS data structures
     call Ops_Alloc(Hdr, OpsVarName, NumObs, Real1)
-    where (GeoVal % vals(1,:) /= MissingReal)
-      Real1 = GeoVal % vals(1,:)
+    if (JediVarName == "aerosol") then
+      ! This field "Total Aerosol (for Vis)" exists on 70 levels, but OPS only
+      ! outputs (and VAR expects) a single value at the surface (GeoVal level
+      ! 70 or cx level 1) for the calculation of visibility. See
+      ! Ops_BGEandCXCreate.inc line 166 and Ops_CxComplete.inc line 299. This
+      ! field is only used for surface visibility calculations so no further
+      ! specific handling is required.
+      GeoValShape = shape(GeoVaL % vals)
+      LvlIdx = GeoValShape(1)  ! Usually 70
+    else
+      LvlIdx = 1
+    end if
+
+    where (GeoVal % vals(LvlIdx,:) /= MissingReal)
+      Real1 = GeoVal % vals(LvlIdx,:)
     end where
 end if
 end subroutine opsinputs_fill_fillrealfromgeoval
@@ -2583,13 +2600,13 @@ else
 end if
 
 if (PackPGEs) then
-  ! For varfields which Ops_VarobPGEs expects PGEs in packed form: 
+  ! For varfields which Ops_VarobPGEs expects PGEs in packed form:
   ! pack consistent with OPS by multiplying by PPF and then truncate.
   Element % PGEFinal = Element % PGEFinal * PPF
   Element % PGEFinal = AINT(Element % PGEFinal)
 else
   ! Varfields which Ops_VarobPGEs expects PGEs in unpacked form,
-  ! To reduce the error (and avoid having to take the truncation error into account when preparing 
+  ! To reduce the error (and avoid having to take the truncation error into account when preparing
   ! known good outputs for tests), round the number after multiplying by PPF and then divide to undo.
   Element % PGEFinal = Element % PGEFinal * PPF
   Element % PGEFinal = NINT(Element % PGEFinal)

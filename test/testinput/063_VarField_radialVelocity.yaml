@@ -23,7 +23,7 @@ observations:
         minvalue: 0.0
     - filter: VarObs Writer
       reject_obs_with_any_variable_failing_qc: true
-      namelist_directory: testinput/VarObsWriterNamelists_021_VarField_surface
+      namelist_directory: testinput/VarObsWriterNamelists_063_VarField_radialVelocity
       general_mode: debug
       station_ID_int_to_string: true
     - filter: VarObs Checker

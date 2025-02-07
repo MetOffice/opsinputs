@@ -17,7 +17,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_unknown = "UNKNOWN"
 character(len=*), parameter, public :: opsinputs_cxfields_Orog = var_sfc_geomz
 character(len=*), parameter, public :: opsinputs_cxfields_pstar = var_ps
 character(len=*), parameter, public :: opsinputs_cxfields_t2 = var_sfc_t2m
-character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_2m"
+character(len=*), parameter, public :: opsinputs_cxfields_rh2 = "relative_humidity_at_2m"
 character(len=*), parameter, public :: opsinputs_cxfields_u10 = var_sfc_u10
 character(len=*), parameter, public :: opsinputs_cxfields_v10 = var_sfc_v10
 character(len=*), parameter, public :: opsinputs_cxfields_vis = "visibility_1p5m"
@@ -29,8 +29,8 @@ character(len=*), parameter, public :: opsinputs_cxfields_TropPres = opsinputs_c
 character(len=*), parameter, public :: opsinputs_cxfields_pmsl = var_pmsl
 character(len=*), parameter, public :: opsinputs_cxfields_SeaIce = var_sfc_ifrac
 character(len=*), parameter, public :: opsinputs_cxfields_SnowAmount = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_qt2 = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_aerosol = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_qt2 = "qt_1p5m"
+character(len=*), parameter, public :: opsinputs_cxfields_aerosol = "aerosol"
 character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamA = "surf_param_a"
 character(len=*), parameter, public :: opsinputs_cxfields_PSurfParamB = "surf_param_b"
 character(len=*), parameter, public :: opsinputs_cxfields_LapseRate = opsinputs_cxfields_unknown
@@ -59,7 +59,7 @@ character(len=*), parameter, public :: opsinputs_cxfields_O3_AQ = opsinputs_cxfi
 character(len=*), parameter, public :: opsinputs_cxfields_NO2_AQ = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_CO_AQ = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_BLtype = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_theta = "potential_temperature"
+character(len=*), parameter, public :: opsinputs_cxfields_theta = "air_potential_temperature"
 character(len=*), parameter, public :: opsinputs_cxfields_rh = var_rh
 character(len=*), parameter, public :: opsinputs_cxfields_u = var_u
 character(len=*), parameter, public :: opsinputs_cxfields_v = var_v
@@ -86,8 +86,8 @@ character(len=*), parameter, public :: opsinputs_cxfields_CDNC = opsinputs_cxfie
 character(len=*), parameter, public :: opsinputs_cxfields_RH_AMC = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_Cl = "liquid_cloud_volume_fraction_in_atmosphere_layer"
 character(len=*), parameter, public :: opsinputs_cxfields_Cf = "ice_cloud_volume_fraction_in_atmosphere_layer"
-character(len=*), parameter, public :: opsinputs_cxfields_qrain = opsinputs_cxfields_unknown
-character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = opsinputs_cxfields_unknown
+character(len=*), parameter, public :: opsinputs_cxfields_qrain = "qrain"
+character(len=*), parameter, public :: opsinputs_cxfields_ExnerA = "dimensionless_exner_function_levels"
 character(len=*), parameter, public :: opsinputs_cxfields_RichNumber = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SoilMoisture = opsinputs_cxfields_unknown
 character(len=*), parameter, public :: opsinputs_cxfields_SoilTemp = opsinputs_cxfields_unknown

@@ -1,0 +1,40 @@
+time window:
+  begin: 2018-01-01T00:00:00Z
+  end: 2018-01-01T02:00:00Z
+
+observations:
+  - obs space:
+      name: RadarZ
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/070_VarField_reflectivity.nc4
+      simulated variables: [reflectivity]
+    obs filters:
+    # Set the flag of observations with missing values to "pass": we want to check if these
+    # values are encoded correctly in the VarObsFile.
+    - filter: Reset Flags to Pass
+      flags_to_reset: [10, 15]  # missing, Hfailed
+    # Reject observation 3: we want to check if it is omitted from the VarObs file, as expected.
+    - filter: Domain Check
+      where:
+      - variable:
+          name: MetaData/latitude
+        minvalue: 0.0
+    - filter: VarObs Writer
+      reject_obs_with_any_variable_failing_qc: true
+      namelist_directory: testinput/VarObsWriterNamelists_070_VarField_reflectivity
+      general_mode: debug
+      station_ID_int_to_string: true
+    - filter: VarObs Checker
+      expected_main_table_columns:
+        # Only observations 1, 2 and 4 are passed; observation 3 is rejected by the domain check
+        field: ["64","65","66","69","70","75","104","64","65","66","69","70","75","104","64","65","66","69","70","75","104"]
+        ob value: ["11.00000","11.00000","11.00000","1.00000","1.10000","11.00000","11.00000","12.00000","12.00000","12.00000","2.00000","-1073741824.00000","12.00000","12.00000","14.00000","14.00000","14.00000","4.00000","1.40000","14.00000","14.00000"]
+        lat:      ["21.00000","21.00000","21.00000","21.00000","21.00000","21.00000","21.00000","22.00000","22.00000","22.00000","22.00000","22.00000","22.00000","22.00000","24.00000","24.00000","24.00000","24.00000","24.00000","24.00000","24.00000"]
+        lon:      ["31.00000","31.00000","31.00000","31.00000","31.00000","31.00000","31.00000","32.00000","32.00000","32.00000","32.00000","32.00000","32.00000","32.00000","34.00000","34.00000","34.00000","34.00000","34.00000","34.00000","34.00000"]
+        time:     ["-3540.00000","-3540.00000","-3540.00000","-3540.00000","-3540.00000","-3540.00000","-3540.00000","-3480.00000","-3480.00000","-3480.00000","-3480.00000","-3480.00000","-3480.00000","-3480.00000","-3360.00000","-3360.00000","-3360.00000","-3360.00000","-3360.00000","-3360.00000","-3360.00000"]
+        Callsign: ["1","1","1","1","1","1","1","2","2","2","2","2","2","2","4","4","4","4","4","4","4"]
+    HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
+    benchmarkFlag: 1000 # just to keep the ObsFilters test happy
+    flaggedBenchmark: 0

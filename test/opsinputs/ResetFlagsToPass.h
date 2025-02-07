@@ -15,8 +15,8 @@
 #include "ioda/ObsDataVector.h"
 #include "oops/base/ObsVariables.h"
 #include "oops/base/Variables.h"
-#include "oops/interface/ObsFilterBase.h"
 #include "oops/util/ObjectCounter.h"
+#include "ufo/ObsFilterBase.h"
 #include "ufo/ObsTraits.h"
 
 namespace eckit {
@@ -40,7 +40,7 @@ namespace test {
 /// \brief Resets observation QC flags to 'pass'.
 ///
 /// See ResetFlagsToPassParameters for the available options.
-class ResetFlagsToPass : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
+class ResetFlagsToPass : public ufo::ObsFilterBase,
                          private util::ObjectCounter<ResetFlagsToPass> {
  public:
   static const std::string classname() {return "opsinputs::test::ResetFlagsToPass";}
@@ -60,7 +60,7 @@ class ResetFlagsToPass : public oops::interface::ObsFilterBase<ufo::ObsTraits>,
                   const ioda::ObsVector &hofx,
                   const ioda::ObsVector &bias,
                   const ufo::ObsDiagnostics &) override;
-  void checkFilterData(const oops::FilterStage filterStage) override {}
+  void checkFilterData(const ufo::FilterStage filterStage) override {}
 
   oops::Variables requiredVars() const override {return geovars_;}
   oops::ObsVariables requiredHdiagnostics() const override {return extradiagvars_;}

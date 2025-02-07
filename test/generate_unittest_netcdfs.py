@@ -16,7 +16,8 @@ missing_int = np.iinfo(np.int32).min + 5
 missing_float_nc = 9.969209968386869e+36
 
 
-def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, radar_doppler_wind=False):
+def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False,
+                                      radar_doppler_wind=False, radar_reflectivity=False):
     f = nc4.Dataset(file_name, 'w', format="NETCDF4")
 
     nlocs = 4
@@ -35,10 +36,10 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
     var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
 
     # Station ID
-    if radar_doppler_wind:
-        # The radar Doppler wind processing uses integers for station identification because
-        # `MetaData/stationIdentification` is mapped to the ODB variable `rad_ident`,
-        # which is an integer.
+    if radar_doppler_wind or radar_reflectivity:
+        # The radar Doppler wind and reflectivity processing both use integers for
+        # station identification because `MetaData/stationIdentification` is mapped
+        # to the ODB variable `rad_ident`, which is an integer.
         var = f.createVariable('MetaData/stationIdentification', 'i', ('Location'))
         var[:] = [1, 2, 3, 4]
     else:
@@ -48,7 +49,7 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
             var[i] = s
 
     # Extra variables for radar
-    if radar_doppler_wind:
+    if radar_doppler_wind or radar_reflectivity:
         var = f.createVariable('MetaData/radar_family', 'i', ('Location',))
         var[:] = [11, 12, 13, 14]
         var = f.createVariable('MetaData/beamTiltAngle', 'i', ('Location',))
@@ -58,6 +59,9 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, rada
         var = f.createVariable('MetaData/beamAzimuthAngle', 'i', ('Location',))
         var[:] = [11, 12, 13, 14]
         var = f.createVariable('MetaData/stationElevation', 'i', ('Location',))
+        var[:] = [11, 12, 13, 14]
+    if radar_reflectivity:
+        var = f.createVariable('QualityInformation/reflectivity', 'i', ('Location',))
         var[:] = [11, 12, 13, 14]
 
     var = f.createVariable('ObsValue/' + var_name, 'f', ('Location',))
@@ -699,7 +703,8 @@ if __name__ == "__main__":
     output_1d_simulated_var_to_netcdf('windNorthwardAt10M',           'testinput/005_VarField_v_ScatwindChosen.nc4', with_bias=True)
     output_simulated_var_profiles_to_netcdf('windNorthward',          'testinput/005_VarField_v_Sonde.nc4')
     output_1d_simulated_var_to_netcdf('precipitableWater',            'testinput/007_VarField_tcwv.nc4')
-    output_1d_simulated_var_to_netcdf('windSpeed',                    'testinput/008_VarField_WindSpeed.nc4')
+    output_1d_simulated_var_to_netcdf('windSpeed',                    'testinput/008_VarField_WindSpeed.nc4', with_bias=True)
+    output_1d_simulated_var_to_netcdf('horizontalVisibility',         'testinput/009_VarField_horizontalVisibility.nc4')
     output_2d_simulated_var_to_netcdf('brightnessTemperature',      'testinput/010_VarField_britemp.nc4', with_bias=True)
     output_1d_normal_var_to_netcdf   ('skinTemperature', 'OneDVar', 'testinput/011_VarField_tskin.nc4')
     output_2d_normal_var_to_netcdf   ('cloudAmount', 'DerivedObsValue', 'testinput/015_VarField_cloud.nc4', use_chans=True)
@@ -725,6 +730,7 @@ if __name__ == "__main__":
                                                                  'thickness_200_50hPa_satid_5Predictor', 'thickness_200_50hPa_satid_8Predictor',
                                                                  'legendre_order_1_satid_5Predictor',    'legendre_order_1_satid_8Predictor'],
                                       'testinput/080_VarField_biaspredictors.nc4', predictors=True)
+    output_1d_simulated_var_to_netcdf   ('reflectivity',  'testinput/070_VarField_reflectivity.nc4', radar_reflectivity=True)
     output_2d_simulated_var_to_netcdf('bendingAngle',              'testinput/071_VarField_bendingangle.nc4', add_occulting_satid=True)
     output_2d_normal_var_to_netcdf('impactParameterRO', 'MetaData', 'testinput/072_VarField_impactparam.nc4')
     output_1d_normal_var_to_netcdf('earthRadiusCurvature', 'MetaData',  'testinput/073_VarField_ro_rad_curv.nc4')
@@ -900,132 +906,146 @@ if __name__ == "__main__":
                                  ['MetaData/stationIdentification'],
                                  'testinput/varobs_ukvnamelist_radar_doppler_wind.nc4')
 
+    # Radar reflectivity - UKV
+    output_full_varobs_to_netcdf(['MetaData/latitude',
+                                  'MetaData/longitude',
+                                  'MetaData/beamTiltAngle',
+                                  'MetaData/gateRange',
+                                  'MetaData/beamAzimuthAngle',
+                                  'MetaData/stationElevation',
+                                  'ObsValue/reflectivity', 'ObsError/reflectivity'],
+                                 [],
+                                 ['MetaData/stationIdentification', 'QualityInformation/reflectivity',],
+                                 'testinput/varobs_ukvnamelist_radar_reflectivity.nc4')
+
 
 
 
     # Cx
     output_1d_simulated_var_to_netcdf('dummy',                      'testinput/dummy.nc4')
-    output_1d_geoval_to_netcdf       ('surface_altitude',           'testinput/001_SurfaceCxField_Orog.nc4')
-    output_1d_geoval_to_netcdf       ('surface_pressure',           'testinput/002_SurfaceCxField_pstar.nc4')
-    output_1d_geoval_to_netcdf       ('surface_temperature',        'testinput/003_SurfaceCxField_t2.nc4')
-    output_1d_geoval_to_netcdf       ('relative_humidity_2m',       'testinput/004_SurfaceCxField_rh2.nc4')
-    output_1d_geoval_to_netcdf       ('uwind_at_10m',               'testinput/005_SurfaceCxField_u10.nc4')
-    output_1d_geoval_to_netcdf       ('vwind_at_10m',               'testinput/006_SurfaceCxField_v10.nc4')
+    output_1d_geoval_to_netcdf       ('height_above_mean_sea_level_at_surface', 'testinput/001_SurfaceCxField_Orog.nc4')
+    output_1d_geoval_to_netcdf       ('air_pressure_at_surface',    'testinput/002_SurfaceCxField_pstar.nc4')
+    output_1d_geoval_to_netcdf       ('air_temperature_at_2m',      'testinput/003_SurfaceCxField_t2.nc4')
+    output_1d_geoval_to_netcdf       ('relative_humidity_at_2m',    'testinput/004_SurfaceCxField_rh2.nc4')
+    output_1d_geoval_to_netcdf       ('eastward_wind_at_10m',       'testinput/005_SurfaceCxField_u10.nc4')
+    output_1d_geoval_to_netcdf       ('northward_wind_at_10m',      'testinput/006_SurfaceCxField_v10.nc4')
     output_1d_geoval_to_netcdf       ('visibility_1p5m',            'testinput/008_SurfaceCxField_visibility_1p5m.nc4')
-    output_1d_geoval_to_netcdf       ('skin_temperature',           'testinput/013_SurfaceCxField_TskinSea.nc4')
-    output_1d_geoval_to_netcdf       ('surface_pressure_at_mean_sea_level', 'testinput/016_SurfaceCxField_pmsl.nc4')
+    output_1d_geoval_to_netcdf       ('skin_temperature_at_surface','testinput/013_SurfaceCxField_TskinSea.nc4')
+    output_1d_geoval_to_netcdf       ('air_pressure_at_sea_level',  'testinput/016_SurfaceCxField_pmsl.nc4')
     output_1d_geoval_to_netcdf       ('ice_area_fraction',          'testinput/017_SurfaceCxField_SeaIce.nc4')
     output_1d_geoval_to_netcdf       ('surf_param_a',               'testinput/022_SurfaceCxField_surf_param_a.nc4')
     output_1d_geoval_to_netcdf       ('surf_param_b',               'testinput/023_SurfaceCxField_surf_param_b.nc4')
     output_1d_geoval_to_netcdf       ('total_cloud_amount', 'testinput/024_SurfaceCxField_CloudAmount.nc4')
     output_1d_geoval_to_netcdf       ('obukhov_length',             'testinput/056_SurfaceCxField_obukhov_length.nc4')
     output_1d_geoval_to_netcdf       ('friction_velocity_over_water', 'testinput/057_SurfaceCxField_friction_velocity_over_water.nc4')
-    output_2d_geoval_to_netcdf       ('potential_temperature',      'testinput/001_UpperAirCxField_theta.nc4')
+    output_2d_geoval_to_netcdf       ('air_potential_temperature',  'testinput/001_UpperAirCxField_theta.nc4')
     output_2d_geoval_to_netcdf       ('relative_humidity',          'testinput/002_UpperAirCxField_relative_humidity.nc4')
     output_2d_geoval_to_netcdf       ('eastward_wind',              'testinput/003_UpperAirCxField_u.nc4')
     output_2d_geoval_to_netcdf       ('northward_wind',             'testinput/004_UpperAirCxField_v.nc4')
-    output_2d_geoval_to_netcdf       ('specific_humidity',          'testinput/005_UpperAirCxField_q.nc4')
+    output_2d_geoval_to_netcdf       ('water_vapor_mixing_ratio_wrt_moist_air', 'testinput/005_UpperAirCxField_q.nc4')
     output_2d_geoval_to_netcdf       ('air_pressure',               'testinput/033_UpperAirCxField_p_bar.nc4')
     output_2d_geoval_to_netcdf       ('air_pressure_levels',        'testinput/011_UpperAirCxField_P.nc4')
     output_2d_geoval_to_netcdf       ('cloud_layer',                'testinput/015_UpperAirCxField_cloud_layer.nc4')
-    output_2d_geoval_to_netcdf       ('mass_content_of_cloud_ice_in_atmosphere_layer', 'testinput/029_UpperAirCxField_qcf.nc4')
-    output_2d_geoval_to_netcdf       ('mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'testinput/030_UpperAirCxField_qcl.nc4')
+    output_2d_geoval_to_netcdf       ('cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',         'testinput/029_UpperAirCxField_qcf.nc4')
+    output_2d_geoval_to_netcdf       ('cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'testinput/030_UpperAirCxField_qcl.nc4')
     output_2d_geoval_to_netcdf       ('cloud_volume_fraction_in_atmosphere_layer', 'testinput/031_UpperAirCxField_cloud_bulk.nc4')
     output_2d_geoval_to_netcdf       ('ice_cloud_volume_fraction_in_atmosphere_layer',      'testinput/034_UpperAirCxField_Cf.nc4')
     output_2d_geoval_to_netcdf       ('liquid_cloud_volume_fraction_in_atmosphere_layer',      'testinput/035_UpperAirCxField_Cl.nc4')
     output_2d_geovals_to_netcdf      (['mass_fraction_of_dust00%s_in_air' % i for i in range(1, 7)], 'testinput/041-046_UpperAirCxField_dust1-dust6.nc4')
     output_2d_geovals_to_netcdf      (['eastward_wind', 'northward_wind'], 'testinput/CxWriter_UnRotateWinds.nc4', shift_by_varindex=False)
+    output_2d_geoval_to_netcdf       ('dimensionless_exner_function_levels', 'testinput/039_UpperAirCxField_Exner.nc4')
+    output_2d_geoval_to_netcdf       ('qrain',      'testinput/040_UpperAirCxField_Qrain.nc4')
 
     # Cx full output for an obsgroup testing
     # list of 1d-variables; list of 2d-variables; filename for output
 
     # ABIClr
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_abiclr.nc4')
 
     # AHIClr
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_ahiclr.nc4')
 
     # AMSR
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_amsr.nc4')
 
     # GMIlow
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_gmilow.nc4')
 
     # GMIhigh
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_gmihigh.nc4')
 
     # ATMS
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_atms.nc4')
 
     # ATOVS
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_atovs.nc4')
 
     # SSMIS
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_ssmis.nc4')
 
     # MWSFY3
-    output_full_cx_to_netcdf(['skin_temperature','ice_area_fraction','surface_altitude','surface_pressure','uwind_at_10m',
-                              'vwind_at_10m','surface_temperature','relative_humidity_2m','surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature','specific_humidity','mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer','air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface','ice_area_fraction','height_above_mean_sea_level_at_surface','air_pressure_at_surface','eastward_wind_at_10m',
+                              'northward_wind_at_10m','air_temperature_at_2m','relative_humidity_at_2m','air_pressure_at_sea_level'],
+                             ['air_potential_temperature','water_vapor_mixing_ratio_wrt_moist_air','cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water','air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_mwsfy3.nc4')
 
     # GNSS-RO
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_gnssro.nc4')
 
     # Sonde
     output_full_cx_to_netcdf(['ice_area_fraction',
-                              'surface_altitude',
-                              'surface_pressure'],
-                             ['eastward_wind', 'northward_wind', 'potential_temperature', 'specific_humidity',
-                              'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+                              'height_above_mean_sea_level_at_surface',
+                              'air_pressure_at_surface'],
+                             ['eastward_wind', 'northward_wind', 'air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air',
+                              'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer',
                               'liquid_cloud_volume_fraction_in_atmosphere_layer',
@@ -1034,11 +1054,11 @@ if __name__ == "__main__":
 
     # Sonde - UKV
     output_full_cx_to_netcdf(['ice_area_fraction',
-                              'surface_altitude',
-                              'surface_pressure'],
-                             ['eastward_wind', 'northward_wind', 'potential_temperature', 'specific_humidity',
-                              'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+                              'height_above_mean_sea_level_at_surface',
+                              'air_pressure_at_surface'],
+                             ['eastward_wind', 'northward_wind', 'air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air',
+                              'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer',
                               'liquid_cloud_volume_fraction_in_atmosphere_layer',
@@ -1046,69 +1066,69 @@ if __name__ == "__main__":
                              'testinput/cx_ukvnamelist_sonde.nc4')
 
     # SurfaceCloud - UKV
-    output_full_cx_to_netcdf(['surface_altitude',
-                              'surface_pressure',
+    output_full_cx_to_netcdf(['height_above_mean_sea_level_at_surface',
+                              'air_pressure_at_surface',
                               'ice_area_fraction',
                               'total_cloud_amount'],
-                             ['potential_temperature', 'specific_humidity', 'air_pressure_levels', 'cloud_layer',
-                              'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'air_pressure_levels', 'cloud_layer',
+                              'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water'],
                              'testinput/cx_ukvnamelist_surfacecloud.nc4')
 
     # SatTCWV
-    output_full_cx_to_netcdf(['surface_altitude', 'surface_pressure', 'ice_area_fraction', 'total_cloud_amount'],
-                             ['potential_temperature', 'specific_humidity', 'air_pressure_levels', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+    output_full_cx_to_netcdf(['height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'ice_area_fraction', 'total_cloud_amount'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'air_pressure_levels', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_sattcwv.nc4')
 
     # IASI - this tests the variable_for_quality_control option
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_iasi.nc4')
 
     # SEVIRIClr
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_seviriclr.nc4')
 
     # SEVIRIClr UKV
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_ukvnamelist_seviriclr.nc4')
 
     # SEVIRIASR UKV
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m', 'surface_pressure_at_mean_sea_level'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_ukvnamelist_seviriasr.nc4')
 
     # GroundGPS
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_groundgps.nc4')
 
     # Aircraft
     output_full_cx_to_netcdf(['ice_area_fraction',
-                              'surface_altitude',
-                              'surface_pressure'],
-                             ['eastward_wind', 'northward_wind', 'potential_temperature', 'specific_humidity',
-                              'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
+                              'height_above_mean_sea_level_at_surface',
+                              'air_pressure_at_surface'],
+                             ['eastward_wind', 'northward_wind', 'air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air',
+                              'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer',
                               'liquid_cloud_volume_fraction_in_atmosphere_layer',
@@ -1116,53 +1136,61 @@ if __name__ == "__main__":
                              'testinput/cx_globalnamelist_aircraft.nc4')
 
     # Surface
-    output_full_cx_to_netcdf(['skin_temperature', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
                               'eastward_wind', 'northward_wind'],
                              'testinput/cx_globalnamelist_surface.nc4')
 
     # Surface - UKV
-    output_full_cx_to_netcdf(['skin_temperature', 'surface_altitude', 'surface_pressure', 'uwind_at_10m',
-                              'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m'],
-                             ['potential_temperature', 'specific_humidity', 'mass_content_of_cloud_ice_in_atmosphere_layer',
-                              'mass_content_of_cloud_liquid_water_in_atmosphere_layer', 'air_pressure_levels',
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'visibility_1p5m','qt_1p5m'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
-                              'eastward_wind', 'northward_wind'],
+                              'eastward_wind', 'northward_wind', 'aerosol'],
                              'testinput/cx_ukvnamelist_surface.nc4')
 
     # Scatwind
-    output_full_cx_to_netcdf(['friction_velocity_over_water', 'ice_area_fraction', 'obukhov_length', 'relative_humidity_2m', 'skin_temperature',
-                              'surface_altitude', 'surface_pressure', 'surface_pressure_at_mean_sea_level', 'surface_temperature',
-                              'uwind_at_10m', 'vwind_at_10m'],
+    output_full_cx_to_netcdf(['friction_velocity_over_water', 'ice_area_fraction', 'obukhov_length', 'relative_humidity_at_2m', 'skin_temperature_at_surface',
+                              'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'air_pressure_at_sea_level', 'air_temperature_at_2m',
+                              'eastward_wind_at_10m', 'northward_wind_at_10m'],
                              ['air_pressure_levels', 'cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer',
-                              'liquid_cloud_volume_fraction_in_atmosphere_layer', 'mass_content_of_cloud_ice_in_atmosphere_layer', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer',
-                              'specific_humidity', 'potential_temperature', 'eastward_wind', 'northward_wind'],
+                              'liquid_cloud_volume_fraction_in_atmosphere_layer', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water', 'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'water_vapor_mixing_ratio_wrt_moist_air', 'air_potential_temperature', 'eastward_wind', 'northward_wind'],
                              'testinput/cx_globalnamelist_scatwind.nc4')
     # Unrotate 10m winds
-    output_full_cx_to_netcdf         (['uwind_at_10m', 'vwind_at_10m'],[], 'testinput/CxWriter_UnRotateWinds10M.nc4')
+    output_full_cx_to_netcdf         (['eastward_wind_at_10m', 'northward_wind_at_10m'],[], 'testinput/CxWriter_UnRotateWinds10M.nc4')
     output_1d_multi_level_simulated_var_to_netcdf('relativeHumidity', 'testinput/relative_humidity_Sonde.nc4')
     output_2d_geoval_for_multi_level_obs_to_netcdf('relative_humidity', 'testinput/002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4')
 
     # Screen
-    output_full_cx_to_netcdf(['surface_altitude', 'skin_temperature', 'ice_area_fraction', 'surface_pressure',
-                              'uwind_at_10m', 'vwind_at_10m', 'surface_temperature', 'relative_humidity_2m',
-                              'visibility_1p5m', 'total_cloud_amount', 'surface_pressure_at_mean_sea_level',
+    output_full_cx_to_netcdf(['height_above_mean_sea_level_at_surface', 'skin_temperature_at_surface', 'ice_area_fraction', 'air_pressure_at_surface',
+                              'eastward_wind_at_10m', 'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m',
+                              'visibility_1p5m', 'total_cloud_amount', 'air_pressure_at_sea_level',
                               'surf_param_a', 'surf_param_b'],
-                             ['potential_temperature', 'eastward_wind', 'northward_wind', 'specific_humidity',
-                              'air_pressure_levels', 'mass_content_of_cloud_liquid_water_in_atmosphere_layer'],
+                             ['air_potential_temperature', 'eastward_wind', 'northward_wind', 'water_vapor_mixing_ratio_wrt_moist_air',
+                              'air_pressure_levels', 'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water'],
                              'testinput/cx_globalnamelist_screen.nc4')
 
     # Oceanwinds
-    output_full_cx_to_netcdf(['skin_temperature', 'ice_area_fraction', 'surface_altitude', 'surface_pressure', 
-                              'uwind_at_10m', 'vwind_at_10m'],
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface',
+                              'eastward_wind_at_10m', 'northward_wind_at_10m'],
                              ['air_pressure_levels'],
                              'testinput/cx_globalnamelist_oceanwinds.nc4')
 
     # Radar doppler wind - UKV
-    output_full_cx_to_netcdf(['surface_altitude'],
+    output_full_cx_to_netcdf(['height_above_mean_sea_level_at_surface'],
                              ['eastward_wind', 'northward_wind', 'upward_air_velocity'],
                              'testinput/cx_ukvnamelist_radar_doppler_wind.nc4')
+
+    # Radar reflectivity - UKV
+    output_full_cx_to_netcdf(['height_above_mean_sea_level_at_surface'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'air_pressure_levels',
+                              'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'dimensionless_exner_function_levels', 'qrain'],
+                             'testinput/cx_ukvnamelist_radar_reflectivity.nc4')
 

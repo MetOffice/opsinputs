@@ -1,4 +1,4 @@
-# (C) Crown Copyright 2021, the Met Office. All rights reserved.
+# (C) Crown Copyright 2024, the Met Office. All rights reserved.
 #
 
 cmake_minimum_required( VERSION 3.12 FATAL_ERROR )
