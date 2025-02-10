@@ -456,6 +456,8 @@ SELECT CASE (Obs % Header % ObsGroup)
           report_types(i - ob_start + 1) = rep_type_meteosat_10_geos_rad
         ELSE IF (Obs % Satid(i) == SatId_METEOSAT11) THEN
           report_types(i - ob_start + 1) = rep_type_meteosat_11_geos_rad
+        ELSE IF (Obs % Satid(i) == SatId_METEOSAT12) THEN
+          report_types(i - ob_start + 1) = rep_type_meteosat_12_geos_rad
         ELSE
           found_report_type = .FALSE.
           DO j = 1, SIZE (map, DIM = 1)
