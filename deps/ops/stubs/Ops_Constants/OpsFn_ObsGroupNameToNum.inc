@@ -128,6 +128,8 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupSurface
   CASE ("SurfaceCloud")
     OpsFn_ObsGroupNameToNum = ObsGroupSurfaceCloud
+  CASE ("MTGIRS")
+    OpsFn_ObsGroupNameToNum = ObsGroupMTGIRS
   CASE DEFAULT
     OpsFn_ObsGroupNameToNum = IMDI
 END SELECT

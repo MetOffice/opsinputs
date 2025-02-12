@@ -73,7 +73,10 @@ INTEGER, PARAMETER :: ObsGroupOceanWinds   =  61 ! => Satellite wind speeds
 INTEGER, PARAMETER :: ObsGroupGIIRSLW      =  62 ! => GIIRS LW radiances
 INTEGER, PARAMETER :: ObsGroupGIIRSMW      =  63 ! => GIIRS MW radiances
 INTEGER, PARAMETER :: ObsGroupScatwindChosen =  64 ! => Scatterometer winds (single solution)
-INTEGER, PARAMETER :: max_obs_group_num    =  64 ! Number of observation groups
+INTEGER, PARAMETER :: ObsGroupSurfaceLSDA    =  65 ! => LSDA (Surface)
+INTEGER, PARAMETER :: ObsGroupAscatLSDA      =  66 ! => LSDA (ASCAT)
+INTEGER, PARAMETER :: ObsGroupMTGIRS         =  67 ! => MTG-IRS radiances
+INTEGER, PARAMETER :: max_obs_group_num      =  67 ! Number of observation groups
 
 CONTAINS
 

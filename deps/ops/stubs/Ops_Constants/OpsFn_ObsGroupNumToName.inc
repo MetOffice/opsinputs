@@ -125,6 +125,8 @@ SELECT CASE (ObsGroup)
     OpsFn_ObsGroupNumToName = "Surface"
   CASE (ObsGroupSurfaceCloud)
     OpsFn_ObsGroupNumToName = "SurfaceCloud"
+  CASE (ObsGroupMTGIRS)
+    OpsFn_ObsGroupNumToName = "MTGIRS"
   CASE DEFAULT
     OpsFn_ObsGroupNumToName = "Unknown"
 END SELECT

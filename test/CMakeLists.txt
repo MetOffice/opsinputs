@@ -351,6 +351,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_seviriclr
                 YAML     varobswriter_globalnamelist_seviriclr.yaml
                 NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
                 DATA     varobs_globalnamelist_seviriclr.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_mtgirs
+                YAML     varobswriter_globalnamelist_mtgirs.yaml
+                NAMELIST ../../etc/global/varobs/MTGIRS.nl
+                DATA     varobs_globalnamelist_mtgirs.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
@@ -665,6 +669,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_seviriclr
                 YAML     cxwriter_globalnamelist_seviriclr.yaml
                 NAMELIST ../../etc/global/cx/SEVIRIClr.nl
                 DATA     cx_globalnamelist_seviriclr.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_mtgirs
+                YAML     cxwriter_globalnamelist_mtgirs.yaml
+                NAMELIST ../../etc/global/cx/MTGIRS.nl
+                DATA     cx_globalnamelist_mtgirs.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sonde
                 YAML     cxwriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/cx/Sonde.nl
