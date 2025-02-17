@@ -24,6 +24,8 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupTOVS .OR. &
     obsgroup == ObsGroupCOMSMIClr .OR. &
     obsgroup == ObsGroupCRIS .OR. &
+    obsgroup == ObsGroupFCIClr .OR. &
+    obsgroup == ObsGroupFCIASR .OR. &
     obsgroup == ObsGroupHIRAS .OR. &
     obsgroup == ObsGroupGeoCloud .OR. &
     obsgroup == ObsGroupGOESImClr .OR. &

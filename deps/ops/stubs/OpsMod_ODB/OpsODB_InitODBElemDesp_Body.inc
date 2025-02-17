@@ -53,6 +53,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupSurfaceCloud,      &
     ObsGroupTOVS,              &
     OpsFn_IsAHIGroup,          &
+    OpsFn_IsFCIGroup,          &
     OpsFn_IsSEVIRIGroup
 
 USE OpsMod_Index
@@ -588,6 +589,28 @@ IF (OpsFn_IsAHIGroup(ObsGroup) .OR. &
                                                                   IndexRH2,             &
                                                                   IndexT2/)
   ElemDesp2ODBDesp(IndexAHIBrightnessTemp) % also_do_levels(1:5)  = (/1,43,43,1,1/)
+END IF
+
+ElemDesp2ODBDesp(IndexFCICloudTopT) % TableName            = 'body'
+ElemDesp2ODBDesp(IndexFCICloudTopT) % ColName              = 'initial_obsvalue'
+ElemDesp2ODBDesp(IndexFCICloudTopT) % Varno                = ops_odb_getval (h, "$cloud_top_temp")
+
+IF (OpsFn_IsFCIGroup(ObsGroup) .OR. &
+    (ObsGroup == ObsGroupGeoCloud .AND. OpsFn_IsFCIGroup (SrcObsGroupGeoCloud))) THEN
+  ElemDesp2ODBDesp(IndexFCIBrightnessTemp) % TableName     = 'body'
+  ElemDesp2ODBDesp(IndexFCIBrightnessTemp) % ColName       = 'initial_obsvalue'
+  ElemDesp2ODBDesp(IndexFCIBrightnessTemp) % Varno         = ops_odb_getval (h, "$rawbt")  ! brightness temperature
+
+  ElemDesp2ODBDesp(IndexFCICloudFree) % TableName          = 'body'
+  ElemDesp2ODBDesp(IndexFCICloudFree) % ColName            = 'initial_obsvalue'
+  ElemDesp2ODBDesp(IndexFCICloudFree) % Varno              = ops_odb_getval (h, "$cloud_frac_clear")
+
+  ElemDesp2ODBDesp(IndexFCIBrightnessTemp) % also_do(1:5)  = (/IndexSkinTemperature, &
+                                                                  IndexRH,              &
+                                                                  IndexTemp,            &
+                                                                  IndexRH2,             &
+                                                                  IndexT2/)
+  ElemDesp2ODBDesp(IndexFCIBrightnessTemp) % also_do_levels(1:5)  = (/1,43,43,1,1/)
 END IF
 
 IF (ObsGroup == ObsGroupMTSATImClr) THEN

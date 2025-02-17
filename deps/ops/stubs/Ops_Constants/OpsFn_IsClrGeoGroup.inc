@@ -16,6 +16,7 @@ LOGICAL             :: OpsFn_IsClrGeoGroup
 IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupAHIClr .OR. &
     obsgroup == ObsGroupCOMSMIClr .OR. &
+    obsgroup == ObsGroupFCIClr .OR. &
     obsgroup == ObsGroupGOESImClr .OR. &
     obsgroup == ObsGroupIN3DIClr .OR. &
     obsgroup == ObsGroupMTSATImClr .OR. &

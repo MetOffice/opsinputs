@@ -76,13 +76,16 @@ INTEGER, PARAMETER :: ObsGroupScatwindChosen =  64 ! => Scatterometer winds (sin
 INTEGER, PARAMETER :: ObsGroupSurfaceLSDA    =  65 ! => LSDA (Surface)
 INTEGER, PARAMETER :: ObsGroupAscatLSDA      =  66 ! => LSDA (ASCAT)
 INTEGER, PARAMETER :: ObsGroupMTGIRS         =  67 ! => MTG-IRS radiances
-INTEGER, PARAMETER :: max_obs_group_num      =  67 ! Number of observation groups
+INTEGER, PARAMETER :: ObsGroupFCIASR         =  68 ! => FCI all-sky radiances
+INTEGER, PARAMETER :: ObsGroupFCIClr         =  69 ! => FCI clear-sky radiances
+INTEGER, PARAMETER :: max_obs_group_num      =  69 ! Number of observation groups
 
 CONTAINS
 
 INCLUDE 'OpsFn_ASRToClrGeoGroup.inc'
 INCLUDE 'OpsFn_IsSatRadGroup.inc'
 INCLUDE 'OpsFn_IsAHIGroup.inc'
+INCLUDE 'OpsFn_IsFCIGroup.inc'
 INCLUDE 'OpsFn_IsSEVIRIGroup.inc'
 INCLUDE 'OpsFn_IsASRGeoGroup.inc'
 INCLUDE 'OpsFn_IsClrGeoGroup.inc'

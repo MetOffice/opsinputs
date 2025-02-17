@@ -48,6 +48,8 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupGPSRO,             &
     ObsGroupSEVIRIClr,         &
     ObsGroupSEVIRIASR,         &
+    ObsGroupFCIClr,            &
+    ObsGroupFCIASR,            &
     ObsGroupMVIRIClr,          &
     ObsGroupGOESImClr,         &
     ObsGroupMTSATImClr,        &
@@ -183,6 +185,11 @@ SELECT CASE (Observations % header % ObsGroup)
     NumLevelLevs = 1
 
   CASE (ObsGroupSEVIRIClr, ObsGroupSEVIRIASR)
+
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
+
+  CASE (ObsGroupFCIClr, ObsGroupFCIASR)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1

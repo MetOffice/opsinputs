@@ -14,6 +14,7 @@ INTEGER, INTENT(IN) :: obsgroup
 LOGICAL             :: OpsFn_IsASRGeoGroup
 
 IF (obsgroup == ObsGroupAHIASR .OR. &
+    obsgroup == ObsGroupFCIASR .OR. &
     obsgroup == ObsGroupSEVIRIASR) THEN
   OpsFn_IsASRGeoGroup = .TRUE.
 ELSE

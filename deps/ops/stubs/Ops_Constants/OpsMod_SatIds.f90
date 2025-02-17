@@ -35,6 +35,7 @@ INTEGER, PARAMETER  :: SatId_Envisat            = 60
 INTEGER, PARAMETER  :: SatId_Sentinel3A         = 61
 INTEGER, PARAMETER  :: SatId_Sentinel3B         = 65
 INTEGER, PARAMETER  :: SatId_Meteosat11         = 70
+INTEGER, PARAMETER  :: SatId_Meteosat12         = 71
 INTEGER, PARAMETER  :: SatId_MSG3               = 73
 INTEGER, PARAMETER  :: SatId_GCOMW1             = 122
 INTEGER, PARAMETER  :: SatId_MTSAT1R            = 171
