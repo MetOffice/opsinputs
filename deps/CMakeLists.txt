@@ -23,7 +23,7 @@ ${CMAKE_Fortran_DEBUG_FLAGS}"
   )
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(OPS_DEFAULT_Fortran_FLAGS "\
--warn alignments,errors,declarations,general,ignore_loc,nointerfaces,notruncated_source,shape,stderrors,uncalled,unused,usage \
+-warn alignments,declarations,errors,general,ignore_loc,nointerfaces,notruncated_source,shape,stderrors,uncalled,unused,usage \
 -implicitnone \
 -traceback \
 -integer-size 64 \
