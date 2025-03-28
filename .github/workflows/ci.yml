@@ -75,7 +75,7 @@ jobs:
             --entrypoint=/usr/local/src/${REPO}/${PR}/build-and-test \
             --workdir=/usr/local/src/${REPO}/${PR} \
             --volume ${PWD}/${PR}:/usr/local/src/${REPO}/${PR} \
-            'jcsda/docker-gnu-openmpi-dev:latest'
+            'jcsda/docker-gnu-openmpi-dev:skylab-v8'
 
   build2:
     if: |

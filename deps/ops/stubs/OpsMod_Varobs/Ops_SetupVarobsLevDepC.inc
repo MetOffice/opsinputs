@@ -48,6 +48,8 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupGPSRO,             &
     ObsGroupSEVIRIClr,         &
     ObsGroupSEVIRIASR,         &
+    ObsGroupFCIClr,            &
+    ObsGroupFCIASR,            &
     ObsGroupMVIRIClr,          &
     ObsGroupGOESImClr,         &
     ObsGroupMTSATImClr,        &
@@ -74,7 +76,8 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupHIRAS,             &
     ObsGroupOceanWinds,        &
     ObsGroupGIIRSLW,           &
-    ObsGroupGIIRSMW
+    ObsGroupGIIRSMW,           &
+    ObsGroupMTGIRS
 
 USE OpsMod_ObsInfo, ONLY: &
     OB_type
@@ -166,6 +169,11 @@ SELECT CASE (Observations % header % ObsGroup)
     ObsLevelType = 0.0
     NumLevelLevs = 1
 
+  CASE (ObsGroupMTGIRS)
+
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
+
   CASE (ObsGroupAMSUB)
 
     ObsLevelType = 0.0
@@ -177,6 +185,11 @@ SELECT CASE (Observations % header % ObsGroup)
     NumLevelLevs = 1
 
   CASE (ObsGroupSEVIRIClr, ObsGroupSEVIRIASR)
+
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
+
+  CASE (ObsGroupFCIClr, ObsGroupFCIASR)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1

@@ -117,6 +117,10 @@ SELECT CASE (num)
     name = "ESAUWA"
   CASE (ObsTypeESAUWI)
     name = "ESAUWI"
+  CASE (ObsTypeFCIEUMASR)
+    name = "FCIASR"
+  CASE (ObsTypeFCIAUTOUK)
+    name = "FCIRADUK"
   CASE (ObsTypeGHRSST)
     name = "GHRSST"
   CASE (ObsTypeGIIRS)

@@ -108,6 +108,11 @@ SELECT CASE (ObsGroup)
     IF (.NOT. RTTOV_CloudSwitch) THEN
       Varfields(13:14) = (/Varfield_cloudtopp, Varfield_cloudfrac/)
     END IF
+  CASE (ObsGroupFCIASR, ObsGroupFCIClr)
+    Varfields(1:12) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
+                        Varfield_solzenith,Varfield_tskin,Varfield_tcozone, &
+                        Varfield_surface,Varfield_numchans,Varfield_channum, &
+                        Varfield_stratt,Varfield_iremiss,Varfield_qcinfo/)
   CASE (ObsGroupHIRAS)
     Varfields(1:12) = (/Varfield_tskin,Varfield_tcozone,Varfield_satzenith, &
                         Varfield_surface,Varfield_stratt,Varfield_satid, &
@@ -169,6 +174,15 @@ SELECT CASE (ObsGroup)
     Varfields(1:6) = (/Varfield_HLOSwind,Varfield_ProfileNo,VarField_dWinddT,   &
                        VarField_dWinddP,VarField_AzimuthCOG,VarField_HeightCOG/)
   CASE (ObsGroupIASI)
+    Varfields(1:12) = (/Varfield_tskin,Varfield_tcozone,Varfield_satzenith, &
+                        Varfield_surface,Varfield_stratt,Varfield_satid, &
+                        Varfield_numchans,Varfield_channum,Varfield_britemp, &
+                        Varfield_emissivity,Varfield_solzenith, &
+                        Varfield_qcinfo/)
+    IF (.NOT. RTTOV_CloudSwitch) THEN
+      Varfields(13:14) = (/Varfield_cloudtopp, Varfield_cloudfrac/)
+    END IF
+  CASE (ObsGroupMTGIRS)
     Varfields(1:12) = (/Varfield_tskin,Varfield_tcozone,Varfield_satzenith, &
                         Varfield_surface,Varfield_stratt,Varfield_satid, &
                         Varfield_numchans,Varfield_channum,Varfield_britemp, &

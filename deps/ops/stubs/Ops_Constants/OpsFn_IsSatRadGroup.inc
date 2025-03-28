@@ -24,6 +24,8 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupTOVS .OR. &
     obsgroup == ObsGroupCOMSMIClr .OR. &
     obsgroup == ObsGroupCRIS .OR. &
+    obsgroup == ObsGroupFCIClr .OR. &
+    obsgroup == ObsGroupFCIASR .OR. &
     obsgroup == ObsGroupHIRAS .OR. &
     obsgroup == ObsGroupGeoCloud .OR. &
     obsgroup == ObsGroupGOESImClr .OR. &
@@ -42,7 +44,8 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupGMIhigh .OR. &
     obsgroup == ObsGroupSSMIS .OR. &
     obsgroup == ObsGroupGIIRSLW .OR. &
-    obsgroup == ObsGroupGIIRSMW) THEN
+    obsgroup == ObsGroupGIIRSMW .OR. &
+    obsgroup == ObsGroupMTGIRS) THEN
 
   OpsFn_IsSatRadGroup = .TRUE.
 ELSE
