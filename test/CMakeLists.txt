@@ -367,7 +367,11 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_aircraft
                 YAML     varobswriter_globalnamelist_aircraft.yaml
                 NAMELIST ../../etc/global/varobs/Aircraft.nl
                 DATA     varobs_globalnamelist_aircraft.nc4)
-
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sternamws
+                YAML     varobswriter_globalnamelist_sternamws.yaml
+                NAMELIST ../../etc/global/varobs/SternaMWS.nl
+                DATA     varobs_globalnamelist_sternamws.nc4)
+              
 # Tests the UKV namelist files in the etc directory
 
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviasr

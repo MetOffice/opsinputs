@@ -284,6 +284,16 @@ SELECT CASE (ObsGroup)
                         Varfield_numchans,Varfield_channum,VarField_satid, &
                         VarField_tcozone,VarField_solzenith,VarField_QCinfo, &
                         VarField_clw/)
+  CASE (ObsGroupEPSMWS) !setup for jedi
+    Varfields(1:10) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
+                        Varfield_solzenith,Varfield_tskin, &
+                        Varfield_surface,Varfield_numchans,Varfield_channum, &
+                        Varfield_mwemiss, varfield_biaspredictors /)
+  CASE (ObsGroupSternaMWS) !set up for jedi
+    Varfields(1:10) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
+                        Varfield_solzenith,Varfield_tskin, &
+                        Varfield_surface,Varfield_numchans,Varfield_channum, &
+                        Varfield_mwemiss, varfield_biaspredictors /)
   CASE (ObsGroupRainAccum)
     Varfields(1:1) = (/Varfield_RainAccum/)
 END SELECT
