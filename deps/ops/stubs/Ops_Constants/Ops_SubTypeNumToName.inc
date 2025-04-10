@@ -67,6 +67,8 @@ SELECT CASE (num)
     name = "ATOVSG"
   CASE (ObsTypeATOVS_L)
     name = "ATOVSL"
+  CASE (ObsTypeAWS)
+    name = "AWS"
   CASE (ObsTypeTOVS_G)
     name = "TOVSG"
   CASE (ObsTypeTOVS_L)
@@ -203,6 +205,8 @@ SELECT CASE (num)
     name = "MWHS"
   CASE (ObsTypeMWRI)
     name = "MWRI"
+  CASE (ObsTypeMWSSG)
+    name = "MWSSG"
   CASE (ObsTypeOceanColour)
     name = "OCEANCOL"
   CASE (ObsTypeOceanFB)

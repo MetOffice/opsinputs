@@ -290,6 +290,10 @@ INTEGER, PARAMETER :: ObsTypeHIRASFSRHR   = 29303   ! => HIRAS FSR (UK)
 
 INTEGER, PARAMETER :: ObsTypeGIIRS        = 29400   ! => GIIRS
 
+INTEGER, PARAMETER :: ObsTypeAWS          = 29600   ! => Arctic weather satellite radiances
+ 
+INTEGER, PARAMETER :: ObsTypeMWSSG        = 29700   ! => EPSSG MWS radiances
+
 ! Aircraft data
 INTEGER, PARAMETER :: ObsTypeAmdar        = 30100  ! => Amdar
 INTEGER, PARAMETER :: ObsTypeAirep        = 30200  ! => airep
