@@ -21,6 +21,7 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupAMSUB .OR. &
     obsgroup == ObsGroupATMS .OR. &
     obsgroup == ObsGroupATOVS .OR. &
+    obsgroup == ObsGroupEPSMWS .OR. &
     obsgroup == ObsGroupTOVS .OR. &
     obsgroup == ObsGroupCOMSMIClr .OR. &
     obsgroup == ObsGroupCRIS .OR. &
@@ -43,6 +44,7 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupGMIlow .OR. &
     obsgroup == ObsGroupGMIhigh .OR. &
     obsgroup == ObsGroupSSMIS .OR. &
+    obsgroup == ObsGroupSternaMWS .OR. &
     obsgroup == ObsGroupGIIRSLW .OR. &
     obsgroup == ObsGroupGIIRSMW .OR. &
     obsgroup == ObsGroupMTGIRS) THEN
