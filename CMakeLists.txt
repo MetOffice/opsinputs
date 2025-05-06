@@ -47,7 +47,7 @@ find_package( MPI REQUIRED COMPONENTS C CXX Fortran )
 include_directories( ${Boost_INCLUDE_DIR} )
 
 # NetCDF
-find_package( NetCDF REQUIRED COMPONENTS C Fortran)
+find_package( NetCDF REQUIRED COMPONENTS C CXX Fortran)
 
 # eckit
 find_package( eckit REQUIRED )
