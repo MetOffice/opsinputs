@@ -7,6 +7,7 @@ this script would then be run automatically as part of the build process wheneve
 
 import numpy as np
 import netCDF4 as nc4
+from datetime import datetime, timezone
 
 # Defined as in oops/util/missingValues.cc
 missing_float = np.finfo(np.float32).min * 0.99
@@ -14,6 +15,27 @@ missing_int = np.iinfo(np.int32).min + 5
 
 # NetCDF missing values
 missing_float_nc = 9.969209968386869e+36
+
+# IODA date time format
+iso8601_string = 'seconds since 1970-01-01T00:00:00Z'
+epoch = datetime.fromisoformat(iso8601_string[14:-1]).replace(tzinfo=timezone.utc)
+
+def convert_string_to_dateTime(timestamp):
+
+    # convert strings of time into python dateTime object
+    try:
+        # Combine and parse the string as a datetime object
+        dtg = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        # Set timezone to UTC
+        dtg = dtg.replace(tzinfo=timezone.utc)
+        # Convert to Unix time in seconds since epoch
+        dateTime = np.int64(round((dtg - epoch).total_seconds()))
+
+        return dateTime
+
+    except ValueError as e:
+        # Raise an informative error if parsing fails
+        raise ValueError(f"Invalid date or time format in inputs timestamp: {e}")
 
 
 def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False,
@@ -515,7 +537,9 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 80200, 90100, 90200, 80100, 100200, 70100,
               100300, 90400, 90200, 100400, 80300, 100500, 90500]
-    var = f.createVariable('MetaData/datetime', str, ('Location'))
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    
     # The NetCDF4 module doesn't support assigning values to variable-length string variables
     # using the `var[:] = ...` syntax, so we do it using a loop
     for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
@@ -523,7 +547,8 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
                            "2018-01-01T00:02:01Z", "2018-01-01T00:01:04Z", "2018-01-01T00:03:01Z",
                            "2018-01-01T00:04:02Z", "2018-01-01T00:03:02Z", "2018-01-01T00:04:01Z",
                            "2018-01-01T00:03:03Z", "2018-01-01T00:05:01Z", "2018-01-01T00:05:02Z"]):
-        var[i] = s
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_1", "station_2",
                            "station_1", "station_2", "station_1",
@@ -661,10 +686,12 @@ def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_
         shift = 10 * var_index
         var[:] = [shift + 3, missing_int, shift + 7, shift + 9]
 
-    var = f.createVariable('MetaData/datetime', str, ('Location'))
+    var = f.createVariable('MetaData/datetime', np.int64, ('Location'))
+    var.units = iso8601_string
     for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
                            "2018-01-01T00:01:02Z", "2018-01-01T00:02:02Z"]):
-        var[i] = s
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     f.date_time = 2018010100
 
