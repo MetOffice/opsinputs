@@ -699,7 +699,7 @@ def output_full_varobs_to_netcdf(oned_float_varnames, twod_float_varnames, oned_
         shift = 10 * var_index
         var[:] = [shift + 3, missing_int, shift + 7, shift + 9]
 
-    var = f.createVariable('MetaData/datetime', np.int64, ('Location'))
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
     var.units = iso8601_string
     for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
                            "2018-01-01T00:01:02Z", "2018-01-01T00:02:02Z"]):
