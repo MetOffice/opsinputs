@@ -53,9 +53,12 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False,
     var[:] = [31, 32, 33, 34]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     # Station ID
     if radar_doppler_wind or radar_reflectivity:
@@ -113,8 +116,6 @@ def output_1d_simulated_var_to_netcdf(var_name, file_name, with_bias=False,
                 biascorr[i] = obsVal[i]
         var[:] = biascorr
 
-    f.date_time = 2018010100
-
     f.close()
 
 
@@ -128,9 +129,12 @@ def output_1d_simulated_var_to_netcdf_stationID_integer(var_name, file_name):
     var[:] = [21, 22, -23, 24]
     var = f.createVariable('MetaData/longitude', 'f', ('Location',))
     var[:] = [31, 32, 33, 34]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
     var = f.createVariable('MetaData/stationIdentification', 'i', ('Location',))
     var[:] = [1, 2, 3, 4]
     var = f.createVariable('ObsValue/' + var_name, 'f', ('Location',))
@@ -138,7 +142,6 @@ def output_1d_simulated_var_to_netcdf_stationID_integer(var_name, file_name):
     var[:] = obsVal
     var = f.createVariable('ObsError/' + var_name, 'f', ('Location',))
     var[:] = [0.1, missing_float, 0.3, 0.4]
-    f.date_time = 2018010100
 
     f.close()
 
@@ -156,9 +159,12 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     var[:] = [31, 32, 33, 34]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -181,7 +187,6 @@ def output_1d_simulated_vars_to_netcdf(var_name_1, var_name_2, file_name):
     var[:] = [0.11, missing_float, 0.13, 0.14]
     var = f.createVariable('PreQC/' + var_name_2, 'i', ('Location',))
     var[:] = [1, 1, 1, 1]
-    f.date_time = 2018010100
 
     f.close()
 
@@ -220,9 +225,12 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     var[:] = [31, 32, 33, 34, -35, -36]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400, 100500, 100600]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute, 5 * minute, 6 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_1", "station_1",
@@ -244,8 +252,7 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     # and the second six correspond to the averaged profiles.
     var[:] = [1.2, missing_float_nc, 1.4, 1.5, 1.6, 1.7,
               1.25, 1.35, 1.45, 1.55, 1.65, 1.75]
-
-    f.date_time = 2018010100
+    
     f._ioda_layout = "ObsGroup"
     f._ioda_layout_version = 0
 
@@ -266,9 +273,12 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
     var[:] = [31, 32, 33, 34]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -286,7 +296,6 @@ def output_1d_normal_var_to_netcdf(var_name, var_group, file_name):
 
     var = f.createVariable(var_group + '/' + var_name, 'f', ('Location',))
     var[:] = [5.1, missing_float, 5.3, 5.4]
-    f.date_time = 2018010100
 
     f.close()
 
@@ -305,9 +314,12 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
     var[:] = [31, 32, 33, 34]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -325,7 +337,6 @@ def output_1d_normal_int_var_to_netcdf(var_name, var_group, file_name):
 
     var = f.createVariable(var_group + '/' + var_name, 'i', ('Location',))
     var[:] = [5, missing_int, 7, 8]
-    f.date_time = 2018010100
 
     f.close()
 
@@ -362,9 +373,12 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
     var[:] = [31, 32, 33, 34]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -412,8 +426,6 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
                      [1.6, 3.0, 3.33],
                      [1.8, 3.2, 3.44]]
 
-    f.date_time = 2018010100
-
     f.close()
 
 
@@ -438,9 +450,12 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
     var[:] = [31, 32, 33, 34]
     var = f.createVariable('MetaData/pressure', 'f', ('Location',))
     var[:] = [100100, 100200, 100300, 100400]
-    var = f.createVariable('MetaData/time', 'f', ('Location',))
-    minute = 1 / 60.
-    var[:] = [1 * minute, 2 * minute, 3 * minute, 4 * minute]
+    var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
+    var.units = iso8601_string
+    for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+        newformat = convert_string_to_dateTime(s)
+        var[i] = newformat
 
     var = f.createVariable('MetaData/stationIdentification', str, ('Location'))
     for i, s in enumerate(["station_1", "station_2", "station_3", "station_4"]):
@@ -514,8 +529,6 @@ def output_2d_normal_var_to_netcdf(var_name, var_group, file_name,
     if predictors:
         var = f.createVariable('MetaData/satelliteIdentifier', 'i', ('Location',))
         var[:] = [5, 5, 5, 8]
-
-    f.date_time = 2018010100
 
     f.close()
 
