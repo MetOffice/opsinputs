@@ -228,7 +228,8 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
     var.units = iso8601_string
     for i, s in enumerate(["2018-01-01T00:01:00Z","2018-01-01T00:02:00Z",
-                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z"]):
+                           "2018-01-01T00:03:00Z","2018-01-01T00:04:00Z",
+                           "2018-01-01T00:05:00Z","2018-01-01T00:06:00Z"]):
         newformat = convert_string_to_dateTime(s)
         var[i] = newformat
 
