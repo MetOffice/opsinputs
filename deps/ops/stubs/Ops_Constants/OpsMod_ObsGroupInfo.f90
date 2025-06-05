@@ -48,6 +48,7 @@ INTEGER, PARAMETER :: ObsGroupGOESImClr    =  36 ! => GOES Imager Clear data
 INTEGER, PARAMETER :: ObsGroupABIClr       =  37 ! => ABI (GOES-16 onwards) radiances
 INTEGER, PARAMETER :: ObsGroupATMS         =  38 ! => ATMS radiances
 INTEGER, PARAMETER :: ObsGroupCrIS         =  39 ! => CrIS+ATMS radiances
+INTEGER, PARAMETER :: ObsGroupCrISFSR      =  72 ! => CrIS+ATMS radiances
 INTEGER, PARAMETER :: ObsGroupCOMSMIClr    =  40 ! => COMS M Imager Clear data
 INTEGER, PARAMETER :: ObsGroupMTSATImClr   =  41 ! => MTSAT Imager Clear data
 INTEGER, PARAMETER :: ObsGroupSurfaceCloud =  42 ! => Surface cloud reports
@@ -80,7 +81,7 @@ INTEGER, PARAMETER :: ObsGroupFCIASR         =  68 ! => FCI all-sky radiances
 INTEGER, PARAMETER :: ObsGroupFCIClr         =  69 ! => FCI clear-sky radiances
 INTEGER, PARAMETER :: ObsGroupSternaMWS      =  70 ! => AWS & Sterna microwave radiances
 INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS 
-INTEGER, PARAMETER :: max_obs_group_num      =  71 ! Number of observation groups
+INTEGER, PARAMETER :: max_obs_group_num      =  72 ! Number of observation groups
 
 CONTAINS
 

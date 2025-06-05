@@ -262,7 +262,6 @@ INTEGER, PARAMETER :: ObsTypeCrIS         = 26000   ! => CrIS+ATMS (global, thin
 INTEGER, PARAMETER :: ObsTypeCrISFSR      = 26001   ! => CrIS FSR +ATMS (global, thinned)
 
 INTEGER, PARAMETER :: ObsTypeCRISHR       = 26100   ! => CrIS+ATMS (UK, full res)
-INTEGER, PARAMETER :: ObsTypeCRISFSRHR    = 26101   ! => CrIS FSR +ATMS (UK, full res)
 
 INTEGER, PARAMETER :: ObsTypeCOMSCSR      = 26200   ! => COMS Imager radiances
 INTEGER, PARAMETER :: ObsTypeMTSATImCSR   = 26300   ! => MTSAT Imager radiances

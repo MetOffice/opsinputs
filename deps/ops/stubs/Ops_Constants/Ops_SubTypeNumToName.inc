@@ -91,6 +91,8 @@ SELECT CASE (num)
     name = "COPTSMO"
   CASE (ObsTypeCrIS)
     name = "CRIMSS"
+  CASE (ObsTypeCrISFSR)
+    name = "CRIMSF"
   CASE (ObsTypeCrISHR)
     name = "CRIMSSHR"
   CASE (ObsTypeHIRAS, ObsTypeHIRASFSR)

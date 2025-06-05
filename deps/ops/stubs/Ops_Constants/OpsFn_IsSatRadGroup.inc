@@ -24,7 +24,8 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupEPSMWS .OR. &
     obsgroup == ObsGroupTOVS .OR. &
     obsgroup == ObsGroupCOMSMIClr .OR. &
-    obsgroup == ObsGroupCRIS .OR. &
+    obsgroup == ObsGroupCrIS .OR. &
+    obsgroup == ObsGroupCrISFSR .OR. &
     obsgroup == ObsGroupFCIClr .OR. &
     obsgroup == ObsGroupFCIASR .OR. &
     obsgroup == ObsGroupHIRAS .OR. &

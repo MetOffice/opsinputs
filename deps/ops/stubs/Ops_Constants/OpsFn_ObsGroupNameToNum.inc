@@ -44,6 +44,8 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupCOMSMIClr
   CASE ("CrIS")
     OpsFn_ObsGroupNameToNum = ObsGroupCrIS
+  CASE ("CrISFSR")
+    OpsFn_ObsGroupNameToNum = ObsGroupCrISFSR
   CASE ("FCIASR")
     OpsFn_ObsGroupNameToNum = ObsGroupFCIASR
   CASE ("FCIClr")
