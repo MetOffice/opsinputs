@@ -90,6 +90,8 @@ SELECT CASE (name)
     num = ObsTypeCopTSMO
   CASE ("CRIMSS")
     num = ObsTypeCrIS
+  CASE ("CRIMSF")
+    num = ObsTypeCrISFSR
   CASE ("CRIMSSHR")
     num = ObsTypeCrISHR
   CASE ("DROPSOND")

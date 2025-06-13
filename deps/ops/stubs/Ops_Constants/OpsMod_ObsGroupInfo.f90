@@ -48,6 +48,7 @@ INTEGER, PARAMETER :: ObsGroupGOESImClr    =  36 ! => GOES Imager Clear data
 INTEGER, PARAMETER :: ObsGroupABIClr       =  37 ! => ABI (GOES-16 onwards) radiances
 INTEGER, PARAMETER :: ObsGroupATMS         =  38 ! => ATMS radiances
 INTEGER, PARAMETER :: ObsGroupCrIS         =  39 ! => CrIS+ATMS radiances
+INTEGER, PARAMETER :: ObsGroupCrISFSR      =  39 ! => CrISFSR+ATMS radiances
 INTEGER, PARAMETER :: ObsGroupCOMSMIClr    =  40 ! => COMS M Imager Clear data
 INTEGER, PARAMETER :: ObsGroupMTSATImClr   =  41 ! => MTSAT Imager Clear data
 INTEGER, PARAMETER :: ObsGroupSurfaceCloud =  42 ! => Surface cloud reports
