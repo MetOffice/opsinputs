@@ -824,14 +824,14 @@ if __name__ == "__main__":
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
                                  'testinput/varobs_globalnamelist_atovs.nc4')
 
-    # Sterna MWS
+    # Sterna MWR 
     output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle'],
                                  ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature', 'Emiss/emissivity',
                                   'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
-                                 'testinput/varobs_globalnamelist_sternamws.nc4')
+                                 'testinput/varobs_globalnamelist_sternamwr.nc4')
 
 
     # GNSS-RO

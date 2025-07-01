@@ -8,11 +8,11 @@ observations:
 # reject_obs_with_any_variables_failing_qc: false
 # This means that despite the blacklist the entries still end up in the varobs file
   - obs space:
-      name: SternaMWS
+      name: SternaMWR
       obsdatain:
         engine:
           type: H5File
-          obsfile: Data/varobs_globalnamelist_sternamws.nc4
+          obsfile: Data/varobs_globalnamelist_sternamwr.nc4
       simulated variables: [brightnessTemperature]
       channels: 1, 3
     obs filters:
@@ -60,11 +60,11 @@ observations:
 # reject_obs_with_all_variables_failing_qc: true
 # reject_obs_with_any_variables_failing_qc: false
   - obs space:
-      name: SternaMWS
+      name: SternaMWR
       obsdatain:
         engine:
           type: H5File
-          obsfile: Data/varobs_globalnamelist_sternamws.nc4
+          obsfile: Data/varobs_globalnamelist_sternamwr.nc4
       simulated variables: [brightnessTemperature]
       channels: 1, 3
     obs filters:
