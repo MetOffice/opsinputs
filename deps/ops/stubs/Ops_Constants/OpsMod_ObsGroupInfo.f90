@@ -78,7 +78,7 @@ INTEGER, PARAMETER :: ObsGroupAscatLSDA      =  66 ! => LSDA (ASCAT)
 INTEGER, PARAMETER :: ObsGroupMTGIRS         =  67 ! => MTG-IRS radiances
 INTEGER, PARAMETER :: ObsGroupFCIASR         =  68 ! => FCI all-sky radiances
 INTEGER, PARAMETER :: ObsGroupFCIClr         =  69 ! => FCI clear-sky radiances
-INTEGER, PARAMETER :: ObsGroupSternaMWS      =  70 ! => AWS & Sterna microwave radiances
+INTEGER, PARAMETER :: ObsGroupSternaMWR      =  70 ! => AWS & Sterna microwave radiances
 INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS 
 INTEGER, PARAMETER :: max_obs_group_num      =  71 ! Number of observation groups
 

@@ -79,7 +79,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupGIIRSMW,           &
     ObsGroupMTGIRS,            &
     ObsGroupEPSMWS,            &
-    ObsGroupSternaMWS
+    ObsGroupSternaMWR
 
 USE OpsMod_ObsInfo, ONLY: &
     OB_type
@@ -341,7 +341,7 @@ SELECT CASE (Observations % header % ObsGroup)
     ObsLevelType = 0.0
     NumLevelLevs = 1
   
-  CASE (ObsGroupSternaMWS)
+  CASE (ObsGroupSternaMWR)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1
