@@ -275,6 +275,8 @@ INTEGER, PARAMETER :: ObsTypeIN3DImCSR    = 26800   ! => INSAT3D Imager radiance
 INTEGER, PARAMETER :: ObsTypeIN3DSdCSR    = 26900   ! => INSAT3D Sounder radiances
 INTEGER, PARAMETER :: ObsTypeMWSFY3       = 27000   ! => FY-3C/D MWTS-2 and MWHS-2 radiances
 INTEGER, PARAMETER :: ObsTypeMWHSFY3      = 27001   ! => MWHS-2 radiances full resolution
+INTEGER, PARAMETER :: ObsTypeMWSFY3E      = 66000   ! => FY-3E/F MWTS-3 and MWHS-2 radiances
+INTEGER, PARAMETER :: ObsTypeMWHSFY3E     = 57003   ! => MWHS-2E radiances full resolution
 
                                                     ! 271xx defined (satwinds - StereoMV)
 INTEGER, PARAMETER :: ObsTypeOCNWINDS     = 27200   ! => Satellite ocean wind speed

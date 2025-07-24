@@ -219,7 +219,7 @@ SELECT CASE (ObsGroup)
                         Varfield_solzenith,Varfield_tskin,Varfield_tcozone, &
                         Varfield_surface,Varfield_numchans,Varfield_channum, &
                         Varfield_stratt,Varfield_iremiss,Varfield_qcinfo/)
-  CASE (ObsGroupMWSFY3)
+  CASE (ObsGroupMWSFY3, ObsGroupMWSFY3E)
     Varfields(1:13) = (/VarField_britemp,VarField_tskin,VarField_mwemiss, &
                         VarField_satzenith,VarField_surface, Varfield_stratt, &
                         Varfield_numchans,Varfield_channum,VarField_satid, &

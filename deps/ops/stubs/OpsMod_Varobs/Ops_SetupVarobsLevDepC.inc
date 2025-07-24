@@ -70,6 +70,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupRainAccum,         &
     ObsGroupMWRI,              &
     ObsGroupMWSFY3,            &
+    ObsGroupMWSFY3E,           &
     ObsGroupGMIlow,            &
     ObsGroupGMIhigh,           &
     ObsGroupHLOSWIND,          &
@@ -311,7 +312,7 @@ SELECT CASE (Observations % header % ObsGroup)
     ObsLevelType = 0.0
     NumLevelLevs = 1
 
-  CASE (ObsGroupMWSFY3)
+  CASE (ObsGroupMWSFY3,ObsGroupMWSFY3E )
 
     ObsLevelType = 0.0
     NumLevelLevs = 1

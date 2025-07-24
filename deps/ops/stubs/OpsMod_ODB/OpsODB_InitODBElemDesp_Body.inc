@@ -42,6 +42,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupSAPHIR,            &
     ObsGroupMTSATImClr,        &
     ObsGroupMWSFY3,            &
+    ObsGroupMWSFY3E,           &
     ObsGroupMWRI,              &
     ObsGroupOcean,             &
     ObsGroupSatSST,            &
@@ -317,7 +318,7 @@ IF (ObsGroup == ObsGroupTOVS) THEN
   ElemDesp2ODBDesp(IndexMSU_SSU_BRGTS_TMPR) % Varno              = ops_odb_getval (h, "$rawbt_amsu")  ! brightness temperature
 END IF
 
-IF (ObsGroup == ObsGroupMWSFY3) THEN
+IF (ObsGroup == ObsGroupMWSFY3 .OR. ObsGroup == ObsGroupMWSFY3E) THEN
   ElemDesp2ODBDesp(IndexBRGTS_TMPR1) % TableName              = 'body'
   ElemDesp2ODBDesp(IndexBRGTS_TMPR1) % ColName                = 'initial_obsvalue'
   ElemDesp2ODBDesp(IndexBRGTS_TMPR1) % Varno                  = ops_odb_getval (h, "$rawbt_mwts")  ! brightness temperature
