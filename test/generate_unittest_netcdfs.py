@@ -1115,7 +1115,22 @@ if __name__ == "__main__":
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_atovs.nc4')
-
+      
+    # EPSMWS                       
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_epsmws.nc4')
+    # SternaMWR                      
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_sternamwr.nc4')
+                             
     # SSMIS
     output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
                               'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
