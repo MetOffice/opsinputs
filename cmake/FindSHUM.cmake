@@ -34,10 +34,17 @@ To guide the search process, set the SHUM_ROOT environment variable or CMake var
 
 #]=======================================================================]
 
-find_path(SHUM_INCLUDE_DIR
-  NAMES f_shum_fieldsfile_class_version_mod.mod
-  PATH_SUFFIXES ${SHUM_PATH}/include
-)
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "Cray")
+  find_path(SHUM_INCLUDE_DIR
+    NAMES F_SHUM_FIELDSFILE_CLASS_VERSION_MOD.mod
+    PATH_SUFFIXES ${SHUM_PATH}/include
+  )
+else()
+  find_path(SHUM_INCLUDE_DIR
+    NAMES f_shum_fieldsfile_class_version_mod.mod
+    PATH_SUFFIXES ${SHUM_PATH}/include
+  )
+endif()
 
 find_library(SHUM_BYTESWAP_LIBRARY NAMES shum_byteswap)
 find_library(SHUM_STRING_CONV_LIBRARY NAMES shum_string_conv)
@@ -51,6 +58,7 @@ find_library(SHUM_FIELDSFILE_CLASS_LIBRARY NAMES shum_fieldsfile_class)
 find_library(SHUM_THREAD_UTILS_LIBRARY NAMES shum_thread_utils)
 find_library(SHUM_HORIZONTAL_FIELD_INTERP_LIBRARY NAMES shum_horizontal_field_interp)
 find_library(SHUM_LATLON_EQ_GRIDS_LIBRARY NAMES shum_latlon_eq_grids)
+find_library(SHUM_LIBRARY NAMES shum)
 
 set(SHUM_LIBRARIES
     ${SHUM_BYTESWAP_LIBRARY}
@@ -64,7 +72,8 @@ set(SHUM_LIBRARIES
     ${SHUM_FIELDSFILE_CLASS_LIBRARY}
     ${SHUM_THREAD_UTILS_LIBRARY}
     ${SHUM_HORIZONTAL_FIELD_INTERP_LIBRARY}
-    ${SHUM_LATLON_EQ_GRIDS_LIBRARY})
+    ${SHUM_LATLON_EQ_GRIDS_LIBRARY}
+    ${SHUM_LIBRARY})
 
 if (SHUM_ROOT AND (NOT EXISTS "${SHUM_ROOT}/include" OR NOT EXISTS "${SHUM_ROOT}/lib"))
   message(WARNING "\

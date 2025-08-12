@@ -36,6 +36,8 @@ list( APPEND opsinputs_src_files
     GnssroStationIDMetOffice.h
 )
 
+message(STATUS "in opsinputs/src/opsinputs/CMakeLists.txt, CMAKE_Fortran_COMPILER_ID = ${CMAKE_Fortran_COMPILER_ID}")
+
 # The opsinputs_cxgenerate_mod.F90 module includes *.inc files from OPS,
 # so it must be compiled with similar flags as OPS,
 # in particular assuming that integers and reals without kind are 64-bit.
@@ -47,9 +49,19 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-double")
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-integer-8 -fdefault-real-8")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-sdefault64")
 endif()
-set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
-                            COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+message(STATUS "in opsinputs/src/opsinputs/CMakeLists.txt, FORTRAN_FLAGS_64_BIT_TYPES = ${FORTRAN_FLAGS_64_BIT_TYPES}")
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+#  set(OLD_CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
+#  set(CMAKE_Fortran_FLAGS "-sdefault64")
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_OPTIONS "-sdefault64")
+else()
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+endif()
 
 # In addition, we need to add the folder with these *.inc files to the
 # include path used when compiling that module.
@@ -75,3 +87,8 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${MODULE_DIR}/ DESTINATION ${CMAKE_INSTALL
 target_include_directories(${PROJECT_NAME} INTERFACE
                             $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${MODULE_DIR}>
                             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/${MODULE_DIR}>)
+
+#if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+#  set(OLD_CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
+#endif()
+
