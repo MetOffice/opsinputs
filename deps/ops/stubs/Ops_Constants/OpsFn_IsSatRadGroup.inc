@@ -44,7 +44,7 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupGMIlow .OR. &
     obsgroup == ObsGroupGMIhigh .OR. &
     obsgroup == ObsGroupSSMIS .OR. &
-    obsgroup == ObsGroupSternaMWS .OR. &
+    obsgroup == ObsGroupSternaMWR .OR. &
     obsgroup == ObsGroupGIIRSLW .OR. &
     obsgroup == ObsGroupGIIRSMW .OR. &
     obsgroup == ObsGroupMTGIRS) THEN
