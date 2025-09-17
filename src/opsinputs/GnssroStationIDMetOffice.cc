@@ -61,7 +61,7 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
   for (size_t i=0; i < nlocs; ++i) {
     if (qualityFlag[i] & (1 << 13)) != 0 {
       isRising[i] = 1;
-    else if (qualityFlag[i] & (1 << 13)) == 0 {
+    else (qualityFlag[i] & (1 << 13)) == 0 {
       isRising[i] = 0;
     }
   } 
