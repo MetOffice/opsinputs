@@ -55,16 +55,20 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
   std::vector<int> satid;
   in.get(Variable("MetaData/satelliteIdentifier"), satid);
   
-  std::vector<int> qualityFlag;
-  in.get(Variable("MetaData/qualityFlag"), qualityFlag);
+  std::vector<int> qualityFlags;
+  in.get(Variable("MetaData/qualityFlags"), qualityFlags);
   std::vector<int> isRising(nlocs, 2);
   for (size_t i=0; i < nlocs; ++i) {
-    if (qualityFlag[i] & (1 << 13)) != 0 {
+    if ((qualityFlags[i] & (1 << 13)) != 0) {
       isRising[i] = 1;
-    else (qualityFlag[i] & (1 << 13)) == 0 {
+    } else if ((qualityFlags[i] & (1 << 13)) == 0) {
       isRising[i] = 0;
     }
-  } 
+    else {
+      isRising[i] = 2;
+    }
+  }
+  
   
   // Get the record number of each profile
   std::vector<size_t> recordNumbers = out.space().recidx_all_recnums();
