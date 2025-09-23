@@ -100,10 +100,26 @@ include( opsinputs_compiler_flags )
 add_subdirectory( deps )
 add_subdirectory( etc )
 add_subdirectory( src )
-add_subdirectory( test )
 
-if(ECBUILD_INSTALL_FORTRAN_MODULES)
-  install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/${CMAKE_CFG_INTDIR} DESTINATION ${INSTALL_INCLUDE_DIR} )
+if( ECBUILD_INSTALL_FORTRAN_MODULES )
+  install(
+    DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/${CMAKE_CFG_INTDIR}
+    DESTINATION ${INSTALL_INCLUDE_DIR}
+  )
+endif()
+
+if( BUILD_TESTING )
+  add_subdirectory( test )
+  ecbuild_add_test(
+    TARGET opsinputs_coding_norms
+    TYPE SCRIPT
+    COMMAND ${oops_BINDIR}/oops_cpplint.py
+    ARGS
+      --quiet
+      --recursive
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
+      ${CMAKE_CURRENT_SOURCE_DIR}/test
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 endif()
 
 ################################################################################
@@ -115,10 +131,3 @@ ecbuild_install_project( NAME opsinputs )
 
 # print the summary of the configuration
 ecbuild_print_summary()
-
-ecbuild_add_test( TARGET opsinputs_coding_norms
-                  TYPE SCRIPT
-                  COMMAND ${oops_BINDIR}/oops_cpplint.py
-                  ARGS --quiet --recursive ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/test
-                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-
