@@ -156,7 +156,7 @@ PUBLIC :: gen_get_unit
 PUBLIC :: gen_get_unit_from_env
 PUBLIC :: gen_fail
 PUBLIC :: gen_message
-PUBLIC :: gen_message_report_sync
+!PUBLIC :: gen_message_report_sync
 PUBLIC :: gen_open_stats_file
 PUBLIC :: Gen_ReadConfigNL
 PUBLIC :: gen_replace_text
@@ -213,7 +213,7 @@ INCLUDE 'gen_write_trace_js_file.inc'
 #include "gen_close_stats_file.inc"
 #include "gen_get_env.inc"
 #include "gen_get_env_a.inc"
-#include "gen_message_report_sync.inc"
+!#include "gen_message_report_sync.inc"
 #include "gen_open_stats_file.inc"
 
 END MODULE GenMod_Core

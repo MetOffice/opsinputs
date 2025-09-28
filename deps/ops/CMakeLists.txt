@@ -9,6 +9,8 @@ if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
   endif()
 elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(OPS_EXTRA_Fortran_FLAGS "-stand f03")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+  set(OPS_EXTRA_Fortran_FLAGS "")
 endif()
 
 set(CMAKE_Fortran_FLAGS "\
