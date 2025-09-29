@@ -1,106 +1,63 @@
 ---
 name: CI
 
+permissions:
+  contents: read
+
 on:
-  push:
-    branches: [develop]
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
 
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
 
-env:
-  REPO: ${{ github.event.repository.name }}
-  PR: pr-${{ github.event.number }}
-  GH_TOKEN: ${{ secrets.GH_PAT }}
-
 jobs:
-  build1:
-    if: |
-      ( github.repository_owner == 'MetOffice' && github.event.pull_request.draft == false )
-    name: gnu-openmpi (JCSDA)
+  lint:
+    name: Lint CMakeLists
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout current
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.PR }}/${{ env.REPO }}
-      - name: Initiate bundle
-        run: cp ./${{ env.PR }}/${{ env.REPO }}/ci/* ./${{ env.PR }}/
-
-      - name: Checkout jedicmake
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.PR }}/jedicmake
-          repository: JCSDA-internal/jedi-cmake
-          submodules: recursive
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Checkout oops
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.PR }}/oops
-          repository: JCSDA-internal/oops
-          token: ${{ secrets.GH_PAT }}
-      - name: Check build-group for oops
-        if: github.event_name == 'pull_request'
-        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/oops
-
-      - name: Checkout ioda
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.PR }}/ioda
-          repository: JCSDA-internal/ioda
-          token: ${{ secrets.GH_PAT }}
-      - name: Check build-group for ioda
-        if: github.event_name == 'pull_request'
-        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ioda
-
-      - name: Checkout ufo
-        uses: actions/checkout@v4
-        with:
-          path: ./${{ env.PR }}/ufo
-          repository: JCSDA-internal/ufo
-          token: ${{ secrets.GH_PAT }}
-      - name: Check build-group for ufo
-        if: github.event_name == 'pull_request'
-        run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ufo
-
-      - name: build and test
+      - uses: actions/checkout@v5
+      - name: Install cmakelint
         run: |
-          docker run --rm \
-            --entrypoint=/usr/local/src/${REPO}/${PR}/build-and-test \
-            --workdir=/usr/local/src/${REPO}/${PR} \
-            --volume ${PWD}/${PR}:/usr/local/src/${REPO}/${PR} \
-            'jcsda/docker-gnu-openmpi-dev:skylab-v8'
-
-  build2:
+          python3 -m pip install cmakelint
+      - name: Lint
+        run: |
+          find -type f '(' -name 'CMakeLists.txt' -o -name '*.cmake' ')' \
+            -exec cmakelint '{}' ';'
+  build:
     if: |
       ( github.repository_owner == 'MetOffice' && github.event.pull_request.draft == false )
-    name: clang-mpich (JCSDA)
-    runs-on: ubuntu-latest
+    name: gnu-openmpi (UKMO)
+    runs-on: jedi-self-hosted-rg
+    environment: CI
+    env:
+      REPO: ${{ github.event.repository.name }}
+      PR: pr-${{ github.event.number }}
 
     steps:
+      - name: Pre-submit cleanup
+        run: |
+          rm -fr ./${{ env.PR }} || true
+          ls -al ./
       - name: Checkout current
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./${{ env.PR }}/${{ env.REPO }}
       - name: Initiate bundle
-        run: cp ./${{ env.PR }}/${{ env.REPO }}/ci/* ./${{ env.PR }}/
+        run: cp -a ./${{ env.PR }}/${{ env.REPO }}/ci/* ./${{ env.PR }}/
 
       - name: Checkout jedicmake
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./${{ env.PR }}/jedicmake
           repository: JCSDA-internal/jedi-cmake
-          submodules: recursive
+          submodules: true
           token: ${{ secrets.GH_PAT }}
 
       - name: Checkout oops
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./${{ env.PR }}/oops
           repository: JCSDA-internal/oops
@@ -110,7 +67,7 @@ jobs:
         run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/oops
 
       - name: Checkout ioda
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./${{ env.PR }}/ioda
           repository: JCSDA-internal/ioda
@@ -120,7 +77,7 @@ jobs:
         run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ioda
 
       - name: Checkout ufo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./${{ env.PR }}/ufo
           repository: JCSDA-internal/ufo
@@ -130,9 +87,19 @@ jobs:
         run: ./${{ env.PR }}/check-build-group.sh ./${{ env.PR }}/ufo
 
       - name: Build and Test
+        env:
+          # Container environment
+          WORKDIR: /var/tmp/${{ env.REPO}}/${{ env.PR }}
+
         run: |
+          az acr login --name ngmssboxjediacr
           docker run --rm \
-            --entrypoint=/usr/local/src/${REPO}/${PR}/build-and-test \
-            --workdir=/usr/local/src/${REPO}/${PR} \
-            --volume ${PWD}/${PR}:/usr/local/src/${REPO}/${PR} \
-            'jcsda/docker-clang-mpich-dev:latest'
+            --name ${REPO}_${PR}_${GITHUB_SHA::7} \
+            --volume ${{ github.workspace }}/${PR}:${WORKDIR} \
+            --workdir=${WORKDIR} \
+            --entrypoint=${WORKDIR}/build-and-test \
+            'ngmssboxjediacr.azurecr.io/jedibase:alma9'
+
+      - name: Cleanup workspace
+        working-directory: ${{github.workspace}}
+        run: rm -fr ${{ env.PR }} || true
