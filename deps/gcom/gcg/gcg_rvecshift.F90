@@ -64,8 +64,8 @@ LOGICAL (KIND=gc_int_kind)  :: wrap
 #if defined(MPI_SRC)
 INTEGER (KIND=gc_int_kind)  :: STAT(mpl_status_size)
 #endif
-INTEGER (KIND=gc_int_kind)  :: i, j, k, me, grank, gsize, grank0,              &
-                               igid, iloc, gj
+INTEGER (KIND=gc_int_kind)  :: i, j, k, grank, gsize, grank0,              &
+                               igid, gj
 INTEGER (KIND=gc_int_kind)  :: ldlen(1_gc_int_kind)
 INTEGER (KIND=gc_int_kind)  :: lst(2)
 INTEGER (KIND=gc_int_kind), ALLOCATABLE  :: glst(:,:)

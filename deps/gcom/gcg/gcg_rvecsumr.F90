@@ -57,8 +57,8 @@ REAL (KIND=gc_real_kind)   :: field(lvl,nv), sums(nv)
 INTEGER (KIND=gc_int_kind) :: STAT(mpl_status_size)
 #endif
 
-INTEGER (KIND=gc_int_kind) :: i, j, me, grank, gsize, igid, iloc
-INTEGER (KIND=gc_int_kind) :: g0, gprev, gnext, glast
+INTEGER (KIND=gc_int_kind) :: i, j, grank, gsize, igid
+INTEGER (KIND=gc_int_kind) :: gprev, gnext, glast
 
 istat = gc__ok
 

@@ -143,11 +143,11 @@ INTEGER (KIND=gc_int_kind) :: n_items_to_send, sarr_len,                       &
                               send_map(7,n_items_to_send)
 INTEGER (KIND=gc_int_kind) :: n_items_to_recv, rarr_len,                       &
                               recv_map(7,n_items_to_recv)
-INTEGER (KIND=gc_int_kind) :: gid, max_buf_size, flag, istat
+INTEGER (KIND=gc_int_kind) :: gid, flag, istat
 REAL (KIND=gc_real_kind)   :: send_array(sarr_len),                            &
                               recv_array(rarr_len)
 
-INTEGER (KIND=gc_int_kind) :: i, j, k, l, length, lbase, lstride,              &
+INTEGER (KIND=gc_int_kind) :: i, j, k, l, lbase, lstride,              &
                               rbase, rstride, tag
 
 #if defined(MPI_SRC)
