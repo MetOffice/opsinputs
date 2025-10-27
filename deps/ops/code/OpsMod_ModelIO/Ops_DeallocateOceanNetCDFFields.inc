@@ -7,7 +7,6 @@
 SUBROUTINE Ops_DeallocateOceanNetCDFFields (netcdf_fields)
 
 USE GenMod_Core, ONLY: &
-  gen_fail,            &
   gen_trace_entry,     &
   gen_trace_exit,      &
   UseTrace
