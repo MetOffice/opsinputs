@@ -34,17 +34,10 @@ To guide the search process, set the SHUM_ROOT environment variable or CMake var
 
 #]=======================================================================]
 
-if(CMAKE_Fortran_COMPILER_ID STREQUAL "Cray")
-  find_path(SHUM_INCLUDE_DIR
-    NAMES F_SHUM_FIELDSFILE_CLASS_VERSION_MOD.mod
-    PATH_SUFFIXES ${SHUM_PATH}/include
-  )
-else()
-  find_path(SHUM_INCLUDE_DIR
-    NAMES f_shum_fieldsfile_class_version_mod.mod
-    PATH_SUFFIXES ${SHUM_PATH}/include
-  )
-endif()
+find_path(SHUM_INCLUDE_DIR
+  NAMES F_SHUM_FIELDSFILE_CLASS_VERSION_MOD.mod f_shum_fieldsfile_class_version_mod.mod
+  PATH_SUFFIXES ${SHUM_PATH}/include
+)
 
 find_library(SHUM_BYTESWAP_LIBRARY NAMES shum_byteswap)
 find_library(SHUM_STRING_CONV_LIBRARY NAMES shum_string_conv)
