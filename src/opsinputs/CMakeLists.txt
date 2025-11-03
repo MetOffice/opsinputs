@@ -48,8 +48,13 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-integer-8 -fdefault-real-8")
 endif()
-set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
-                            COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_FLAGS "-i8 -r8")
+else()
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+endif()
 
 # In addition, we need to add the folder with these *.inc files to the
 # include path used when compiling that module.
