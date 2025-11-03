@@ -47,9 +47,17 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-double")
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-integer-8 -fdefault-real-8")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-sdefault64")
 endif()
-set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
-                            COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_OPTIONS "-sdefault64")
+else()
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
+endif()
 
 # In addition, we need to add the folder with these *.inc files to the
 # include path used when compiling that module.
