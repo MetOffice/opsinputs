@@ -90,6 +90,8 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupMWRI
   CASE ("MWSFY3")
     OpsFn_ObsGroupNameToNum = ObsGroupMWSFY3
+  CASE ("MWSFY3E")
+    OpsFn_ObsGroupNameToNum = ObsGroupMWSFY3E
   CASE ("OceanSound")
     OpsFn_ObsGroupNameToNum = ObsGroupOcean
   CASE ("OceanWinds")
