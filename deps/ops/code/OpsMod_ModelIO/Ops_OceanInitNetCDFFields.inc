@@ -8,7 +8,6 @@ SUBROUTINE Ops_OceanInitNetCDFFields
 
 USE GenMod_Core, ONLY: &
   MessageOut,          &
-  gen_fail,            &
   gen_trace_entry,     &
   gen_trace_exit,      &
   StatusOK,            &
