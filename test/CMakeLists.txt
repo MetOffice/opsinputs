@@ -670,6 +670,10 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_mwsfy3
                 YAML     cxwriter_globalnamelist_mwsfy3.yaml
                 NAMELIST ../../etc/global/cx/MWSFY3.nl
                 DATA     cx_globalnamelist_mwsfy3.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_mwsfy3e
+                YAML     cxwriter_globalnamelist_mwsfy3e.yaml
+                NAMELIST ../../etc/global/cx/MWSFY3E.nl
+                DATA     cx_globalnamelist_mwsfy3e.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gnssro
                 YAML     cxwriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/cx/GPSRO.nl
