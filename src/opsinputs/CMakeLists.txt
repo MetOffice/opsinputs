@@ -47,8 +47,14 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-double")
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-integer-8 -fdefault-real-8")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+  set(FORTRAN_FLAGS_64_BIT_TYPES "-sdefault64")
 endif()
-if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_OPTIONS "-sdefault64")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
   set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                               COMPILE_FLAGS "-i8 -r8")
 else()
