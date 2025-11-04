@@ -206,6 +206,8 @@ SELECT CASE (name)
     num = ObsTypeMWRI
   CASE ("MWTS")
     num = ObsTypeMWSFY3
+  CASE ("MWSSG")
+    num = ObsTypeMWSSG
   CASE ("MWTS3")
     num = ObsTypeMWSFY3E
   CASE ("OCEANCOL")
