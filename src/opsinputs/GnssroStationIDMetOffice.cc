@@ -37,6 +37,7 @@ static ObsFunctionMaker<GnssroStationIDMetOffice>
 GnssroStationIDMetOffice::GnssroStationIDMetOffice(const eckit::LocalConfiguration & conf)
   : invars_() {
   invars_ += Variable("MetaData/satelliteIdentifier");
+  invars_ += Variable("MetaData/qualityFlags");
 }
 
 // -----------------------------------------------------------------------------
@@ -54,22 +55,18 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
   const size_t nlocs = in.nlocs();
   std::vector<int> satid;
   in.get(Variable("MetaData/satelliteIdentifier"), satid);
-  
+
   std::vector<int> qualityFlags;
   in.get(Variable("MetaData/qualityFlags"), qualityFlags);
-  std::vector<int> isRising(nlocs, 2);
-  for (size_t i=0; i < nlocs; ++i) {
-    if ((qualityFlags[i] & (1 << 13)) != 0) {
-      isRising[i] = 1;
-    } else if ((qualityFlags[i] & (1 << 13)) == 0) {
-      isRising[i] = 0;
+    std::vector<int> isRising(nlocs, 2);  // setting = 0, rising = 1, unknown = 2
+    for (size_t i = 0; i < nlocs; ++i) {
+      if ((qualityFlags[i] & (1 << 13)) != 0) {
+        isRising[i] = 1;
+      } else {
+        isRising[i] = 0;
+      }
     }
-    else {
-      isRising[i] = 2;
-    }
-  }
-  
-  
+
   // Get the record number of each profile
   std::vector<size_t> recordNumbers = out.space().recidx_all_recnums();
   oops::Log::debug() << "Unique record numbers" << std::endl;
