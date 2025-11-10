@@ -119,6 +119,12 @@ SELECT CASE (ObsGroup)
                         Varfield_numchans,Varfield_channum,Varfield_britemp, &
                         Varfield_emissivity,Varfield_solzenith, &
                         Varfield_qcinfo/)
+  CASE (ObsGroupHIRAS2)
+    Varfields(1:12) = (/Varfield_tskin,Varfield_tcozone,Varfield_satzenith, &
+                        Varfield_surface,Varfield_stratt,Varfield_satid, &
+                        Varfield_numchans,Varfield_channum,Varfield_britemp, &
+                        Varfield_emissivity,Varfield_solzenith, &
+                        Varfield_qcinfo/)
     IF (.NOT. RTTOV_CloudSwitch) THEN
       Varfields(13:14) = (/Varfield_cloudtopp, Varfield_cloudfrac/)
     END IF
