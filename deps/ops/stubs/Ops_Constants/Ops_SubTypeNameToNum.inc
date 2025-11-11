@@ -92,6 +92,8 @@ SELECT CASE (name)
     num = ObsTypeCrIS
   CASE ("CRIMSSHR")
     num = ObsTypeCrISHR
+  CASE ("CRIMSF")
+    num = ObsTypeHIRAS2
   CASE ("DROPSOND")
     num = ObsTypeDropsonde
   CASE ("DRWIND")
@@ -116,7 +118,7 @@ SELECT CASE (name)
     num = ObsTypeESAUWI
   CASE ("FCIASR")
     num = ObsTypeFCIEUMASR
-  CASE ("FCIRADUK") 
+  CASE ("FCIRADUK")
     num = ObsTypeFCIAUTOUK
   CASE ("GAUGE")
     num = ObsTypeGauge

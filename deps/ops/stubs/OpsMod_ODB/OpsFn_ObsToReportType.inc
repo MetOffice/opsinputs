@@ -573,11 +573,29 @@ SELECT CASE (Obs % Header % ObsGroup)
     IF (Obs % Header % Satid % Present) THEN
       DO i = ob_start, ob_end
         IF (Obs % Satid(i) == SatId_FY3D) THEN
-          report_types(i - ob_start + 1) = rep_type_fy3_d_hiras_rad 
+          report_types(i - ob_start + 1) = rep_type_fy3_d_hiras_rad
         ELSE
           found_report_type = .FALSE.
           DO j = 1, SIZE (map, DIM = 1)
             IF (map(j,1) == ObsGroupHIRAS .AND. map(j,2) == Obs % Satid(i)) THEN
+              report_types(i - ob_start + 1) = map(j,3)
+              found_report_type = .TRUE.
+              EXIT
+            END IF
+          END DO
+          CALL update_unrecognized_satids (Obs % Satid(i))
+        END IF
+      END DO
+    END IF
+  CASE (ObsGroupHIRAS2)
+    IF (Obs % Header % Satid % Present) THEN
+      DO i = ob_start, ob_end
+        IF (Obs % Satid(i) == SatId_FY3E) THEN
+          report_types(i - ob_start + 1) = rep_type_fy3e_hiras2_rad
+        ELSE
+          found_report_type = .FALSE.
+          DO j = 1, SIZE (map, DIM = 1)
+            IF (map(j,1) == ObsGroupHIRAS2 .AND. map(j,2) == Obs % Satid(i)) THEN
               report_types(i - ob_start + 1) = map(j,3)
               found_report_type = .TRUE.
               EXIT
