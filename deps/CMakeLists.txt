@@ -45,6 +45,11 @@ ${CMAKE_Fortran_FLAGS}"
 -check uninit \
 ${CMAKE_Fortran_DEBUG_FLAGS}"
   )
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+  set(OPS_DEFAULT_Fortran_FLAGS "\
+-i8 -r8 \
+${CMAKE_Fortran_FLAGS}"
+  )
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -sdefault64 \
