@@ -852,7 +852,8 @@ if __name__ == "__main__":
                                   'ObsValue/bendingAngle',
                                   'ObsError/bendingAngle'],
                                  [],
-                                 ['MetaData/satelliteIdentifier'],
+                                 ['MetaData/satelliteIdentifier',
+                                  'MetaData/qualityFlags'],
                                  'testinput/varobs_globalnamelist_gnssro.nc4')
 
     # Sonde
