@@ -18,7 +18,6 @@ SUBROUTINE Ops_PartitionedFindCoordIndices (presearch_data,  &
                                             j_coordinates)
 
 USE GenMod_Core, ONLY: &
-  gen_fail,            &
   gen_trace_entry,     &
   gen_trace_exit,      &
   UseTrace

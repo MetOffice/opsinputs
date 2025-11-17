@@ -201,8 +201,12 @@ SELECT CASE (num)
     name = "MSGWINDS"
   CASE (ObsTypeMWSFY3)
     name = "MWTS"
+  CASE (ObsTypeMWSFY3E)
+    name = "MWTS3"
   CASE (ObsTypeMWHSFY3)
     name = "MWHS"
+  CASE (ObsTypeMWHSFY3E)
+    name = "MWHS2E"
   CASE (ObsTypeMWRI)
     name = "MWRI"
   CASE (ObsTypeMWSSG)

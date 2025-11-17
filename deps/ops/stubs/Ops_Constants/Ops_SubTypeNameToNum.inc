@@ -200,12 +200,16 @@ SELECT CASE (name)
     num = ObsTypeMSGWINDS
   CASE ("MWHS")
     num = ObsTypeMWHSFY3
+  CASE ("MWHS2E")
+    num = ObsTypeMWHSFY3E
   CASE ("MWRI")
     num = ObsTypeMWRI
-  CASE ("MWTS")
-    num = ObsTypeMWSFY3
   CASE ("MWSSG")
     num = ObsTypeMWSSG
+  CASE ("MWTS")
+    num = ObsTypeMWSFY3
+  CASE ("MWTS3")
+    num = ObsTypeMWSFY3E
   CASE ("OCEANCOL")
     num = ObsTypeOceanColour
   CASE ("OCEANFB")
