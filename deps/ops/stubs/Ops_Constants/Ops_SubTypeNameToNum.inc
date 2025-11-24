@@ -92,7 +92,7 @@ SELECT CASE (name)
     num = ObsTypeCrIS
   CASE ("CRIMSSHR")
     num = ObsTypeCrISHR
-  CASE ("CRIMSF")
+  CASE ("HIRAS2")
     num = ObsTypeHIRAS2
   CASE ("DROPSOND")
     num = ObsTypeDropsonde
