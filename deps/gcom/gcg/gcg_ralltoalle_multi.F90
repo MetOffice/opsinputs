@@ -129,11 +129,11 @@ INTEGER (KIND=gc_int_kind) :: n_items_to_send, sarr_len,                       &
                               send_map(7,n_items_to_send)
 INTEGER (KIND=gc_int_kind) :: n_items_to_recv, rarr_len,                       &
                               recv_map(7,n_items_to_recv)
-INTEGER (KIND=gc_int_kind) :: gid, max_buf_size, flag, istat
+INTEGER (KIND=gc_int_kind) :: gid, flag, istat
 REAL (KIND=gc_real_kind)   :: send_array(sarr_len),                            &
                               recv_array(rarr_len)
 
-INTEGER (KIND=gc_int_kind) :: i, j, k, b, l, sbase,                            &
+INTEGER (KIND=gc_int_kind) :: i, j, k, b, sbase,                            &
                               sstride, rbase, rstride, tag
 
 #if defined(MPI_SRC)
@@ -162,7 +162,6 @@ INTEGER (KIND=gc_int_kind), ALLOCATABLE :: pos2(:)
 INTEGER (KIND=gc_int_kind), ALLOCATABLE :: STAT(:,:)
 
 LOGICAL (KIND=gc_log_kind) :: send_completed  ! All the outstanding sends have completed
-LOGICAL (KIND=gc_log_kind) :: recv_completed  ! All the outstanding receives have completed
 
 EXTERNAL  mpl_comm_rank
 EXTERNAL  mpl_comm_size

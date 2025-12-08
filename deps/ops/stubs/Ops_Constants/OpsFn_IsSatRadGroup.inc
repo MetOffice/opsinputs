@@ -38,6 +38,7 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupSAPHIR .OR. &
     obsgroup == ObsGroupMVIRIClr .OR. &
     obsgroup == ObsGroupMWSFY3 .OR. &
+    obsgroup == ObsGroupMWSFY3E .OR. &
     obsgroup == ObsGroupMWRI .OR. &
     obsgroup == ObsGroupSEVIRIClr .OR. &
     obsgroup == ObsGroupSEVIRIASR .OR. &

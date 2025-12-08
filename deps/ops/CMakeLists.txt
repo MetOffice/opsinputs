@@ -139,6 +139,7 @@ target_link_libraries(ops
   ${SHUM_BYTESWAP_LIBRARY}
   ${SHUM_STRING_CONV_LIBRARY}
   ${SHUM_WGDOS_PACKING_LIBRARY}
+  ${SHUM_LIBRARY}
   NetCDF::NetCDF_Fortran
 )
 
@@ -187,6 +188,7 @@ target_link_libraries(ops_serial
   ${SHUM_BYTESWAP_LIBRARY}
   ${SHUM_STRING_CONV_LIBRARY}
   ${SHUM_WGDOS_PACKING_LIBRARY}
+  ${SHUM_LIBRARY}
   NetCDF::NetCDF_Fortran
 )
 

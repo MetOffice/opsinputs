@@ -32,13 +32,11 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
 -diag-disable 10121 \
 -assume norealloc_lhs \
 ${CMAKE_Fortran_FLAGS}"
-#-Wp,-P \
   )
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -fdefault-integer-8 -fdefault-real-8 \
 ${CMAKE_Fortran_FLAGS}"
-#-Wp,-P \
   )
   set(CMAKE_Fortran_DEBUG_FLAGS "\
 -check bounds \
@@ -47,11 +45,20 @@ ${CMAKE_Fortran_FLAGS}"
 -check uninit \
 ${CMAKE_Fortran_DEBUG_FLAGS}"
   )
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+  set(OPS_DEFAULT_Fortran_FLAGS "\
+-i8 -r8 \
+${CMAKE_Fortran_FLAGS}"
+  )
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+  set(OPS_DEFAULT_Fortran_FLAGS "\
+-sdefault64 \
+${CMAKE_Fortran_FLAGS}"
+  )
 elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -double \
 ${CMAKE_Fortran_FLAGS}"
-#-Wp,-P \
   )
   set(CMAKE_Fortran_DEBUG_FLAGS "\
 ${CMAKE_Fortran_DEBUG_FLAGS}"
