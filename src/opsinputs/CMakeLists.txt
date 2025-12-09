@@ -54,6 +54,9 @@ endif()
 if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
   set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                               COMPILE_OPTIONS "-sdefault64")
+elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+  set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
+                              COMPILE_FLAGS "-i8 -r8")
 else()
   set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                               COMPILE_FLAGS "${FORTRAN_FLAGS_64_BIT_TYPES}")
