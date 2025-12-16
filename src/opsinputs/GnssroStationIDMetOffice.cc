@@ -56,13 +56,13 @@ void GnssroStationIDMetOffice::compute(const ObsFilterData & in,
   std::vector<int> satid;
   in.get(Variable("MetaData/satelliteIdentifier"), satid);
 
-  const int missing = util::missingValue(missing);
+  const int missing = util::missingValue<int>();
   std::vector<int> qualityFlags;
   in.get(Variable("MetaData/qualityFlags"), qualityFlags);
   std::vector<int> isRising(nlocs, 2);  // setting = 0, rising = 1, unknown = 2
   for (size_t i = 0; i < nlocs; ++i) {
     if (qualityFlags[i] == missing) {
-      isRising[i] = 2;  // unknown
+      isRising[i] = 2;
     } else if ((qualityFlags[i] & (1 << 13)) != 0) {
       isRising[i] = 1;
     } else {
