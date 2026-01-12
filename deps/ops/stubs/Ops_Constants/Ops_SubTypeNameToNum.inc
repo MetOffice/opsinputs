@@ -116,7 +116,7 @@ SELECT CASE (name)
     num = ObsTypeESAUWI
   CASE ("FCIASR")
     num = ObsTypeFCIEUMASR
-  CASE ("FCIRADUK") 
+  CASE ("FCIRADUK")
     num = ObsTypeFCIAUTOUK
   CASE ("GAUGE")
     num = ObsTypeGauge

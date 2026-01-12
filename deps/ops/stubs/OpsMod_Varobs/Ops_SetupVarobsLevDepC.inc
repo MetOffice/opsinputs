@@ -75,6 +75,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupGMIhigh,           &
     ObsGroupHLOSWIND,          &
     ObsGroupHIRAS,             &
+    ObsGroupHIRAS2,            &
     ObsGroupOceanWinds,        &
     ObsGroupGIIRSLW,           &
     ObsGroupGIIRSMW,           &
@@ -323,12 +324,16 @@ SELECT CASE (Observations % header % ObsGroup)
     NumLevelLevs = 1
 
   CASE (ObsGroupHLOSWIND)
-  
+
       ObsLevelType = 0.0
       NumLevelLevs = NumObLev
 
   CASE (ObsGroupHIRAS)
 
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
+
+  CASE (ObsGroupHIRAS2)
     ObsLevelType = 0.0
     NumLevelLevs = 1
 
@@ -341,12 +346,12 @@ SELECT CASE (Observations % header % ObsGroup)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1
-  
+
   CASE (ObsGroupSternaMWR)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1
-  
+
   CASE (ObsGroupEPSMWS)
 
     ObsLevelType = 0.0
