@@ -28,12 +28,12 @@ REAL              :: C(SIZE(A,1),SIZE(B,2))
 
 ! Local declarations:
 #if defined(MATMUL_ESSL)
-INTEGER*4         :: ARG2
-INTEGER*4         :: ARG5
-INTEGER*4         :: ARG8
-INTEGER*4         :: ARG9
-INTEGER*4         :: ARG10
-INTEGER*4         :: ARG11
+INTEGER(kind=4)   :: ARG2
+INTEGER(kind=4)   :: ARG5
+INTEGER(kind=4)   :: ARG8
+INTEGER(kind=4)   :: ARG9
+INTEGER(kind=4)   :: ARG10
+INTEGER(kind=4)   :: ARG11
 
 ARG2 = SIZE (A, DIM = 1)
 ARG5 = SIZE (B, DIM = 1)
