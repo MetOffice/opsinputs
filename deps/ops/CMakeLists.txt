@@ -2,7 +2,7 @@
 #
 
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
-  set(OPS_EXTRA_Fortran_FLAGS "-std=f2003 -fallow-argument-mismatch")
+  set(OPS_EXTRA_Fortran_FLAGS "-std=f2008 -fallow-argument-mismatch")
 elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(OPS_EXTRA_Fortran_FLAGS "-stand f03")
 endif()
