@@ -31,11 +31,11 @@ USE mpi, ONLY: mpi_comm_type_shared, mpi_comm_world, mpi_comm_self,            &
                mpi_mode_nostore, mpi_mode_noput, mpi_mode_noprecede,           &
                mpi_lock_exclusive, mpi_lock_shared, mpi_byte, mpi_character,   &
                mpi_integer4, mpi_integer8, mpi_real4, mpi_real8, mpi_integer4, &
-               mpi_integer8, mpi_complex8, mpi_wtime,                          &
+               mpi_integer8, mpi_complex8, mpi_wtime
 #if defined(PREC_32B)
-               mpi_logical, mpi_integer, mpi_real, mpi_complex
+USE mpi, ONLY: mpi_logical, mpi_integer, mpi_real, mpi_complex
 #else
-mpi_complex16
+USE mpi, ONLY: mpi_complex16
 #endif
 #endif
 
