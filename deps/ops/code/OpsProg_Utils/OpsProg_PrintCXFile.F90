@@ -183,22 +183,22 @@ IF (mype == 0) THEN
     IF (all_obs) THEN
       IF (ALLOCATED (column_list)) DEALLOCATE (column_list)
       ALLOCATE (column_list (MAXVAL (Header % Lookup (LBNPT,:))))
-      column_list = (/(i,i = 1,MAXVAL (Header % Lookup (LBNPT,:)))/)
+      column_list = [(i,i = 1,MAXVAL (Header % Lookup (LBNPT,:)))]
     ELSE
       IF (.NOT. ALLOCATED (column_list)) THEN
         ALLOCATE (column_list(1 + (column_end - column_start) / column_stride))
-        column_list = (/(i,i = column_start,column_end,column_stride)/)
+        column_list = [(i,i = column_start,column_end,column_stride)]
       END IF
     END IF
 
     IF (all_obs) THEN
       IF (ALLOCATED (batch_list)) DEALLOCATE (batch_list)
       ALLOCATE (batch_list (Header % Fixhd(FH_LookupSize2)))
-      batch_list = (/(i,i = 1,Header % Fixhd(FH_LookupSize2))/)
+      batch_list = [(i,i = 1,Header % Fixhd(FH_LookupSize2))]
     ELSE
       IF (.NOT. ALLOCATED (batch_list)) THEN
         ALLOCATE (batch_list(1 + (batch_end - batch_start) / batch_stride))
-        batch_list = (/(i,i = batch_start,batch_end,batch_stride)/)
+        batch_list = [(i,i = batch_start,batch_end,batch_stride)]
       END IF
     END IF
 

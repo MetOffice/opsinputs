@@ -42,7 +42,7 @@ REAL              :: TropLat = 30.0                    ! Latitude at which hemis
                                                        !   changing to tropical values
 REAL              :: TropInt = 10.0                    ! Latitude interval over which values change
 REAL              :: BdPrintBox(12) = &                ! Print buddy check calc. for obs in boxes
-                           (/ 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0 /)
+                           [ 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0 ]
 
 REAL    :: OceanScaleHsyn = 400.0        ! Synoptic correlation scale (km)
 REAL    :: OceanScaleHmes = 100.0        ! Mesoscale correlation scale (km)
