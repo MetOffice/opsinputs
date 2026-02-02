@@ -616,6 +616,8 @@ do i = 1, size(VarFields)
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
     ! here and in opsinputs_varobswriter_populateobservations.
     call geovars % push_back("land_type_index")
+  case default
+    continue
   end select
 end do
 

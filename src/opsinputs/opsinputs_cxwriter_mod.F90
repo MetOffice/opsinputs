@@ -773,6 +773,8 @@ do i = 1, size(CxFields)
         write (DustBinIndexStr, '(i1)') DustBinIndex
         GeoVarName = opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end
       end if
+    case default
+      continue
 
   end select
 
@@ -1271,6 +1273,8 @@ do iCxField = 1, size(CxFields)
           opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end, &
           self % JediToOpsLayoutMapping, self % hofx, self % varnames)
       end if
+    case default
+      continue
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx
