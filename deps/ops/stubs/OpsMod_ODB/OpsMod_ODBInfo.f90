@@ -24,18 +24,18 @@ INTEGER(kind=odb_int), PARAMETER :: odb_all_pools = -1_odb_int
 
 ! ODB update query stuff
 INTEGER, PARAMETER               :: num_update_params = 11
-CHARACTER(len=*), PARAMETER      :: update_query_strings(num_update_params) =     &
-                                                        (/"$cycle_date        ",  &
-                                                          "$cycle_time        ",  &
-                                                          "$time_window_before",  &
-                                                          "$time_window_after ",  &
-                                                          "$level_number      ",  &
-                                                          "$ops_subtype       ",  &
-                                                          "$ops_obsgroup      ",  &
-                                                          "$varno             ",  &
-                                                          "$model_level_flag  ",  &
-                                                          "$superob_flag      ",  &
-                                                          "$runid             "/)
+CHARACTER(len=*), PARAMETER      :: update_query_strings(num_update_params) =    &
+                                                        ["$cycle_date        ",  &
+                                                         "$cycle_time        ",  &
+                                                         "$time_window_before",  &
+                                                         "$time_window_after ",  &
+                                                         "$level_number      ",  &
+                                                         "$ops_subtype       ",  &
+                                                         "$ops_obsgroup      ",  &
+                                                         "$varno             ",  &
+                                                         "$model_level_flag  ",  &
+                                                         "$superob_flag      ",  &
+                                                         "$runid             "]
 INTEGER, PARAMETER               :: cycle_date = 1
 INTEGER, PARAMETER               :: cycle_time = 2
 INTEGER, PARAMETER               :: time_window_before = 3

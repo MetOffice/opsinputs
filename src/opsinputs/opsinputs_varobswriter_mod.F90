@@ -1526,7 +1526,7 @@ integer(kind=c_int)              :: SatIdValue(NumObs)
 integer(kind=c_int), allocatable :: UniqueSatIds(:)
 integer                          :: ii, jj
 integer, parameter               :: maxpred = 31
-character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
+character(len=*), parameter      :: PredictorBaseName(1:maxpred) = [ &
               "constant                          ", &
               "thickness_850_300hPa              ", &
               "thickness_200_50hPa               ", &
@@ -1557,7 +1557,7 @@ character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
               "satelliteOrbitalAngle_order_9_cos ", &
               "satelliteOrbitalAngle_order_9_sin ", &
               "satelliteOrbitalAngle_order_10_cos", &
-              "satelliteOrbitalAngle_order_10_sin" /)
+              "satelliteOrbitalAngle_order_10_sin" ]
 character(len=150) :: JediVarGroupWithSatId
 
 ! Body:
