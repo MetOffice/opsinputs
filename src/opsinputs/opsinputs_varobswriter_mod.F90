@@ -606,6 +606,8 @@ type(oops_variables), intent(inout)      :: geovars
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
 integer                                  :: i
+character(len=80)                        :: ErrorMessage
+character(len=*), parameter              :: RoutineName = "opsinputs_varobswriter_addrequiredgeovars"
 
 ! Body:
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
@@ -617,6 +619,8 @@ do i = 1, size(VarFields)
     ! here and in opsinputs_varobswriter_populateobservations.
     call geovars % push_back("land_type_index")
   case default
+    write (ErrorMessage, '("Varfield not recognized: ",I0)') VarFields(i)
+    call gen_warn(RoutineName, ErrorMessage)
     continue
   end select
 end do
