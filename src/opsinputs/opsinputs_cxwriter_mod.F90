@@ -599,6 +599,8 @@ integer                              :: i
 character(len=max_varname_length)    :: GeoVarName
 integer                              :: DustBinIndex
 character                            :: DustBinIndexStr
+character(len=80)                    :: ErrorMessage
+character(len=*), parameter          :: RoutineName = "opsinputs_cxwriter_addrequiredgeovars"
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)
@@ -773,6 +775,10 @@ do i = 1, size(CxFields)
         write (DustBinIndexStr, '(i1)') DustBinIndex
         GeoVarName = opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end
       end if
+    case default
+      write (ErrorMessage, '("Stash code not recognized: ",I0)') CxField
+      call gen_warn(RoutineName, ErrorMessage)
+      continue
 
   end select
 
@@ -1271,6 +1277,10 @@ do iCxField = 1, size(CxFields)
           opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end, &
           self % JediToOpsLayoutMapping, self % hofx, self % varnames)
       end if
+    case default
+      write (ErrorMessage, '("Stash code not recognized: ",I0)') CxField
+      call gen_warn(RoutineName, ErrorMessage)
+      continue
   end select
 end do
 end subroutine opsinputs_cxwriter_populatecx
