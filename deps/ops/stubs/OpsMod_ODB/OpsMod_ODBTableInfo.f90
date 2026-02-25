@@ -71,10 +71,10 @@ TYPE Tables_type
   INTEGER, ALLOCATABLE              :: obsvertco_types(:)
 END TYPE
 
-CHARACTER(len=*), PARAMETER         :: body_flags(2) = (/"datum_status",  &
-                                                         "datum_event1"/)
-CHARACTER(len=*), PARAMETER         :: conv_body_flags(1) = (/"level"/)
-CHARACTER(len=*), PARAMETER         :: hdr_flags(2) = (/"report_status",  &
-                                                        "report_event1"/)
+CHARACTER(len=*), PARAMETER         :: body_flags(2) = ["datum_status",  &
+                                                        "datum_event1"]
+CHARACTER(len=*), PARAMETER         :: conv_body_flags(1) = ["level"]
+CHARACTER(len=*), PARAMETER         :: hdr_flags(2) = ["report_status",  &
+                                                       "report_event1"]
 
 END MODULE OpsMod_ODBTableInfo

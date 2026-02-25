@@ -33,7 +33,8 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupATMS,              &
     ObsGroupCrIS,              &
     ObsGroupHIRAS,             &
-    ObsGroupGIIRSLW,           &    
+    ObsGroupHIRAS2,            &
+    ObsGroupGIIRSLW,           &
     ObsGroupGIIRSMW,           &
     ObsGroupOcean,             &
     ObsGroupSatwind,           &
@@ -407,7 +408,8 @@ ElemDesp2ODBDesp(IndexScanLine) % data_type                      = odb_integer
 ElemDesp2ODBDesp(IndexScanLine) % has_missing                    = c_false
 
 IF (ObsGroup == ObsGroupCrIS .or. ObsGroup == ObsGroupHIRAS .or. &
-    ObsGroup == ObsGroupGIIRSLW .or. ObsGroup == ObsGroupGIIRSMW) THEN
+    ObsGroup == ObsGroupHIRAS2 .or. ObsGroup == ObsGroupGIIRSLW .or. &
+    ObsGroup == ObsGroupGIIRSMW) THEN
   ElemDesp2ODBDesp(IndexPixelNumber) % TableName                 = 'radiance'
   ElemDesp2ODBDesp(IndexPixelNumber) % ColName                   = 'field_of_regard'
   ElemDesp2ODBDesp(IndexPixelNumber) % data_type                 = odb_real

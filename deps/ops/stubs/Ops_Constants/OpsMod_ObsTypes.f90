@@ -285,15 +285,16 @@ INTEGER, PARAMETER :: ObsTypeMWRI         = 29000   ! => MWRI radiances
 INTEGER, PARAMETER :: ObsTypeGMIlow       = 29100   ! => GMI low freq channels
 INTEGER, PARAMETER :: ObsTypeGMIhigh      = 29200   ! => GMI high freq channels
 
-INTEGER, PARAMETER :: ObsTypeHIRAS        = 29300   ! => HIRAS 
-INTEGER, PARAMETER :: ObsTypeHIRASFSR     = 29301   ! => HIRAS FSR 
+INTEGER, PARAMETER :: ObsTypeHIRAS        = 29300   ! => HIRAS
+INTEGER, PARAMETER :: ObsTypeHIRASFSR     = 29301   ! => HIRAS FSR
 INTEGER, PARAMETER :: ObsTypeHIRASHR      = 29302   ! => HIRAS (UK)
 INTEGER, PARAMETER :: ObsTypeHIRASFSRHR   = 29303   ! => HIRAS FSR (UK)
+INTEGER, PARAMETER :: ObsTypeHIRAS2       = 29310   ! => HIRAS2
 
 INTEGER, PARAMETER :: ObsTypeGIIRS        = 29400   ! => GIIRS
 
 INTEGER, PARAMETER :: ObsTypeAWS          = 29600   ! => Arctic weather satellite radiances
- 
+
 INTEGER, PARAMETER :: ObsTypeMWSSG        = 29700   ! => EPSSG MWS radiances
 
 ! Aircraft data

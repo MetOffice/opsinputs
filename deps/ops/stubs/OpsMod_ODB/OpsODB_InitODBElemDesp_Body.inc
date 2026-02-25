@@ -27,6 +27,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupCOMSMIClr,         &
     ObsGroupCrIS,              &
     ObsGroupHIRAS,             &
+    ObsGroupHIRAS2,            &
     ObsGroupMWSFY3B,           &
     ObsGroupGeoCloud,          &
     ObsGroupGIIRSLW,           &
@@ -357,6 +358,24 @@ IF (ObsGroup == ObsGroupHIRAS) THEN
   ElemDesp2ODBDesp(IndexHIRASBrightnessTemp) % TableName         = 'body'
   ElemDesp2ODBDesp(IndexHIRASBrightnessTemp) % ColName           = 'initial_obsvalue'
   ElemDesp2ODBDesp(IndexHIRASBrightnessTemp) % Varno             = ops_odb_getval (h, "$rawbt")
+END IF
+
+IF (ObsGroup == ObsGroupHIRAS2) THEN
+  ElemDesp2ODBDesp(IndexRadiance) % TableName         = 'body'
+  ElemDesp2ODBDesp(IndexRadiance) % ColName           = 'initial_obsvalue'
+  ElemDesp2ODBDesp(IndexRadiance) % Varno             = ops_odb_getval (h, "$rawsca")
+  ElemDesp2ODBDesp(IndexRadiance) % also_do(1:7)      = (/IndexPstar,           &
+                                                          IndexSkinTemperature, &
+                                                          IndexRH,              &
+                                                          IndexTemp,            &
+                                                          IndexRH2,             &
+                                                          IndexT2,              &
+                                                          IndexHIRAS2BrightnessTemp/)
+  ElemDesp2ODBDesp(IndexRadiance) % also_do_levels(1:7)       = (/1,1,43,43,1,1,431/)
+
+  ElemDesp2ODBDesp(IndexHIRAS2BrightnessTemp) % TableName         = 'body'
+  ElemDesp2ODBDesp(IndexHIRAS2BrightnessTemp) % ColName           = 'initial_obsvalue'
+  ElemDesp2ODBDesp(IndexHIRAS2BrightnessTemp) % Varno             = ops_odb_getval (h, "$rawbt")
 END IF
 
 IF (ObsGroup == ObsGroupGIIRSLW .or. ObsGroup == ObsGroupGIIRSMW) THEN
@@ -1333,7 +1352,7 @@ IF (ObsGroup == ObsGroupGMIlow .OR. ObsGroup == ObsGroupGMIhigh) THEN
   ElemDesp2ODBDesp(IndexGMIBrightnessTemp) % TableName    = 'body'
   ElemDesp2ODBDesp(IndexGMIBrightnessTemp) % ColName      = 'initial_obsvalue'
   ElemDesp2ODBDesp(IndexGMIBrightnessTemp) % Varno        = ops_odb_getval (h, "$rawbt")  ! brightness temperature
-  ElemDesp2ODBDesp(IndexGMIBrightnessTemp) % also_do(1:5) = (/IndexSkinTemperature, & 
+  ElemDesp2ODBDesp(IndexGMIBrightnessTemp) % also_do(1:5) = (/IndexSkinTemperature, &
                                                               IndexRH,              &
                                                               IndexTemp,            &
                                                               IndexRH2,             &

@@ -50,6 +50,8 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupFCIClr
   CASE ("HIRAS")
     OpsFn_ObsGroupNameToNum = ObsGroupHIRAS
+  CASE ("HIRAS2")
+    OpsFn_ObsGroupNameToNum = ObsGroupHIRAS2
   CASE ("MWSFY3B")
     OpsFn_ObsGroupNameToNum = ObsGroupMWSFY3B
   CASE ("GeoCloud")

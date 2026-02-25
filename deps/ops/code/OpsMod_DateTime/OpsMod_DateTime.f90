@@ -34,7 +34,7 @@ INTEGER, PARAMETER :: minutes_in_year = 525600
 INTEGER, PARAMETER :: seconds_in_day = minutes_in_day * 60
 INTEGER, PARAMETER :: seconds_in_hour = 3600
 
-INTEGER, PARAMETER :: month_table(12) = (/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)
+INTEGER, PARAMETER :: month_table(12) = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 INTERFACE OpsFn_DateTime_Create
   MODULE PROCEDURE OpsFn_DateTime_CreateFromMinUTC

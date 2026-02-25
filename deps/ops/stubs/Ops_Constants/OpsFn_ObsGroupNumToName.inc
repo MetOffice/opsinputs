@@ -27,6 +27,8 @@ SELECT CASE (ObsGroup)
     OpsFn_ObsGroupNumToName = "AIRS"
   CASE (ObsGroupHIRAS)
     OpsFn_ObsGroupNumToName = "HIRAS"
+  CASE (ObsGroupHIRAS2)
+    OpsFn_ObsGroupNumToName = "HIRAS2"
   CASE (ObsGroupHLOSwind)
     OpsFn_ObsGroupNumToName = "HLOSwind"
   CASE (ObsGroupAltim)

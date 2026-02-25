@@ -196,21 +196,21 @@ IF (mype == 0) THEN
     IF (all_obs) THEN
       IF (ALLOCATED (ob_list)) DEALLOCATE (ob_list)
       ALLOCATE (ob_list (MAXVAL (varobs % Lookup(VarobsLookupNumObs,:))))
-      ob_list = (/(i, i = 1, MAXVAL (varobs % Lookup(VarobsLookupNumObs,:)))/)
+      ob_list = [(i, i = 1, MAXVAL (varobs % Lookup(VarobsLookupNumObs,:)))]
     ELSE
       IF (.NOT. ALLOCATED (ob_list)) THEN
         ALLOCATE (ob_list(1 + (ob_end - ob_start) / ob_stride))
-        ob_list = (/(i, i = ob_start, ob_end, ob_stride)/)
+        ob_list = [(i, i = ob_start, ob_end, ob_stride)]
       END IF
     END IF
     IF (all_obs) THEN
       IF (ALLOCATED (batch_list)) DEALLOCATE (batch_list)
       ALLOCATE (batch_list (varobs % Fixhd(FH_LookupSize2)))
-      batch_list = (/(i, i = 1, varobs % Fixhd(FH_LookupSize2))/)
+      batch_list = [(i, i = 1, varobs % Fixhd(FH_LookupSize2))]
     ELSE
       IF (.NOT. ALLOCATED (batch_list)) THEN
         ALLOCATE (batch_list(1 + (batch_end - batch_start) / batch_stride))
-        batch_list = (/(i, i = batch_start,batch_end,batch_stride)/)
+        batch_list = [(i, i = batch_start,batch_end,batch_stride)]
       END IF
     END IF
     IF (.NOT. ALLOCATED (varfields_list)) THEN
