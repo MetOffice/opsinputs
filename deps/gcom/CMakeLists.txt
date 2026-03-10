@@ -2,11 +2,7 @@
 #
 
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
-  if("${CMAKE_Fortran_COMPILER_VERSION}" VERSION_GREATER "10.1.0")
-    set(GCOM_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused -fallow-argument-mismatch")
-  else()
-    set(GCOM_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused")
-  endif()
+  set(GCOM_EXTRA_Fortran_FLAGS "-Wno-unused-dummy-argument -Wno-unused -fallow-argument-mismatch")
 elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(GCOM_EXTRA_Fortran_FLAGS "-warn nounused")
 endif()

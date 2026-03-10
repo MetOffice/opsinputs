@@ -182,6 +182,11 @@ SELECT CASE (ObsGroup)
                        StashItem_qcl,StashItem_p,StashItem_p_surface,          &
                        StashCode_u10,StashCode_v10,StashCode_t2,StashCode_rh2, &
                        StashCode_pmsl/)
+  CASE (ObsGroupMTGIRS)
+    CxFields(1:14) = (/StashItem_theta,StashItem_q,StashItem_qcf,StashItem_SST,  &
+                       StashItem_SeaIce,StashItem_orog,StashItem_qcl,            &
+                       StashItem_p,StashItem_p_Surface,StashCode_u10,            &
+                       StashCode_v10,StashCode_t2,StashCode_rh2,StashCode_pmsl/)
   CASE (ObsGroupSatSST)
     CxFields(1:1) = (/AncilItem_SST/)
   CASE (ObsGroupAOD)
@@ -308,6 +313,12 @@ SELECT CASE (ObsGroup)
                        StashCode_v10,StashCode_t2,StashCode_rh2,StashCode_pmsl/)
 
   CASE (ObsGroupHIRAS)
+    CxFields(1:14) = (/StashItem_theta,StashItem_q,StashItem_qcf,StashItem_SST,  &
+                       StashItem_SeaIce,StashItem_orog,StashItem_qcl,            &
+                       StashItem_p,StashItem_p_Surface,StashCode_u10,            &
+                       StashCode_v10,StashCode_t2,StashCode_rh2,StashCode_pmsl/)
+
+  CASE (ObsGroupHIRAS2)
     CxFields(1:14) = (/StashItem_theta,StashItem_q,StashItem_qcf,StashItem_SST,  &
                        StashItem_SeaIce,StashItem_orog,StashItem_qcl,            &
                        StashItem_p,StashItem_p_Surface,StashCode_u10,            &

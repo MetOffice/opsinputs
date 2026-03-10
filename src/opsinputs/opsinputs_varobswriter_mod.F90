@@ -606,6 +606,8 @@ type(oops_variables), intent(inout)      :: geovars
 ! Local declarations:
 integer(integer64)                       :: VarFields(ActualMaxVarfield)
 integer                                  :: i
+character(len=80)                        :: ErrorMessage
+character(len=*), parameter              :: RoutineName = "opsinputs_varobswriter_addrequiredgeovars"
 
 ! Body:
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
@@ -616,6 +618,10 @@ do i = 1, size(VarFields)
     ! TODO(someone): "land_type_index" may not be the right geoval to use. If it isn't, change it
     ! here and in opsinputs_varobswriter_populateobservations.
     call geovars % push_back("land_type_index")
+  case default
+    write (ErrorMessage, '("Varfield not recognized: ",I0)') VarFields(i)
+    call gen_warn(RoutineName, ErrorMessage)
+    continue
   end select
 end do
 
@@ -1526,7 +1532,7 @@ integer(kind=c_int)              :: SatIdValue(NumObs)
 integer(kind=c_int), allocatable :: UniqueSatIds(:)
 integer                          :: ii, jj
 integer, parameter               :: maxpred = 31
-character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
+character(len=*), parameter      :: PredictorBaseName(1:maxpred) = [ &
               "constant                          ", &
               "thickness_850_300hPa              ", &
               "thickness_200_50hPa               ", &
@@ -1557,7 +1563,7 @@ character(len=*), parameter      :: PredictorBaseName(1:maxpred) = (/ &
               "satelliteOrbitalAngle_order_9_cos ", &
               "satelliteOrbitalAngle_order_9_sin ", &
               "satelliteOrbitalAngle_order_10_cos", &
-              "satelliteOrbitalAngle_order_10_sin" /)
+              "satelliteOrbitalAngle_order_10_sin" ]
 character(len=150) :: JediVarGroupWithSatId
 
 ! Body:

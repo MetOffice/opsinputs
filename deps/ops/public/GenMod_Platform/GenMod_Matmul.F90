@@ -5,6 +5,10 @@
 !-------------------------------------------------------------------------------
 MODULE GenMod_Matmul
 
+#if defined(MATMUL_ESSL)
+USE, INTRINSIC :: ISO_FORTRAN_ENV, ONLY: int32
+#endif
+
 INTERFACE Gen_MATMUL
   MODULE PROCEDURE Gen_MATMUL_MM
   MODULE PROCEDURE Gen_MATMUL_MV
@@ -28,12 +32,12 @@ REAL              :: C(SIZE(A,1),SIZE(B,2))
 
 ! Local declarations:
 #if defined(MATMUL_ESSL)
-INTEGER*4         :: ARG2
-INTEGER*4         :: ARG5
-INTEGER*4         :: ARG8
-INTEGER*4         :: ARG9
-INTEGER*4         :: ARG10
-INTEGER*4         :: ARG11
+INTEGER(kind=int32)   :: ARG2
+INTEGER(kind=int32)   :: ARG5
+INTEGER(kind=int32)   :: ARG8
+INTEGER(kind=int32)   :: ARG9
+INTEGER(kind=int32)   :: ARG10
+INTEGER(kind=int32)   :: ARG11
 
 ARG2 = SIZE (A, DIM = 1)
 ARG5 = SIZE (B, DIM = 1)

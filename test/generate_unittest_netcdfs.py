@@ -253,7 +253,7 @@ def output_1d_multi_level_simulated_var_to_netcdf(var_name, file_name):
     # and the second six correspond to the averaged profiles.
     var[:] = [1.2, missing_float_nc, 1.4, 1.5, 1.6, 1.7,
               1.25, 1.35, 1.45, 1.55, 1.65, 1.75]
-    
+
     f._ioda_layout = "ObsGroup"
     f._ioda_layout_version = 0
 
@@ -556,7 +556,7 @@ def output_simulated_var_profiles_to_netcdf(var_name, file_name):
               100300, 90400, 90200, 100400, 80300, 100500, 90500]
     var = f.createVariable('MetaData/dateTime', np.int64, ('Location'))
     var.units = iso8601_string
-    
+
     # The NetCDF4 module doesn't support assigning values to variable-length string variables
     # using the `var[:] = ...` syntax, so we do it using a loop
     for i, s in enumerate(["2018-01-01T00:01:01Z", "2018-01-01T00:02:03Z",
@@ -827,7 +827,7 @@ if __name__ == "__main__":
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
                                  'testinput/varobs_globalnamelist_atovs.nc4')
 
-    # Sterna MWR 
+    # Sterna MWR
     output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle'],
                                  ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature', 'Emiss/emissivity',
@@ -835,15 +835,15 @@ if __name__ == "__main__":
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
                                  'testinput/varobs_globalnamelist_sternamwr.nc4')
-                                 
-    # EPSMWS 
+
+    # EPSMWS
     output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude', 'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
                                   'MetaData/solarZenithAngle'],
                                  ['ObsValue/brightnessTemperature', 'ObsError/brightnessTemperature', 'Emiss/emissivity',
                                   'BiasCorrObsValue/brightnessTemperature', 'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
                                   'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier'],
-                                 'testinput/varobs_globalnamelist_epsmws.nc4')                             
+                                 'testinput/varobs_globalnamelist_epsmws.nc4')
 
 
     # GNSS-RO
@@ -985,6 +985,19 @@ if __name__ == "__main__":
                                  ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier', 'MetaData/observationSubTypeNum'],
                                  'testinput/varobs_globalnamelist_mtgirs.nc4')
 
+    # HIRAS2 - this tests the variable_for_quality_control option
+    output_full_varobs_to_netcdf(['MetaData/latitude', 'MetaData/longitude',
+                                  'OneDVar/skinTemperature', 'MetaData/sensorZenithAngle',
+                                  'MetaData/solarZenithAngle', 'OutputToVAR/pressureAtTopOfCloud', 'OneDVar/cloudAmount',
+                                  'MetaData/ozoneTotal'],
+                                 ['ObsValue/radiance', 'DerivedObsValue/brightnessTemperature', 'EffectiveError/brightnessTemperature',
+                                  'OneDVar/emissivity', 'BiasCorrObsValue/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_13Predictor/brightnessTemperature',
+                                  'thickness_850_300hPa_satid_17Predictor/brightnessTemperature'],
+                                 ['MetaData/surfaceQualifier', 'MetaData/satelliteIdentifier', 'MetaData/observationSubTypeNum'],
+                                 'testinput/varobs_globalnamelist_hiras2.nc4')
+
+
     # Aircraft
     output_full_varobs_to_netcdf(['MetaData/latitude',
                                   'MetaData/longitude',
@@ -1119,22 +1132,22 @@ if __name__ == "__main__":
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_atovs.nc4')
-      
-    # EPSMWS                       
+
+    # EPSMWS
     output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
                               'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
                              ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_epsmws.nc4')
-    # SternaMWR                      
+    # SternaMWR
     output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
                               'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
                              ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_sternamwr.nc4')
-                             
+
     # SSMIS
     output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
                               'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
@@ -1158,7 +1171,7 @@ if __name__ == "__main__":
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water','air_pressure_levels',
                               'cloud_volume_fraction_in_atmosphere_layer','liquid_cloud_volume_fraction_in_atmosphere_layer','ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_mwsfy3e.nc4')
-    
+
     # GNSS-RO
     output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
                               'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
@@ -1274,6 +1287,14 @@ if __name__ == "__main__":
                               'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
                              'testinput/cx_globalnamelist_mtgirs.nc4')
 
+    # HIRAS2 - this tests the variable_for_quality_control option
+    output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
+                              'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m', 'air_pressure_at_sea_level'],
+                             ['air_potential_temperature', 'water_vapor_mixing_ratio_wrt_moist_air', 'cloud_ice_mixing_ratio_wrt_moist_air_and_condensed_water',
+                              'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water', 'air_pressure_levels',
+                              'cloud_volume_fraction_in_atmosphere_layer', 'liquid_cloud_volume_fraction_in_atmosphere_layer', 'ice_cloud_volume_fraction_in_atmosphere_layer'],
+                             'testinput/cx_globalnamelist_hiras2.nc4')
+
     # GroundGPS
     output_full_cx_to_netcdf(['skin_temperature_at_surface', 'ice_area_fraction', 'height_above_mean_sea_level_at_surface', 'air_pressure_at_surface', 'eastward_wind_at_10m',
                               'northward_wind_at_10m', 'air_temperature_at_2m', 'relative_humidity_at_2m'],
@@ -1353,4 +1374,3 @@ if __name__ == "__main__":
                               'cloud_liquid_water_mixing_ratio_wrt_moist_air_and_condensed_water',
                               'dimensionless_exner_function_levels', 'qrain'],
                              'testinput/cx_ukvnamelist_radar_reflectivity.nc4')
-

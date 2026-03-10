@@ -68,7 +68,7 @@ INTEGER, PARAMETER :: ObsGroupGMIlow       =  56 ! => GMI low freq channels
 INTEGER, PARAMETER :: ObsGroupGMIhigh      =  57 ! => GMI high freq channels
 INTEGER, PARAMETER :: ObsGroupHLOSwind     =  58 ! => ALADIN-AEOLUS HLOS wind
 INTEGER, PARAMETER :: ObsGroupOceanColour  =  59 ! => Ocean Colour Data
-INTEGER, PARAMETER :: ObsGroupHIRAS        =  60 ! => HIRAS 
+INTEGER, PARAMETER :: ObsGroupHIRAS        =  60 ! => HIRAS
 INTEGER, PARAMETER :: ObsGroupOceanWinds   =  61 ! => Satellite wind speeds
 INTEGER, PARAMETER :: ObsGroupGIIRSLW      =  62 ! => GIIRS LW radiances
 INTEGER, PARAMETER :: ObsGroupGIIRSMW      =  63 ! => GIIRS MW radiances
@@ -79,9 +79,10 @@ INTEGER, PARAMETER :: ObsGroupMTGIRS         =  67 ! => MTG-IRS radiances
 INTEGER, PARAMETER :: ObsGroupFCIASR         =  68 ! => FCI all-sky radiances
 INTEGER, PARAMETER :: ObsGroupFCIClr         =  69 ! => FCI clear-sky radiances
 INTEGER, PARAMETER :: ObsGroupSternaMWR      =  70 ! => AWS & Sterna microwave radiances
-INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS 
+INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS
 INTEGER, PARAMETER :: ObsGroupMWSFY3E        =  72 ! => FY3E microwave sounder data
-INTEGER, PARAMETER :: max_obs_group_num      =  72 ! Number of observation groups
+INTEGER, PARAMETER :: ObsGroupHIRAS2         =  74 ! => HIRAS Radiances
+INTEGER, PARAMETER :: max_obs_group_num      =  74 ! Number of observation groups
 
 CONTAINS
 
