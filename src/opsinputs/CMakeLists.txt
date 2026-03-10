@@ -73,7 +73,7 @@ ecbuild_add_library( TARGET   opsinputs
                      HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/opsinputs
                      LINKER_LANGUAGE ${OPSINPUTS_LINKER_LANGUAGE}
                      PRIVATE_INCLUDES ${OPS_INCLUDE_DIR} )
-target_link_libraries( opsinputs PUBLIC ufo ioda oops PRIVATE ops )
+target_link_libraries( opsinputs PUBLIC ufo ioda oops ops )
 
 ## Include paths
 target_include_directories(opsinputs PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
