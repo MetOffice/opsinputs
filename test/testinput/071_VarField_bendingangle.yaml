@@ -67,9 +67,9 @@ observations:
         time:     ["-3540.00000", "-3540.00000",
                    "-3480.00000", "-3480.00000", 
                    "-3360.00000", "-3360.00000"]
-        Callsign: ["0003000000000000", "0003000000000000",
-                   "0003000010000001", "0003000010000001",
-                   "0720000030000003", "0720000030000003"]
+        Callsign: ["0003000000000001", "0003000000000001",
+                   "0003000010000010", "0003000010000010",
+                   "0720000030000030", "0720000030000030"]
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

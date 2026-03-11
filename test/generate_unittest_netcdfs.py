@@ -393,6 +393,9 @@ def output_2d_simulated_var_to_netcdf(var_name, file_name, with_bias=False, with
         var = f.createVariable('MetaData/satelliteIdentifier', 'i', ('Location',))
         var[:] = [3, 3, 5, 720]
 
+    var = f.createVariable('MetaData/qualityFlags', 'i', ('Location',))
+    var[:] = [8192, 0, 0, 0]
+
     # Create Variables
     var = f.createVariable('ObsValue/' + var_name, 'f', ('Location', 'Channel'))
     var[:, :] = [[1.1, 2.1, 3.1],
@@ -852,7 +855,8 @@ if __name__ == "__main__":
                                   'ObsValue/bendingAngle',
                                   'ObsError/bendingAngle'],
                                  [],
-                                 ['MetaData/satelliteIdentifier'],
+                                 ['MetaData/satelliteIdentifier',
+                                  'MetaData/qualityFlags'],
                                  'testinput/varobs_globalnamelist_gnssro.nc4')
 
     # Sonde
