@@ -1117,6 +1117,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
             arrayindex = arrayindex + offsetsize
           else
             arrayindex = varChannels(iChannel)
+            write (ErrorMessage, '(A,A)') "PJL: arrayindex, iChannel, varChannels(iChannel): ", arrayindex, iChannel, varChannels(iChannel)
+            call gen_warn(RoutineName, ErrorMessage)
           end if
 	else
 	  exit
@@ -1131,6 +1133,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
         if (sizeOfVarobsArray > size(channels)) then
           if (.not. compressChannels) then
             arrayindex = Channels(iChannel)
+            write (ErrorMessage, '(A,A)') "PJL: arrayindex, iChannel, Channels(iChannel): ", arrayindex, iChannel, Channels(iChannel)
+            call gen_warn(RoutineName, ErrorMessage)
           end if
         end if
       end if ! the end
