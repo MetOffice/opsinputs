@@ -56,7 +56,6 @@ observations:
     - filter: VarObs Checker
       expected_main_table_columns:
         # Rows are locations, columns are filter variables
-        # The blacklist doesn't stop the missing ob from being written out because of the above "bad" settings
         field: [3,4,5,78,
         3,4,5,78,
         3,4,5,78]
