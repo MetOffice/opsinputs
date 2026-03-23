@@ -717,6 +717,8 @@ integer                                               :: iobs
 character(len=200)                                    :: varname
 logical                                               :: FillChanNum = .false.
 logical                                               :: FillNumChans = .false.
+integer                                               :: ichan, nan_count_brierror, nan_count_channums
+real(real64)                                          :: test_val
 
 ! Body:
 
@@ -1224,10 +1226,6 @@ do iVarField = 1, nVarFields
 end do
 
 ! Debug: Check for NaN in observation data for SEVIRIClr
-integer :: ichan, nan_count_brierror, nan_count_channums
-real(real64) :: test_val
-! (iobs is already declared in the subroutine)
-
 if (trim(self % ObsGroupName) == "SEVIRIClr") then
   nan_count_brierror = 0
   nan_count_channums = 0
