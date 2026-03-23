@@ -1377,9 +1377,15 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 
 ChannelIndicesVar(:,:) = 0
 
-if (FillChanNum) then
-  call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
-                 num_levels = NumChannels)
+  if (FillChanNum) then
+    ! If varChannels is smaller than channels, allocate ChanNum with num_levels = size(varChannels)
+    if (size(varChannels) > 0 .and. size(varChannels) < size(channels)) then
+      call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
+                     num_levels = size(varChannels))
+    else
+      call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
+                     num_levels = NumChannels)
+    end if
   if ((varObsSize_loc /= 0)) then
     if (varObsSize_loc > size(channels)) then
       if (size(varChannels) > 0 .and. (size(channels) == size(varChannels))) then
@@ -1400,23 +1406,30 @@ if (FillChanNum) then
           Ob % ChanNum = ChannelIndicesVar
         end if
       else if (size(varChannels) > 0 .and. (size(varChannels) < size(channels))) then
-        ChannelIndicesVar(:,:) = IMDI
-        do iObs = 1, Ob % Header % NumObsLocal
-          iVarChannel = 0
-          do iChannel = 1, ChannelCounts(iObs)
-            if (ChannelIndices(iObs, iChannel) > 0 .and. &
-                ChannelIndices(iObs, iChannel) <= size(channels)) then
-              do array_loop = 1, size(varChannels)
-                if (channels(ChannelIndices(iObs, iChannel)) == varChannels(array_loop)) then
-                  iVarChannel = iVarChannel + 1
-                  ChannelIndicesVar(iObs, iVarChannel) = varChannels(array_loop)
-                  exit
-                end if
-              end do
+          ! Only fill up to the number of varChannels, do not pad with IMDI
+          ChannelIndicesVar(:,:) = 0
+          do iObs = 1, Ob % Header % NumObsLocal
+            iVarChannel = 0
+            do iChannel = 1, ChannelCounts(iObs)
+              if (ChannelIndices(iObs, iChannel) > 0 .and. &
+                  ChannelIndices(iObs, iChannel) <= size(channels)) then
+                do array_loop = 1, size(varChannels)
+                  if (channels(ChannelIndices(iObs, iChannel)) == varChannels(array_loop)) then
+                    if (iVarChannel < size(varChannels)) then
+                      iVarChannel = iVarChannel + 1
+                      ChannelIndicesVar(iObs, iVarChannel) = varChannels(array_loop)
+                    end if
+                    exit
+                  end if
+                end do
+              end if
+            end do
+            ! Zero out any remaining entries above iVarChannel (if any)
+            if (iVarChannel < size(varChannels)) then
+              ChannelIndicesVar(iObs, (iVarChannel+1):size(varChannels)) = 0
             end if
           end do
-        end do
-        Ob % ChanNum = ChannelIndicesVar
+          Ob % ChanNum = ChannelIndicesVar
       else
         if (compressChannels) then
           Ob % ChanNum = ChannelIndices
