@@ -1286,6 +1286,7 @@ integer(integer64), allocatable :: ChannelIndicesVar(:,:)
 integer(integer64)              :: ChannelIndices(Ob % Header % NumObsLocal, size(channels))
 integer(integer64)              :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                         :: iChannel
+integer                         :: iVarChannel
 integer                         :: iObs
 real(kind=c_double)             :: MissingDouble
 integer(integer64)              :: array_loop
@@ -1351,6 +1352,24 @@ if (FillChanNum) then
           end do
           Ob % ChanNum = ChannelIndicesVar
         end if
+      else if (size(varChannels) > 0 .and. (size(varChannels) < size(channels))) then
+        ChannelIndicesVar(:,:) = IMDI
+        do iObs = 1, Ob % Header % NumObsLocal
+          iVarChannel = 0
+          do iChannel = 1, ChannelCounts(iObs)
+            if (ChannelIndices(iObs, iChannel) > 0 .and. &
+                ChannelIndices(iObs, iChannel) <= size(channels)) then
+              do array_loop = 1, size(varChannels)
+                if (channels(ChannelIndices(iObs, iChannel)) == varChannels(array_loop)) then
+                  iVarChannel = iVarChannel + 1
+                  ChannelIndicesVar(iObs, iVarChannel) = varChannels(array_loop)
+                  exit
+                end if
+              end do
+            end if
+          end do
+        end do
+        Ob % ChanNum = ChannelIndicesVar
       else
         if (compressChannels) then
           Ob % ChanNum = ChannelIndices
