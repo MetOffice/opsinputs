@@ -1493,7 +1493,18 @@ end if
 
 if (FillNumChans) then
   call Ops_Alloc(Ob % Header % NumChans, "NumChans", Ob % Header % NumObsLocal, Ob % NumChans)
-  Ob % NumChans = ChannelCounts
+  ! When ChanNum is restricted to varChannels (a strict subset of channels), NumChans must
+  ! count only the QC-passing channels that are also in varChannels — not all QC-passing
+  ! channels from the full channels list (ChannelCounts). If NumChans > size(varChannels)
+  ! then VAR would read ChanNum out of bounds.
+  if (FillChanNum .and. associated(Ob % ChanNum) .and. &
+      size(varChannels) > 0 .and. size(varChannels) < size(channels) .and. varObsSize_loc /= 0) then
+    do iObs = 1, Ob % Header % NumObsLocal
+      Ob % NumChans(iObs) = count(Ob % ChanNum(iObs, :) > 0)
+    end do
+  else
+    Ob % NumChans = ChannelCounts
+  end if
 end if
 end subroutine opsinputs_varobswriter_fillchannumandnumchans
 
