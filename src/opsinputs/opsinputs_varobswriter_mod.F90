@@ -1447,7 +1447,28 @@ ChannelIndicesVar(:,:) = 0
         end if
       end if
     else if (varObsSize_loc == size(channels)) then
-      if (size(varChannels) > 0) then
+      if (size(varChannels) > 0 .and. size(varChannels) < size(channels)) then
+        ! varChannels is a true subset of channels: look up each passing channel in varChannels
+        ! and store the actual channel number at the next compact ChanNum slot.
+        do iObs = 1, Ob % Header % NumObsLocal
+          iVarChannel = 0
+          do iChannel = 1, ChannelCounts(iObs)
+            if (ChannelIndices(iObs, iChannel) > 0 .and. &
+                ChannelIndices(iObs, iChannel) <= size(channels)) then
+              do array_loop = 1, size(varChannels)
+                if (channels(ChannelIndices(iObs, iChannel)) == varChannels(array_loop)) then
+                  if (iVarChannel < size(varChannels)) then
+                    iVarChannel = iVarChannel + 1
+                    ChannelIndicesVar(iObs, iVarChannel) = varChannels(array_loop)
+                  end if
+                  exit
+                end if
+              end do
+            end if
+          end do
+        end do
+        Ob % ChanNum = ChannelIndicesVar
+      else if (size(varChannels) > 0) then
         do iChannel=1,  NumChannels
           if (compressChannels) then
             do iObs=1, Ob % Header % NumObsLocal
