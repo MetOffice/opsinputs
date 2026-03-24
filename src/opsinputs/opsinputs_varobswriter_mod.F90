@@ -1378,10 +1378,11 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 ChannelIndicesVar(:,:) = 0
 
   if (FillChanNum) then
-    ! If varChannels is smaller than channels, allocate ChanNum with num_levels = size(varChannels)
+    ! Allocate ChanNum, using size(varChannels) when it is a subset of all channels so that the
+    ! header (Ob % Header % ChanNum) is also properly initialised for Ops_CheckVarFields.
     if (size(varChannels) > 0 .and. size(varChannels) < size(channels)) then
       call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
-                     num_levels = size(varChannels))
+                     num_levels = int(size(varChannels), kind=integer64))
     else
       call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                      num_levels = NumChannels)
@@ -1404,6 +1405,11 @@ ChannelIndicesVar(:,:) = 0
             end if
           end do
           Ob % ChanNum = ChannelIndicesVar
+          ! DEBUG: Print a sample of ChanNum after filling
+          write(*, '(A)') '[DEBUG] Sample ChanNum values after filling:'
+          do iobs = 1, min(3, size(Ob % ChanNum, 1))
+            write(*, '(A,I0,A,10I8)') '  Obs ', iobs, ':', Ob % ChanNum(iobs, 1:min(10, size(Ob % ChanNum,2)))
+          end do
         end if
       else if (size(varChannels) > 0 .and. (size(varChannels) < size(channels))) then
           ! Only fill up to the number of varChannels, do not pad with IMDI
