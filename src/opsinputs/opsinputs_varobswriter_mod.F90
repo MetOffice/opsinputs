@@ -1378,9 +1378,12 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 ChannelIndicesVar(:,:) = 0
 
   if (FillChanNum) then
-    ! Allocate ChanNum, using size(varChannels) when it is a subset of all channels so that the
-    ! header (Ob % Header % ChanNum) is also properly initialised for Ops_CheckVarFields.
-    if (size(varChannels) > 0 .and. size(varChannels) < size(channels)) then
+    ! Allocate ChanNum. Use size(varChannels) as num_levels only when we have a non-trivial
+    ! varobs array size AND varChannels is a strict subset of channels — those are the only
+    ! branches that fill ChanNum from ChannelIndicesVar (which is sized to varChannels).
+    ! In all other cases (including varObsSize_loc == 0 where we assign ChannelIndices
+    ! directly) allocate with NumChannels = size(channels) so shapes always match.
+    if (size(varChannels) > 0 .and. size(varChannels) < size(channels) .and. varObsSize_loc /= 0) then
       call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                      num_levels = int(size(varChannels), kind=integer64))
     else
