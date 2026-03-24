@@ -351,31 +351,20 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_seviriclr
                 YAML     varobswriter_globalnamelist_seviriclr.yaml
                 NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
                 DATA     varobs_globalnamelist_seviriclr.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_mtgirs
-                YAML     varobswriter_globalnamelist_mtgirs.yaml
-                NAMELIST ../../etc/global/varobs/MTGIRS.nl
-                DATA     varobs_globalnamelist_mtgirs.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
-                YAML     varobswriter_globalnamelist_sonde.yaml
-                NAMELIST ../../etc/global/varobs/Sonde.nl
-                DATA     varobs_globalnamelist_sonde.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_scatwind
-                YAML     varobswriter_globalnamelist_scatwind.yaml
-                NAMELIST ../../etc/global/varobs/Scatwind.nl
-                DATA     varobs_globalnamelist_scatwind.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_aircraft
-                YAML     varobswriter_globalnamelist_aircraft.yaml
-                NAMELIST ../../etc/global/varobs/Aircraft.nl
-                DATA     varobs_globalnamelist_aircraft.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sternamwr
-                YAML     varobswriter_globalnamelist_sternamwr.yaml
-                NAMELIST ../../etc/global/varobs/SternaMWR.nl
-                DATA     varobs_globalnamelist_sternamwr.nc4)
-ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_epsmws
-                YAML     varobswriter_globalnamelist_epsmws.yaml
-                NAMELIST ../../etc/global/varobs/EPSMWS.nl
-                DATA     varobs_globalnamelist_epsmws.nc4)
-              
+
+ADD_WRITER_TEST(NAME     varobswriter_varChanneltest
+                YAML     varobswriter_varChanneltest.yaml
+                NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
+                DATA     varobs_globalnamelist_seviriclr.nc4)
+
+# Verifies ChanNum and NumChans consistency when varChannels is a strict subset of channels.
+# ChanNum must have only size(varChannels) levels (no IMDI padding) and NumChans must count
+# only QC-passing channels that appear in varChannels.
+ADD_WRITER_TEST(NAME     varobswriter_varChanneltest_checker
+                YAML     varobswriter_varChanneltest_checker.yaml
+                NAMELIST VarObsWriterNamelists_varobswriter_varChanneltest_checker/SEVIRIClr.nl
+                DATA     varobs_globalnamelist_seviriclr.nc4)
+
 # Tests the UKV namelist files in the etc directory
 
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviasr

@@ -1378,11 +1378,11 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 ChannelIndicesVar(:,:) = 0
 
   if (FillChanNum) then
-    ! Allocate ChanNum. Use size(varChannels) as num_levels only when we have a non-trivial
-    ! varobs array size AND varChannels is a strict subset of channels — those are the only
-    ! branches that fill ChanNum from ChannelIndicesVar (which is sized to varChannels).
-    ! In all other cases (including varObsSize_loc == 0 where we assign ChannelIndices
-    ! directly) allocate with NumChannels = size(channels) so shapes always match.
+    ! Allocate ChanNum. Use size(varChannels) as num_levels when varChannels is a strict
+    ! subset of channels and varObsSize_loc is non-zero (covers both size_of_varobs_array
+    ! equal to size(varChannels) and equal to size(channels)).
+    ! When varObsSize_loc == 0 we assign ChannelIndices directly, so allocate with NumChannels
+    ! = size(channels) so shapes always match.
     if (size(varChannels) > 0 .and. size(varChannels) < size(channels) .and. varObsSize_loc /= 0) then
       call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
                      num_levels = int(size(varChannels), kind=integer64))
@@ -1449,7 +1449,10 @@ ChannelIndicesVar(:,:) = 0
           Ob % ChanNum = ChannelIndices
         end if
       end if
-    else if (varObsSize_loc == size(channels)) then
+    else
+      ! varObsSize_loc > 0 and <= size(channels): covers both the case where the varobs
+      ! array is sized to size(varChannels) (the natural subset case, varObsSize_loc == size(varChannels))
+      ! and the case where it equals size(channels). The sub-branches below guard independently.
       if (size(varChannels) > 0 .and. size(varChannels) < size(channels)) then
         ! varChannels is a true subset of channels: look up each passing channel in varChannels
         ! and store the actual channel number at the next compact ChanNum slot.
