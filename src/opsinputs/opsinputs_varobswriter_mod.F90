@@ -717,8 +717,7 @@ integer                                               :: iobs
 character(len=200)                                    :: varname
 logical                                               :: FillChanNum = .false.
 logical                                               :: FillNumChans = .false.
-integer                                               :: ichan, nan_count_brierror, nan_count_channums
-real(real64)                                          :: test_val
+
 
 ! Body:
 
@@ -1225,51 +1224,6 @@ do iVarField = 1, nVarFields
 
 end do
 
-! Debug: Check for NaN in observation data for SEVIRIClr
-if (trim(self % ObsGroupName) == "SEVIRIClr") then
-  nan_count_brierror = 0
-  nan_count_channums = 0
-  
-  if (associated(Ob % BriTempVarError)) then
-    do iobs = 1, Ob % Header % NumObsLocal
-      do ichan = 1, size(Ob % BriTempVarError, 2)
-        test_val = Ob % BriTempVarError(iobs, ichan)
-        if (test_val /= test_val .or. test_val > 1.0e10 .or. test_val < -1.0e10) then
-          nan_count_brierror = nan_count_brierror + 1
-          if (nan_count_brierror <= 5) then
-            write(*, '(A,I0,A,I0,A,E20.10)') &
-              "[DEBUG] SEVIRIClr BriTempVarError NaN at obs=", iobs, &
-              " chan=", ichan, " val=", test_val
-          end if
-        end if
-      end do
-    end do
-    if (nan_count_brierror > 0) then
-      write(*, '(A,I0)') "[DEBUG] SEVIRIClr Total BriTempVarError NaNs: ", nan_count_brierror
-    end if
-  end if
-  
-  if (associated(Ob % ChanNum) .and. associated(Ob % NumChans)) then
-    do iobs = 1, Ob % Header % NumObsLocal
-      if (Ob % NumChans(iobs) > 0) then
-        do ichan = 1, Ob % NumChans(iobs)
-          if (Ob % ChanNum(iobs, ichan) <= 0 .or. Ob % ChanNum(iobs, ichan) > 1000) then
-            nan_count_channums = nan_count_channums + 1
-            if (nan_count_channums <= 5) then
-              write(*, '(A,I0,A,I0,A,I0)') &
-                "[DEBUG] SEVIRIClr ChanNum invalid at obs=", iobs, &
-                " index=", ichan, " val=", Ob % ChanNum(iobs, ichan)
-            end if
-          end if
-        end do
-      end if
-    end do
-    if (nan_count_channums > 0) then
-      write(*, '(A,I0)') "[DEBUG] SEVIRIClr Total ChanNum anomalies: ", nan_count_channums
-    end if
-  end if
-end if
-
 end subroutine opsinputs_varobswriter_populateobservations
 
 ! ------------------------------------------------------------------------------
@@ -1408,11 +1362,6 @@ ChannelIndicesVar(:,:) = 0
             end if
           end do
           Ob % ChanNum = ChannelIndicesVar
-          ! DEBUG: Print a sample of ChanNum after filling
-          write(*, '(A)') '[DEBUG] Sample ChanNum values after filling:'
-          do iobs = 1, min(3, size(Ob % ChanNum, 1))
-            write(*, '(A,I0,A,10I8)') '  Obs ', iobs, ':', Ob % ChanNum(iobs, 1:min(10, size(Ob % ChanNum,2)))
-          end do
         end if
       else if (size(varChannels) > 0 .and. (size(varChannels) < size(channels))) then
           ! Only fill up to the number of varChannels, do not pad with IMDI
