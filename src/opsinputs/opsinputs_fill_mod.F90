@@ -964,7 +964,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                 :: Real1(:)
+real(real64), pointer, intent(inout)               :: Real1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -1051,7 +1051,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)             :: Hdr
 character(len=*), intent(in)                        :: OpsVarName
 integer(integer64), intent(in)                      :: NumObs
-real(real64), pointer, intent(out)                  :: Real2(:,:)
+real(real64), pointer, intent(inout)                :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
@@ -1179,7 +1179,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                 :: Real2(:,:)
+real(real64), pointer, intent(inout)               :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
@@ -1269,7 +1269,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)             :: Hdr
 character(len=*), intent(in)                        :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in)  :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                  :: Real2(:,:)
+real(real64), pointer, intent(inout)                :: Real2(:,:)
 type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
 integer(integer64), intent(in)                      :: VarobsLength
@@ -1354,7 +1354,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 integer(integer64), intent(in)                     :: NumObs
-real(real64), pointer, intent(out)                 :: Real1(:)
+real(real64), pointer, intent(inout)               :: Real1(:)
 type(ufo_geovals), intent(in)                      :: GeoVals
 character(len=*), intent(in)                       :: JediVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
@@ -1443,7 +1443,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer, intent(out)              :: Real2(:,:)
+real(real64), pointer, intent(inout)            :: Real2(:,:)
 type(ufo_geovals), intent(in)                   :: GeoVals
 logical, intent(in)                             :: GeoVaLsAreTopToBottom
 character(len=*), intent(in)                    :: JediVarName
@@ -1578,7 +1578,7 @@ implicit none
 ! Subroutine arguments:
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
-real(real64), pointer, intent(out)                 :: Real2(:,:)
+real(real64), pointer, intent(inout)               :: Real2(:,:)
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 real(c_double), intent(in)                         :: hofx(:)
 character(len=*), intent(in)                       :: JediVarName
@@ -1654,7 +1654,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 integer(integer64), intent(in)                     :: NumObs
-real(real64), pointer, intent(out)                 :: Real1(:)
+real(real64), pointer, intent(inout)               :: Real1(:)
 character(len=*), intent(in)                       :: JediVarName
 type(ufo_geovals), intent(in)                      :: GeoVals
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
@@ -1718,7 +1718,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 integer(integer64), intent(in)                     :: NumObs
-real(real64), pointer, intent(out)                 :: Real2(:,:)
+real(real64), pointer, intent(inout)               :: Real2(:,:)
 character(len=*), intent(in)                       :: JediVarName
 type(ufo_geovals), intent(in)                      :: GeoVals
 logical, intent(in)                                :: GeoVaLsAreTopToBottom
@@ -1875,7 +1875,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-integer(integer64), pointer, intent(out)           :: Int2(:,:)
+integer(integer64), pointer, intent(inout)         :: Int2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 integer(integer64), intent(in)                     :: VarobsLength
@@ -2049,7 +2049,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                 :: Real1(:)
+real(real64), pointer, intent(inout)               :: Real1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -2125,7 +2125,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer, intent(out)              :: Real2(:,:)
+real(real64), pointer, intent(inout)            :: Real2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
@@ -2200,7 +2200,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                 :: Real2(:,:)
+real(real64), pointer, intent(inout)               :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
@@ -2297,7 +2297,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-real(real64), pointer, intent(out)                 :: Real2(:,:)
+real(real64), pointer, intent(inout)               :: Real2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 integer(integer64), intent(in)                     :: VarobsLength
