@@ -98,7 +98,7 @@ SELECT CASE (num)
   CASE (ObsTypeHIRASHR, ObsTypeHIRASFSRHR)
     name = "CRIMSSHR"
   CASE (ObsTypeHIRAS2)
-    name = "CRIMSF"
+    name = "HIRAS2"
   CASE (ObsTypeDropsonde)
     name = "DROPSOND"
   CASE (ObsTypeRadwind)
