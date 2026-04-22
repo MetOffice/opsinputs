@@ -51,8 +51,8 @@ class CxWriter : public ufo::ObsFilterBase,
   typedef CxWriterParameters Parameters_;
 
   CxWriter(ioda::ObsSpace &, const Parameters_ &,
-           std::shared_ptr<ioda::ObsDataVector<int> > flags,
-           std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
+           ioda::ObsDataVector<int> & flags,
+           ioda::ObsDataVector<float> & obsErrors);
   ~CxWriter();
 
   void preProcess() override {}
@@ -78,8 +78,8 @@ class CxWriter : public ufo::ObsFilterBase,
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::ObsVariables extradiagvars_;
-  std::shared_ptr<ioda::ObsDataVector<int>> flags_;
-  std::shared_ptr<ioda::ObsDataVector<float>> obsErrors_;
+  ioda::ObsDataVector<int> flags_;
+  ioda::ObsDataVector<float> obsErrors_;
 
   CxWriterParameters parameters_;
 };
