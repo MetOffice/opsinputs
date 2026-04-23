@@ -78,8 +78,8 @@ class CxWriter : public ufo::ObsFilterBase,
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::ObsVariables extradiagvars_;
-  ioda::ObsDataVector<int> flags_;
-  ioda::ObsDataVector<float> obsErrors_;
+  ioda::ObsDataVector<int> & flags_;
+  ioda::ObsDataVector<float> & obsErrors_;
 
   CxWriterParameters parameters_;
 };
