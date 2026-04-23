@@ -37,7 +37,7 @@ void ResetFlagsToPass::postFilter(const ufo::GeoVaLs &,
                                   const ufo::ObsDiagnostics &) {
   oops::Log::trace() << "ResetFlagsToPass postFilter" << std::endl;
   for (size_t v = 0; v < flags_.nvars(); ++v) {
-    ioda::ObsDataRow<int> &varflags = (flags_)[v];
+    ioda::ObsDataRow<int> &varflags = flags_[v];
     for (size_t i = 0; i < flags_.nlocs(); ++i)
       if (oops::contains(flagsToReset_, varflags[i]))
         varflags[i] = ufo::QCflags::pass;
