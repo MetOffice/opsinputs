@@ -50,8 +50,8 @@ class ResetFlagsToPass : public ufo::ObsFilterBase,
   typedef ResetFlagsToPassParameters Parameters_;
 
   ResetFlagsToPass(ioda::ObsSpace &, const Parameters_ &,
-                   std::shared_ptr<ioda::ObsDataVector<int> > flags,
-                   std::shared_ptr<ioda::ObsDataVector<float> > obsErrors);
+                   ioda::ObsDataVector<int> & flags,
+                   ioda::ObsDataVector<float> & obsErrors);
   ~ResetFlagsToPass();
 
   void preProcess() override {}
@@ -71,7 +71,7 @@ class ResetFlagsToPass : public ufo::ObsFilterBase,
   ioda::ObsSpace & obsdb_;
   oops::Variables geovars_;
   oops::ObsVariables extradiagvars_;
-  std::shared_ptr<ioda::ObsDataVector<int>> flags_;
+  ioda::ObsDataVector<int> & flags_;
 
   ResetFlagsToPassParameters parameters_;
 
