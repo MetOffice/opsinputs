@@ -1311,8 +1311,8 @@ real(real64), allocatable :: Uunrot(:)               ! Array for unrotated wind 
 real(real64), allocatable :: Vunrot(:)               ! Array for unrotated wind v component
 real(real64), allocatable :: U10unrot(:)             ! Array for unrotated wind u10 component
 real(real64), allocatable :: V10unrot(:)             ! Array for unrotated wind v10 component
-logical                   :: UpperWinds   = .false.  ! Upper air wind u and v components present
-logical                   :: SurfaceWinds = .false.  ! Surface wind u and v components present
+logical, save             :: UpperWinds   = .false.  ! Upper air wind u and v components present
+logical, save             :: SurfaceWinds = .false.  ! Surface wind u and v components present
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)

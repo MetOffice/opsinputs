@@ -122,7 +122,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El1(:)
+type(Element_type), pointer, intent(inout)      :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
@@ -246,7 +246,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
+type(Element_type), pointer, intent(inout)      :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 type(c_ptr), value, intent(in)                  :: Flags
@@ -377,7 +377,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(Element_type), pointer                        :: El2(:,:)
+type(Element_type), pointer, intent(inout)         :: El2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
@@ -538,7 +538,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(Element_type), pointer                        :: El2(:,:)
+type(Element_type), pointer, intent(inout)         :: El2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 type(c_ptr), value, intent(in)                     :: Flags
@@ -607,7 +607,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El1(:)
+type(Element_type), pointer, intent(inout)      :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
@@ -720,7 +720,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
+type(Element_type), pointer, intent(inout)      :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediValueVarName
@@ -850,7 +850,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
+type(Element_type), pointer, intent(inout)      :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Levels(:)
 character(len=*), intent(in)                    :: JediValueVarName
@@ -1795,7 +1795,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-integer(integer64), pointer                        :: Int1(:)
+integer(integer64), pointer, intent(inout)         :: Int1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -1952,7 +1952,7 @@ type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 integer(integer64), intent(in)                     :: StringLen
-character(len=StringLen), pointer                  :: String1(:)
+character(len=StringLen), pointer, intent(inout)   :: String1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -2361,7 +2361,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(coord_type), pointer                       :: Coord2(:,:)
+type(coord_type), pointer, intent(inout)        :: Coord2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
@@ -2430,7 +2430,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(coord_type), pointer                          :: Coord2(:,:)
+type(coord_type), pointer, intent(inout)           :: Coord2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -2502,7 +2502,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(coord_type), pointer                          :: Coord2(:,:)
+type(coord_type), pointer, intent(inout)           :: Coord2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 character(len=*), intent(in)                       :: JediVarName

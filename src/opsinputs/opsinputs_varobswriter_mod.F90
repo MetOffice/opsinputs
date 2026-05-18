@@ -715,8 +715,8 @@ integer                                               :: nVarFields
 integer                                               :: iVarField
 integer                                               :: iobs
 character(len=200)                                    :: varname
-logical                                               :: FillChanNum = .false.
-logical                                               :: FillNumChans = .false.
+logical, save                                         :: FillChanNum = .false.
+logical, save                                         :: FillNumChans = .false.
 
 ! Body:
 
@@ -1518,7 +1518,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real2(:,:)
+real(real64), pointer, intent(inout)            :: Real2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName

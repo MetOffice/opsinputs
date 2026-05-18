@@ -28,6 +28,12 @@ line-length=140
     "C061", # missing-intent
     "C091", # external-procedure
 ]
+"src/opsinputs/opsinputs_obsdatavector_interface.f90" = [
+    "C071", # assumed-size
+]
+"src/opsinputs/opsinputs_obsspace_interface.f90" = [
+    "C071", # assumed-size
+]
 "src/opsinputs/opsinputs_varobswriter_mod.F90" = [
     "C091", # external-procedure
     "C121", # use-all
