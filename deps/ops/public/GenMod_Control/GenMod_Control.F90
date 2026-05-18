@@ -16,7 +16,7 @@ USE, INTRINSIC :: ISO_C_BINDING, ONLY: &
 IMPLICIT NONE
 
 INTEGER, PARAMETER                 :: LenDocumentationURL = 100
-CHARACTER(len=LenDocumentationURL) :: DocumentationURL = '.'
+CHARACTER(len=LenDocumentationURL) :: DocumentationURL = "."
 LOGICAL                            :: ProduceHTML = .TRUE.
 INTEGER                            :: mype = 0 ! This processor's number:  0 <= mype < NPROC.
 INTEGER                            :: nproc = 1  ! Number of processors

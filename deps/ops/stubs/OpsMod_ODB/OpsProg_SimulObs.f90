@@ -52,7 +52,7 @@ REAL, ALLOCATABLE               :: x(:,:)
 REAL, ALLOCATABLE               :: z(:)
 REAL                            :: rblank8
 REAL                            :: mdi
-CHARACTER(len=8), PARAMETER     :: cblank8 = ''
+CHARACTER(len=8), PARAMETER     :: cblank8 = ""
 LOGICAL, ALLOCATABLE            :: LL_offset(:)
 CHARACTER(len=300)              :: messages(3)
 TYPE (arguments_type)           :: args
@@ -80,14 +80,14 @@ CALL args % process (input_file)
 !-- Open database
 !   -------------
 
-session % dbname = 'ECMA'
+session % dbname = "ECMA"
 session % npools = 1
 
 CALL ops_odb_open (session, &
-                   'NEW')
+                   "NEW")
 
 !-- Loop over input files and fill appropriate database table
-!   When the same table appears multiple times, 
+!   When the same table appears multiple times,
 !   increment the pool number (modulo npools)
 
 preset_num_rows = .FALSE.
@@ -102,13 +102,13 @@ DO jf = 1, SIZE (input_file)
   in_data = .FALSE.
   num_constant_columns = 0
   DO
-    READ (unit, '(A)', IOSTAT = iostat) buffer
+    READ (unit, "(A)", IOSTAT = iostat) buffer
     IF (iostat == 0) THEN
-      IF (buffer(1:1) == '#') THEN
+      IF (buffer(1:1) == "#") THEN
         tblname = buffer(2:)
-      ELSE IF (buffer(1:1) == '$') THEN
+      ELSE IF (buffer(1:1) == "$") THEN
         IF (buffer(2:INDEX (buffer, "=") - 1) == "rows") THEN
-          READ (buffer(INDEX (buffer, '=') + 1:), *) nrows
+          READ (buffer(INDEX (buffer, "=") + 1:), *) nrows
         END IF
         preset_num_rows = .TRUE.
         constant_rows_only = .TRUE.
@@ -159,9 +159,9 @@ DO jf = 1, SIZE (input_file)
   in_data = .FALSE.
   constant_column_number = 0
   DO
-    READ (unit, '(A)', IOSTAT = iostat) buffer
+    READ (unit, "(A)", IOSTAT = iostat) buffer
     IF (iostat == 0) THEN
-      IF (buffer(1:1) == '#' .OR. buffer(1:1) == '$') THEN
+      IF (buffer(1:1) == "#" .OR. buffer(1:1) == "$") THEN
       ELSE IF (INDEX (buffer, "=") > 0) THEN
         constant_column_number = constant_column_number + 1
         constant_columns(constant_column_number) = buffer(1:INDEX (buffer, "=") - 1)
@@ -182,7 +182,7 @@ DO jf = 1, SIZE (input_file)
     END IF
   END DO
 
-  IF (tblname(1:1) /= '@') tblname = '@' // TRIM (tblname)
+  IF (tblname(1:1) /= "@") tblname = "@" // TRIM (tblname)
 
   ncols_all = ops_odb_get_num_columns (session, tblname)
 
@@ -199,15 +199,15 @@ DO jf = 1, SIZE (input_file)
                                  tblname, &
                                  ctype)
 
-  LL_offset(:) = cvar(:)(1:11) == 'LINKOFFSET('
+  LL_offset(:) = cvar(:)(1:11) == "LINKOFFSET("
   is_string(:) = .FALSE.
-  WHERE (ctype(:) == 'string') is_string(:) = .TRUE.
+  WHERE (ctype(:) == "string") is_string(:) = .TRUE.
 
   ALLOCATE (x(nrows,0:ncols_all))
   x(:,:) = 0
   rblank8 = TRANSFER (cblank8,rblank8)
   DO j = 1, ncols_all
-    IF (ctype(j) == 'string') THEN
+    IF (ctype(j) == "string") THEN
       DO i = 1, nrows
         x(i,j) = rblank8
       END DO
@@ -228,8 +228,8 @@ DO jf = 1, SIZE (input_file)
   mdi = session % odb_mdi
 
   IF (ANY (colmap(:) < 0 .OR. colmap(:) > ncols_all)) THEN
-    WRITE (messages(1), '(A,I0,A)') 'Error: Some column ids out of range [1:',ncols_all,']'
-    CALL gen_fail ('MAIN',      &
+    WRITE (messages(1), "(A,I0,A)") "Error: Some column ids out of range [1:",ncols_all,"]"
+    CALL gen_fail ("MAIN",      &
                    messages(1))
   END IF
 
@@ -250,7 +250,7 @@ DO jf = 1, SIZE (input_file)
   IF (.NOT. constant_rows_only) THEN
     ALLOCATE (z(ncols_all))  ! temporary buffer
     DO i = 1, nrows
-      READ (unit, '(A)') buffer
+      READ (unit, "(A)") buffer
       buffer = ADJUSTL (buffer)
       i_prev = 1
       k = 1
@@ -258,13 +258,13 @@ DO jf = 1, SIZE (input_file)
       DO j = 1, LEN_TRIM (buffer)
         IF (buffer(j:j) == "") THEN
           IF (buffer(j + 1:j + 1) == "") CYCLE
-          IF (ADJUSTL (buffer(i_prev:i_prev + 7)) == 'NULL') THEN
+          IF (ADJUSTL (buffer(i_prev:i_prev + 7)) == "NULL") THEN
             z(k) = mdi
           ELSE IF (is_string(ABS (colmap(k)))) THEN
             READ (buffer(i_prev:i_prev + 7), *) char_tmp
             z(k) = TRANSFER (ADJUSTR (char_tmp), z(k))
           ELSE IF (INDEX (buffer(i_prev:j), "b") > 0) THEN
-            READ (buffer(i_prev + INDEX (buffer(i_prev:), "b"):j), '(B32)') io_tmp
+            READ (buffer(i_prev + INDEX (buffer(i_prev:), "b"):j), "(B32)") io_tmp
             z(k) = io_tmp
           ELSE
             READ (buffer(i_prev:j), *) z(k)
@@ -273,13 +273,13 @@ DO jf = 1, SIZE (input_file)
           i_prev = j
         END IF
       END DO
-      IF (ADJUSTL (buffer(i_prev:)) == 'NULL') THEN
+      IF (ADJUSTL (buffer(i_prev:)) == "NULL") THEN
         z(k) = mdi
       ELSE IF (is_string(ABS (colmap(k)))) THEN
         READ (buffer(i_prev:), *) char_tmp
         z(k) = TRANSFER (ADJUSTR (char_tmp), z(k))
       ELSE IF (INDEX (buffer(i_prev:), "b") > 0) THEN
-        READ (buffer(i_prev + INDEX (buffer(i_prev:), "b"):), '(B32)') io_tmp
+        READ (buffer(i_prev + INDEX (buffer(i_prev:), "b"):), "(B32)") io_tmp
         z(k) = io_tmp
       ELSE
         READ (buffer(i_prev:), *) z(k)
@@ -296,7 +296,7 @@ DO jf = 1, SIZE (input_file)
       k = 0
       DO i = 1, nrows
         x(i,j) = k
-        k = k + x(i,j + 1) 
+        k = k + x(i,j + 1)
       END DO
     END IF
   END DO

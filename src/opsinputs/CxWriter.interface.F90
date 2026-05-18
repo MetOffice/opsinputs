@@ -40,7 +40,7 @@ contains
 
 !> Creates an opsinputs_cxwriter object. Returns 1 if the creation succeeds and 0 if it fails.
 function opsinputs_cxwriter_create_c(c_self, c_conf, c_varlist) &
-  bind(c,name='opsinputs_cxwriter_create_f90')
+  bind(c,name="opsinputs_cxwriter_create_f90")
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
@@ -66,7 +66,7 @@ end function opsinputs_cxwriter_create_c
 ! ------------------------------------------------------------------------------
 
 subroutine opsinputs_cxwriter_delete_c(c_self) &
-  bind(c,name='opsinputs_cxwriter_delete_f90')
+  bind(c,name="opsinputs_cxwriter_delete_f90")
 implicit none
 integer(c_int), intent(inout) :: c_self
 
@@ -81,7 +81,7 @@ end subroutine opsinputs_cxwriter_delete_c
 ! ------------------------------------------------------------------------------
 
 subroutine opsinputs_cxwriter_prior_c(c_self, c_obspace, c_geovals) &
-  bind(c,name='opsinputs_cxwriter_prior_f90')
+  bind(c,name="opsinputs_cxwriter_prior_f90")
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
@@ -101,7 +101,7 @@ end subroutine opsinputs_cxwriter_prior_c
 
 subroutine opsinputs_cxwriter_post_c(c_self, c_obspace, c_geovals, c_flags, &
                                      c_nvars, c_nlocs, c_varnames, c_hofx) &
-  bind(c,name='opsinputs_cxwriter_post_f90')
+  bind(c,name="opsinputs_cxwriter_post_f90")
 implicit none
 integer(c_int), intent(in)     :: c_self
 type(c_ptr), value, intent(in) :: c_obspace

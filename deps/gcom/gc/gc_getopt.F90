@@ -37,7 +37,7 @@ INTEGER (KIND=gc_int_kind) :: var, val, istat
 IF (var > gc__max_opts .OR. var < 1) THEN
   ! VAR is out of range
   CALL gc_abort(gc_me(), gc_nproc(),                                           &
-                'Cannot get option - out of range')
+                "Cannot get option - out of range")
 END IF
 
 val   = gc__options(var)

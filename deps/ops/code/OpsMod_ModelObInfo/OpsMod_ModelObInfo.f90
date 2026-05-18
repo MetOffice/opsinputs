@@ -276,10 +276,10 @@ TYPE ModelOB_type
                                                       ! correct
   REAL, POINTER              :: SeaSrfcHeight(:) => NULL() ! Altimeter SSH         cm
   REAL, POINTER              :: SeaIce(:) => NULL() ! Sea Ice
-  REAL, POINTER              :: CHL(:) => NULL()       ! mass concentration of chlorophyll a 
+  REAL, POINTER              :: CHL(:) => NULL()       ! mass concentration of chlorophyll a
                                                                    ! in sea water milligram     m-3
   REAL, POINTER              :: KD490(:) => NULL()     ! volume attenuation coefficient of downwelling
-  REAL, POINTER              :: LCHL(:) => NULL()       ! mass concentration of chlorophyll a 
+  REAL, POINTER              :: LCHL(:) => NULL()       ! mass concentration of chlorophyll a
                                                                    ! in sea water milligram     m-3
   REAL, POINTER              :: LKD490(:) => NULL()     ! volume attenuation coefficient of downwelling
   REAL, POINTER              :: SSTMes_Var(:) => NULL() ! mesoscale SST variance

@@ -12,15 +12,22 @@ MODULE OpsMod_Kinds
 #define HAVE_ISO_FORTRAN_ENV_INT8 1
 #endif
 
-USE, INTRINSIC :: ISO_FORTRAN_ENV, ONLY: &
 #ifdef HAVE_ISO_FORTRAN_ENV_INT8
+USE, INTRINSIC :: ISO_FORTRAN_ENV, ONLY: &
   int8,                                  &
-#endif
   int16,                                 &
   int32,                                 &
   int64,                                 &
   real32,                                &
   real64
+#else
+USE, INTRINSIC :: ISO_FORTRAN_ENV, ONLY: &
+  int16,                                 &
+  int32,                                 &
+  int64,                                 &
+  real32,                                &
+  real64
+#endif
 
 #endif
 

@@ -114,12 +114,11 @@ USE gc_globals_mod, ONLY:                                                      &
     gc__mpi_maxtag
 #endif
 
-USE gc_kinds_mod, ONLY:                                                        &
 #if defined(MPI_SRC)
-    gc_log_kind,                                                               &
+USE gc_kinds_mod, ONLY: gc_int_kind, gc_real_kind, gc_log_kind
+#else
+USE gc_kinds_mod, ONLY: gc_int_kind, gc_real_kind
 #endif
-    gc_int_kind,                                                               &
-    gc_real_kind
 
 IMPLICIT NONE
 

@@ -56,4 +56,4 @@ INTEGER, PARAMETER :: gc_log_kind  = gc_integer64
 INTEGER, PARAMETER :: gc_real_kind = gc_real64
 #endif
 
-END MODULE
+END MODULE gc_kinds_mod

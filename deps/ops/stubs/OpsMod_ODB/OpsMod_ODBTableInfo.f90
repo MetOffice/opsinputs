@@ -69,7 +69,7 @@ TYPE Tables_type
   INTEGER, ALLOCATABLE              :: obslevels(:)
   REAL, ALLOCATABLE                 :: obsvertco_references(:)
   INTEGER, ALLOCATABLE              :: obsvertco_types(:)
-END TYPE
+END TYPE Tables_type
 
 CHARACTER(len=*), PARAMETER         :: body_flags(2) = ["datum_status",  &
                                                         "datum_event1"]

@@ -8,6 +8,7 @@
 module opsinputs_cxgenerate_mod
 
 implicit none
+public
 
 integer            :: CxLevels = 30
 integer, parameter :: MaxModelCodes = 100

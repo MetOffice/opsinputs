@@ -40,7 +40,6 @@ end function opsinputs_obsdatavector_int_nlocs
 
 type(obs_variables) function opsinputs_obsdatavector_int_varnames(c_vec)
   !use, intrinsic :: iso_c_binding, only: c_ptr
-  !use obs_variables_mod
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
 
@@ -95,7 +94,6 @@ end function opsinputs_obsdatavector_float_nlocs
 
 type(obs_variables) function opsinputs_obsdatavector_float_varnames(c_vec)
   !use, intrinsic :: iso_c_binding
-  use obs_variables_mod
   implicit none
   type(c_ptr), value, intent(in) :: c_vec
 
