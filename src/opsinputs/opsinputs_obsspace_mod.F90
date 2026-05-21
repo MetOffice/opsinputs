@@ -22,7 +22,7 @@ contains
 !> Get a datetime variable from ObsSpace, representing it as an array of offsets (in seconds)
 !> with respect to a reference datetime.
 subroutine opsinputs_obsspace_get_db_datetime_offset_in_seconds(obss, group, vname, reference, offsets)
-  use, intrinsic :: iso_c_binding
+  use, intrinsic :: iso_c_binding, only: c_char, c_int64_t, c_ptr, c_size_t
   implicit none
   type(c_ptr), value, intent(in) :: obss
   character(len=*), intent(in) :: group
@@ -46,7 +46,7 @@ end subroutine opsinputs_obsspace_get_db_datetime_offset_in_seconds
 
 !> Get a string variable from ObsSpace.
 subroutine opsinputs_obsspace_get_db_string(obss, group, vname, string_length, strings)
-  use, intrinsic :: iso_c_binding
+  use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_size_t
   implicit none
   type(c_ptr), value, intent(in) :: obss
   character(len=*), intent(in) :: group
@@ -79,7 +79,7 @@ end subroutine opsinputs_obsspace_get_db_string
 !>   elements of `LocationsOrderedByRecord` storing the first location of each record.
 subroutine opsinputs_obsspace_get_locs_ordered_by_record(obss,  &
                                                          LocationsOrderedByRecord, RecordStarts)
-  use, intrinsic :: iso_c_binding
+  use, intrinsic :: iso_c_binding, only: c_int32_t, c_ptr
   implicit none
   type(c_ptr), value, intent(in) :: obss
   integer(c_int32_t), intent(inout) :: LocationsOrderedByRecord(:)

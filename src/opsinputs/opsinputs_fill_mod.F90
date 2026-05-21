@@ -122,7 +122,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El1(:)
+type(Element_type), pointer, intent(inout)      :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
@@ -168,7 +168,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
   else
-    write (ErrorMessage, '(A,A)') "QC flags not found for variable ", JediVarName
+    write (ErrorMessage, "(A,A)") "QC flags not found for variable ", JediVarName
     call gen_warn(RoutineName, ErrorMessage)
     Flag(:) = 0 ! assume all observations passed QC
   end if
@@ -176,7 +176,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
     call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
   else
-    write (ErrorMessage, '(A,A,A)') "Variable ObsError/", JediVarName, " not found"
+    write (ErrorMessage, "(A,A,A)") "Variable ObsError/", JediVarName, " not found"
     call gen_warn(RoutineName, ErrorMessage)
     ObsError(:) = MissingFloat
   end if
@@ -246,7 +246,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
+type(Element_type), pointer, intent(inout)      :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 type(c_ptr), value, intent(in)                  :: Flags
@@ -302,7 +302,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarNamesWithChannels(1))) then
     if (opsinputs_obsdatavector_int_has(Flags, JediVarNamesWithChannels(iChannel))) then
       call opsinputs_obsdatavector_int_get(Flags, JediVarNamesWithChannels(iChannel), Flag)
     else
-      write (ErrorMessage, '(A,A,A)') &
+      write (ErrorMessage, "(A,A,A)") &
         "Warning: variable ", JediVarNamesWithChannels(iChannel), " QC flags not found"
       call gen_warn(RoutineName, ErrorMessage)
       Flag(:) = 0 ! assume all observations passed QC
@@ -311,7 +311,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarNamesWithChannels(1))) then
     if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarNamesWithChannels(iChannel))) then
       call opsinputs_obsdatavector_float_get(ObsErrors, JediVarNamesWithChannels(iChannel), ObsError)
     else
-      write (ErrorMessage, '(A,A,A)') &
+      write (ErrorMessage, "(A,A,A)") &
         "Warning: variable ObsError/", JediVarNamesWithChannels(iChannel), " not found"
       call gen_warn(RoutineName, ErrorMessage)
       ObsError(:) = MissingFloat
@@ -377,7 +377,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(Element_type), pointer                        :: El2(:,:)
+type(Element_type), pointer, intent(inout)         :: El2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 type(c_ptr), value, intent(in)                     :: Flags
 type(c_ptr), value, intent(in)                     :: ObsErrors
@@ -432,7 +432,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   if (opsinputs_obsdatavector_int_has(Flags, JediVarName)) then
     call opsinputs_obsdatavector_int_get(Flags, JediVarName, Flag)
   else
-    write (ErrorMessage, '(A,A,A)') &
+    write (ErrorMessage, "(A,A,A)") &
       "Warning: variable ", JediVarName, " QC flags not found"
     call gen_warn(RoutineName, ErrorMessage)
     Flag(:) = 0 ! assume all observations passed QC
@@ -441,7 +441,7 @@ if (obsspace_has(ObsSpace, JediGroupName, JediVarName)) then
   if (opsinputs_obsdatavector_float_has(ObsErrors, JediVarName)) then
     call opsinputs_obsdatavector_float_get(ObsErrors, JediVarName, ObsError)
   else
-    write (ErrorMessage, '(A,A,A)') &
+    write (ErrorMessage, "(A,A,A)") &
       "Warning: variable ObsError/", JediVarName, " not found"
     call gen_warn(RoutineName, ErrorMessage)
     ObsError(:) = MissingFloat
@@ -538,7 +538,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(Element_type), pointer                        :: El2(:,:)
+type(Element_type), pointer, intent(inout)         :: El2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 type(c_ptr), value, intent(in)                     :: Flags
@@ -607,7 +607,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El1(:)
+type(Element_type), pointer, intent(inout)      :: El1(:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 character(len=*), intent(in)                    :: JediValueVarName
 character(len=*), intent(in)                    :: JediValueGroup
@@ -629,7 +629,7 @@ character(len=256)                              :: ErrorMessage
 ! Body:
 
 if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
-  write (ErrorMessage, '(A)') &
+  write (ErrorMessage, "(A)") &
     "JediErrorVarName and JediErrorGroup must be either both absent or both present"
   call gen_warn(RoutineName, ErrorMessage)
 end if
@@ -720,7 +720,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
+type(Element_type), pointer, intent(inout)      :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediValueVarName
@@ -746,7 +746,7 @@ character(len=256)                              :: ErrorMessage
 ! Body:
 
 if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
-  write (ErrorMessage, '(A)') &
+  write (ErrorMessage, "(A)") &
     "JediErrorVarName and JediErrorGroup must be either both absent or both present"
   call gen_warn(RoutineName, ErrorMessage)
 end if
@@ -850,7 +850,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(Element_type), pointer                     :: El2(:,:)
+type(Element_type), pointer, intent(inout)      :: El2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Levels(:)
 character(len=*), intent(in)                    :: JediValueVarName
@@ -873,7 +873,7 @@ character(len=256)                              :: ErrorMessage
 
 ! Body:
 if (present(JediErrorVarName) .neqv. present(JediErrorGroup)) then
-  write (ErrorMessage, '(A)') &
+  write (ErrorMessage, "(A)") &
     "JediErrorVarName and JediErrorGroup must be either both absent or both present"
   call gen_warn(RoutineName, ErrorMessage)
 end if
@@ -1118,8 +1118,8 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
           else
             arrayindex = varChannels(iChannel)
           end if
-	else
-	  exit
+        else
+          exit
         end if
       else
         if (.not. compressChannels) then
@@ -1795,7 +1795,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-integer(integer64), pointer                        :: Int1(:)
+integer(integer64), pointer, intent(inout)         :: Int1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -1952,7 +1952,7 @@ type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
 integer(integer64), intent(in)                     :: StringLen
-character(len=StringLen), pointer                  :: String1(:)
+character(len=StringLen), pointer, intent(inout)   :: String1(:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -2361,7 +2361,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-type(coord_type), pointer                       :: Coord2(:,:)
+type(coord_type), pointer, intent(inout)        :: Coord2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
@@ -2430,7 +2430,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(coord_type), pointer                          :: Coord2(:,:)
+type(coord_type), pointer, intent(inout)           :: Coord2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
@@ -2502,7 +2502,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)            :: Hdr
 character(len=*), intent(in)                       :: OpsVarName
 type(opsinputs_jeditoopslayoutmapping), intent(in) :: JediToOpsLayoutMapping
-type(coord_type), pointer                          :: Coord2(:,:)
+type(coord_type), pointer, intent(inout)           :: Coord2(:,:)
 type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 character(len=*), intent(in)                       :: JediVarName
@@ -2540,7 +2540,7 @@ if (size(Levels) == 0) then
   VarNames(1) = VarName
 else
   do ilev = 1, size(Levels)
-    write (VarNames(ilev),'(A,I0)') VarName, Levels(ilev)
+    write (VarNames(ilev),"(A,I0)") VarName, Levels(ilev)
   end do
 end if
 end function opsinputs_fill_varnames_with_levels

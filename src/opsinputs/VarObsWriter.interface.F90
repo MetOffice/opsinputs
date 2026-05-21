@@ -42,9 +42,9 @@ contains
 function opsinputs_varobswriter_create_c(c_self, c_conf, c_comm_is_valid, c_comm, &
                                          c_nchannels, c_channels, &
                                          c_varlist, c_varlist_diags) &
-  bind(c,name='opsinputs_varobswriter_create_f90')
-use oops_variables_mod
-use obs_variables_mod
+  bind(c,name="opsinputs_varobswriter_create_f90")
+use oops_variables_mod, only: oops_variables
+use obs_variables_mod, only: obs_variables
 implicit none
 integer(c_int), intent(inout)  :: c_self
 type(c_ptr), value, intent(in) :: c_conf
@@ -82,7 +82,7 @@ end function opsinputs_varobswriter_create_c
 ! ------------------------------------------------------------------------------
 
 subroutine opsinputs_varobswriter_delete_c(c_self) &
-  bind(c,name='opsinputs_varobswriter_delete_f90')
+  bind(c,name="opsinputs_varobswriter_delete_f90")
 implicit none
 integer(c_int), intent(inout) :: c_self
 
@@ -97,7 +97,7 @@ end subroutine opsinputs_varobswriter_delete_c
 ! ------------------------------------------------------------------------------
 
 subroutine opsinputs_varobswriter_prior_c(c_self, c_obspace, c_geovals) &
-  bind(c,name='opsinputs_varobswriter_prior_f90')
+  bind(c,name="opsinputs_varobswriter_prior_f90")
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace
@@ -117,7 +117,7 @@ end subroutine opsinputs_varobswriter_prior_c
 
 subroutine opsinputs_varobswriter_post_c(c_self, c_obspace, c_flags, c_obserrors, &
                                          c_nvars, c_nlocs, c_hofx, c_obsdiags) &
-  bind(c,name='opsinputs_varobswriter_post_f90')
+  bind(c,name="opsinputs_varobswriter_post_f90")
 implicit none
 integer(c_int), intent(in) :: c_self
 type(c_ptr), value, intent(in) :: c_obspace

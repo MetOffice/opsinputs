@@ -46,7 +46,7 @@ INTEGER (KIND=gc_int_kind), INTENT(IN) :: len1
 INTEGER (KIND=gc_int_kind), INTENT(IN) :: nproc
 INTEGER (KIND=gc_int_kind), INTENT(IN) :: root
 INTEGER (KIND=gc_int_kind), INTENT(OUT) :: istat
-INTEGER (KIND=gc_int_kind), INTENT(IN OUT) :: imin(len1)
+INTEGER (KIND=gc_int_kind), INTENT(INOUT) :: imin(len1)
 
 INTEGER (KIND=gc_int_kind) :: reduce_data_iwrk(len1)
 

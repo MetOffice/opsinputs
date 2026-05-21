@@ -53,11 +53,11 @@ SUBROUTINE gc_init_intro (comm)
 USE mpl, ONLY:                                                                 &
     mpl_comm_world
 
-USE gc_kinds_mod, ONLY:                                                        &
 #if defined(MPI_SRC)
-    gc_log_kind,                                                               &
+USE gc_kinds_mod, ONLY: gc_int_kind, gc_log_kind
+#else
+USE gc_kinds_mod, ONLY: gc_int_kind
 #endif
-    gc_int_kind
 
 IMPLICIT NONE
 
@@ -111,11 +111,11 @@ USE gc_globals_mod, ONLY:                                                      &
 USE gc__buildconst, ONLY: gc__isize, mpi_bsend_buffer_size
 #endif
 
-USE gc_kinds_mod, ONLY:                                                        &
 #if defined(MPI_SRC)
-    gc_log_kind,                                                               &
+USE gc_kinds_mod, ONLY: gc_int_kind, gc_log_kind
+#else
+USE gc_kinds_mod, ONLY: gc_int_kind
 #endif
-    gc_int_kind
 
 IMPLICIT NONE
 
