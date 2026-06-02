@@ -24,9 +24,9 @@
 namespace opsinputs {
 
 CxWriter::CxWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
-                   std::shared_ptr<ioda::ObsDataVector<int> > flags,
-                   std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)),
+                   ioda::ObsDataVector<int> & flags,
+                   ioda::ObsDataVector<float> & obsErrors)
+  : obsdb_(obsdb), geovars_(), extradiagvars_(), flags_(flags), obsErrors_(obsErrors),
     parameters_(params)
 {
   oops::Log::trace() << "CxWriter constructor starting" << std::endl;
@@ -93,14 +93,14 @@ void CxWriter::postFilter(const ufo::GeoVaLs & gv,
     for (const ufo::Variable &var : parameters_.variables_for_qc.value().get())
       filtervars += var;
     ioda::ObsDataVector<int> flags(obsdb_, filtervars.toOopsObsVariables());
-    for (int ivar = 0; ivar < flags.nvars(); ivar++) {
+    for (size_t ivar = 0; ivar < flags.nvars(); ivar++) {
       const std::string varname = flags.varnames()[ivar];
-      flags[varname] = flags_->operator[](varname);
+      flags[varname] = flags_.operator[](varname);
     }
     opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), flags,
                                 hofx.nvars(), hofx.nlocs(), hofx.varnames(), &hofx.toFortran());
   } else {
-    opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), *flags_,
+    opsinputs_cxwriter_post_f90(key_, obsdb_, gv.toFortran(), flags_,
                                 hofx.nvars(), hofx.nlocs(), hofx.varnames(), &hofx.toFortran());
   }
 }

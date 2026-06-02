@@ -36,20 +36,21 @@ IMPLICIT NONE
 INTEGER (KIND=gc_int_kind) :: mxproc, mxcoll, mxpt2pt
 CHARACTER(LEN=*)           :: intf
 
+#if defined(PREC_32B)
+CHARACTER(LEN=*), PARAMETER :: gc_descrip_value = " 32"
+#else
+CHARACTER(LEN=*), PARAMETER :: gc_descrip_value = " 64"
+#endif
+
 
 mxcoll = 0            ! Deprecated
 mxproc = 0            ! Deprecated
 mxpt2pt = gc_none     ! Deprecated
-intf = 'GCOM Version ' //                                                      &
+intf = "GCOM Version " //                                                      &
   gc_version //                                                                &
-  ' built at ' //                                                              &
+  " built at " //                                                              &
   gc_build_date //                                                             &
-  ' Interface: ' //                                                            &
-#if defined(PREC_32B)
-     gc_descrip //                                                             &
-  ' 32'
-#else
-gc_descrip //                                                                  &
-' 64'
-#endif
+  " Interface: " //                                                            &
+  gc_descrip //                                                                &
+  gc_descrip_value
 END SUBROUTINE gc_config

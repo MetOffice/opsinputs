@@ -24,7 +24,7 @@ IMPLICIT NONE
 ! Arguments and Variables at Model/GCOM precision level
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: inbuf(*)
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: insize
-INTEGER (KIND=gc_int_kind), INTENT(IN OUT) :: posn
+INTEGER (KIND=gc_int_kind), INTENT(INOUT) :: posn
 INTEGER (KIND=gc_int_kind), INTENT(OUT)   :: outbuf(*)
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: outcount
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: datatype

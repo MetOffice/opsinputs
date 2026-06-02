@@ -45,14 +45,14 @@ INTEGER (KIND=gc_int_kind) :: var, val, istat
 ! Ensure Option is one we recognise
 IF (var > gc__max_opts .OR. var < 1) THEN
   CALL gc_abort(gc_me(), gc_nproc(),                                           &
-                'Cannot set option - unrecognised')
+                "Cannot set option - unrecognised")
 END IF
 
 ! Ensure Option values are recognised
 IF (var == gc_force_bitrep .AND.                                               &
     (val /= gc_on .AND. val /= gc_off)) THEN
   CALL gc_abort(gc_me(), gc_nproc(),                                           &
-      'Cannot set GC_FORCE_BITREP - value unrecognised')
+      "Cannot set GC_FORCE_BITREP - value unrecognised")
 END IF
 
 gc__options(var) = val

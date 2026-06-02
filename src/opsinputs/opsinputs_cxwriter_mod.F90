@@ -173,7 +173,7 @@ private
   real(real64), allocatable              :: EtaTheta(:)
   real(real64), allocatable              :: EtaRho(  :)
 
-  type(ufo_geovals), pointer             :: GeoVals
+  type(ufo_geovals), pointer             :: GeoVals => null()
   type(opsinputs_jeditoopslayoutmapping) :: JediToOpsLayoutMapping
   type(obs_variables)                    :: varnames
   real(c_double), pointer                :: hofx(:, :)
@@ -772,7 +772,7 @@ do i = 1, size(CxFields)
     case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:6
       DustBinIndex = CxField - StashItem_dustMin + 1
       if (DustBinIndex <= NDustBins) then
-        write (DustBinIndexStr, '(i1)') DustBinIndex
+        write (DustBinIndexStr, "(i1)") DustBinIndex
         GeoVarName = opsinputs_cxfields_dustp_start // DustBinIndexStr // opsinputs_cxfields_dustp_end
       end if
     case default
@@ -1270,7 +1270,7 @@ do iCxField = 1, size(CxFields)
     case (StashItem_dustMin:StashItem_dustMax) ! IndexCxDust1:IndexCxDust6
       DustBinIndex = CxField - StashItem_dustMin + 1
       if (DustBinIndex <= NDustBins) then
-        write (DustBinIndexStr, '(i1)') DustBinIndex
+        write (DustBinIndexStr, "(i1)") DustBinIndex
         call opsinputs_fill_fillreal2dfromgeovalorhofx( &
           Cx % Header % dustp, "dustp", Cx % dustp(DustBinIndex) % field, &
           self % GeoVals,  self % GeoVaLsAreTopToBottom, &
@@ -1311,8 +1311,8 @@ real(real64), allocatable :: Uunrot(:)               ! Array for unrotated wind 
 real(real64), allocatable :: Vunrot(:)               ! Array for unrotated wind v component
 real(real64), allocatable :: U10unrot(:)             ! Array for unrotated wind u10 component
 real(real64), allocatable :: V10unrot(:)             ! Array for unrotated wind v10 component
-logical                   :: UpperWinds   = .false.  ! Upper air wind u and v components present
-logical                   :: SurfaceWinds = .false.  ! Surface wind u and v components present
+logical, save             :: UpperWinds   = .false.  ! Upper air wind u and v components present
+logical, save             :: SurfaceWinds = .false.  ! Surface wind u and v components present
 
 ! Body:
 call Ops_ReadCXControlNL(self % obsgroup, CxFields, BGECall = .false._8, ops_call = .false._8)

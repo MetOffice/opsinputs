@@ -7,7 +7,7 @@
 interface
 
 integer(kind=c_int) function c_opsinputs_obsdatavector_int_nlocs(vec) &
-    bind(C,name='opsinputs_obsdatavector_int_nlocs_f')
+    bind(C,name="opsinputs_obsdatavector_int_nlocs_f")
   use, intrinsic :: iso_c_binding, only: c_int, c_ptr
   implicit none
 
@@ -15,14 +15,14 @@ integer(kind=c_int) function c_opsinputs_obsdatavector_int_nlocs(vec) &
 end function c_opsinputs_obsdatavector_int_nlocs
 
 type(c_ptr) function c_opsinputs_obsdatavector_int_varnames(vec) &
-    bind(C, name='opsinputs_obsdatavector_int_varnames_f')
+    bind(C, name="opsinputs_obsdatavector_int_varnames_f")
   use, intrinsic :: iso_c_binding, only: c_ptr
   implicit none
   type(c_ptr), value :: vec
 end function c_opsinputs_obsdatavector_int_varnames
 
 logical(kind=c_bool) function c_opsinputs_obsdatavector_int_has(vec, variable) &
-    bind(C,name='opsinputs_obsdatavector_int_has_f')
+    bind(C,name="opsinputs_obsdatavector_int_has_f")
   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_ptr
   implicit none
 
@@ -31,7 +31,7 @@ logical(kind=c_bool) function c_opsinputs_obsdatavector_int_has(vec, variable) &
 end function c_opsinputs_obsdatavector_int_has
 
 subroutine c_opsinputs_obsdatavector_int_get(vec, variable, length, data) &
-    bind(C,name='opsinputs_obsdatavector_int_get_f')
+    bind(C,name="opsinputs_obsdatavector_int_get_f")
   use, intrinsic :: iso_c_binding, only : c_char, c_int, c_ptr, c_size_t
   implicit none
   type(c_ptr), value :: vec
@@ -41,7 +41,7 @@ subroutine c_opsinputs_obsdatavector_int_get(vec, variable, length, data) &
 end subroutine c_opsinputs_obsdatavector_int_get
 
 integer(kind=c_int) function c_opsinputs_obsdatavector_float_nlocs(vec) &
-    bind(C,name='opsinputs_obsdatavector_float_nlocs_f')
+    bind(C,name="opsinputs_obsdatavector_float_nlocs_f")
   use, intrinsic :: iso_c_binding, only: c_int, c_ptr
   implicit none
 
@@ -49,14 +49,14 @@ integer(kind=c_int) function c_opsinputs_obsdatavector_float_nlocs(vec) &
 end function c_opsinputs_obsdatavector_float_nlocs
 
 type(c_ptr) function c_opsinputs_obsdatavector_float_varnames(vec) &
-    bind(C, name='opsinputs_obsdatavector_float_varnames_f')
+    bind(C, name="opsinputs_obsdatavector_float_varnames_f")
   use, intrinsic :: iso_c_binding, only: c_ptr
   implicit none
   type(c_ptr), value :: vec
 end function c_opsinputs_obsdatavector_float_varnames
 
 logical(kind=c_bool) function c_opsinputs_obsdatavector_float_has(vec, variable) &
-    bind(C,name='opsinputs_obsdatavector_float_has_f')
+    bind(C,name="opsinputs_obsdatavector_float_has_f")
   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_ptr
   implicit none
 
@@ -65,7 +65,7 @@ logical(kind=c_bool) function c_opsinputs_obsdatavector_float_has(vec, variable)
 end function c_opsinputs_obsdatavector_float_has
 
 subroutine c_opsinputs_obsdatavector_float_get(vec, variable, length, data) &
-    bind(C,name='opsinputs_obsdatavector_float_get_f')
+    bind(C,name="opsinputs_obsdatavector_float_get_f")
   use, intrinsic :: iso_c_binding, only : c_char, c_float, c_ptr, c_size_t
   implicit none
   type(c_ptr), value :: vec

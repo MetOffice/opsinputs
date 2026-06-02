@@ -92,8 +92,8 @@ integer :: count0
 REAL(kind=jprb), ALLOCATABLE :: dr_hook_handle_stack(:,:)
 INTEGER, ALLOCATABLE :: dr_hook_pointer(:)
 
-CHARACTER(len=*), PARAMETER :: ColourWarning = 'maroon' ! colour: warning
-CHARACTER(len=*), PARAMETER :: ColourFatal = 'red'    ! colour: fatal error
+CHARACTER(len=*), PARAMETER :: ColourWarning = "maroon" ! colour: warning
+CHARACTER(len=*), PARAMETER :: ColourFatal = "red"    ! colour: fatal error
 
 ! Error status codes known to the system are listed by name below.
 ! StatusOK StatusWarning and StatusFatal are for general use.

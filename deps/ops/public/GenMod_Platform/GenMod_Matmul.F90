@@ -48,10 +48,10 @@ ARG11 = SIZE (B, DIM = 2)
 
 CALL DGEMUL (A,     &
              ARG2,  &
-             'N',   &
+             "N",   &
              B,     &
              ARG5,  &
-             'N',   &
+             "N",   &
              C,     &
              ARG8,  &
              ARG9,  &

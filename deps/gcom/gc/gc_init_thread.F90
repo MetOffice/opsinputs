@@ -58,20 +58,24 @@ actual=mpl_thread_multiple
 
 IF (me==0) THEN
   IF (actual/=requested) THEN
-    WRITE(6,'(A)')'WARNING - REQUESTED AND ACTUAL THREADING LEVEL DIFFERENT'
+    WRITE(6,"(A)")"WARNING - REQUESTED AND ACTUAL THREADING LEVEL DIFFERENT"
   END IF
-  IF (requested == mpl_thread_multiple)                                        &
-    WRITE(6,'(A)')'THREAD LEVEL REQUESTED is MPL_THREAD_MULTIPLE'
-  IF (requested == mpl_thread_serialized)                                      &
-    WRITE(6,'(A)')'THREAD LEVEL REQUESTED is MPL_THREAD_SERIALIZED'
-  IF (requested == mpl_thread_funneled)                                        &
-    WRITE(6,'(A)')'THREAD LEVEL REQUESTED is MPL_THREAD_FUNNELED'
-  IF (requested == mpl_thread_single)                                          &
-    WRITE(6,'(A)')'THREAD LEVEL REQUESTED is MPL_THREAD_SINGLE'
-  IF (actual==mpl_thread_multiple) WRITE(6,'(A)')'THREAD LEVEL SET is MPL_THREAD_MULTIPLE'
-  IF (actual==mpl_thread_serialized) WRITE(6,'(A)')'THREAD LEVEL SET is MPL_THREAD_SERIALIZED'
-  IF (actual==mpl_thread_funneled) WRITE(6,'(A)')'THREAD LEVEL SET is MPL_THREAD_FUNNELED'
-  IF (actual==mpl_thread_single) WRITE(6,'(A)')'THREAD LEVEL SET is MPL_THREAD_SINGLE'
+  IF (requested == mpl_thread_multiple) then
+    WRITE(6,"(A)")"THREAD LEVEL REQUESTED is MPL_THREAD_MULTIPLE"
+  end if
+  IF (requested == mpl_thread_serialized) then
+    WRITE(6,"(A)")"THREAD LEVEL REQUESTED is MPL_THREAD_SERIALIZED"
+  end if
+  IF (requested == mpl_thread_funneled) then
+    WRITE(6,"(A)")"THREAD LEVEL REQUESTED is MPL_THREAD_FUNNELED"
+  end if
+  IF (requested == mpl_thread_single) then
+    WRITE(6,"(A)")"THREAD LEVEL REQUESTED is MPL_THREAD_SINGLE"
+  end if
+  IF (actual==mpl_thread_multiple) WRITE(6,"(A)")"THREAD LEVEL SET is MPL_THREAD_MULTIPLE"
+  IF (actual==mpl_thread_serialized) WRITE(6,"(A)")"THREAD LEVEL SET is MPL_THREAD_SERIALIZED"
+  IF (actual==mpl_thread_funneled) WRITE(6,"(A)")"THREAD LEVEL SET is MPL_THREAD_FUNNELED"
+  IF (actual==mpl_thread_single) WRITE(6,"(A)")"THREAD LEVEL SET is MPL_THREAD_SINGLE"
 END IF
 
 RETURN
@@ -82,11 +86,11 @@ SUBROUTINE gc_init_intro_thread (comm, requested)
 USE mpl, ONLY:                                                                 &
     mpl_comm_world
 
-USE gc_kinds_mod, ONLY:                                                        &
 #if defined(MPI_SRC)
-    gc_log_kind,                                                               &
+USE gc_kinds_mod, ONLY: gc_int_kind, gc_log_kind
+#else
+USE gc_kinds_mod, ONLY: gc_int_kind
 #endif
-    gc_int_kind
 
 IMPLICIT NONE
 

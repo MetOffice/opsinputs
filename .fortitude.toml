@@ -1,0 +1,40 @@
+[check]
+target-std="f2008"
+line-length=140
+
+[check.per-file-ignores]
+"deps/**" = [
+    "C001", # implicit-typing
+    "C061", # missing-intent
+    "C071", # assumed-size
+    "C072", # assumed-size-character-intent
+    "C091", # external-procedure
+    "C092", # procedure-not-in-module
+    "C131", # missing-accessibility-statement
+]
+"deps/ops/public/GenMod_Platform/**" = [
+    "C002", # interface-implicit-typing
+]
+"deps/ops/public/GenMod_Sleep/GenMod_Sleep.f90" = [
+    "C002", # interface-implicit-typing
+]
+"src/opsinputs/opsinputs_cxfields_mod.F90" = [
+    "C121", # use-all
+]
+"src/opsinputs/opsinputs_cxwriter_mod.F90" = [
+    "C121", # use-all
+]
+"src/opsinputs/opsinputs_mpl_mod.F90" = [
+    "C061", # missing-intent
+    "C091", # external-procedure
+]
+"src/opsinputs/opsinputs_obsdatavector_interface.f90" = [
+    "C071", # assumed-size
+]
+"src/opsinputs/opsinputs_obsspace_interface.f90" = [
+    "C071", # assumed-size
+]
+"src/opsinputs/opsinputs_varobswriter_mod.F90" = [
+    "C091", # external-procedure
+    "C121", # use-all
+]
