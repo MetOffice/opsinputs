@@ -6,6 +6,7 @@
 module opsinputs_mpl_mod
 
 implicit none
+public
 
 ! ------------------------------------------------------------------------------
 contains

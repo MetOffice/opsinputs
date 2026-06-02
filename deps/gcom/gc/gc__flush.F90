@@ -26,12 +26,11 @@ INTEGER (KIND=gc_int_kind), INTENT(IN)  :: lunit
 USE f90_unix_io,ONLY:FLUSH
 #endif
 
-USE gc_kinds_mod, ONLY:                                                        &
-#if defined(LINUX_NAG_COMPILER) || defined(_X1) || defined(XD1) \
-|| defined(XT3)
-    gc_integer32,                                                              &
+#if defined(LINUX_NAG_COMPILER) || defined(_X1) || defined(XD1) || defined(XT3)
+USE gc_kinds_mod, ONLY: gc_int_kind, gc_integer32
+#else
+USE gc_kinds_mod, ONLY: gc_int_kind
 #endif
-    gc_int_kind
 
 IMPLICIT NONE
 

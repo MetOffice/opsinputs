@@ -26,11 +26,11 @@ SUBROUTINE gc_abort (me, nproc, mesg)
 USE mpl, ONLY: mpl_comm_world
 #endif
 
-USE gc__buildconst, ONLY:                                                      &
 #if defined(MPI_SRC)
-  mpiabort_errno,                                                              &
+USE gc__buildconst, ONLY: gc__forterrunit, mpiabort_errno
+#else
+USE gc__buildconst, ONLY: gc__forterrunit
 #endif
-  gc__forterrunit
 
 USE, INTRINSIC :: ISO_FORTRAN_ENV, ONLY: OUTPUT_UNIT
 
@@ -40,9 +40,9 @@ IMPLICIT NONE
 
 INTEGER (KIND=gc_int_kind) :: me, nproc, i, info
 CHARACTER(LEN=*) :: mesg
-CHARACTER(LEN=*), PARAMETER     :: seqf2       = '(a20,i5,a3,a)'
+CHARACTER(LEN=*), PARAMETER     :: seqf2       = "(a20,i5,a3,a)"
 
-WRITE(gc__forterrunit,seqf2) 'gc_abort (Processor ',me,'): ', mesg
+WRITE(gc__forterrunit,seqf2) "gc_abort (Processor ",me,"): ", mesg
 CALL gc__flush(gc__forterrunit)
 CALL gc__flush(INT(OUTPUT_UNIT, KIND=gc_int_kind))
 

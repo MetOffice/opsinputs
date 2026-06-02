@@ -6,10 +6,10 @@
 !
 ! Included in the module are two public routines:
 ! 1) OPS_InitFieldData - inilise and read the model state into memory
-! Inputs: 
+! Inputs:
 !   domain: contains the infomation required to get the header data and read the
 !       fields.
-!   FieldsInfo: information about fields in UM dump, prepared in 
+!   FieldsInfo: information about fields in UM dump, prepared in
 !       Ops_CXSetupArrays
 !   CxArrays: used to get the number of levels in each required field
 !   ForecastTimes: define the time slices to be read
@@ -21,7 +21,7 @@
 ! Included in the module are two private routines:
 ! 1) GetReqDims - used by OPS_InitFieldData to get the dimensions of the
 ! shared memory
-! 2) ReadModelShared - used by OPS_InitFieldData to read the data into the 
+! 2) ReadModelShared - used by OPS_InitFieldData to read the data into the
 ! shared memory
 !-------------------------------------------------------------------------------
 

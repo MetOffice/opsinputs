@@ -199,12 +199,12 @@ private
 
   logical :: compressVarChannels
   logical :: increaseChanArray
-  
+
   !this stores the atmospheric levels we wish to pass to varobs
-  integer(c_int), allocatable :: modlevs(:) 
-  
-  type(ufo_geovals), pointer :: GeoVals
-  type(ufo_geovals), pointer :: ObsDiags
+  integer(c_int), allocatable :: modlevs(:)
+
+  type(ufo_geovals), pointer :: GeoVals => null()
+  type(ufo_geovals), pointer :: ObsDiags => null()
 end type opsinputs_varobswriter
 
 ! ------------------------------------------------------------------------------
@@ -501,7 +501,7 @@ end if
 allocate(self % modlevs(self % IC_PLevels))
 do ilev = 1, self % IC_PLevels
   self % modlevs(ilev) = ilev
-enddo
+end do
 
 ! Fill in the list of variables that will be needed to populate the requested varfields.
 call opsinputs_varobswriter_addrequiredgeovars(self, geovars)
@@ -715,8 +715,8 @@ integer                                               :: nVarFields
 integer                                               :: iVarField
 integer                                               :: iobs
 character(len=200)                                    :: varname
-logical                                               :: FillChanNum = .false.
-logical                                               :: FillNumChans = .false.
+logical, save                                         :: FillChanNum = .false.
+logical, save                                         :: FillNumChans = .false.
 
 
 ! Body:
@@ -1210,7 +1210,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % HeightCOG, "HeightCOG", Ob % Header % NumObsLocal, Ob % HeightCOG)
     case default
-      write (ErrorMessage, '(A,I0)') "VarField code not recognised ", VarFields(iVarField)
+      write (ErrorMessage, "(A,I0)") "VarField code not recognised ", VarFields(iVarField)
       call gen_warn(RoutineName, ErrorMessage)
       cycle
   end select
@@ -1261,7 +1261,7 @@ end subroutine opsinputs_varobswriter_fillreportflags
 !> Ob % ChanNum is filled with the indices of channels that passed QC;
 !> an optional offset to the channel number can be added. This is
 !> sometimes required when multiple instruments are packed together
-!> e.g. for HIRS & AMSUA 
+!> e.g. for HIRS & AMSUA
 !> the number of these channels is stored in Ob % NumChans.
 subroutine opsinputs_varobswriter_fillchannumandnumchans( &
   Ob, ObsSpace, channels, varChannels, Flags, FillChanNum, FillNumChans, compressVarChannels, &
@@ -1581,7 +1581,7 @@ end subroutine opsinputs_varobswriter_fillsatid
 
 !> Fill the Ob % BiasPredictor field.
 !>
-!> This is done in a separate routine because this field is filled from 
+!> This is done in a separate routine because this field is filled from
 !> several arrays in the Obs Space and there is some data manipulation
 subroutine opsinputs_varobswriter_fillpredictors( &
   Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName)
@@ -1590,7 +1590,7 @@ implicit none
 type(ElementHeader_Type), intent(inout)         :: Hdr
 character(len=*), intent(in)                    :: OpsVarName
 integer(integer64), intent(in)                  :: NumObs
-real(real64), pointer                           :: Real2(:,:)
+real(real64), pointer, intent(inout)            :: Real2(:,:)
 type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName

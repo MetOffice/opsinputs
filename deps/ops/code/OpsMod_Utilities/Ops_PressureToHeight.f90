@@ -37,7 +37,7 @@ REAL, INTENT(OUT)          :: Heights(Npoints)  ! Calculated heights (gpm)
 REAL, INTENT(IN)           :: Pressures(Npoints)! Pressures (Pascals) to be converted
 
 ! Local declarations:
-CHARACTER(len=*),PARAMETER :: RoutineName = 'Ops_PressureToHeight'
+CHARACTER(len=*),PARAMETER :: RoutineName = "Ops_PressureToHeight"
 INTEGER                    :: I               ! Loop variable
 REAL                       :: RepT_Bot        ! Reciprical of bottom temperature
 REAL                       :: RepT_Top        ! Reciprical of top temperature

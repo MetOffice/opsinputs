@@ -173,13 +173,13 @@ CALL Ops_InitMPI
 
 IF (GeneralMode >= QuietMode .AND. mype == 0) THEN
 
-  WRITE (MessageOut, '(A)') "========================================="
-  WRITE (MessageOut, '(A)') "OpsProg_CreateODB : Execution starts"
+  WRITE (MessageOut, "(A)") "========================================="
+  WRITE (MessageOut, "(A)") "OpsProg_CreateODB : Execution starts"
   date_time = OpsFn_DateTime_now ()
   WRITE (MessageOut, "(A4,I2.2,A1,I2.2,A1,I2.2,A4,I2.2,A1,I2.2,A1,I4)")        &
     "at ", date_time % hour, ":", date_time % minute, ":", date_time % second, &
     " on ", date_time % day, "/", date_time % month, "/", date_time % year
-  WRITE (MessageOut, '(A)') "========================================="
+  WRITE (MessageOut, "(A)") "========================================="
 
 END IF
 
@@ -211,7 +211,7 @@ END IF
 CALL Ops_ReadCycleTime
 
 IF (mype == 0) THEN
-  WRITE (StatsOut, '(A,2(I2.2,A),I4.4,A,I2.2)') " " // TRIM (Runid) // " ",&
+  WRITE (StatsOut, "(A,2(I2.2,A),I4.4,A,I2.2)") " " // TRIM (Runid) // " ",&
               CycleTime(cycle_day), "/", CycleTime(cycle_month), "/", &
               CycleTime(cycle_year), " ", cycleTime(cycle_hour)
 END IF
@@ -221,7 +221,7 @@ CALL Ops_ReadOutputSwitches
 
 IF (COUNT (obs_group_list /= IMDI) == 0) THEN
   CALL gen_warn (ProgName,                         &
-                 'No Observation types requested')
+                 "No Observation types requested")
   GOTO 9999
 END IF
 
@@ -352,16 +352,16 @@ DO i = 1, SIZE (obs_group_list)
   END IF
 
   IF (mype == 0) THEN
-    WRITE (StatsOut, '(A)') &
-        ' --------------------------------------------------------------------'
-    StatsString = ' Total ' // TRIM (OpsFn_ObsourcetoString(MainObsource)) // ' ' //    &
-                  TRIM (OpsFn_ObsGroupNumToName(obs_group_list(i))) // ' obs '
-    WRITE (StatsString(35:44), '(A2,I8)') '= ', &
+    WRITE (StatsOut, "(A)") &
+        " --------------------------------------------------------------------"
+    StatsString = " Total " // TRIM (OpsFn_ObsourcetoString(MainObsource)) // " " //    &
+                  TRIM (OpsFn_ObsGroupNumToName(obs_group_list(i))) // " obs "
+    WRITE (StatsString(35:44), "(A2,I8)") "= ", &
            SUM (TempMDBData % SubTypeData(:) % TotalNumObs)
-    WRITE (StatsOut, '(A)') TRIM (StatsString)
-    WRITE (StatsOut, '(A)') &
-        ' --------------------------------------------------------------------'
-    WRITE (StatsOut, '(A)') ' '
+    WRITE (StatsOut, "(A)") TRIM (StatsString)
+    WRITE (StatsOut, "(A)") &
+        " --------------------------------------------------------------------"
+    WRITE (StatsOut, "(A)") " "
   END IF
   IF (TempMDBData % NumSubTypes > 0) THEN
     DEALLOCATE (TempMDBData % SubTypeData)
@@ -396,13 +396,13 @@ END IF
 
 IF (GeneralMode >= QuietMode .AND. mype == 0) THEN
 
-  WRITE (MessageOut,'(A)') "========================================="
-  WRITE (MessageOut,'(A)') "OpsProg_CreateODB ends normally"
+  WRITE (MessageOut,"(A)") "========================================="
+  WRITE (MessageOut,"(A)") "OpsProg_CreateODB ends normally"
   date_time = OpsFn_DateTime_now ()
   WRITE(MessageOut, "(A4,I2.2,A1,I2.2,A1,I2.2,A4,I2.2,A1,I2.2,A1,I4)")         &
     "at ", date_time % hour, ":", date_time % minute, ":", date_time % second, &
     " on ", date_time % day, "/", date_time % month, "/", date_time % year
-  WRITE (MessageOut,'(A)') "========================================="
+  WRITE (MessageOut,"(A)") "========================================="
 
 END IF
 

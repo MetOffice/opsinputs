@@ -167,9 +167,10 @@ ELSE
   DO i = 0,gsize-1
     gj = gj + glst(1,i)
   END DO
-  IF (gj  >   max_rotate)                                                      &
-     CALL gcg__errlim(1_gc_int_kind, 'RVECSHIFT',                              &
-                      'ROTATE', max_rotate, gj)
+  IF (gj  >   max_rotate) then
+    CALL gcg__errlim(1_gc_int_kind, "RVECSHIFT",                              &
+                      "ROTATE", max_rotate, gj)
+  end if
 
 END IF
 
