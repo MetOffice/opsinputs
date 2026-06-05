@@ -1,7 +1,7 @@
 # (C) Crown Copyright 2020, the Met Office. All rights reserved.
 #
 
-list( APPEND opsinputs_src_files
+list(APPEND opsinputs_src_files
     opsinputs_cxfields_mod.F90
     opsinputs_fill_mod.F90
     opsinputs_obsspace_f.cc
@@ -41,20 +41,20 @@ list( APPEND opsinputs_src_files
 # in particular assuming that integers and reals without kind are 64-bit.
 if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-real-8 -fdefault-integer-8")
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-integer-size 64 -real-size 64")
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-double")
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-fdefault-integer-8 -fdefault-real-8")
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
   set(FORTRAN_FLAGS_64_BIT_TYPES "-sdefault64")
 endif()
 
-if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
   set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                               COMPILE_OPTIONS "-sdefault64")
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
   set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                               COMPILE_FLAGS "-i8 -r8")
 else()
@@ -67,12 +67,13 @@ endif()
 set_source_files_properties(opsinputs_cxgenerate_mod.F90 PROPERTIES
                             INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/ops/stubs/OpsMod_CXGenerate)
 
-ecbuild_add_library( TARGET   opsinputs
-                     SOURCES  ${opsinputs_src_files}
-                     INSTALL_HEADERS LISTED
-                     HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/opsinputs
-                     LINKER_LANGUAGE ${OPSINPUTS_LINKER_LANGUAGE}
-                     PRIVATE_INCLUDES ${OPS_INCLUDE_DIR} )
+ecbuild_add_library(
+  TARGET   opsinputs
+  SOURCES  ${opsinputs_src_files}
+  INSTALL_HEADERS LISTED
+  HEADER_DESTINATION ${INSTALL_INCLUDE_DIR}/opsinputs
+  LINKER_LANGUAGE ${OPSINPUTS_LINKER_LANGUAGE}
+  PRIVATE_INCLUDES ${OPS_INCLUDE_DIR})
 target_link_libraries( opsinputs PUBLIC ufo ioda oops PRIVATE ops )
 
 ## Include paths

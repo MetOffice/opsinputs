@@ -5,6 +5,9 @@
 
 #include "../../test/opsinputs/TempFile.h"
 
+#include <string>
+#include <utility>
+
 namespace opsinputs {
 namespace test {
 

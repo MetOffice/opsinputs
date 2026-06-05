@@ -5,6 +5,8 @@
 
 #include "opsinputs/VarObsWriter.h"
 
+#include <set>
+#include <string>
 #include <utility>
 #include <vector>
 

@@ -30,7 +30,8 @@ This will define the following variables:
 
 Notes
 ^^^^^
-To guide the search process, set the SHUM_ROOT environment variable or CMake variable to the path to the SHUM build directory.
+To guide the search process, set the SHUM_ROOT environment variable or CMake
+variable to the path to the SHUM build directory.
 
 #]=======================================================================]
 
@@ -68,7 +69,7 @@ set(SHUM_LIBRARIES
     ${SHUM_LATLON_EQ_GRIDS_LIBRARY}
     ${SHUM_LIBRARY})
 
-if (SHUM_ROOT AND (NOT EXISTS "${SHUM_ROOT}/include" OR NOT EXISTS "${SHUM_ROOT}/lib"))
+if(SHUM_ROOT AND (NOT EXISTS "${SHUM_ROOT}/include" OR NOT EXISTS "${SHUM_ROOT}/lib"))
   message(WARNING "\
     The 'include' and/or 'lib' subdirectories of the SHUM build directory haven't been found.\n\
     Locate a build or rebuild SHUM.\n\

@@ -5,6 +5,7 @@
 
 #include "opsinputs/CxWriter.h"
 
+#include <string>
 #include <utility>
 #include <vector>
 
