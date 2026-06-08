@@ -218,16 +218,16 @@ else()
     TARGET gcom
     SOURCES ${GCOM_SOURCE_FILES})
 endif()
- 
-target_compile_definitions(gcom PRIVATE 
-  GC_VERSION="'7.2'" 
-  GC_DESCRIP="'MPP'" 
+
+target_compile_definitions(gcom PRIVATE
+  GC_VERSION="'7.2'"
+  GC_DESCRIP="'MPP'"
   GC_BUILD_DATE="'927'"
-  MPI_SRC 
-  MPILIB_32B 
-  PREC_64B 
-  GC__FORTERRUNIT=0 
-  GC__FLUSHUNIT6 
+  MPI_SRC
+  MPILIB_32B
+  PREC_64B
+  GC__FORTERRUNIT=0
+  GC__FLUSHUNIT6
 #  USE_MPIF_INCLUDE
 )
 

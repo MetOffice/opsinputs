@@ -6,6 +6,8 @@
 #include "opsinputs/LocalEnvironment.h"
 
 #include <cstdlib>
+#include <map>
+#include <string>
 
 namespace opsinputs {
 

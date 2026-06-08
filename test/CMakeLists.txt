@@ -23,32 +23,30 @@ include( opsinputs_functions )
 # - DONT_SET_OPS_OUTPUT_DIR_ENV_VAR: if true, OPS environment variables specifying output folders
 #   won't be set, so the output folder needs to be defined in the YAML file.
 function( ADD_WRITER_TEST )
-  set( options DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
+  set( options DONT_SET_OPS_OUTPUT_DIR_ENV_VAR )
   set( single_value_args NAME YAML NAMELIST MPI )
-  set( multi_value_args DATA)
+  set( multi_value_args DATA )
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
-                         ${_FIRST_ARG} ${ARGN} )
+                              ${_FIRST_ARG} ${ARGN} )
   if(_PAR_UNPARSED_ARGUMENTS)
     ecbuild_critical("Unknown keywords given to ADD_WRITER_TEST(): \"${_PAR_UNPARSED_ARGUMENTS}\"")
   endif()
 
   list( APPEND opsinputs_test_input ${_PAR_YAML} )
   list( APPEND opsinputs_test_input ${_PAR_NAMELIST} )
-  set ( opsinputs_test_input ${opsinputs_test_input} PARENT_SCOPE )
-  list( APPEND opsinputs_test_data ${_PAR_DATA})
+  set( opsinputs_test_input ${opsinputs_test_input} PARENT_SCOPE )
+  list( APPEND opsinputs_test_data ${_PAR_DATA} )
   set( opsinputs_test_data ${opsinputs_test_data} PARENT_SCOPE )
 
-  set( environment
-       OOPS_TRAPFPE=1
-       OPSINPUTS_OPSPROG_RUNNER=${OPSINPUTS_OPSPROG_RUNNER} )
-  if ( NOT ${_PAR_DONT_SET_OPS_OUTPUT_DIR_ENV_VAR} )
-    list ( APPEND environment
+  set( environment OOPS_TRAPFPE=1 OPSINPUTS_OPSPROG_RUNNER=${OPSINPUTS_OPSPROG_RUNNER} )
+  if( NOT ${_PAR_DONT_SET_OPS_OUTPUT_DIR_ENV_VAR} )
+    list( APPEND environment
       OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
       OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME} )
   endif()
 
-  if (NOT _PAR_MPI)
-     set(_PAR_MPI 1)
+  if(NOT _PAR_MPI)
+    set(_PAR_MPI 1)
   endif()
   ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
                     COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
@@ -59,8 +57,8 @@ function( ADD_WRITER_TEST )
   set_tests_properties( test_opsinputs_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
-set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput)
-set( OPSINPUTS_OPSPROG_RUNNER ${CMAKE_CURRENT_BINARY_DIR}/opsprog_runner.sh)
+set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput )
+set( OPSINPUTS_OPSPROG_RUNNER ${CMAKE_CURRENT_BINARY_DIR}/opsprog_runner.sh )
 
 # Shell script running OPS programs with PATH set appropriately
 get_target_property( OPSPROG_BIN_DIR OpsProg_PrintVarobs RUNTIME_OUTPUT_DIRECTORY )
@@ -84,7 +82,7 @@ ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                                 opsinputs/VarObsCheckerParameters.h
                                 mains/TestObsFilters.cc
                         LIBS    opsinputs )
-if (ufo_SOURCE_DIR)
+if(ufo_SOURCE_DIR)
   target_include_directories(test_OpsInputsFilters.x PRIVATE
     ${ufo_SOURCE_DIR}
   )
@@ -97,7 +95,7 @@ endif()
 # Cleans up the output directory
 ecbuild_add_test( TARGET  test_opsinputs_varobswriter_setup
                   COMMAND ${CMAKE_COMMAND}
-                  ARGS    "-E" "remove_directory" ${OPSINPUTS_OUTPUT_DIR})
+                  ARGS    "-E" "remove_directory" ${OPSINPUTS_OUTPUT_DIR} )
 set_tests_properties(test_opsinputs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
 
 ### VarObsWriter tests
@@ -375,7 +373,7 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_epsmws
                 YAML     varobswriter_globalnamelist_epsmws.yaml
                 NAMELIST ../../etc/global/varobs/EPSMWS.nl
                 DATA     varobs_globalnamelist_epsmws.nc4)
-              
+
 # Tests the UKV namelist files in the etc directory
 
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviasr
@@ -661,7 +659,7 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_epsmws
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sternamwr
                 YAML     cxwriter_globalnamelist_sternamwr.yaml
                 NAMELIST ../../etc/global/cx/SternaMWR.nl
-                DATA     cx_globalnamelist_sternamwr.nc4 dummy.nc4)              
+                DATA     cx_globalnamelist_sternamwr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_ssmis
                 YAML     cxwriter_globalnamelist_ssmis.yaml
                 NAMELIST ../../etc/global/cx/SSMIS.nl
@@ -760,16 +758,14 @@ ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
                   ARGS    "testinput/empty.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   MPI     4
-                  LIBS    opsinputs)
+                  LIBS    opsinputs )
 
 ### Final things to do
 
 # Create symlinks to test inputs and data files
 CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/testinput ${opsinputs_test_input} )
-CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/Data      ${opsinputs_test_data}  )
+CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DIR}/Data ${opsinputs_test_data} )
 
 # Add files to cmake resources
 list( TRANSFORM opsinputs_test_input PREPEND testinput/ )
-ecbuild_add_resources( TARGET opsinputs_test_scripts
-                       SOURCES_PACK
-                       ${opsinputs_test_input} )
+ecbuild_add_resources( TARGET opsinputs_test_scripts SOURCES_PACK ${opsinputs_test_input} )
