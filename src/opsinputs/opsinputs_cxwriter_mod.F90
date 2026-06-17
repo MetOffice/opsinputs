@@ -930,6 +930,12 @@ do iCxField = 1, size(CxFields)
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % rh2, "rh2", Cx % Header % NumLocal, Cx % rh2, &
         self % GeoVals, opsinputs_cxfields_rh2, self % JediToOpsLayoutMapping)
+      if (associated(Cx % rh2)) then
+        where (Cx % rh2 /= RMDI)
+          Cx % rh2 = Cx % rh2 * 100.0_real64
+        end where
+      end if
+  end if
     case (StashCode_u10, StashCode_U10_B_grid) ! IndexCxu10
       call opsinputs_fill_fillrealfromgeoval( &
         Cx % Header % u10, "u10", Cx % Header % NumLocal, Cx % u10, &
@@ -1110,6 +1116,11 @@ do iCxField = 1, size(CxFields)
         self % GeoVaLs, self % GeoVaLsAreTopToBottom, opsinputs_cxfields_rh, &
         self % JediToOpsLayoutMapping, self % hofx, self % varnames, &
         "relativeHumidity", self % WriteHofXIntoCX)
+      if (associated(Cx % rh)) then
+        where (Cx % rh /= RMDI)
+          Cx % rh = Cx % rh * 100.0_real64
+        end where
+      end if
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
       call opsinputs_fill_fillreal2dfromgeovalorhofx( &
         Cx % Header % u, "u", Cx % u, &
