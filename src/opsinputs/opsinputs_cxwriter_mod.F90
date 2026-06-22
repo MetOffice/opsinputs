@@ -933,7 +933,7 @@ do iCxField = 1, size(CxFields)
       ! RH now comes from the model interface as a fraction, but OPS expects it as a percentage, so convert here.
       if (associated(Cx % rh2)) then
         where (Cx % rh2 /= RMDI)
-          Cx % rh2 = Cx % rh2 * 100.0_real64
+          Cx % rh2 = Cx % rh2 * 100.0
         end where
       end if
     case (StashCode_u10, StashCode_U10_B_grid) ! IndexCxu10
@@ -1119,7 +1119,7 @@ do iCxField = 1, size(CxFields)
       ! RH now comes from the model interface as a fraction, but OPS expects it as a percentage, so convert here.
       if (associated(Cx % rh)) then
         where (Cx % rh /= RMDI)
-          Cx % rh = Cx % rh * 100.0_real64
+          Cx % rh = Cx % rh * 100.0
         end where
       end if
     case (StashItem_u, StashCode_u_p_B_grid) ! IndexCxu
