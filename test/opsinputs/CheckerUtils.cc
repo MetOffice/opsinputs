@@ -3,9 +3,15 @@
  *
  */
 
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <map>
+#include <memory>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>

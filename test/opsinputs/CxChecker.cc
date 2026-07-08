@@ -5,6 +5,10 @@
 
 #include <cstdio>
 #include <fstream>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>

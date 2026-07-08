@@ -21,7 +21,7 @@ ${CMAKE_Fortran_FLAGS}"
 -frange-check \
 ${CMAKE_Fortran_DEBUG_FLAGS}"
   )
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -warn alignments,declarations,errors,general,ignore_loc,nointerfaces,notruncated_source,shape,stderrors,uncalled,unused,usage \
 -implicitnone \
@@ -33,7 +33,7 @@ elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
 -assume norealloc_lhs \
 ${CMAKE_Fortran_FLAGS}"
   )
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Flang")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -fdefault-integer-8 -fdefault-real-8 \
 ${CMAKE_Fortran_FLAGS}"
@@ -41,21 +41,21 @@ ${CMAKE_Fortran_FLAGS}"
   set(CMAKE_Fortran_DEBUG_FLAGS "\
 -check bounds \
 -check format \
--check pointers \ 
+-check pointers \
 -check uninit \
 ${CMAKE_Fortran_DEBUG_FLAGS}"
   )
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NVHPC")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -i8 -r8 \
 ${CMAKE_Fortran_FLAGS}"
   )
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Cray")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -sdefault64 \
 ${CMAKE_Fortran_FLAGS}"
   )
-elseif ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "NAG")
   set(OPS_DEFAULT_Fortran_FLAGS "\
 -double \
 ${CMAKE_Fortran_FLAGS}"
@@ -67,7 +67,7 @@ endif()
 
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 
-if( NOT (MPI_FOUND AND MPI_Fortran_FOUND) )
+if( NOT ( MPI_FOUND AND MPI_Fortran_FOUND ) )
   find_package( MPI REQUIRED COMPONENTS Fortran )
 endif()
 

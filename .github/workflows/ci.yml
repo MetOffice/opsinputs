@@ -28,16 +28,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Install cmakelint
+      - name: Install linters
         run: |
           python3 -m pip install cmakelint fortitude-lint
       - name: Run cmakelint
         run: |
-          find -type f '(' -name 'CMakeLists.txt' -o -name '*.cmake' ')' \
-            -exec cmakelint '{}' ';'
+          mapfile -t names < <(find -name 'CMakeLists.txt' -o -name '*.cmake')
+          cmakelint "${names[@]}"
       - name: Run fortitude check
         run: |
-          fortitude check --target-std=f2008 --line-length=150
+          fortitude check
 
   build:
     name: gnu-openmpi
