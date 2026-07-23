@@ -32,6 +32,7 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupGeoCloud .OR. &
     obsgroup == ObsGroupGOESImClr .OR. &
     obsgroup == ObsGroupIASI .OR. &
+    obsgroup == ObsGroupIASING .OR. &
     obsgroup == ObsGroupIN3DIClr .OR. &
     obsgroup == ObsGroupIN3DS .OR. &
     obsgroup == ObsGroupMWSFY3B .OR. &

@@ -179,7 +179,7 @@ SELECT CASE (ObsGroup)
   CASE (ObsGroupHLOSWIND)
     Varfields(1:6) = (/Varfield_HLOSwind,Varfield_ProfileNo,VarField_dWinddT,   &
                        VarField_dWinddP,VarField_AzimuthCOG,VarField_HeightCOG/)
-  CASE (ObsGroupIASI)
+  CASE (ObsGroupIASI, ObsGroupIASING)
     Varfields(1:12) = (/Varfield_tskin,Varfield_tcozone,Varfield_satzenith, &
                         Varfield_surface,Varfield_stratt,Varfield_satid, &
                         Varfield_numchans,Varfield_channum,Varfield_britemp, &

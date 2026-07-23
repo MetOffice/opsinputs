@@ -38,6 +38,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupGPSRO,             &
     ObsGroupHLOSWind,          &
     ObsGroupIASI,              &
+    ObsGroupIASING,            &
     ObsGroupIN3DIClr,          &
     ObsGroupIN3DS,             &
     ObsGroupSAPHIR,            &
@@ -1363,6 +1364,16 @@ IF (ObsGroup == ObsGroupGMIlow .OR. ObsGroup == ObsGroupGMIhigh) THEN
   ElemDesp2ODBDesp(IndexChnlQlty) % ColName                   = 'channel_quality_flags'
   ElemDesp2ODBDesp(IndexChnlQlty) % related_varnos(1:1)       = (/ops_odb_getval (h, "$rawbt")/)
 
+END IF
+
+IF (ObsGroup == ObsGroupIASING) THEN
+  ElemDesp2ODBDesp(IndexRadiance) % TableName                 = 'body'
+  ElemDesp2ODBDesp(IndexRadiance) % ColName                   = 'initial_obsvalue'
+  ElemDesp2ODBDesp(IndexRadiance) % Varno                     = ops_odb_getval (h, "$rawsca")
+
+  ElemDesp2ODBDesp(IndexMWSBrightnessTemperature) % TableName = 'body'
+  ElemDesp2ODBDesp(IndexMWSBrightnessTemperature) % ColName   = 'initial_obsvalue'
+  ElemDesp2ODBDesp(IndexMWSBrightnessTemperature) % Varno     = ops_odb_getval (h, "$rawbt")  ! brightness temperature
 END IF
 
 ElemDesp2ODBDesp(IndexHLOSWIND) % TableName                   = 'body'

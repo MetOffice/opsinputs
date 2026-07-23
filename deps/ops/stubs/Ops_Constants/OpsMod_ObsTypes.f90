@@ -269,6 +269,7 @@ INTEGER, PARAMETER :: ObsTypeMTSATImCSR   = 26300   ! => MTSAT Imager radiances
 INTEGER, PARAMETER :: ObsTypeAHICSR       = 26310   ! => AHI radiances
 INTEGER, PARAMETER :: ObsTypeAHIASR       = 26320   ! => AHI all-sky radiances
 INTEGER, PARAMETER :: ObsTypeABICSR       = 26330   ! => ABI (GOES-16 onwards) radiances
+INTEGER, PARAMETER :: ObsTypeIASING       = 26500   ! => IASI-NG
 INTEGER, PARAMETER :: ObsTypeSATAOD       = 26600   ! => Satellite AOD (Polar)
 INTEGER, PARAMETER :: ObsTypeASCATCO      = 26700   ! => ASCAT coastal winds
 INTEGER, PARAMETER :: ObsTypeIN3DImCSR    = 26800   ! => INSAT3D Imager radiances

@@ -107,6 +107,7 @@ Using(ObsGroupOceanWinds) = ops_env_is_true ("OPS_OCEANWINDS")
 Using(ObsGroupGIIRSLW) = ops_env_is_true ("OPS_GIIRSLW")
 Using(ObsGroupGIIRSMW) = ops_env_is_true ("OPS_GIIRSMW")
 Using(ObsGroupMTGIRS) = ops_env_is_true ("OPS_MTGIRS")
+Using(ObsGroupIASING) = ops_env_is_true ("OPS_IASING")
 
 ALLOCATE (obs_group_list(COUNT (using)))
 obs_group_list = IMDI

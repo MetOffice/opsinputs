@@ -155,6 +155,8 @@ SELECT CASE (num)
     name = "IASIHR"
   CASE (ObsTypeIASI_L)
     name = "IASIL"
+  CASE (ObsTypeIASING)
+    name = "IASING"
   CASE (ObsTypeIMDWINDS)
     name = "IMDWINDS"
   CASE (ObsTypeIN3DImCSR)

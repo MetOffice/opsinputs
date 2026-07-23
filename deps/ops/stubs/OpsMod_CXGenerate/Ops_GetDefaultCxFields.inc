@@ -165,7 +165,7 @@ SELECT CASE (ObsGroup)
   CASE (ObsGroupHLOSWIND)
     CxFields(1:5) = (/StashItem_u,StashItem_v,StashItem_orog,StashItem_p, &
                       StashItem_p_Surface/)
-  CASE (ObsGroupIASI)
+  CASE (ObsGroupIASI, ObsGroupIASING)
     CxFields(1:14) = (/StashItem_theta,StashItem_q,StashItem_qcf,StashItem_SST,  &
                        StashItem_SeaIce,StashItem_orog,StashItem_qcl,            &
                        StashItem_p,StashItem_p_Surface,StashCode_u10,            &
