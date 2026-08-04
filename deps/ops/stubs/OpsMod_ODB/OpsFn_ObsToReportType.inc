@@ -121,6 +121,8 @@ USE OpsMod_Satids, ONLY:    &
   SatId_NOAA19,             &
   SatId_NOAA20,             &
   SatId_NOAA21,             &
+  SatId_GCOMW1,             &
+  SatId_GOSATGW,            &
   SatId_OceanSat2,          &
   SatId_OceanSat3,          &
   SatId_OceanSat3A,         &
@@ -289,7 +291,25 @@ SELECT CASE (Obs % Header % ObsGroup)
       END DO
     END IF
   CASE (ObsGroupAMSR)
-    report_types = rep_type_amsr2_rad
+    IF (Obs % Header % Satid % Present) THEN
+      DO i = ob_start, ob_end
+        IF (Obs % Satid(i) == SatId_GCOMW1) THEN
+          report_types(i - ob_start + 1) = rep_type_amsr2_rad
+        ELSE IF (Obs % Satid(i) == SatId_GOSATGW) THEN
+          report_types(i - ob_start + 1) = rep_type_amsr3_rad
+        ELSE
+          found_report_type = .FALSE.
+          DO j = 1, SIZE (map, DIM = 1)
+            IF (map(j,1) == ObsGroupAMSR .AND. map(j,2) == Obs % Satid(i)) THEN
+              report_types(i - ob_start + 1) = map(j,3)
+              found_report_type = .TRUE.
+              EXIT
+            END IF
+          END DO
+          CALL update_unrecognized_satids (Obs % Satid(i))
+        END IF
+      END DO
+    END IF
   CASE (ObsGroupAMSUB)
     IF (Obs % Header % Satid % Present) THEN
       DO i = ob_start, ob_end
