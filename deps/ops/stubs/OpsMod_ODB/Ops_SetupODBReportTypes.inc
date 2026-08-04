@@ -168,6 +168,7 @@ IF (.NOT. have_setup_reporttypes) THEN
   rep_type_mwts2_fy3d = NINT (ops_odb_getval (session, "$rep_type_mwts2_fy3d"))
   rep_type_mwri_fy3d = NINT (ops_odb_getval (session, "$rep_type_mwri_fy3d"))
   rep_type_amsr2_rad = NINT (ops_odb_getval (session, "$rep_type_amsr2_rad"))
+  rep_type_amsr3_rad = NINT (ops_odb_getval (session, "$rep_type_amsr3_rad"))
   rep_type_saphir_rad = NINT (ops_odb_getval (session, "$rep_type_saphir_rad"))
   rep_type_noaa_15_amsub_rad = NINT (ops_odb_getval (session, "$rep_type_noaa_15_amsub_rad"))
   rep_type_noaa_16_amsub_rad = NINT (ops_odb_getval (session, "$rep_type_noaa_16_amsub_rad"))

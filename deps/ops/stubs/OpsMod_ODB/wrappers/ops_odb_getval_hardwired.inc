@@ -647,6 +647,8 @@ SELECT CASE (string)
     ops_odb_getval_hardwired = 39001
   CASE ("$rep_type_amsr2_rad")
     ops_odb_getval_hardwired = 41001
+  CASE ("$rep_type_amsr3_rad")
+    ops_odb_getval_hardwired = 41002
   CASE ("$rep_type_saphir_rad")
     ops_odb_getval_hardwired = 42001
   CASE ("$rep_type_doppler_wind_lidar")
@@ -654,7 +656,7 @@ SELECT CASE (string)
   CASE ("$rep_type_envisat_radiance")
     ops_odb_getval_hardwired = 48001
   CASE ("$rep_type_gmi_rad")
-    ops_odb_getval_hardwired = 50001 
+    ops_odb_getval_hardwired = 50001
   CASE ("$rep_type_metop_b_satsst")
     ops_odb_getval_hardwired = 51001
   CASE ("$rep_type_meteosat_9_satsst")

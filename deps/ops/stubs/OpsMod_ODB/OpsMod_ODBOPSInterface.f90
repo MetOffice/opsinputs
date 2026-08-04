@@ -173,6 +173,7 @@ INTEGER                 :: rep_type_saral_wave = 0
 INTEGER                 :: rep_type_sentinel_3a_wave = 0
 INTEGER                 :: rep_type_cryosat_2_wave = 0
 INTEGER                 :: rep_type_amsr2_rad = 0
+INTEGER                 :: rep_type_amsr3_rad = 0
 INTEGER                 :: rep_type_saphir_rad = 0
 INTEGER                 :: rep_type_noaa_15_amsub_rad = 0
 INTEGER                 :: rep_type_noaa_16_amsub_rad = 0
