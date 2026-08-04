@@ -300,6 +300,22 @@ SELECT CASE (ObsGroup)
                         Varfield_solzenith,Varfield_tskin, &
                         Varfield_surface,Varfield_numchans,Varfield_channum, &
                         Varfield_mwemiss /)
+  CASE (ObsGroupHYMSFULL) !set up for jedi
+    Varfields(1:9) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
+                        Varfield_solzenith,Varfield_tskin, &
+                        Varfield_surface,Varfield_numchans,Varfield_channum, &
+                        Varfield_mwemiss /)
+  CASE (ObsGroupHYMSSUPER) !set up for jedi
+    Varfields(1:9) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
+                        Varfield_solzenith,Varfield_tskin, &
+                        Varfield_surface,Varfield_numchans,Varfield_channum, &
+                        Varfield_mwemiss /)                        
+  CASE (ObsGroupHYMSATMS) !set up for jedi
+    Varfields(1:9) = (/Varfield_britemp,Varfield_satid,Varfield_satzenith, &
+                        Varfield_solzenith,Varfield_tskin, &
+                        Varfield_surface,Varfield_numchans,Varfield_channum, &
+                        Varfield_mwemiss /)                        
+                        
   CASE (ObsGroupRainAccum)
     Varfields(1:1) = (/Varfield_RainAccum/)
 END SELECT
