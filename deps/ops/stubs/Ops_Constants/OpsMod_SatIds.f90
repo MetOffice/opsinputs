@@ -38,6 +38,7 @@ INTEGER, PARAMETER  :: SatId_Meteosat11         = 70
 INTEGER, PARAMETER  :: SatId_Meteosat12         = 71
 INTEGER, PARAMETER  :: SatId_MSG3               = 73
 INTEGER, PARAMETER  :: SatId_GCOMW1             = 122
+INTEGER, PARAMETER  :: SatId_GOSATGW            = 142
 INTEGER, PARAMETER  :: SatId_MTSAT1R            = 171
 INTEGER, PARAMETER  :: SatId_MTSAT2             = 172
 INTEGER, PARAMETER  :: SatId_Himawari8          = 173
