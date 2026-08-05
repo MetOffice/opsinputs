@@ -82,6 +82,9 @@ INTEGER, PARAMETER :: ObsGroupSternaMWR      =  70 ! => AWS & Sterna microwave r
 INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS
 INTEGER, PARAMETER :: ObsGroupMWSFY3E        =  72 ! => FY3E microwave sounder data
 INTEGER, PARAMETER :: ObsGroupHIRAS2         =  74 ! => HIRAS Radiances
+INTEGER, PARAMETER :: ObsGroupHYMSFULL       =  75 ! => HYMSFULL Radiances
+INTEGER, PARAMETER :: ObsGroupHYMSSUPER      =  76 ! => HYMSSUPER Radiances
+INTEGER, PARAMETER :: ObsGroupHYMSATMS       =  77 ! => HYMSATMS Radiances
 INTEGER, PARAMETER :: max_obs_group_num      =  74 ! Number of observation groups
 
 CONTAINS
