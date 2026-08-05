@@ -32,6 +32,8 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupAltim
   CASE ("AMSR")
     OpsFn_ObsGroupNameToNum = ObsGroupAMSR
+  CASE ("AMSR3")
+    OpsFn_ObsGroupNameToNum = ObsGroupAMSR
   CASE ("AMSUB")
     OpsFn_ObsGroupNameToNum = ObsGroupAMSUB
   CASE ("ATMS")
