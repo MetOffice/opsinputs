@@ -49,7 +49,10 @@ IF (obsgroup == ObsGroupABIClr .OR. &
     obsgroup == ObsGroupSternaMWR .OR. &
     obsgroup == ObsGroupGIIRSLW .OR. &
     obsgroup == ObsGroupGIIRSMW .OR. &
-    obsgroup == ObsGroupMTGIRS) THEN
+    obsgroup == ObsGroupMTGIRS  .OR. &
+    obsgroup == ObsGroupHYMSFULL  .OR. &    
+    obsgroup == ObsGroupHYMSSUPER  .OR. &    
+    obsgroup == ObsGroupHYMSATMS) THEN
 
   OpsFn_IsSatRadGroup = .TRUE.
 ELSE
