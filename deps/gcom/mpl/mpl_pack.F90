@@ -27,7 +27,7 @@ INTEGER (KIND=gc_int_kind), INTENT(IN)    :: incount
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: datatype
 INTEGER (KIND=gc_int_kind), INTENT(OUT)   :: outbuf(*)
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: outsize
-INTEGER (KIND=gc_int_kind), INTENT(IN OUT) :: posn
+INTEGER (KIND=gc_int_kind), INTENT(INOUT) :: posn
 INTEGER (KIND=gc_int_kind), INTENT(IN)    :: comm
 INTEGER (KIND=gc_int_kind), INTENT(OUT)   :: ERROR
 

@@ -8,7 +8,7 @@ interface
 
 subroutine c_opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
     obss, group, variable, reference, length, offsets) &
-    bind(C,name='opsinputs_obsspace_get_db_datetime_offset_in_seconds_f')
+    bind(C,name="opsinputs_obsspace_get_db_datetime_offset_in_seconds_f")
   use, intrinsic :: iso_c_binding, only: c_char, c_int64_t, c_ptr, c_size_t
   implicit none
   type(c_ptr), value :: obss
@@ -21,7 +21,7 @@ end subroutine c_opsinputs_obsspace_get_db_datetime_offset_in_seconds
 
 subroutine c_opsinputs_obsspace_get_db_string( &
     obss, group, variable, string_length, num_strings, characters) &
-    bind(C,name='opsinputs_obsspace_get_db_string_f')
+    bind(C,name="opsinputs_obsspace_get_db_string_f")
   use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_size_t
   implicit none
   type(c_ptr), value :: obss
@@ -34,7 +34,7 @@ end subroutine c_opsinputs_obsspace_get_db_string
 
 subroutine c_opsinputs_obsspace_get_locs_ordered_by_record( &
     obss, NumLocations, LocationsOrderedByRecord, NumRecordStarts, RecordStarts) &
-    bind(C,name='opsinputs_obsspace_get_locs_ordered_by_record_f')
+    bind(C,name="opsinputs_obsspace_get_locs_ordered_by_record_f")
   use, intrinsic :: iso_c_binding, only: c_ptr, c_int32_t
   implicit none
   type(c_ptr), value :: obss

@@ -74,7 +74,7 @@ INTEGER (KIND=gc_int_kind) :: dummy1,dummy2,gcg__mpi_rank
 #include "gc_functions.h"
 
 CALL gc_abort(gc_me(),gc_nproc(),                                              &
-              'GCG__MPI_RANK called for non-MPI')
+              "GCG__MPI_RANK called for non-MPI")
 
 gcg__mpi_rank = -1
 

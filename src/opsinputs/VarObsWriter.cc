@@ -5,6 +5,8 @@
 
 #include "opsinputs/VarObsWriter.h"
 
+#include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -29,10 +31,10 @@
 namespace opsinputs {
 
 VarObsWriter::VarObsWriter(ioda::ObsSpace & obsdb, const Parameters_ & params,
-                           std::shared_ptr<ioda::ObsDataVector<int> > flags,
-                           std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), extradiagvars_(), flags_(std::move(flags)),
-    obsErrors_(std::move(obsErrors)), parameters_(params)
+                           ioda::ObsDataVector<int> & flags,
+                           ioda::ObsDataVector<float> & obsErrors)
+  : obsdb_(obsdb), geovars_(), extradiagvars_(), flags_(flags),
+    obsErrors_(obsErrors), parameters_(params)
 {
   oops::Log::trace() << "VarObsWriter constructor starting" << std::endl;
 
@@ -121,15 +123,15 @@ void VarObsWriter::postFilter(const ufo::GeoVaLs & gv,
     for (const ufo::Variable &var : parameters_.variables_for_qc.value().get())
       filtervars += var;
     ioda::ObsDataVector<int> flags(obsdb_, filtervars.toOopsObsVariables());
-    for (int ivar = 0; ivar < flags.nvars(); ivar++) {
+    for (size_t ivar = 0; ivar < flags.nvars(); ivar++) {
       std::string varname = flags.varnames()[ivar];
-      flags[varname] = flags_->operator[](varname);
+      flags[varname] = flags_.operator[](varname);
     }
-    opsinputs_varobswriter_post_f90(key_, obsdb_, flags, *obsErrors_,
+    opsinputs_varobswriter_post_f90(key_, obsdb_, flags, obsErrors_,
                                     hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
                                     obsdiags.toFortran());
   } else {
-    opsinputs_varobswriter_post_f90(key_, obsdb_, *flags_, *obsErrors_,
+    opsinputs_varobswriter_post_f90(key_, obsdb_, flags_, obsErrors_,
                                     hofx.nvars(), hofx.nlocs(), hofx.toFortran(),
                                     obsdiags.toFortran());
   }

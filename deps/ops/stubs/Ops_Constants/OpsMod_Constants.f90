@@ -64,6 +64,6 @@ REAL, PARAMETER             :: rhmax(0:40) =  &
       133.96, 135.26, 136.58, 137.90, 139.23, &
       140.57, 141.92, 143.27, 144.64, 146.02, 147.40 ]
 
-CHARACTER(len=16), PARAMETER :: CMDI = 'XXXXXXXX'
+CHARACTER(len=16), PARAMETER :: CMDI = "XXXXXXXX"
 
 END MODULE OpsMod_Constants

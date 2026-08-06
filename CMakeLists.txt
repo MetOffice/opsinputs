@@ -12,7 +12,7 @@ set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( CMAKE_CXX_EXTENSIONS OFF )
 
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH})
+set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH} )
 
 set( CMAKE_DIRECTORY_LABELS "opsinputs" )
 
@@ -47,7 +47,7 @@ find_package( MPI REQUIRED COMPONENTS C CXX Fortran )
 include_directories( ${Boost_INCLUDE_DIR} )
 
 # NetCDF
-find_package( NetCDF REQUIRED COMPONENTS C CXX Fortran)
+find_package( NetCDF REQUIRED COMPONENTS C CXX Fortran )
 
 # eckit
 find_package( eckit REQUIRED )
@@ -86,9 +86,9 @@ get_directory_property( OPSINPUTS_DEFINITIONS COMPILE_DEFINITIONS )
 
 foreach( _tpl ${OPSINPUTS_TPLS} )
   string( TOUPPER ${_tpl} TPL )
-  list( APPEND OPSINPUTS_EXTRA_DEFINITIONS   ${${TPL}_DEFINITIONS}  ${${TPL}_TPL_DEFINITIONS}  )
+  list( APPEND OPSINPUTS_EXTRA_DEFINITIONS   ${${TPL}_DEFINITIONS}  ${${TPL}_TPL_DEFINITIONS} )
   list( APPEND OPSINPUTS_EXTRA_INCLUDE_DIRS  ${${TPL}_INCLUDE_DIRS} ${${TPL}_TPL_INCLUDE_DIRS} )
-  list( APPEND OPSINPUTS_EXTRA_LIBRARIES     ${${TPL}_LIBRARIES}    ${${TPL}_TPL_LIBRARIES}    )
+  list( APPEND OPSINPUTS_EXTRA_LIBRARIES     ${${TPL}_LIBRARIES}    ${${TPL}_TPL_LIBRARIES} )
 endforeach()
 
 ################################################################################
@@ -110,16 +110,37 @@ endif()
 
 if( BUILD_TESTING )
   add_subdirectory( test )
-  ecbuild_add_test(
-    TARGET opsinputs_coding_norms
-    TYPE SCRIPT
-    COMMAND ${oops_BINDIR}/oops_cpplint.py
-    ARGS
-      --quiet
-      --recursive
-      ${CMAKE_CURRENT_SOURCE_DIR}/src
-      ${CMAKE_CURRENT_SOURCE_DIR}/test
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+  # We can make use of CMake's native support of cpplint in future. If we set
+  # `CMAKE_<LANG>_CPPLINT` (where `<LANG>` is either `C` or `CXX`) to point to
+  # the `cpplint` executable, it will run `cpplint` as part of the build.
+  find_program(
+    CPPLINT_EXECUTABLE
+    NAMES cpplint
+    DOC "Path to the cpplint executable"
+  )
+  if(CPPLINT_EXECUTABLE)
+    ecbuild_add_test(
+      TARGET "${PROJECT_NAME}_coding_norms"
+      LABELS lint
+      TYPE SCRIPT
+      COMMAND "${CPPLINT_EXECUTABLE}"
+      ARGS --quiet --recursive "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+  endif()
+  find_program(
+    FORTITUDE_EXECUTABLE
+    NAMES fortitude
+    DOC "Path to the Fortitude linter executable"
+  )
+  if(FORTITUDE_EXECUTABLE)
+    ecbuild_add_test(
+      TARGET "${PROJECT_NAME}_fortitude_check"
+      LABELS lint
+      TYPE SCRIPT
+      COMMAND "${FORTITUDE_EXECUTABLE}"
+      ARGS check "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+  endif()
 endif()
 
 ################################################################################

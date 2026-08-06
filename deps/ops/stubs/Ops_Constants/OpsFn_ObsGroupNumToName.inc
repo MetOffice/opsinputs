@@ -139,6 +139,12 @@ SELECT CASE (ObsGroup)
     OpsFn_ObsGroupNumToName = "EPSMWS"
   CASE (ObsGroupSternaMWR)
     OpsFn_ObsGroupNumToName = "SternaMWR"
+  CASE (ObsGroupHYMSFULL)
+    OpsFn_ObsGroupNumToName = "HYMSFULL"
+  CASE (ObsGroupHYMSSUPER)
+    OpsFn_ObsGroupNumToName = "HYMSSUPER"
+  CASE (ObsGroupHYMSATMS)
+    OpsFn_ObsGroupNumToName = "HYMSATMS"        
   CASE DEFAULT
     OpsFn_ObsGroupNumToName = "Unknown"
 END SELECT

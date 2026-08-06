@@ -672,7 +672,7 @@ TYPE OB_type
   REAL, POINTER                          :: AMSUscatindx(:) => NULL()    ! AMSU scattering index (atovs)
   INTEGER, POINTER                       :: ATOVSProcOption(:) => NULL() ! processing options from 1DVAR (atovs)
   INTEGER, POINTER                       :: QCHIRSfov(:) => NULL()       ! HIRS flags from ATOVPP (atovs)
-  INTEGER, POINTER                       :: QCGIIRSfov(:) => NULL()      ! GIIRSflags 
+  INTEGER, POINTER                       :: QCGIIRSfov(:) => NULL()      ! GIIRSflags
   REAL, POINTER                          :: HIRS_Temp(:) => NULL()       ! HIRS instrument temp (K) (atovs)
   REAL, POINTER                          :: AMSUa1_Temp(:) => NULL()     ! AMSU-A1 instrument temp (K) (atovs)
   REAL, POINTER                          :: AMSUa2_Temp(:) => NULL()     ! AMSU-A2 instrument temp (K) (atovs)
@@ -851,7 +851,7 @@ TYPE OB_type
   TYPE (Element_type), POINTER           :: WIND_SPED(:) => NULL() ! Surface windspeed       m/s
   TYPE (Element_type), POINTER           :: SeaHeight(:) => NULL() ! Height of Sea surface   m
   TYPE (Element_type), POINTER           :: SeaIce(:) => NULL()    ! Sea ice
-  TYPE (Element_type), POINTER           :: CHL(:) => NULL()       ! mass concentration of chlorophyll a 
+  TYPE (Element_type), POINTER           :: CHL(:) => NULL()       ! mass concentration of chlorophyll a
                                                                    ! in sea water milligram     m-3
   TYPE (Element_type), POINTER           :: KD490(:) => NULL()     ! volume attenuation coefficient of downwelling
                                                                    ! radiative flux in sea water at 490 nm\n  m-1
@@ -859,7 +859,7 @@ TYPE OB_type
   TYPE (Element_type), POINTER           :: Tskin(:) => NULL()     ! Surface radiative temp. K
   TYPE (Element_type), POINTER           :: TCWV(:) => NULL()      ! Total Column Water Vapour kg/m^2
   TYPE (Element_type), POINTER           :: LWP(:) => NULL()       ! Liquid Water Path  kg/m^2
-  TYPE (Element_type), POINTER           :: IWP(:) => NULL()       ! Ice Water Path  kg/m^2 
+  TYPE (Element_type), POINTER           :: IWP(:) => NULL()       ! Ice Water Path  kg/m^2
   TYPE (Element_type), POINTER           :: RetLWP(:) => NULL()    ! retrieved Liquid Water Path  kg/m^2
   TYPE (Element_type), POINTER           :: Rainrate(:,:) => NULL()  ! Rain rate     kg/m^2/s
   TYPE (Element_type), POINTER           :: Snowrate(:,:) => NULL()  ! Snow rate     kg/m^2/s

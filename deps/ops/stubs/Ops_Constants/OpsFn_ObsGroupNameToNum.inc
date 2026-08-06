@@ -142,6 +142,12 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupEPSMWS
   CASE ("SternaMWR")
     OpsFn_ObsGroupNameToNum = ObsGroupSternaMWR
+  CASE ("HYMSFULL")
+    OpsFn_ObsGroupNameToNum = ObsGroupHYMSFULL
+  CASE ("HYMSSUPER")
+    OpsFn_ObsGroupNameToNum = ObsGroupHYMSSUPER
+  CASE ("HYMSATMS")
+    OpsFn_ObsGroupNameToNum = ObsGroupHYMSATMS       
   CASE DEFAULT
     OpsFn_ObsGroupNameToNum = IMDI
 END SELECT

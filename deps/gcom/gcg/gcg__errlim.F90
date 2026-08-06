@@ -27,12 +27,12 @@ EXTERNAL gc_me, gc_nproc
 
 gcg__me = gc_me()
 gcg__nproc = gc_nproc()
-WRITE(*,*) 'GCG_', sub, '(): internal limit MAX_', lim,                        &
-           ' exceeded on processor ', gcg__me
-WRITE(*,*) 'Maximum value is ', mval, '. Actual value is ',                    &
-           aval, '. Exiting.'
+WRITE(*,*) "GCG_", sub, "(): internal limit MAX_", lim,                        &
+           " exceeded on processor ", gcg__me
+WRITE(*,*) "Maximum value is ", mval, ". Actual value is ",                    &
+           aval, ". Exiting."
 
-CALL gc_abort(gcg__me, gcg__nproc, '*** DEFINED LIMIT EXCEEDED ***')
+CALL gc_abort(gcg__me, gcg__nproc, "*** DEFINED LIMIT EXCEEDED ***")
 
 RETURN
 END SUBROUTINE gcg__errlim

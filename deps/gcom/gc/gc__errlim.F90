@@ -24,12 +24,12 @@ IMPLICIT NONE
 INTEGER (KIND=gc_int_kind) :: iabrt, mval, aval
 CHARACTER(LEN=*) :: sub, lim
 
-WRITE(*,*) 'GC_', sub, '(): internal limit MAX_', lim,                         &
-           ' exceeded on processor ', gc_me()
-WRITE(*,*) 'Maximum value is ', mval, '. Actual value is ',                    &
-           aval, '. Exiting.'
+WRITE(*,*) "GC_", sub, "(): internal limit MAX_", lim,                         &
+           " exceeded on processor ", gc_me()
+WRITE(*,*) "Maximum value is ", mval, ". Actual value is ",                    &
+           aval, ". Exiting."
 
-CALL gc_abort(gc_me(), gc_nproc(), '*** STATIC LIMIT EXCEEDED ***')
+CALL gc_abort(gc_me(), gc_nproc(), "*** STATIC LIMIT EXCEEDED ***")
 
 RETURN
 END SUBROUTINE gc__errlim

@@ -80,7 +80,7 @@ CONTAINS
   ! Routine to destroy SharedData - Final doesnt work currently
   PROCEDURE, PUBLIC     :: DestroySharedData
 
-END TYPE
+END TYPE SharedMemory_type
 
 !-------------------------------------------------------------------------------
 ! Module parameters
@@ -124,7 +124,7 @@ INTEGER                      :: i
 INTEGER                      :: WindowSize
 INTEGER                      :: ArraySize(ARRAY_RANK)
 CHARACTER(len=80)            :: ErrMess
-CHARACTER (len=*), PARAMETER :: RoutineName = 'InitSharedMemory'
+CHARACTER (len=*), PARAMETER :: RoutineName = "InitSharedMemory"
 
 ALLOCATE (self % FieldDims(SIZE (FieldDims, DIM = 1), SIZE (FieldDims, DIM = 2), SIZE (FieldDims, DIM = 3)))
 self % FieldDims = FieldDims
@@ -138,7 +138,7 @@ IF(SharedMemoryTimeSlice) THEN
   ArraySize(4) = 1                       ! Read one time-slice per time
 ELSE
   ArraySize(4) = SIZE (FieldDims,3)      ! Number of time-slices for all fields
-ENDIF
+END IF
 
 ! Setting up the shared memory
 CALL ops_mpl_comm_split_type (mpl_comm_world,       &
@@ -149,7 +149,7 @@ CALL ops_mpl_comm_split_type (mpl_comm_world,       &
                               istat)
 
 IF (istat /= mpl_success) THEN
-  WRITE (ErrMess, '(A,I0,A,I0)') &
+  WRITE (ErrMess, "(A,I0,A,I0)") &
          "Error in ops_mpl_comm_split_type, mype = ", mype, " istat = ", istat
   CALL gen_fail (RoutineName, &
                  ErrMess)
@@ -161,7 +161,7 @@ CALL ops_mpl_comm_rank (self % ShareComm,  &
                         istat)
 
 IF (istat /= mpl_success) THEN
-  WRITE (ErrMess, '(A,I0,A,I0)') &
+  WRITE (ErrMess, "(A,I0,A,I0)") &
          "Error in ops_mpl_comm_rank, mype = ", mype, " istat = ", istat
   CALL gen_fail (RoutineName, &
                  ErrMess)
@@ -174,7 +174,7 @@ CALL ops_mpl_comm_size (self % ShareComm, &
                         istat)
 
 IF (istat /= mpl_success) THEN
-  WRITE (ErrMess, '(A,I0,A,I0)') &
+  WRITE (ErrMess, "(A,I0,A,I0)") &
          "Error in ops_mpl_comm_size, mype = ", mype, " istat = ", istat
   CALL gen_fail (RoutineName, &
                  ErrMess)
@@ -189,7 +189,7 @@ IF (self % SharedRank == 0) THEN
   END DO
 
   ! Output information about the number of PE's per node and the allocated size
-  WRITE (MessageOut, '(A,I0,A,F7.3,A)') "InitSharedMemory: this node has ", &
+  WRITE (MessageOut, "(A,I0,A,F7.3,A)") "InitSharedMemory: this node has ", &
          self % NProcNode ," PE's and is allocating ",                      &
          real(WindowSize) / real(2**30) ," GiB of shared memory"
 
@@ -207,7 +207,7 @@ CALL ops_mpl_win_allocate_shared (WindowSize,       &
                                   istat)
 
 IF (istat /= mpl_success) THEN
-  WRITE (ErrMess, '(A,I0,A,I0)') &
+  WRITE (ErrMess, "(A,I0,A,I0)") &
          "Error in ops_mpl_win_allocate_shared, mype = ", mype, " istat = ", istat
   CALL gen_fail (RoutineName, &
                  ErrMess)
@@ -222,7 +222,7 @@ IF (self % SharedRank /= 0) THEN
                                  self % BasePtr, &
                                  istat)
   IF (istat /= mpl_success) THEN
-    WRITE (ErrMess, '(A,I0,A,I0)') &
+    WRITE (ErrMess, "(A,I0,A,I0)") &
            "Error in ops_mpl_win_shared_query, mype = ", mype, " istat = ", istat
     CALL gen_fail (RoutineName, &
                    ErrMess)
@@ -332,12 +332,12 @@ INTEGER, INTENT(IN)          :: iField
 REAL(real32), POINTER        :: FieldData(:,:)
 
 ! Local declarations:
-CHARACTER (len=*), PARAMETER :: RoutineName = 'GetData(SharedMemory_type)'
+CHARACTER (len=*), PARAMETER :: RoutineName = "GetData(SharedMemory_type)"
 INTEGER :: iTime_local
 
 IF (.NOT. self % is_instantiated) THEN
   CALL gen_fail (RoutineName,                               &
-                 'SharedMemory object is NOT instantiated')
+                 "SharedMemory object is NOT instantiated")
 END IF
 
 ! If not reading all fields then reuse the first time slice
@@ -405,7 +405,7 @@ IMPLICIT NONE
 CLASS (SharedMemory_type) :: self
 
 CHARACTER(len=80)            :: ErrMess
-CHARACTER (len=*), PARAMETER :: RoutineName = 'DestroySharedData'
+CHARACTER (len=*), PARAMETER :: RoutineName = "DestroySharedData"
 
 IF (self % is_instantiated) THEN
 
@@ -415,7 +415,7 @@ IF (self % is_instantiated) THEN
                          istat)
 
   IF (istat /= mpl_success) THEN
-    WRITE (ErrMess, '(A,I0,A,I0)') &
+    WRITE (ErrMess, "(A,I0,A,I0)") &
            "Error in ops_mpl_win_free, mype = ", mype, " istat = ", istat
     CALL gen_fail (RoutineName, &
                    ErrMess)

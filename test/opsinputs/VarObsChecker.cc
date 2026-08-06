@@ -5,6 +5,10 @@
 
 #include <cstdio>
 #include <fstream>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -75,9 +79,9 @@ struct VarObsChecker::PrintVarObsOutput {
 
 
 VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const Parameters_ & params,
-                             std::shared_ptr<ioda::ObsDataVector<int> > flags,
-                             std::shared_ptr<ioda::ObsDataVector<float> > obsErrors)
-  : obsdb_(obsdb), geovars_(), flags_(std::move(flags)), obsErrors_(std::move(obsErrors)),
+                             ioda::ObsDataVector<int> & flags,
+                             ioda::ObsDataVector<float> & obsErrors)
+  : obsdb_(obsdb), geovars_(), flags_(flags), obsErrors_(obsErrors),
     parameters_(params)
 {
   oops::Log::trace() << "VarObsChecker constructor starting" << std::endl;

@@ -66,10 +66,10 @@ USE gc_kinds_mod, ONLY: gc_int_kind
 IMPLICIT NONE
 PRIVATE
 
-PUBLIC ::                                                                      &
 #if defined(MPI_SRC)
-  mpiabort_errno, mpi_bsend_buffer_size,                                       &
+PUBLIC :: mpiabort_errno, mpi_bsend_buffer_size
 #endif
+PUBLIC ::                                                                      &
   gc_version, gc_build_date, gc_int_type, gc_real_type, gc_descrip, gc__isize, &
   gc__rsize, gc__forterrunit
 

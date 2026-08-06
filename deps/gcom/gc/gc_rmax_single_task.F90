@@ -46,7 +46,7 @@ INTEGER (KIND=gc_int_kind), INTENT(IN) :: len1
 INTEGER (KIND=gc_int_kind), INTENT(IN) :: nproc
 INTEGER (KIND=gc_int_kind), INTENT(IN) :: root
 INTEGER (KIND=gc_int_kind), INTENT(OUT) :: istat
-REAL    (KIND=gc_real_kind), INTENT(IN OUT) :: smax(len1)
+REAL    (KIND=gc_real_kind), INTENT(INOUT) :: smax(len1)
 
 REAL (KIND=gc_real_kind)   :: reduce_data_wrk(len1)
 
