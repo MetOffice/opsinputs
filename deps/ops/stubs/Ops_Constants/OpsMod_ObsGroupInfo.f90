@@ -80,7 +80,7 @@ INTEGER, PARAMETER :: ObsGroupFCIASR         =  68 ! => FCI all-sky radiances
 INTEGER, PARAMETER :: ObsGroupFCIClr         =  69 ! => FCI clear-sky radiances
 INTEGER, PARAMETER :: ObsGroupSternaMWR      =  70 ! => AWS & Sterna microwave radiances
 INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS
-INTEGER, PARAMETER :: ObsGroupMWSFY3E        =  72 ! => FY3E microwave sounder data
+INTEGER, PARAMETER :: ObsGroupMWSFY3E        =  73 ! => FY3E microwave sounder data
 INTEGER, PARAMETER :: ObsGroupHIRAS2         =  74 ! => HIRAS Radiances
 INTEGER, PARAMETER :: max_obs_group_num      =  74 ! Number of observation groups
 
