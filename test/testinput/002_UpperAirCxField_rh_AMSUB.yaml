@@ -33,9 +33,9 @@ observations:
       expected_upper_air_variables: ["2"] # IndexCxrh
       expected_main_table_columns:
       - # batch 1
-        - ["1.10", "1.20", "1.30"]       # column 1
-        - ["2.10", "**********", "2.30"] # column 2 (the asterisks represent a missing float)
-        - ["4.10", "4.20", "4.30"]       # column 3
+        - ["110.00", "120.00", "130.00"]     # column 1
+        - ["210.00", "**********", "230.00"] # column 2 (the asterisks represent a missing float)
+        - ["410.00", "420.00", "430.00"]     # column 3
     HofX: ObsValue # just a placeholder -- not used, but needed to force calls to postFilter.
     benchmarkFlag: 1000 # just to keep the ObsFilters test happy
     flaggedBenchmark: 0

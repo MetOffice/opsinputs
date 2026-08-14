@@ -10,7 +10,7 @@ include( opsinputs_functions )
 # Defines a VarObsWriter or CxWriter test.
 #
 # Arguments:
-# - name: Test name (will be prefixed by "test_opsvalues_").
+# - name: Test name (will be prefixed by "${PROJECT_NAME}_").
 # - yaml: path to the test's input YAML file, relative to the testinput subfolder.
 # - namelist: path to the test's input namelist file, relative to the testinput subfolder. May be
 #   omitted if the test does not use a namelist file.
@@ -25,7 +25,7 @@ include( opsinputs_functions )
 function( ADD_WRITER_TEST )
   set( options DONT_SET_OPS_OUTPUT_DIR_ENV_VAR )
   set( single_value_args NAME YAML NAMELIST MPI )
-  set( multi_value_args DATA )
+  set( multi_value_args DATA LABELS )
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
                               ${_FIRST_ARG} ${ARGN} )
   if(_PAR_UNPARSED_ARGUMENTS)
@@ -41,20 +41,21 @@ function( ADD_WRITER_TEST )
   set( environment OOPS_TRAPFPE=1 OPSINPUTS_OPSPROG_RUNNER=${OPSINPUTS_OPSPROG_RUNNER} )
   if( NOT ${_PAR_DONT_SET_OPS_OUTPUT_DIR_ENV_VAR} )
     list( APPEND environment
-      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME}
-      OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/test_opsinputs_${_PAR_NAME} )
+      OPS_VAROB_OUTPUT_DIR=${OPSINPUTS_OUTPUT_DIR}/${PROJECT_NAME}_${_PAR_NAME}
+      OPS_CX_DIR_LIST=${OPSINPUTS_OUTPUT_DIR}/${PROJECT_NAME}_${_PAR_NAME} )
   endif()
 
   if(NOT _PAR_MPI)
     set(_PAR_MPI 1)
   endif()
-  ecbuild_add_test( TARGET  test_opsinputs_${_PAR_NAME}
-                    COMMAND ${CMAKE_BINARY_DIR}/bin/test_OpsInputsFilters.x
+  ecbuild_add_test( TARGET  ${PROJECT_NAME}_${_PAR_NAME}
+                    LABELS  ${_PAR_LABELS}
+                    COMMAND ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}_test_inputs_filters.x
                     ARGS    "testinput/${_PAR_YAML}"
                     ENVIRONMENT "${environment}"
                     MPI     ${_PAR_MPI}
-                    DEPENDS test_OpsInputsFilters.x )
-  set_tests_properties( test_opsinputs_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+                    DEPENDS ${PROJECT_NAME}_test_inputs_filters.x )
+  set_tests_properties( ${PROJECT_NAME}_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
 endfunction()
 
 set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput )
@@ -64,7 +65,7 @@ set( OPSINPUTS_OPSPROG_RUNNER ${CMAKE_CURRENT_BINARY_DIR}/opsprog_runner.sh )
 get_target_property( OPSPROG_BIN_DIR OpsProg_PrintVarobs RUNTIME_OUTPUT_DIRECTORY )
 configure_file( opsprog_runner.sh.in ${OPSINPUTS_OPSPROG_RUNNER} @ONLY )
 
-ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
+ecbuild_add_executable( TARGET  ${PROJECT_NAME}_test_inputs_filters.x
                         SOURCES opsinputs/instantiateObsFilterFactory.cc
                                 opsinputs/instantiateObsFilterFactory.h
                                 opsinputs/CheckerUtils.cc
@@ -81,271 +82,340 @@ ecbuild_add_executable( TARGET  test_OpsInputsFilters.x
                                 opsinputs/VarObsChecker.h
                                 opsinputs/VarObsCheckerParameters.h
                                 mains/TestObsFilters.cc
-                        LIBS    opsinputs )
+                        LIBS    ${PROJECT_NAME} )
 if(ufo_SOURCE_DIR)
-  target_include_directories(test_OpsInputsFilters.x PRIVATE
+  target_include_directories(${PROJECT_NAME}_test_inputs_filters.x PRIVATE
     ${ufo_SOURCE_DIR}
   )
 else()
-  target_include_directories(test_OpsInputsFilters.x PRIVATE
+  target_include_directories(${PROJECT_NAME}_test_inputs_filters.x PRIVATE
     ${CMAKE_INSTALL_PREFIX}/include/ufo
   )
 endif()
 
 # Cleans up the output directory
-ecbuild_add_test( TARGET  test_opsinputs_varobswriter_setup
+ecbuild_add_test( TARGET  ${PROJECT_NAME}_varobswriter_setup
                   COMMAND ${CMAKE_COMMAND}
                   ARGS    "-E" "remove_directory" ${OPSINPUTS_OUTPUT_DIR} )
-set_tests_properties(test_opsinputs_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
+set_tests_properties(${PROJECT_NAME}_varobswriter_setup PROPERTIES FIXTURES_SETUP CleanOutputDir)
 
 ### VarObsWriter tests
 
 # Tests of individual varfields
 ADD_WRITER_TEST(NAME     varobswriter_001_VarField_pstar
+                LABELS   varobswriter varfield
                 YAML     001_VarField_pstar.yaml
                 DATA     001_VarField_pstar.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_001_VarField_pstar_stationID_integer
+                LABELS   varobswriter varfield
                 YAML     001_VarField_pstar_stationID_integer.yaml
                 DATA     001_VarField_pstar_stationID_integer.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_Surface
+                LABELS   varobswriter varfield
                 YAML     002_VarField_temperature_Surface.yaml
                 DATA     002_VarField_temperature_Surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ
+                LABELS   varobswriter varfield
                 YAML     002_VarField_temperature_RadarZ.yaml
                 DATA     002_VarField_temperature_RadarZ.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_003_VarField_rh_Surface
+                LABELS   varobswriter varfield
                 YAML     003_VarField_rh_Surface.yaml
                 DATA     003_VarField_rh_Surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_003_VarField_rh_Sonde
+                LABELS   varobswriter varfield
                 YAML     003_VarField_rh_Sonde.yaml
                 DATA     003_VarField_rh_Sonde.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Surface
+                LABELS   varobswriter varfield
                 YAML     004_VarField_u_Surface.yaml
                 DATA     004_VarField_u_Surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_Sonde
+                LABELS   varobswriter varfield
                 YAML     004_VarField_u_Sonde.yaml
                 DATA     004_VarField_u_Sonde.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_004_VarField_u_ScatwindChosen
+                LABELS   varobswriter varfield
                 YAML     004_VarField_u_ScatwindChosen.yaml
                 DATA     004_VarField_u_ScatwindChosen.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Surface
+                LABELS   varobswriter varfield
                 YAML     005_VarField_v_Surface.yaml
                 DATA     005_VarField_v_Surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_Sonde
+                LABELS   varobswriter varfield
                 YAML     005_VarField_v_Sonde.yaml
                 DATA     005_VarField_v_Sonde.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_005_VarField_v_ScatwindChosen
+                LABELS   varobswriter varfield
                 YAML     005_VarField_v_ScatwindChosen.yaml
                 DATA     005_VarField_v_ScatwindChosen.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_007_VarField_tcwv
+                LABELS   varobswriter varfield
                 YAML     007_VarField_tcwv.yaml
                 DATA     007_VarField_tcwv.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_008_VarField_WindSpeed
+                LABELS   varobswriter varfield
                 YAML     008_VarField_WindSpeed.yaml
                 DATA     008_VarField_WindSpeed.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_009_VarField_horizontalVisibility
+                LABELS   varobswriter varfield
                 YAML     009_VarField_horizontalVisibility.yaml
                 DATA     009_VarField_horizontalVisibility.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_010_VarField_britemp
+                LABELS   varobswriter varfield
                 YAML     010_VarField_britemp.yaml
                 NAMELIST VarObsWriterNamelists_010_VarField_britemp/AMSUB.nl
                 DATA     010_VarField_britemp.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_011_VarField_tskin
+                LABELS   varobswriter varfield
                 YAML     011_VarField_tskin.yaml
                 NAMELIST VarObsWriterNamelists_011_VarField_tskin/AMSUB.nl
                 DATA     011_VarField_tskin.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_012_VarField_gpstzdelay
+                LABELS   varobswriter varfield
                 YAML     012_VarField_gpstzdelay.yaml
                 DATA     012_VarField_gpstzdelay.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_015_VarField_cloud
+                LABELS   varobswriter varfield
                 YAML     015_VarField_cloud.yaml
                 DATA     015_VarField_cloud.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_017_VarField_mwemiss
+                LABELS   varobswriter varfield
                 YAML     017_VarField_mwemiss.yaml
                 NAMELIST VarObsWriterNamelists_017_VarField_mwemiss/AMSUB.nl
                 DATA     017_VarField_mwemiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_018_VarField_tcozone
+                LABELS   varobswriter varfield
                 YAML     018_VarField_tcozone.yaml
                 NAMELIST VarObsWriterNamelists_018_VarField_tcozone/IASI.nl
                 DATA     018_VarField_tcozone.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_019_VarField_satzenith
+                LABELS   varobswriter varfield
                 YAML     019_VarField_satzenith.yaml
                 NAMELIST VarObsWriterNamelists_019_VarField_satzenith/AMSUB.nl
                 DATA     019_VarField_satzenith.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_021_VarField_surface
+                LABELS   varobswriter varfield
                 YAML     021_VarField_surface.yaml
                 NAMELIST VarObsWriterNamelists_021_VarField_surface/AMSUB.nl
                 DATA     021_VarField_surface.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_023_VarField_modelsurface_geoval
+                LABELS   varobswriter varfield
                 YAML     023_VarField_modelsurface_geoval.yaml
                 NAMELIST VarObsWriterNamelists_023_VarField_modelsurface/Surface.nl
                 DATA     023_VarField_modelsurface_geoval.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_028_VarField_satid
+                LABELS   varobswriter varfield
                 YAML     028_VarField_satid.yaml
                 NAMELIST VarObsWriterNamelists_028_VarField_satid/AMSUB.nl
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_031_VarField_solzenith
+                LABELS   varobswriter varfield
                 YAML     031_VarField_solzenith.yaml
                 NAMELIST VarObsWriterNamelists_031_VarField_solzenith/AMSUB.nl
                 DATA     031_VarField_solzenith.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_034_VarField_iremiss
+                LABELS   varobswriter varfield
                 YAML     034_VarField_iremiss.yaml
                 NAMELIST VarObsWriterNamelists_034_VarField_iremiss/AMSUB.nl
                 DATA     034_VarField_iremiss.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_035_VarField_cloudtopp
+                LABELS   varobswriter varfield
                 YAML     035_VarField_cloudtopp.yaml
                 NAMELIST VarObsWriterNamelists_035_VarField_cloudtopp/IASI.nl
                 DATA     035_VarField_cloudtopp.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_036_VarField_cloudfrac
+                LABELS   varobswriter varfield
                 YAML     036_VarField_cloudfrac.yaml
                 NAMELIST VarObsWriterNamelists_036_VarField_cloudfrac/IASI.nl
                 DATA     036_VarField_cloudfrac.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_051_VarField_u10ambwind
+                LABELS   varobswriter varfield
                 YAML     051_VarField_u10ambwind.yaml
                 DATA     051_VarField_u10ambwind.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_052_VarField_v10ambwind
+                LABELS   varobswriter varfield
                 YAML     052_VarField_v10ambwind.yaml
                 DATA     052_VarField_v10ambwind.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_053_VarField_awpriorpcorrect
+                LABELS   varobswriter varfield
                 YAML     053_VarField_awpriorpcorrect.yaml
                 DATA     053_VarField_awpriorpcorrect.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_054_VarField_numchans
+                LABELS   varobswriter varfield
                 YAML     054_VarField_numchans.yaml
                 NAMELIST VarObsWriterNamelists_054_VarField_numchans/AMSUB.nl
                 DATA     010_VarField_britemp.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_055_VarField_channum
+                LABELS   varobswriter varfield
                 YAML     055_VarField_channum.yaml
                 NAMELIST VarObsWriterNamelists_055_VarField_channum/AMSUB.nl
                 DATA     010_VarField_britemp.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_057_VarField_emissivity
+                LABELS   varobswriter varfield
                 YAML     057_VarField_emissivity.yaml
                 NAMELIST VarObsWriterNamelists_057_VarField_emissivity/IASI.nl
                 DATA     057_VarField_emissivity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_063_VarField_radialVelocity
+                LABELS   varobswriter varfield
                 YAML     063_VarField_radialVelocity.yaml
                 NAMELIST VarObsWriterNamelists_063_VarField_radialVelocity/Radar.nl
                 DATA     063_VarField_radialVelocity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_067_VarField_GPS_Station_Height
+                LABELS   varobswriter varfield
                 YAML     067_VarField_GPS_Station_Height.yaml
                 DATA     067_VarField_GPS_Station_Height.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_068_VarField_clw
+                LABELS   varobswriter varfield
                 YAML     068_VarField_clw.yaml
                 NAMELIST VarObsWriterNamelists_068_VarField_clw/AMSUB.nl
                 DATA     068_VarField_clw.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_070_VarField_reflectivity
+                LABELS   varobswriter varfield
                 YAML     070_VarField_reflectivity.yaml
                 NAMELIST VarObsWriterNamelists_070_VarField_reflectivity/RadarZ.nl
                 DATA     070_VarField_reflectivity.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_071_VarField_bendingangle
+                LABELS   varobswriter varfield
                 YAML     071_VarField_bendingangle.yaml
                 DATA     071_VarField_bendingangle.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_072_VarField_impactparam
+                LABELS   varobswriter varfield
                 YAML     072_VarField_impactparam.yaml
                 DATA     072_VarField_impactparam.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_073_VarField_ro_rad_curv
+                LABELS   varobswriter varfield
                 YAML     073_VarField_ro_rad_curv.yaml
                 DATA     073_VarField_ro_rad_curv.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_074_VarField_ro_geoid_und
+                LABELS   varobswriter varfield
                 YAML     074_VarField_ro_geoid_und.yaml
                 DATA     074_VarField_ro_geoid_und.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_076_VarField_britempvarerror
+                LABELS   varobswriter varfield
                 YAML     076_VarField_britempvarerror.yaml
                 NAMELIST VarObsWriterNamelists_076_VarField_britempvarerror/AMSUB.nl
                 DATA     076_VarField_britempvarerror.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_077_VarField_aod
+                LABELS   varobswriter varfield
                 YAML     077_VarField_aod.yaml
                 DATA     077_VarField_aod.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_078_VarField_theta
+                LABELS   varobswriter varfield
                 YAML     078_VarField_theta.yaml
                 DATA     078_VarField_theta.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_080_VarField_biaspredictors
+                LABELS   varobswriter varfield
                 YAML     080_VarField_biaspredictors.yaml
                 NAMELIST VarObsWriterNamelists_080_VarField_biaspredictors/ATMS.nl
                 DATA     080_VarField_biaspredictors.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_081_VarField_level_time
+                LABELS   varobswriter varfield
                 YAML     081_VarField_level_time.yaml
                 NAMELIST VarObsWriterNamelists_081_VarField_level_time/Sonde.nl
                 DATA     078_VarField_theta.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_082_VarField_level_lat
+                LABELS   varobswriter varfield
                 YAML     082_VarField_level_lat.yaml
                 NAMELIST VarObsWriterNamelists_082_VarField_level_lat/Sonde.nl
                 DATA     078_VarField_theta.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_083_VarField_level_lon
+                LABELS   varobswriter varfield
                 YAML     083_VarField_level_lon.yaml
                 NAMELIST VarObsWriterNamelists_083_VarField_level_lon/Sonde.nl
                 DATA     078_VarField_theta.nc4)
 
 # MPI tests
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_1
+                LABELS   mpi varobswriter varfield
                 MPI      1
                 YAML     002_VarField_temperature_RadarZ_MPI_1.yaml
                 DATA     002_VarField_temperature_RadarZ.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_002_VarField_temperature_RadarZ_MPI_4
+                LABELS   mpi varobswriter varfield
                 MPI      4
                 YAML     002_VarField_temperature_RadarZ_MPI_4.yaml
                 DATA     002_VarField_temperature_RadarZ.nc4)
 
 # Header field tests
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_VertCoord
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_FixedHeader_VertCoord.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_HorizGrid
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_FixedHeader_HorizGrid.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_GridStagger
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_FixedHeader_GridStagger.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_Times
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_FixedHeader_Times.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_Offset_Time
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_FixedHeader_Offset_Time.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_FixedHeader_SubModel
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_FixedHeader_SubModel.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_IntegerConstants_LensAndLevels
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_IntegerConstants_LensAndLevels.yaml
                 DATA     028_VarField_satid.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_RealConstants
+                LABELS   varobswriter fixed_header
                 YAML     varobswriter_RealConstants.yaml
                 DATA     028_VarField_satid.nc4)
 
 # Tests of other options
 ADD_WRITER_TEST(NAME     varobswriter_reject_obs_with_all_variables_failing_qc
+                LABELS   varobswriter
                 YAML     varobswriter_reject_obs_with_all_variables_failing_qc.yaml
                 DATA     reject_obs_with_all_variables_failing_qc.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_nested_output_directory
+                LABELS   varobswriter
                 YAML     varobswriter_nested_output_directory.yaml
                 DATA     028_VarField_satid.nc4
                 DONT_SET_OPS_OUTPUT_DIR_ENV_VAR)
 
 # Tests the global namelist files in the etc directory
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_abiclr
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_abiclr.yaml
                 NAMELIST ../../etc/global/varobs/ABIClr.nl
                 DATA     varobs_globalnamelist_abiclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_ahiclr
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_ahiclr.yaml
                 NAMELIST ../../etc/global/varobs/AHIClr.nl
                 DATA     varobs_globalnamelist_ahiclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atms
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/varobs/ATMS.nl
                 DATA     varobs_globalnamelist_atms.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_atovs
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_atovs.yaml
                 NAMELIST ../../etc/global/varobs/ATOVS.nl
                 DATA     varobs_globalnamelist_atovs.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_gnssro
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/varobs/GPSRO.nl
                 DATA     varobs_globalnamelist_gnssro.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_iasi
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_iasi.yaml
                 NAMELIST ../../etc/global/varobs/IASI.nl
                 DATA     varobs_globalnamelist_iasi.nc4 018_VarField_tcozone_obsdiag.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_seviriclr
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_seviriclr.yaml
                 NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
                 DATA     varobs_globalnamelist_seviriclr.nc4)
@@ -354,26 +424,32 @@ ADD_WRITER_TEST(NAME     varobswriter_varChanneltest
                 NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
                 DATA     varobs_globalnamelist_seviriclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_mtgirs
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_mtgirs.yaml
                 NAMELIST ../../etc/global/varobs/MTGIRS.nl
                 DATA     varobs_globalnamelist_mtgirs.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sonde
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/varobs/Sonde.nl
                 DATA     varobs_globalnamelist_sonde.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_scatwind
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_scatwind.yaml
                 NAMELIST ../../etc/global/varobs/Scatwind.nl
                 DATA     varobs_globalnamelist_scatwind.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_aircraft
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_aircraft.yaml
                 NAMELIST ../../etc/global/varobs/Aircraft.nl
                 DATA     varobs_globalnamelist_aircraft.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sternamwr
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_sternamwr.yaml
                 NAMELIST ../../etc/global/varobs/SternaMWR.nl
                 DATA     varobs_globalnamelist_sternamwr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_epsmws
+                LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_epsmws.yaml
                 NAMELIST ../../etc/global/varobs/EPSMWS.nl
                 DATA     varobs_globalnamelist_epsmws.nc4)
@@ -389,26 +465,32 @@ ADD_WRITER_TEST(NAME     varobswriter_varChanneltest_checker
 # Tests the UKV namelist files in the etc directory
 
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviasr
+                LABELS   varobswriter ukvnamelist
                 YAML     varobswriter_ukvnamelist_seviriasr.yaml
                 NAMELIST ../../etc/ukv/varobs/SEVIRIASR.nl
                 DATA     varobs_ukvnamelist_seviriasr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_seviviclr
+                LABELS   varobswriter ukvnamelist
                 YAML     varobswriter_ukvnamelist_seviriclr.yaml
                 NAMELIST ../../etc/ukv/varobs/SEVIRIClr.nl
                 DATA     varobs_ukvnamelist_seviriclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_sonde
+                LABELS   varobswriter ukvnamelist
                 YAML     varobswriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/varobs/Sonde.nl
                 DATA     varobs_ukvnamelist_sonde.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_surfacecloud
+                LABELS   varobswriter ukvnamelist
                 YAML     varobswriter_ukvnamelist_surfacecloud.yaml
                 NAMELIST ../../etc/ukv/varobs/SurfaceCloud.nl
                 DATA     varobs_ukvnamelist_surfacecloud.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_doppler_wind
+                LABELS   varobswriter ukvnamelist
                 YAML     varobswriter_ukvnamelist_radar_doppler_wind.yaml
                 NAMELIST ../../etc/ukv/varobs/Radar.nl
                 DATA     varobs_ukvnamelist_radar_doppler_wind.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_reflectivity
+                LABELS   varobswriter ukvnamelist
                 YAML     varobswriter_ukvnamelist_radar_reflectivity.yaml
                 NAMELIST ../../etc/ukv/varobs/RadarZ.nl
                 DATA     varobs_ukvnamelist_radar_reflectivity.nc4)
@@ -417,136 +499,169 @@ ADD_WRITER_TEST(NAME     varobswriter_ukvnamelist_radar_reflectivity
 
 # Tests of individual surface varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_SurfaceCxField_Orog
+                LABELS   cxwriter varfield
                 YAML     001_SurfaceCxField_Orog.yaml
                 NAMELIST CxWriterNamelists_001_SurfaceCxField_Orog/AMSUB.nl
                 DATA     001_SurfaceCxField_Orog.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_002_SurfaceCxField_pstar
+                LABELS   cxwriter varfield
                 YAML     002_SurfaceCxField_pstar.yaml
                 NAMELIST CxWriterNamelists_002_SurfaceCxField_pstar/HLOSwind.nl
                 DATA     002_SurfaceCxField_pstar.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_003_SurfaceCxField_t2
+                LABELS   cxwriter varfield
                 YAML     003_SurfaceCxField_t2.yaml
                 NAMELIST CxWriterNamelists_003_SurfaceCxField_t2/AMSUB.nl
                 DATA     003_SurfaceCxField_t2.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_004_SurfaceCxField_rh2
+                LABELS   cxwriter varfield
                 YAML     004_SurfaceCxField_rh2.yaml
                 NAMELIST CxWriterNamelists_004_SurfaceCxField_rh2/AMSUB.nl
                 DATA     004_SurfaceCxField_rh2.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_005_SurfaceCxField_u10
+                LABELS   cxwriter varfield
                 YAML     005_SurfaceCxField_u10.yaml
                 NAMELIST CxWriterNamelists_005_SurfaceCxField_u10/AMSUB.nl
                 DATA     005_SurfaceCxField_u10.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_006_SurfaceCxField_v10
+                LABELS   cxwriter varfield
                 YAML     006_SurfaceCxField_v10.yaml
                 NAMELIST CxWriterNamelists_006_SurfaceCxField_v10/AMSUB.nl
                 DATA     006_SurfaceCxField_v10.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_008_SurfaceCxField_visibility_1p5m
+                LABELS   cxwriter varfield
                 YAML     008_SurfaceCxField_visibility_1p5m.yaml
                 NAMELIST CxWriterNamelists_008_SurfaceCxField_visibility_1p5m/Surface.nl
                 DATA     008_SurfaceCxField_visibility_1p5m.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_013_SurfaceCxField_TskinSea
+                LABELS   cxwriter varfield
                 YAML     013_SurfaceCxField_TskinSea.yaml
                 NAMELIST CxWriterNamelists_013_SurfaceCxField_TskinSea/AMSUB.nl
                 DATA     013_SurfaceCxField_TskinSea.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_016_SurfaceCxField_pmsl
+                LABELS   cxwriter varfield
                 YAML     016_SurfaceCxField_pmsl.yaml
                 NAMELIST CxWriterNamelists_016_SurfaceCxField_pmsl/AMSUB.nl
                 DATA     016_SurfaceCxField_pmsl.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_017_SurfaceCxField_SeaIce
+                LABELS   cxwriter varfield
                 YAML     017_SurfaceCxField_SeaIce.yaml
                 NAMELIST CxWriterNamelists_017_SurfaceCxField_SeaIce/AMSUB.nl
                 DATA     017_SurfaceCxField_SeaIce.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_022_SurfaceCxField_surf_param_a
+                LABELS   cxwriter varfield
                 YAML     022_SurfaceCxField_surf_param_a.yaml
                 NAMELIST CxWriterNamelists_022_SurfaceCxField_surf_param_a/Surface.nl
                 DATA     022_SurfaceCxField_surf_param_a.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_023_SurfaceCxField_surf_param_b
+                LABELS   cxwriter varfield
                 YAML     023_SurfaceCxField_surf_param_b.yaml
                 NAMELIST CxWriterNamelists_023_SurfaceCxField_surf_param_b/Surface.nl
                 DATA     023_SurfaceCxField_surf_param_b.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_024_SurfaceCxField_CloudAmount
+                LABELS   cxwriter varfield
                 YAML     024_SurfaceCxField_CloudAmount.yaml
                 NAMELIST CxWriterNamelists_024_SurfaceCxField_CloudAmount/SatTCWV.nl
                 DATA     024_SurfaceCxField_CloudAmount.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_056_SurfaceCxField_obukhov_length
+                LABELS   cxwriter varfield
                 YAML     056_SurfaceCxField_obukhov_length.yaml
                 NAMELIST CxWriterNamelists_056_SurfaceCxField_obukhov_length/Scatwind.nl
                 DATA     056_SurfaceCxField_obukhov_length.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_057_SurfaceCxField_friction_velocity_over_water
+                LABELS   cxwriter varfield
                 YAML     057_SurfaceCxField_friction_velocity_over_water.yaml
                 NAMELIST CxWriterNamelists_057_SurfaceCxField_friction_velocity_over_water/Scatwind.nl
                 DATA     057_SurfaceCxField_friction_velocity_over_water.nc4 dummy.nc4)
 
 # Tests of individual upper-air varfields
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta
+                LABELS   cxwriter varfield
                 YAML     001_UpperAirCxField_theta.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_002_UpperAirCxField_rh_AMSUB
+                LABELS   cxwriter varfield
                 YAML     002_UpperAirCxField_rh_AMSUB.yaml
                 NAMELIST CxWriterNamelists_002_UpperAirCxField_rh/AMSUB.nl
                 DATA     002_UpperAirCxField_relative_humidity.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_002_UpperAirCxField_rh_Sonde
+                LABELS   cxwriter varfield
                 YAML     002_UpperAirCxField_rh_Sonde.yaml
                 NAMELIST CxWriterNamelists_002_UpperAirCxField_rh/Sonde.nl
                 DATA     002_UpperAirCxFieldForMultiLevelObs_relative_humidity.nc4 relative_humidity_Sonde.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_003_UpperAirCxField_u
+                LABELS   cxwriter varfield
                 YAML     003_UpperAirCxField_u.yaml
                 NAMELIST CxWriterNamelists_003_UpperAirCxField_u/HLOSwind.nl
                 DATA     003_UpperAirCxField_u.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_004_UpperAirCxField_v
+                LABELS   cxwriter varfield
                 YAML     004_UpperAirCxField_v.yaml
                 NAMELIST CxWriterNamelists_004_UpperAirCxField_v/HLOSwind.nl
                 DATA     004_UpperAirCxField_v.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_005_UpperAirCxField_q
+                LABELS   cxwriter varfield
                 YAML     005_UpperAirCxField_q.yaml
                 NAMELIST CxWriterNamelists_005_UpperAirCxField_q/AMSUB.nl
                 DATA     005_UpperAirCxField_q.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_011_UpperAirCxField_P
+                LABELS   cxwriter varfield
                 YAML     011_UpperAirCxField_P.yaml
                 NAMELIST CxWriterNamelists_011_UpperAirCxField_P/AMSUB.nl
                 DATA     011_UpperAirCxField_P.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_015_UpperAirCxField_cloud_layer
+                LABELS   cxwriter varfield
                 YAML     015_UpperAirCxField_cloud_layer.yaml
                 NAMELIST CxWriterNamelists_015_UpperAirCxField_cloud_layer/SurfaceCloud.nl
                 DATA     015_UpperAirCxField_cloud_layer.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_029_UpperAirCxField_qcf
+                LABELS   cxwriter varfield
                 YAML     029_UpperAirCxField_qcf.yaml
                 NAMELIST CxWriterNamelists_029_UpperAirCxField_qcf/AMSUB.nl
                 DATA     029_UpperAirCxField_qcf.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_030_UpperAirCxField_qcl
+                LABELS   cxwriter varfield
                 YAML     030_UpperAirCxField_qcl.yaml
                 NAMELIST CxWriterNamelists_030_UpperAirCxField_qcl/AMSUB.nl
                 DATA     030_UpperAirCxField_qcl.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_031_UpperAirCxField_cloud_bulk
+                LABELS   cxwriter varfield
                 YAML     031_UpperAirCxField_cloud_bulk.yaml
                 NAMELIST CxWriterNamelists_031_UpperAirCxField_cloud_bulk/AMSUB.nl
                 DATA     031_UpperAirCxField_cloud_bulk.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_033_UpperAirCxField_p_bar
+                LABELS   cxwriter varfield
                 YAML     033_UpperAirCxField_p_bar.yaml
                 NAMELIST CxWriterNamelists_033_UpperAirCxField_p_bar/AMSUB.nl
                 DATA     033_UpperAirCxField_p_bar.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_034_UpperAirCxField_Cf
+                LABELS   cxwriter varfield
                 YAML     034_UpperAirCxField_Cf.yaml
                 NAMELIST CxWriterNamelists_034_UpperAirCxField_Cf/AMSUB.nl
                 DATA     034_UpperAirCxField_Cf.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_035_UpperAirCxField_Cl
+                LABELS   cxwriter varfield
                 YAML     035_UpperAirCxField_Cl.yaml
                 NAMELIST CxWriterNamelists_035_UpperAirCxField_Cl/AMSUB.nl
                 DATA     035_UpperAirCxField_Cl.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_039_UpperAirCxField_Exner
+                LABELS   cxwriter varfield
                 YAML     039_UpperAirCxField_Exner.yaml
                 NAMELIST CxWriterNamelists_039_UpperAirCxField_Exner/RadarZ.nl
                 DATA     039_UpperAirCxField_Exner.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_040_UpperAirCxField_Qrain
+                LABELS   cxwriter varfield
                 YAML     040_UpperAirCxField_Qrain.yaml
                 NAMELIST CxWriterNamelists_040_UpperAirCxField_Qrain/RadarZ.nl
                 DATA     040_UpperAirCxField_Qrain.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_041-042_UpperAirCxField_dust1-dust2
+                LABELS   cxwriter varfield
                 YAML     041-042_UpperAirCxField_dust1-dust2.yaml
                 NAMELIST CxWriterNamelists_041-042_UpperAirCxField_dust1-dust2/AOD.nl
                 DATA     041-046_UpperAirCxField_dust1-dust6.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_041-046_UpperAirCxField_dust1-dust6
+                LABELS   cxwriter varfield
                 YAML     041-046_UpperAirCxField_dust1-dust6.yaml
                 NAMELIST CxWriterNamelists_041-046_UpperAirCxField_dust1-dust6/AOD.nl
                 DATA     041-046_UpperAirCxField_dust1-dust6.nc4 dummy.nc4)
@@ -554,71 +669,87 @@ ADD_WRITER_TEST(NAME     cxwriter_041-046_UpperAirCxField_dust1-dust6
 # Test of wind un-rotation
 
 ADD_WRITER_TEST(NAME     cxwriter_UnRotateWinds
+                LABELS   cxwriter
                 YAML     CxWriter_UnRotateWinds.yaml
                 NAMELIST CxWriterNamelists_UnRotateWinds/Sonde.nl
                 DATA     CxWriter_UnRotateWinds.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_UnRotateWinds10M
+                LABELS   cxwriter
                 YAML     CxWriter_UnRotateWinds10M.yaml
                 NAMELIST CxWriterNamelists_UnRotateWinds10M/Scatwind.nl
                 DATA     CxWriter_UnRotateWinds10M.nc4 dummy.nc4)
 
 # Header field tests
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_VertCoord
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_VertCoord.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_HorizGrid
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_HorizGrid.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_GridStagger
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_GridStagger.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_ObsFileType
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_ObsFileType.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Times
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_Times.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_Offset_Time
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_Offset_Time.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_FixedHeader_SubModel
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_FixedHeader_SubModel.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_IntegerConstants_PLevels
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_IntegerConstants_PLevels.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_RealConstants
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_RealConstants.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_Lookup_Times
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_Lookup_Times.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_Lookup_Numbers
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_Lookup_Numbers.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_LevelDependentConstants
+                LABELS   cxwriter fixed_header
                 YAML     cxwriter_LevelDependentConstants.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 
 # MPI tests
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_1
+                LABELS   cxwriter mpi varfield
                 MPI      1
                 YAML     001_UpperAirCxField_theta_MPI_1.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_4
+                LABELS   cxwriter mpi varfield
                 MPI      4
                 YAML     001_UpperAirCxField_theta_MPI_4.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
@@ -626,10 +757,12 @@ ADD_WRITER_TEST(NAME     cxwriter_001_UpperAirCxField_theta_MPI_4
 
 # Tests of other options
 ADD_WRITER_TEST(NAME     cxwriter_reject_obs_with_all_variables_failing_qc
+                LABELS   cxwriter
                 YAML     cxwriter_reject_obs_with_all_variables_failing_qc.yaml
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
                 DATA     001_UpperAirCxField_theta.nc4 reject_obs_with_all_variables_failing_qc_satellite.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
+                LABELS   cxwriter
                 YAML     cxwriter_nested_output_directory.yaml
                 DATA     001_UpperAirCxField_theta.nc4 dummy.nc4
                 NAMELIST CxWriterNamelists_001_UpperAirCxField_theta/AMSUB.nl
@@ -637,96 +770,120 @@ ADD_WRITER_TEST(NAME     cxwriter_nested_output_directory
 
 # Tests the global namelist files in the etc directory
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_abiclr
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_abiclr.yaml
                 NAMELIST ../../etc/global/cx/ABIClr.nl
                 DATA     cx_globalnamelist_abiclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_ahiclr
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_ahiclr.yaml
                 NAMELIST ../../etc/global/cx/AHIClr.nl
                 DATA     cx_globalnamelist_ahiclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_asmr
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_amsr.yaml
                 NAMELIST ../../etc/global/cx/AMSR.nl
                 DATA     cx_globalnamelist_amsr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gmilow
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_gmilow.yaml
                 NAMELIST ../../etc/global/cx/GMIlow.nl
                 DATA     cx_globalnamelist_gmilow.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gmihigh
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_gmihigh.yaml
                 NAMELIST ../../etc/global/cx/GMIhigh.nl
                 DATA     cx_globalnamelist_gmihigh.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atms
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_atms.yaml
                 NAMELIST ../../etc/global/cx/ATMS.nl
                 DATA     cx_globalnamelist_atms.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_atovs
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_atovs.yaml
                 NAMELIST ../../etc/global/cx/ATOVS.nl
                 DATA     cx_globalnamelist_atovs.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_epsmws
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_epsmws.yaml
                 NAMELIST ../../etc/global/cx/EPSMWS.nl
                 DATA     cx_globalnamelist_epsmws.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sternamwr
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_sternamwr.yaml
                 NAMELIST ../../etc/global/cx/SternaMWR.nl
                 DATA     cx_globalnamelist_sternamwr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_ssmis
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_ssmis.yaml
                 NAMELIST ../../etc/global/cx/SSMIS.nl
                 DATA     cx_globalnamelist_ssmis.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_mwsfy3
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_mwsfy3.yaml
                 NAMELIST ../../etc/global/cx/MWSFY3.nl
                 DATA     cx_globalnamelist_mwsfy3.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_mwsfy3e
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_mwsfy3e.yaml
                 NAMELIST ../../etc/global/cx/MWSFY3E.nl
                 DATA     cx_globalnamelist_mwsfy3e.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_gnssro
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_gnssro.yaml
                 NAMELIST ../../etc/global/cx/GPSRO.nl
                 DATA     cx_globalnamelist_gnssro.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_groundgps
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_groundgps.yaml
                 NAMELIST ../../etc/global/cx/GroundGPS.nl
                 DATA     cx_globalnamelist_groundgps.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_iasi
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_iasi.yaml
                 DATA     cx_globalnamelist_iasi.nc4 varobs_globalnamelist_iasi.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_seviriclr
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_seviriclr.yaml
                 NAMELIST ../../etc/global/cx/SEVIRIClr.nl
                 DATA     cx_globalnamelist_seviriclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_mtgirs
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_mtgirs.yaml
                 NAMELIST ../../etc/global/cx/MTGIRS.nl
                 DATA     cx_globalnamelist_mtgirs.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sonde
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_sonde.yaml
                 NAMELIST ../../etc/global/cx/Sonde.nl
                 DATA     cx_globalnamelist_sonde.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_sattcwv
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_sattcwv.yaml
                 NAMELIST ../../etc/global/cx/SatTCWV.nl
                 DATA     cx_globalnamelist_sattcwv.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_aircraft
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_aircraft.yaml
                 NAMELIST ../../etc/global/cx/Aircraft.nl
                 DATA     cx_globalnamelist_aircraft.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_surface
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_surface.yaml
                 NAMELIST ../../etc/global/cx/Surface.nl
                 DATA     cx_globalnamelist_surface.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_scatwind
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_scatwind.yaml
                 DATA     cx_globalnamelist_scatwind.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_screen
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_screen.yaml
                 NAMELIST ../../etc/global/cx/screen/Surface.nl
                 DATA     cx_globalnamelist_screen.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_oceanwinds
+                LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_oceanwinds.yaml
                 NAMELIST ../../etc/global/cx/Oceanwinds.nl
                 DATA     cx_globalnamelist_oceanwinds.nc4 dummy.nc4)
@@ -734,30 +891,37 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_oceanwinds
 # Tests the ukv namelist files in the etc directory
 
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_seviriasr
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_seviriasr.yaml
                 NAMELIST ../../etc/ukv/cx/SEVIRIASR.nl
                 DATA     cx_ukvnamelist_seviriasr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_seviriclr
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_seviriclr.yaml
                 NAMELIST ../../etc/ukv/cx/SEVIRIClr.nl
                 DATA     cx_ukvnamelist_seviriclr.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_sonde
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_sonde.yaml
                 NAMELIST ../../etc/ukv/cx/Sonde.nl
                 DATA     cx_ukvnamelist_sonde.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surfacecloud
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_surfacecloud.yaml
                 NAMELIST ../../etc/ukv/cx/SurfaceCloud.nl
                 DATA     cx_ukvnamelist_surfacecloud.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_surface
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_surface.yaml
                 NAMELIST ../../etc/ukv/cx/Surface.nl
                 DATA     cx_ukvnamelist_surface.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_doppler_wind
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_radar_doppler_wind.yaml
                 NAMELIST ../../etc/ukv/cx/Radar.nl
                 DATA     cx_ukvnamelist_radar_doppler_wind.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_reflectivity
+                LABELS   cxwriter ukvnamelist
                 YAML     cxwriter_ukvnamelist_radar_reflectivity.yaml
                 NAMELIST ../../etc/ukv/cx/RadarZ.nl
                 DATA     cx_ukvnamelist_radar_reflectivity.nc4 dummy.nc4)
@@ -765,12 +929,12 @@ ADD_WRITER_TEST(NAME     cxwriter_ukvnamelist_radar_reflectivity
 ### Tests of auxiliary classes
 
 list( APPEND opsinputs_test_input empty.yaml )
-ecbuild_add_test( TARGET  test_opsinputs_mpiexceptionsynchronizer
+ecbuild_add_test( TARGET  ${PROJECT_NAME}_mpiexceptionsynchronizer
                   SOURCES mains/TestMPIExceptionSynchronizer.cc
                   ARGS    "testinput/empty.yaml"
                   ENVIRONMENT OOPS_TRAPFPE=1
                   MPI     4
-                  LIBS    opsinputs )
+                  LIBS    ${PROJECT_NAME} )
 
 ### Final things to do
 
@@ -780,4 +944,4 @@ CREATE_SYMLINKS( ${CMAKE_CURRENT_SOURCE_DIR}/testinput ${CMAKE_CURRENT_BINARY_DI
 
 # Add files to cmake resources
 list( TRANSFORM opsinputs_test_input PREPEND testinput/ )
-ecbuild_add_resources( TARGET opsinputs_test_scripts SOURCES_PACK ${opsinputs_test_input} )
+ecbuild_add_resources( TARGET ${PROJECT_NAME}_test_scripts SOURCES_PACK ${opsinputs_test_input} )
