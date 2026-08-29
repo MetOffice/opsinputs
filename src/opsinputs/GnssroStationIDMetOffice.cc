@@ -18,6 +18,7 @@
 #include "opsinputs/GnssroStationIDMetOffice.h"
 
 #include <math.h>
+#include <iomanip>
 #include <string>
 #include <vector>
 
