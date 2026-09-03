@@ -14,18 +14,14 @@ USE GenMod_Control, ONLY: &
   QuietMode,              &
   mype
 
-USE GenMod_Core, ONLY:  &
-  gen_close_stats_file, &
-  gen_fail,             &
-  gen_open_stats_file,  &
-  gen_summary,          &
-  gen_trace_entry,      &
-  gen_trace_exit,       &
-  gen_trace_report,     &
-  gen_warn,             &
-  MessageOut,           &
-  StatsOut,             &
-  StatusOK,             &
+USE GenMod_Core, ONLY: &
+  gen_fail,            &
+  gen_summary,         &
+  gen_trace_entry,     &
+  gen_trace_exit,      &
+  gen_trace_report,    &
+  gen_warn,            &
+  MessageOut,          &
   UseTrace
 
 USE GenMod_MiscUMScienceConstants, ONLY: &
@@ -149,7 +145,6 @@ IMPLICIT NONE
 ! Local declarations:
 CHARACTER(len=*), PARAMETER :: ProgName = "OpsProg_CreateODB"
 INTEGER                     :: Error
-INTEGER                     :: rc
 TYPE (ODBSession_type)      :: ecma
 INTEGER                     :: i
 INTEGER                     :: j
@@ -185,13 +180,6 @@ END IF
 
 IF (UseTrace) CALL gen_trace_entry (ProgName)
 
-CALL gen_open_stats_file ("OpsProg_CreateODB statistics", &
-                          rc)
-IF (rc /= StatusOK) THEN
-  CALL gen_fail (ProgName,                       &
-                 "Error in gen_open_stats_file")
-END IF
-
 CALL Ops_ReadODBControlNL
 
 odb1_mode = .NOT. ops_env_is_true ("OPS_CREATEODB_FORMAT_ODB2")
@@ -209,12 +197,6 @@ IF (odb1_mode) THEN
 END IF
 
 CALL Ops_ReadCycleTime
-
-IF (mype == 0) THEN
-  WRITE (StatsOut, "(A,2(I2.2,A),I4.4,A,I2.2)") " " // TRIM (Runid) // " ",&
-              CycleTime(cycle_day), "/", CycleTime(cycle_month), "/", &
-              CycleTime(cycle_year), " ", cycleTime(cycle_hour)
-END IF
 
 CALL Ops_ReadObsGroupSwitches (obs_group_list)
 CALL Ops_ReadOutputSwitches
@@ -351,18 +333,6 @@ DO i = 1, SIZE (obs_group_list)
     END IF
   END IF
 
-  IF (mype == 0) THEN
-    WRITE (StatsOut, "(A)") &
-        " --------------------------------------------------------------------"
-    StatsString = " Total " // TRIM (OpsFn_ObsourcetoString(MainObsource)) // " " //    &
-                  TRIM (OpsFn_ObsGroupNumToName(obs_group_list(i))) // " obs "
-    WRITE (StatsString(35:44), "(A2,I8)") "= ", &
-           SUM (TempMDBData % SubTypeData(:) % TotalNumObs)
-    WRITE (StatsOut, "(A)") TRIM (StatsString)
-    WRITE (StatsOut, "(A)") &
-        " --------------------------------------------------------------------"
-    WRITE (StatsOut, "(A)") " "
-  END IF
   IF (TempMDBData % NumSubTypes > 0) THEN
     DEALLOCATE (TempMDBData % SubTypeData)
   END IF
@@ -380,12 +350,6 @@ IF (odb1_mode) THEN
 END IF
 
 9999 CONTINUE
-
-CALL gen_close_stats_file (Error)
-IF (Error /= StatusOK) THEN
-  CALL gen_fail (ProgName,                  &
-                 "Cannot close stats file")
-END IF
 
 CALL gen_summary
 
