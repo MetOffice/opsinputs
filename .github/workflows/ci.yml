@@ -54,7 +54,6 @@ jobs:
       group: mo-jedi-rg
       labels: jedi-self-hosted-rg
     env:
-      MOBB_CI_PR_BODY_OUT: mobb-ci-gh-pr-body.out
       REPO: ${{ github.event.repository.name }}
       TIMEOUT_MINUTE: 301
 
@@ -62,16 +61,20 @@ jobs:
       - name: Define NAMESPACE (pull_request)
         if: github.event_name == 'pull_request'
         run: |
-          echo "NAMESPACE=ci-${{github.event_name}}-${{github.event.number}}" >>"${GITHUB_ENV}"
+          NAMESPACE="ci-${{github.event_name}}-${{github.event.number}}"
+          echo "NAMESPACE=${NAMESPACE}" >>"${GITHUB_ENV}"
+          echo "MOBB_CI_PR_BODY_OUT=mobb-${NAMESPACE}-body.out" >>"${GITHUB_ENV}"
 
       - name: Define NAMESPACE (not pull_request)
         if: github.event_name != 'pull_request'
         run: |
-          echo "NAMESPACE=ci-${{github.event_name}}" >>"${GITHUB_ENV}"
+          NAMESPACE="ci-${{github.event_name}}"
+          echo "NAMESPACE=${NAMESPACE}" >>"${GITHUB_ENV}"
+          echo "MOBB_CI_PR_BODY_OUT=mobb-${NAMESPACE}-body.out" >>"${GITHUB_ENV}"
 
       - name: Cleanup (pre)
         run: |
-          rm -fr "./${NAMESPACE}"
+          rm -fr "./${NAMESPACE}" "./${MOBB_CI_PR_BODY_OUT}"
 
       - name: Checkout
         uses: actions/checkout@v5
@@ -126,4 +129,4 @@ jobs:
         timeout-minutes: ${{ fromJSON(env.TIMEOUT_MINUTE) }}
 
       - name: Cleanup (post)
-        run: rm -fr "./${NAMESPACE}"
+        run: rm -fr "./${NAMESPACE}" "./${MOBB_CI_PR_BODY_OUT}"
