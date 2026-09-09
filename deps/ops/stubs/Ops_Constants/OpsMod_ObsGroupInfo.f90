@@ -85,7 +85,7 @@ INTEGER, PARAMETER :: ObsGroupHIRAS2         =  74 ! => HIRAS Radiances
 INTEGER, PARAMETER :: ObsGroupHYMSFULL       =  75 ! => HYMSFULL Radiances
 INTEGER, PARAMETER :: ObsGroupHYMSSUPER      =  76 ! => HYMSSUPER Radiances
 INTEGER, PARAMETER :: ObsGroupHYMSATMS       =  77 ! => HYMSATMS Radiances
-INTEGER, PARAMETER :: max_obs_group_num      =  74 ! Number of observation groups
+INTEGER, PARAMETER :: max_obs_group_num      =  77 ! Number of observation groups
 
 CONTAINS
 
