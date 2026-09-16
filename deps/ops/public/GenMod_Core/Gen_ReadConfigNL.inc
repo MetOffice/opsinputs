@@ -28,8 +28,7 @@ USE GenMod_Control, ONLY: &
     GCOMBitRep,           &
     GenMode,              &
     WarningToError,       &
-    WarningsMax,          &
-    StatsAppend
+    WarningsMax
 
 IMPLICIT NONE
 
@@ -46,8 +45,7 @@ NAMELIST / Gen_ConfigNL / &
   GCOMBitRep,             &
   GenMode,                &
   WarningToError,         &
-  WarningsMax,            &
-  StatsAppend
+  WarningsMax
 
 CALL gen_get_unit_from_env (file_unit,           &
                             (/'GEN_CONFIG_NL'/), &

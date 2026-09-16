@@ -26,17 +26,13 @@ USE GenMod_Control, ONLY: &
     nproc,                &
     mype
 
-USE GenMod_Core, ONLY:    &
-    gen_close_stats_file, &
-    gen_fail,             &
-    gen_open_stats_file,  &
-    gen_trace_entry,      &
-    gen_trace_exit,       &
-    gen_warn,             &
-    MaxFileNameLen,       &
-    MessageOut,           &
-    StatsOut,             &
-    StatusOK,             &
+USE GenMod_Core, ONLY: &
+    gen_fail,          &
+    gen_trace_entry,   &
+    gen_trace_exit,    &
+    gen_warn,          &
+    MaxFileNameLen,    &
+    MessageOut,        &
     UseTrace
 
 USE GenMod_MiscUMScienceConstants, ONLY: &
@@ -141,7 +137,6 @@ INTEGER                                   :: varfield_array_size
 TYPE (varobs_type)                        :: varobs
 CHARACTER(len=MaxFileNameLen)             :: Filename
 CHARACTER(len=80)                         :: StatsString
-INTEGER                                   :: rc
 
 !-------------------------------------------------------------------------------
 ! 0. Tracing and initialisation
@@ -466,28 +461,6 @@ IF (mype == 0) THEN
       Filename = TRIM (Filename) // "/" // TRIM (ObsGroupName) // ".varobs.done"
     END IF
     CALL Ops_TouchFile (Filename)
-  END IF
-
-  CALL gen_open_stats_file ("VarObsWriter statistics", &
-                            rc)
-  IF (rc /= StatusOK) THEN
-    CALL gen_fail (RoutineName,                    &
-                   "Error in gen_open_stats_file")
-  END IF
-  WRITE (StatsOut, '(A)') &
-          ' --------------------------------------------------------------------'
-  StatsString = ' Total Varobs ' // TRIM (Observations % Header % ObsGroupName) // ' obs '
-  WRITE (StatsString(35:44),'(A2,I8)') '= ', NumVarObsTotal
-
-  WRITE (StatsOut, '(A)') TRIM (StatsString)
-  WRITE (StatsOut, '(A)') &
-        ' --------------------------------------------------------------------'
-  WRITE (StatsOut, '(A)') ''
-
-  CALL gen_close_stats_file (rc)
-  IF (rc /= StatusOK) THEN
-    CALL gen_fail (RoutineName,               &
-                   "Cannot close stats file")
   END IF
 
 END IF
