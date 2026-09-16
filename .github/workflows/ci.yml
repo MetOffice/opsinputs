@@ -30,11 +30,14 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install linters
         run: |
-          python3 -m pip install cmakelint fortitude-lint
+          python3 -m pip install cmakelint cpplint fortitude-lint
       - name: Run cmakelint
         run: |
           mapfile -t names < <(find -name 'CMakeLists.txt' -o -name '*.cmake')
           cmakelint "${names[@]}"
+      - name: Run cpplint
+        run: |
+          cpplint --recursive .
       - name: Run fortitude check
         run: |
           fortitude check
