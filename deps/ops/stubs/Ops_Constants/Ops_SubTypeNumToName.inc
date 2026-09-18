@@ -239,6 +239,8 @@ SELECT CASE (num)
     name = "PAOBS"
   CASE (ObsTypePilot)
     name = "PILOT"
+  CASE (ObsTypePseudoIASI)
+    name = "PseudoIASI"
   CASE (ObsTypeRadopWind)
     name = "RADOP"
   CASE (ObsTypeRadop2Wind)

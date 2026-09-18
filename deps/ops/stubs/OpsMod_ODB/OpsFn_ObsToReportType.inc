@@ -654,12 +654,32 @@ SELECT CASE (Obs % Header % ObsGroup)
   CASE (ObsGroupIASING)
     IF (Obs % Header % Satid % Present) THEN
       DO i = ob_start, ob_end
-        IF (Obs % Satid(i) == SatId_MetopD) THEN
+        ! IASING (native resolution) is stored as SatId_MetopE for convenience, while
+        ! IASING (IASI resolution) is stored as SatId_MetopD and processed as ObsGroupIASI
+        IF (Obs % Satid(i) == SatId_MetopD .OR. Obs % Satid(i) == SatId_MetopE) THEN
           report_types(i - ob_start + 1) = rep_type_iasing_metop_d
         ELSE
           found_report_type = .FALSE.
           DO j = 1, SIZE (map, DIM = 1)
             IF (map(j,1) == ObsGroupIASING .AND. map(j,2) == Obs % Satid(i)) THEN
+              report_types(i - ob_start + 1) = map(j,3)
+              found_report_type = .TRUE.
+              EXIT
+            END IF
+          END DO
+          CALL update_unrecognized_satids (Obs % Satid(i))
+        END IF
+      END DO
+    END IF
+  CASE (ObsGroupPseudoIASI)
+    IF (Obs % Header % Satid % Present) THEN
+      DO i = ob_start, ob_end
+        IF (Obs % Satid(i) == SatId_MetopD) THEN
+          report_types(i - ob_start + 1) = rep_type_iasing_metop_d
+        ELSE
+          found_report_type = .FALSE.
+          DO j = 1, SIZE (map, DIM = 1)
+            IF (map(j,1) == ObsGroupPseudoIASI .AND. map(j,2) == Obs % Satid(i)) THEN
               report_types(i - ob_start + 1) = map(j,3)
               found_report_type = .TRUE.
               EXIT

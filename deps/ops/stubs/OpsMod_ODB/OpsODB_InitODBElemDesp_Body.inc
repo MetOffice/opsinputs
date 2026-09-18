@@ -39,6 +39,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupHLOSWind,          &
     ObsGroupIASI,              &
     ObsGroupIASING,            &
+    ObsGroupPseudoIASI,        &
     ObsGroupIN3DIClr,          &
     ObsGroupIN3DS,             &
     ObsGroupSAPHIR,            &
@@ -1366,7 +1367,7 @@ IF (ObsGroup == ObsGroupGMIlow .OR. ObsGroup == ObsGroupGMIhigh) THEN
 
 END IF
 
-IF (ObsGroup == ObsGroupIASING) THEN
+IF (ObsGroup == ObsGroupIASING .OR. ObsGroup == ObsGroupPseudoIASI) THEN
   ElemDesp2ODBDesp(IndexRadiance) % TableName                 = 'body'
   ElemDesp2ODBDesp(IndexRadiance) % ColName                   = 'initial_obsvalue'
   ElemDesp2ODBDesp(IndexRadiance) % Varno                     = ops_odb_getval (h, "$rawsca")

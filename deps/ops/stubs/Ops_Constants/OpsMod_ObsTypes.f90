@@ -251,6 +251,7 @@ INTEGER, PARAMETER :: ObsTypeWINDSAT      = 24800   ! => WINDSAT BUFR
 INTEGER, PARAMETER :: ObsTypeAMSR2        = 25000   ! => AMSR2 radiances
 INTEGER, PARAMETER :: ObsTypeAIRSL        = 25100   ! => AIRS locally received data
 INTEGER, PARAMETER :: ObsTypeIASI_H       = 25300   ! => High Res IASI
+INTEGER, PARAMETER :: ObsTypePseudoIASI   = 25310   ! => IASI-NG degraded to IASI sampling
 INTEGER, PARAMETER :: ObsTypeMERIS        = 25400   ! => MERIS
 INTEGER, PARAMETER :: ObsTypeOLCI         = 25410   ! => OLCI
 INTEGER, PARAMETER :: ObsTypeASCATHR      = 25500   ! => HiRes ASCAT BUFR

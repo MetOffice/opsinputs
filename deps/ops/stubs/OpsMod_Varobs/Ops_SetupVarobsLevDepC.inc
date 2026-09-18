@@ -43,6 +43,7 @@ USE OpsMod_ObsGroupInfo, ONLY: &
     ObsGroupCrIS,              &
     ObsGroupIASI,              &
     ObsGroupIASING,            &
+    ObsGroupPseudoIASI,        &
     ObsGroupSBUV,              &
     ObsGroupRadar,             &
     ObsGroupRadarZ,            &
@@ -175,6 +176,11 @@ SELECT CASE (Observations % header % ObsGroup)
     NumLevelLevs = 1
 
   CASE (ObsGroupIASING)
+
+    ObsLevelType = 0.0
+    NumLevelLevs = 1
+
+  CASE (ObsGroupPseudoIASI)
 
     ObsLevelType = 0.0
     NumLevelLevs = 1

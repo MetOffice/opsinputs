@@ -83,7 +83,8 @@ INTEGER, PARAMETER :: ObsGroupEPSMWS         =  71 ! => EPS SG MWS
 INTEGER, PARAMETER :: ObsGroupMWSFY3E        =  72 ! => FY3E microwave sounder data
 INTEGER, PARAMETER :: ObsGroupHIRAS2         =  74 ! => HIRAS Radiances
 INTEGER, PARAMETER :: ObsGroupIASING         =  75 ! => IASI Next Generation on EPS-SG
-INTEGER, PARAMETER :: max_obs_group_num      =  75 ! Number of observation groups
+INTEGER, PARAMETER :: ObsGroupPseudoIASI     =  76 ! => Pseudo-IASI version of IASI-NG on EPS-SG
+INTEGER, PARAMETER :: max_obs_group_num      =  76 ! Number of observation groups
 
 CONTAINS
 
