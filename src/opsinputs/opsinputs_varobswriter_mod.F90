@@ -718,6 +718,7 @@ character(len=200)                                    :: varname
 logical, save                                         :: FillChanNum = .false.
 logical, save                                         :: FillNumChans = .false.
 
+
 ! Body:
 
 ! Get the list of varfields to populate
@@ -1286,6 +1287,7 @@ integer(integer64), allocatable :: ChannelIndicesVar(:,:)
 integer(integer64)              :: ChannelIndices(Ob % Header % NumObsLocal, size(channels))
 integer(integer64)              :: ChannelCounts(Ob % Header % NumObsLocal)
 integer                         :: iChannel
+integer                         :: iVarChannel
 integer                         :: iObs
 real(kind=c_double)             :: MissingDouble
 integer(integer64)              :: array_loop
@@ -1329,9 +1331,19 @@ call opsinputs_varobswriter_findchannelspassingqc( &
 
 ChannelIndicesVar(:,:) = 0
 
-if (FillChanNum) then
-  call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
-                 num_levels = NumChannels)
+  if (FillChanNum) then
+    ! Allocate ChanNum. Use size(varChannels) as num_levels when varChannels is a strict
+    ! subset of channels and varObsSize_loc is non-zero (covers both size_of_varobs_array
+    ! equal to size(varChannels) and equal to size(channels)).
+    ! When varObsSize_loc == 0 we assign ChannelIndices directly, so allocate with NumChannels
+    ! = size(channels) so shapes always match.
+    if (size(varChannels) > 0 .and. size(varChannels) < size(channels) .and. varObsSize_loc /= 0) then
+      call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
+                     num_levels = int(size(varChannels), kind=integer64))
+    else
+      call Ops_Alloc(Ob % Header % ChanNum, "ChanNum", Ob % Header % NumObsLocal, Ob % ChanNum, &
+                     num_levels = NumChannels)
+    end if
   if ((varObsSize_loc /= 0)) then
     if (varObsSize_loc > size(channels)) then
       if (size(varChannels) > 0 .and. (size(channels) == size(varChannels))) then
@@ -1351,6 +1363,31 @@ if (FillChanNum) then
           end do
           Ob % ChanNum = ChannelIndicesVar
         end if
+      else if (size(varChannels) > 0 .and. (size(varChannels) < size(channels))) then
+          ! Only fill up to the number of varChannels, do not pad with IMDI
+          ChannelIndicesVar(:,:) = 0
+          do iObs = 1, Ob % Header % NumObsLocal
+            iVarChannel = 0
+            do iChannel = 1, ChannelCounts(iObs)
+              if (ChannelIndices(iObs, iChannel) > 0 .and. &
+                  ChannelIndices(iObs, iChannel) <= size(channels)) then
+                do array_loop = 1, size(varChannels)
+                  if (channels(ChannelIndices(iObs, iChannel)) == varChannels(array_loop)) then
+                    if (iVarChannel < size(varChannels)) then
+                      iVarChannel = iVarChannel + 1
+                      ChannelIndicesVar(iObs, iVarChannel) = varChannels(array_loop)
+                    end if
+                    exit
+                  end if
+                end do
+              end if
+            end do
+            ! Zero out any remaining entries above iVarChannel (if any)
+            if (iVarChannel < size(varChannels)) then
+              ChannelIndicesVar(iObs, (iVarChannel+1):size(varChannels)) = 0
+            end if
+          end do
+          Ob % ChanNum = ChannelIndicesVar
       else
         if (compressChannels) then
           Ob % ChanNum = ChannelIndices
@@ -1361,8 +1398,32 @@ if (FillChanNum) then
           Ob % ChanNum = ChannelIndices
         end if
       end if
-    else if (varObsSize_loc == size(channels)) then
-      if (size(varChannels) > 0) then
+    else
+      ! varObsSize_loc > 0 and <= size(channels): covers both the case where the varobs
+      ! array is sized to size(varChannels) (the natural subset case, varObsSize_loc == size(varChannels))
+      ! and the case where it equals size(channels). The sub-branches below guard independently.
+      if (size(varChannels) > 0 .and. size(varChannels) < size(channels)) then
+        ! varChannels is a true subset of channels: look up each passing channel in varChannels
+        ! and store the actual channel number at the next compact ChanNum slot.
+        do iObs = 1, Ob % Header % NumObsLocal
+          iVarChannel = 0
+          do iChannel = 1, ChannelCounts(iObs)
+            if (ChannelIndices(iObs, iChannel) > 0 .and. &
+                ChannelIndices(iObs, iChannel) <= size(channels)) then
+              do array_loop = 1, size(varChannels)
+                if (channels(ChannelIndices(iObs, iChannel)) == varChannels(array_loop)) then
+                  if (iVarChannel < size(varChannels)) then
+                    iVarChannel = iVarChannel + 1
+                    ChannelIndicesVar(iObs, iVarChannel) = varChannels(array_loop)
+                  end if
+                  exit
+                end if
+              end do
+            end if
+          end do
+        end do
+        Ob % ChanNum = ChannelIndicesVar
+      else if (size(varChannels) > 0) then
         do iChannel=1,  NumChannels
           if (compressChannels) then
             do iObs=1, Ob % Header % NumObsLocal
@@ -1384,7 +1445,18 @@ end if
 
 if (FillNumChans) then
   call Ops_Alloc(Ob % Header % NumChans, "NumChans", Ob % Header % NumObsLocal, Ob % NumChans)
-  Ob % NumChans = ChannelCounts
+  ! When ChanNum is restricted to varChannels (a strict subset of channels), NumChans must
+  ! count only the QC-passing channels that are also in varChannels — not all QC-passing
+  ! channels from the full channels list (ChannelCounts). If NumChans > size(varChannels)
+  ! then VAR would read ChanNum out of bounds.
+  if (FillChanNum .and. associated(Ob % ChanNum) .and. &
+      size(varChannels) > 0 .and. size(varChannels) < size(channels) .and. varObsSize_loc /= 0) then
+    do iObs = 1, Ob % Header % NumObsLocal
+      Ob % NumChans(iObs) = count(Ob % ChanNum(iObs, :) > 0)
+    end do
+  else
+    Ob % NumChans = ChannelCounts
+  end if
 end if
 end subroutine opsinputs_varobswriter_fillchannumandnumchans
 

@@ -419,6 +419,10 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_seviriclr
                 YAML     varobswriter_globalnamelist_seviriclr.yaml
                 NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
                 DATA     varobs_globalnamelist_seviriclr.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_varChanneltest
+                YAML     varobswriter_varChanneltest.yaml
+                NAMELIST ../../etc/global/varobs/SEVIRIClr.nl
+                DATA     varobs_globalnamelist_seviriclr.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_mtgirs
                 LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_mtgirs.yaml
@@ -449,6 +453,14 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_epsmws
                 YAML     varobswriter_globalnamelist_epsmws.yaml
                 NAMELIST ../../etc/global/varobs/EPSMWS.nl
                 DATA     varobs_globalnamelist_epsmws.nc4)
+
+# Verifies ChanNum and NumChans consistency when varChannels is a strict subset of channels.
+# ChanNum must have only size(varChannels) levels (no IMDI padding) and NumChans must count
+# only QC-passing channels that appear in varChannels.
+ADD_WRITER_TEST(NAME     varobswriter_varChanneltest_checker
+                YAML     varobswriter_varChanneltest_checker.yaml
+                NAMELIST VarObsWriterNamelists_varobswriter_varChanneltest_checker/SEVIRIClr.nl
+                DATA     varobs_globalnamelist_seviriclr.nc4)
 
 # Tests the UKV namelist files in the etc directory
 
