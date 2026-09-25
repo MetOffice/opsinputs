@@ -1422,13 +1422,6 @@ ElemDesp2ODBDesp(IndexIASIPCScore) % colname_array_length        = 300
 ElemDesp2ODBDesp(IndexIASIPCScoreCount) % TableName              = 'iasi_principle_component'
 ElemDesp2ODBDesp(IndexIASIPCScoreCount) % ColName                = 'principle_component_count'
 
-ElemDesp2ODBDesp(IndexIASINGPCScore) % TableName                 = 'principal_component'
-ElemDesp2ODBDesp(IndexIASINGPCScore) % ColName                   = 'principal_component_ng_score'
-ElemDesp2ODBDesp(IndexIASINGPCScore) % colname_array_length      = 340
-
-ElemDesp2ODBDesp(IndexIASINGPCScoreCount) % TableName            = 'principal_component'
-ElemDesp2ODBDesp(IndexIASINGPCScoreCount) % ColName              = 'principal_component_ng_count'
-
 ElemDesp2ODBDesp(IndexODBObsType) % TableName                    = 'hdr'
 ElemDesp2ODBDesp(IndexODBObsType) % ColName                      = 'obstype'
 
@@ -1675,10 +1668,10 @@ ElemDesp2ODBDesp(IndexModelSurfaceType) % ColName                = 'totalcloud'
 ElemDesp2ODBDesp(IndexModelSurfaceType) % data_type              = odb_real
 ElemDesp2ODBDesp(IndexModelSurfaceType) % has_missing            = c_false
 
-ElemDesp2ODBDesp(IndexSatelliteClassification) % TableName       = 'radiance'
-ElemDesp2ODBDesp(IndexSatelliteClassification) % ColName         = 'satellite_classification'
-ElemDesp2ODBDesp(IndexSatelliteClassification) % data_type       = odb_integer
-ElemDesp2ODBDesp(IndexSatelliteClassification) % has_missing     = c_false
+ElemDesp2ODBDesp(IndexSatelliteMission) % TableName              = 'radiance'
+ElemDesp2ODBDesp(IndexSatelliteMission) % ColName                = 'satellite_mission'
+ElemDesp2ODBDesp(IndexSatelliteMission) % data_type              = odb_integer
+ElemDesp2ODBDesp(IndexSatelliteMission) % has_missing            = c_false
 
 ElemDesp2ODBDesp(IndexNonNormalisedPCScore) % TableName          = 'radiance'
 ElemDesp2ODBDesp(IndexNonNormalisedPCScore) % ColName            = 'non_normalised_pcscore'
