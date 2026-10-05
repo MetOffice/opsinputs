@@ -61,7 +61,6 @@ USE GenMod_UMHeaderConstants, ONLY: &
     IC_LenCxCol
 
 USE mpl, ONLY:      &
-    mpl_comm_world, &
     mpl_integer,    &
     mpl_real,       &
     mpl_success
@@ -169,7 +168,7 @@ CALL ops_mpl_gatherv ((/len_data/),      &
                       mpl_displacements, &
                       mpl_integer,       &
                       0,                 &
-                      mpl_comm_world,    &
+                      mpi_group,         &
                       Errstat)
 IF (Errstat /= mpl_success) THEN
   WRITE (ErrMess, '(A,I0)') "Error in mpl_gatherv (CX lengths), Errstat = ", Errstat
@@ -200,7 +199,7 @@ CALL ops_mpl_gatherv (CxData,            &
                       mpl_displacements, &
                       mpl_real,          &
                       0,                 &
-                      mpl_comm_world,    &
+                      mpi_group,         &
                       Errstat)
 IF (Errstat /= mpl_success) THEN
   WRITE (ErrMess, '(A,I0)') "Error in mpl_gatherv (CX data), Errstat = ", Errstat

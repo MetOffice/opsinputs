@@ -39,7 +39,6 @@ USE GenMod_MiscUMScienceConstants, ONLY: &
     RMDI
 
 USE mpl, ONLY:      &
-    mpl_comm_world, &
     mpl_real,       &
     mpl_success
 
@@ -164,7 +163,7 @@ CALL ops_mpl_gatherv (VarArray,           &
                       displacements,      &
                       mpl_real,           &
                       0,                  &
-                      mpl_comm_world,     &
+                      mpi_group,          &
                       istat)
 IF (istat /= mpl_success) THEN
   WRITE (ErrMess, '(A,I0)') "Error in mpl_gatherv, istat = ", istat
