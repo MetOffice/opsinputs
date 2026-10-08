@@ -39,7 +39,6 @@ INTEGER                            :: WarningsMax = IMDI
 LOGICAL                            :: GCOMBitRep = .FALSE.
 REAL                               :: ErrorSleep = 2.5          ! Seconds to sleep when exiting program on error
 LOGICAL                            :: WarningToError = .FALSE.  ! Convert calls to gen_warn to calls to gen_fail
-LOGICAL                            :: StatsAppend = .FALSE.     ! Allow capability to revert to old behaviour
 
 INTEGER                            :: UM_SECTOR_SIZE = 2048
 

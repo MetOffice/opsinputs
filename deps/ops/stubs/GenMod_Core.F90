@@ -105,7 +105,6 @@ INTEGER, PARAMETER          :: StatusWarning = -1 ! Non fatal error ErrorStatus 
 INTEGER, PARAMETER          :: MessageIn = 5    ! unit number for standard input
 INTEGER, PARAMETER          :: MessageOut = 6   ! unit number for standard output
 INTEGER, PARAMETER          :: ErrorOut = 0     ! unit number for standard error output
-INTEGER, PARAMETER          :: StatsOut = 7     ! unit number for statistics output
 INTEGER                     :: WarningCount = 0 ! number of warning messages
 
 INTEGER, PARAMETER            :: MaxFileNameLen = 255 ! maximum file name length
@@ -146,7 +145,6 @@ INTERFACE gen_warn
   MODULE PROCEDURE gen_warn_scalar
 END INTERFACE gen_warn
 
-PUBLIC :: gen_close_stats_file
 PUBLIC :: gen_do_trace
 PUBLIC :: gen_error_report
 PUBLIC :: gen_free_unit
@@ -157,7 +155,6 @@ PUBLIC :: gen_get_unit_from_env
 PUBLIC :: gen_fail
 PUBLIC :: gen_message
 PUBLIC :: gen_message_report_sync
-PUBLIC :: gen_open_stats_file
 PUBLIC :: Gen_ReadConfigNL
 PUBLIC :: gen_replace_text
 PUBLIC :: Gen_StringSplit
@@ -174,7 +171,6 @@ PUBLIC :: ErrorOut
 PUBLIC :: MaxFileNameLen
 PUBLIC :: MessageIn
 PUBLIC :: MessageOut
-PUBLIC :: StatsOut
 PUBLIC :: StatusFatal
 PUBLIC :: StatusOK
 PUBLIC :: StatusWarning
@@ -210,10 +206,8 @@ INCLUDE 'Gen_WriteMessageHeader.inc'
 INCLUDE 'gen_write_trace_js_file.inc'
 
 #include "gen_fortran_version.h"
-#include "gen_close_stats_file.inc"
 #include "gen_get_env.inc"
 #include "gen_get_env_a.inc"
 #include "gen_message_report_sync.inc"
-#include "gen_open_stats_file.inc"
 
 END MODULE GenMod_Core

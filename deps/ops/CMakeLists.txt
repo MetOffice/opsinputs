@@ -35,9 +35,7 @@ set(OPS_SOURCE_FILES
   code/OpsMod_Utilities/OpsMod_Utilities.f90
   code/OpsMod_VarobsLib/OpsMod_VarobsLib.f90
   code/OpsProg_Utils/OpsMod_UtilsProgs.f90
-  public/GenMod_Control/GenMod_Control.F90
   public/GenMod_Control/GenMod_Setup.F90
-  public/GenMod_Core/GenMod_Core.F90
   public/GenMod_Platform/GenMod_Matmul.F90
   public/GenMod_Platform/GenMod_Platform.F90
   public/GenMod_Platform/Gen_CPUTime.c
@@ -70,6 +68,8 @@ set(OPS_SOURCE_FILES
   stubs/Ops_Constants/OpsMod_SatIds.f90
   stubs/Ops_Constants/OpsMod_Stash.f90
   stubs/Ops_Constants/OpsMod_Varfields.f90
+  stubs/GenMod_Control.F90
+  stubs/GenMod_Core.F90
   stubs/OpsMod_AODGeneral/OpsMod_AODGeneral.f90
   stubs/OpsMod_GPSRO/OpsMod_GPSRO.f90
   stubs/OpsMod_GPSRO/OpsMod_GPSROInfo.f90
@@ -92,6 +92,7 @@ foreach(file ${OPS_SOURCE_FILES})
   list(APPEND OPS_SOURCE_DIRS "${dir}")
 endforeach()
 list(REMOVE_DUPLICATES OPS_SOURCE_DIRS)
+list(APPEND OPS_SOURCE_DIRS public/GenMod_Core)
 include_directories( ${OPS_SOURCE_DIRS} )
 
 # Find extra dependencies
