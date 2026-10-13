@@ -139,6 +139,10 @@ SELECT CASE (ObsGroup)
     OpsFn_ObsGroupNumToName = "EPSMWS"
   CASE (ObsGroupSternaMWR)
     OpsFn_ObsGroupNumToName = "SternaMWR"
+  CASE (ObsGroupIASING)
+    OpsFn_ObsGroupNumToName = "IASING"
+  CASE (ObsGroupPseudoIASI)
+    OpsFn_ObsGroupNumToName = "PseudoIASI"
   CASE DEFAULT
     OpsFn_ObsGroupNumToName = "Unknown"
 END SELECT
