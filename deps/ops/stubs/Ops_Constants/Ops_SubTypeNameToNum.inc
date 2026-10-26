@@ -150,6 +150,8 @@ SELECT CASE (name)
     num = ObsTypeIASI_H
   CASE ("IASIL")
     num = ObsTypeIASI_L
+  CASE ("IASING")
+    num = ObsTypeIASING
   CASE ("IMDWINDS")
     num = ObsTypeIMDWINDS
   CASE ("IN3DCSR")
@@ -236,6 +238,8 @@ SELECT CASE (name)
     num = 40700
   CASE ("PILOT")
     num = ObsTypePilot
+  CASE ("PseudoIASI")
+    num = ObsTypePseudoIASI
   CASE ("RADOP")
     num = ObsTypeRadopWind
   CASE ("RADOP2")

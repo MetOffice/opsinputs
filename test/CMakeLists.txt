@@ -414,6 +414,16 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_iasi
                 YAML     varobswriter_globalnamelist_iasi.yaml
                 NAMELIST ../../etc/global/varobs/IASI.nl
                 DATA     varobs_globalnamelist_iasi.nc4 018_VarField_tcozone_obsdiag.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_iasing
+                LABELS   varobswriter globalnamelist
+                YAML     varobswriter_globalnamelist_iasing.yaml
+                NAMELIST ../../etc/global/varobs/IASING.nl
+                DATA     varobs_globalnamelist_iasing.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_pseudoiasi
+                LABELS   varobswriter globalnamelist
+                YAML     varobswriter_globalnamelist_pseudoiasi.yaml
+                NAMELIST ../../etc/global/varobs/PseudoIASI.nl
+                DATA     varobs_globalnamelist_pseudoiasi.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_seviriclr
                 LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_seviriclr.yaml
@@ -843,6 +853,14 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_iasi
                 LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_iasi.yaml
                 DATA     cx_globalnamelist_iasi.nc4 varobs_globalnamelist_iasi.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_iasing
+                LABELS   cxwriter globalnamelist
+                YAML     cxwriter_globalnamelist_iasing.yaml
+                DATA     cx_globalnamelist_iasing.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_pseudoiasi
+                LABELS   cxwriter globalnamelist
+                YAML     cxwriter_globalnamelist_pseudoiasi.yaml
+                DATA     cx_globalnamelist_pseudoiasi.nc4 dummy.nc4)
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_seviriclr
                 LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_seviriclr.yaml

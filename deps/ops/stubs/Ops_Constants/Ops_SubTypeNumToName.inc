@@ -155,6 +155,8 @@ SELECT CASE (num)
     name = "IASIHR"
   CASE (ObsTypeIASI_L)
     name = "IASIL"
+  CASE (ObsTypeIASING)
+    name = "IASING"
   CASE (ObsTypeIMDWINDS)
     name = "IMDWINDS"
   CASE (ObsTypeIN3DImCSR)
@@ -237,6 +239,8 @@ SELECT CASE (num)
     name = "PAOBS"
   CASE (ObsTypePilot)
     name = "PILOT"
+  CASE (ObsTypePseudoIASI)
+    name = "PseudoIASI"
   CASE (ObsTypeRadopWind)
     name = "RADOP"
   CASE (ObsTypeRadop2Wind)

@@ -1668,6 +1668,49 @@ ElemDesp2ODBDesp(IndexModelSurfaceType) % ColName                = 'totalcloud'
 ElemDesp2ODBDesp(IndexModelSurfaceType) % data_type              = odb_real
 ElemDesp2ODBDesp(IndexModelSurfaceType) % has_missing            = c_false
 
+ElemDesp2ODBDesp(IndexSatelliteMission) % TableName              = 'radiance'
+ElemDesp2ODBDesp(IndexSatelliteMission) % ColName                = 'satellite_mission'
+ElemDesp2ODBDesp(IndexSatelliteMission) % data_type              = odb_integer
+ElemDesp2ODBDesp(IndexSatelliteMission) % has_missing            = c_false
+
+ElemDesp2ODBDesp(IndexNonNormalisedPCScore) % TableName          = 'radiance'
+ElemDesp2ODBDesp(IndexNonNormalisedPCScore) % ColName            = 'non_normalised_pcscore'
+ElemDesp2ODBDesp(IndexNonNormalisedPCScore) % data_type          = odb_real
+ElemDesp2ODBDesp(IndexNonNormalisedPCScore) % has_missing        = c_false
+
+ElemDesp2ODBDesp(IndexChannelStartBand) % TableName              = 'radiance'
+ElemDesp2ODBDesp(IndexChannelStartBand) % ColName                = 'band_channel_start'
+ElemDesp2ODBDesp(IndexChannelStartBand) % colname_array_length   = 4
+ElemDesp2ODBDesp(IndexChannelStartBand) % data_type              = odb_real
+ElemDesp2ODBDesp(IndexChannelStartBand) % has_missing            = c_false
+
+ElemDesp2ODBDesp(IndexChannelEndBand) % TableName                = 'radiance'
+ElemDesp2ODBDesp(IndexChannelEndBand) % ColName                  = 'band_channel_end'
+ElemDesp2ODBDesp(IndexChannelEndBand) % colname_array_length     = 4
+ElemDesp2ODBDesp(IndexChannelEndBand) % data_type                = odb_real
+ElemDesp2ODBDesp(IndexChannelEndBand) % has_missing              = c_false
+
+ElemDesp2ODBDesp(IndexPCResidualBand) % TableName                = 'radiance'
+ElemDesp2ODBDesp(IndexPCResidualBand) % ColName                  = 'band_pc_residual'
+ElemDesp2ODBDesp(IndexPCResidualBand) % colname_array_length     = 4
+ElemDesp2ODBDesp(IndexPCResidualBand) % data_type                = odb_real
+ElemDesp2ODBDesp(IndexPCResidualBand) % has_missing              = c_false
+
+ElemDesp2ODBDesp(IndexNumberOfRadianceChannels) % TableName      = 'hdr'
+ElemDesp2ODBDesp(IndexNumberOfRadianceChannels) % ColName        = 'numlev'
+ElemDesp2ODBDesp(IndexNumberOfRadianceChannels) % data_type      = odb_integer
+ElemDesp2ODBDesp(IndexNumberOfRadianceChannels) % has_missing    = c_false
+
+ElemDesp2ODBDesp(IndexNumberOfMWSChannels) % TableName           = 'hdr'
+ElemDesp2ODBDesp(IndexNumberOfMWSChannels) % ColName             = 'numlev'
+ElemDesp2ODBDesp(IndexNumberOfMWSChannels) % data_type           = odb_integer
+ElemDesp2ODBDesp(IndexNumberOfMWSChannels) % has_missing         = c_false
+
+ElemDesp2ODBDesp(IndexIASINGRadianceTypeFlags) % TableName       = 'radiance'
+ElemDesp2ODBDesp(IndexIASINGRadianceTypeFlags) % ColName         = 'radiance_type'
+ElemDesp2ODBDesp(IndexIASINGRadianceTypeFlags) % data_type       = odb_integer
+ElemDesp2ODBDesp(IndexIASINGRadianceTypeFlags) % has_missing     = c_false
+
 CALL OpsODB_InitODBElemDesp_Body (h,        &
                                   obsgroup)
 

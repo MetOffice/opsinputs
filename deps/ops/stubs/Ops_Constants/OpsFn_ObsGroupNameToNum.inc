@@ -76,6 +76,10 @@ SELECT CASE (ObsGroupName)
     OpsFn_ObsGroupNameToNum = ObsGroupHLOSwind
   CASE ("IASI")
     OpsFn_ObsGroupNameToNum = ObsGroupIASI
+  CASE ("IASING")
+    OpsFn_ObsGroupNameToNum = ObsGroupIASING
+  CASE ("PseudoIASI")
+    OpsFn_ObsGroupNameToNum = ObsGroupPseudoIASI
   CASE ("IN3DIClr")
     OpsFn_ObsGroupNameToNum = ObsGroupIN3DIClr
   CASE ("IN3DS")
