@@ -1,25 +1,14 @@
-# (C) Crown Copyright 2020, the Met Office. All rights reserved.
-#
+# (C) Crown Copyright Met Office. All rights reserved.
+cmake_minimum_required( VERSION 3.26 FATAL_ERROR )
+project( opsinputs VERSION 2026 LANGUAGES C CXX Fortran )
 
-################################################################################
-# opsinputs
-################################################################################
-
-cmake_minimum_required( VERSION 3.12 FATAL_ERROR )
-
-project( opsinputs VERSION 0.1 LANGUAGES C CXX Fortran )
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( CMAKE_CXX_EXTENSIONS OFF )
-
 set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH} )
-
 set( CMAKE_DIRECTORY_LABELS "opsinputs" )
 
 set( ECBUILD_DEFAULT_BUILD_TYPE Release )
-set( ENABLE_OS_TESTS           OFF CACHE BOOL "Disable OS tests" FORCE )
-set( ENABLE_LARGE_FILE_SUPPORT OFF CACHE BOOL "Disable testing of large file support" FORCE )
-
 find_package( ecbuild 3.3.2 REQUIRED )
 include( ecbuild_system NO_POLICY_SCOPE )
 

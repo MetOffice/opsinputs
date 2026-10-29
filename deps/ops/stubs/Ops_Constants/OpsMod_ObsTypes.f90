@@ -251,6 +251,7 @@ INTEGER, PARAMETER :: ObsTypeWINDSAT      = 24800   ! => WINDSAT BUFR
 INTEGER, PARAMETER :: ObsTypeAMSR2        = 25000   ! => AMSR2 radiances
 INTEGER, PARAMETER :: ObsTypeAIRSL        = 25100   ! => AIRS locally received data
 INTEGER, PARAMETER :: ObsTypeIASI_H       = 25300   ! => High Res IASI
+INTEGER, PARAMETER :: ObsTypePseudoIASI   = 25310   ! => IASI-NG degraded to IASI sampling
 INTEGER, PARAMETER :: ObsTypeMERIS        = 25400   ! => MERIS
 INTEGER, PARAMETER :: ObsTypeOLCI         = 25410   ! => OLCI
 INTEGER, PARAMETER :: ObsTypeASCATHR      = 25500   ! => HiRes ASCAT BUFR
@@ -269,6 +270,7 @@ INTEGER, PARAMETER :: ObsTypeMTSATImCSR   = 26300   ! => MTSAT Imager radiances
 INTEGER, PARAMETER :: ObsTypeAHICSR       = 26310   ! => AHI radiances
 INTEGER, PARAMETER :: ObsTypeAHIASR       = 26320   ! => AHI all-sky radiances
 INTEGER, PARAMETER :: ObsTypeABICSR       = 26330   ! => ABI (GOES-16 onwards) radiances
+INTEGER, PARAMETER :: ObsTypeIASING       = 26500   ! => IASI-NG
 INTEGER, PARAMETER :: ObsTypeSATAOD       = 26600   ! => Satellite AOD (Polar)
 INTEGER, PARAMETER :: ObsTypeASCATCO      = 26700   ! => ASCAT coastal winds
 INTEGER, PARAMETER :: ObsTypeIN3DImCSR    = 26800   ! => INSAT3D Imager radiances
