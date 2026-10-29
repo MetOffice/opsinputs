@@ -648,7 +648,7 @@ SELECT CASE (string)
   CASE ("$rep_type_amsr2_rad")
     ops_odb_getval_hardwired = 41001
   CASE ("$rep_type_amsr3_rad")
-    ops_odb_getval_hardwired = 41002
+    ops_odb_getval_hardwired = 81002
   CASE ("$rep_type_saphir_rad")
     ops_odb_getval_hardwired = 42001
   CASE ("$rep_type_doppler_wind_lidar")
