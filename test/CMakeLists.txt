@@ -310,6 +310,10 @@ ADD_WRITER_TEST(NAME     varobswriter_080_VarField_biaspredictors
                 YAML     080_VarField_biaspredictors.yaml
                 NAMELIST VarObsWriterNamelists_080_VarField_biaspredictors/ATMS.nl
                 DATA     080_VarField_biaspredictors.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_varbc_multiwriter
+                LABELS   varobswriter varbc
+                YAML     varobswriter_varbc_multiwriter.yaml
+                DATA     varobs_globalnamelist_atms.nc4)
 ADD_WRITER_TEST(NAME     varobswriter_081_VarField_level_time
                 LABELS   varobswriter varfield
                 YAML     081_VarField_level_time.yaml

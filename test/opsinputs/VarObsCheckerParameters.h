@@ -36,6 +36,9 @@ class VarObsCheckerParameters : public ufo::ObsFilterParametersBase {
   /// Expected contents of columns of the main table with per-observation data.
   oops::Parameter<std::map<std::string, std::vector<std::string>>> expectedMainTableColumns{
     "expected_main_table_columns", {}, this};
+
+  /// Varfield numbers that must appear in the main table.
+  oops::Parameter<std::vector<std::string>> expectedVarfields{"expected_varfields", {}, this};
 };
 
 }  // namespace opsinputs
