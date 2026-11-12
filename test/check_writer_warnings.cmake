@@ -2,7 +2,7 @@ execute_process(
   COMMAND "${WRITER_EXECUTABLE}" "${WRITER_INPUT}"
   RESULT_VARIABLE result
   OUTPUT_VARIABLE output
-  ERROR_VARIABLE errors )
+  ERROR_VARIABLE errors)
 message("${output}${errors}")
 if(NOT "${result}" STREQUAL "0")
   message(FATAL_ERROR "Writer test failed: ${result}")

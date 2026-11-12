@@ -899,7 +899,9 @@ ADD_WRITER_TEST(NAME     cxwriter_unknown_stash
                 YAML     cxwriter_unknown_stash.yaml
                 NAMELIST CxWriterNamelists_unknown/Aircraft.nl
                 DATA     cx_globalnamelist_aircraft.nc4 dummy.nc4
-                EXPECTED_WARNINGS "opsinputs_cxwriter_addrequiredgeovars.*Stash code not recognized: 99999.*opsinputs_cxwriter_populatecx.*Stash code not recognized: 99999")
+                EXPECTED_WARNINGS
+                  "opsinputs_cxwriter_addrequiredgeovars.*Stash code not recognized: 99999"
+                  "opsinputs_cxwriter_populatecx.*Stash code not recognized: 99999")
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_surface
                 LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_surface.yaml
