@@ -25,7 +25,7 @@ include( opsinputs_functions )
 function( ADD_WRITER_TEST )
   set( options DONT_SET_OPS_OUTPUT_DIR_ENV_VAR )
   set( single_value_args NAME YAML NAMELIST MPI )
-  set( multi_value_args DATA LABELS )
+  set( multi_value_args DATA LABELS EXPECTED_WARNINGS )
   cmake_parse_arguments( _PAR "${options}" "${single_value_args}" "${multi_value_args}"
                               ${_FIRST_ARG} ${ARGN} )
   if(_PAR_UNPARSED_ARGUMENTS)
@@ -48,14 +48,28 @@ function( ADD_WRITER_TEST )
   if(NOT _PAR_MPI)
     set(_PAR_MPI 1)
   endif()
+  set( test_command ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}_test_inputs_filters.x )
+  set( test_args "testinput/${_PAR_YAML}" )
+  if(_PAR_EXPECTED_WARNINGS)
+    set( test_command ${CMAKE_COMMAND} )
+    set( test_args
+      "-DWRITER_EXECUTABLE=${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}_test_inputs_filters.x"
+      "-DWRITER_INPUT=testinput/${_PAR_YAML}"
+      "-DEXPECTED_WARNINGS=${_PAR_EXPECTED_WARNINGS}"
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/check_writer_warnings.cmake )
+  endif()
   ecbuild_add_test( TARGET  ${PROJECT_NAME}_${_PAR_NAME}
                     LABELS  ${_PAR_LABELS}
-                    COMMAND ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}_test_inputs_filters.x
-                    ARGS    "testinput/${_PAR_YAML}"
+                    COMMAND ${test_command}
+                    ARGS    ${test_args}
                     ENVIRONMENT "${environment}"
                     MPI     ${_PAR_MPI}
                     DEPENDS ${PROJECT_NAME}_test_inputs_filters.x )
   set_tests_properties( ${PROJECT_NAME}_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
+  if(NOT _PAR_EXPECTED_WARNINGS)
+    set_tests_properties( ${PROJECT_NAME}_${_PAR_NAME} PROPERTIES
+      FAIL_REGULAR_EXPRESSION "[Vv]ar[Ff]ield (code )?not recogni[sz]ed;Stash code not recognized" )
+  endif()
 endfunction()
 
 set( OPSINPUTS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/testoutput )
@@ -449,6 +463,12 @@ ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_aircraft
                 YAML     varobswriter_globalnamelist_aircraft.yaml
                 NAMELIST ../../etc/global/varobs/Aircraft.nl
                 DATA     varobs_globalnamelist_aircraft.nc4)
+ADD_WRITER_TEST(NAME     varobswriter_unknown_varfield
+                LABELS   varobswriter
+                YAML     varobswriter_unknown_varfield.yaml
+                NAMELIST VarObsWriterNamelists_unknown/Surface.nl
+                DATA     003_VarField_rh_Surface.nc4
+                EXPECTED_WARNINGS "opsinputs_varobswriter_populateobservations.*VarField code not recognised 13")
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sternamwr
                 LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_sternamwr.yaml
@@ -874,6 +894,12 @@ ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_aircraft
                 YAML     cxwriter_globalnamelist_aircraft.yaml
                 NAMELIST ../../etc/global/cx/Aircraft.nl
                 DATA     cx_globalnamelist_aircraft.nc4 dummy.nc4)
+ADD_WRITER_TEST(NAME     cxwriter_unknown_stash
+                LABELS   cxwriter
+                YAML     cxwriter_unknown_stash.yaml
+                NAMELIST CxWriterNamelists_unknown/Aircraft.nl
+                DATA     cx_globalnamelist_aircraft.nc4 dummy.nc4
+                EXPECTED_WARNINGS "opsinputs_cxwriter_addrequiredgeovars.*Stash code not recognized: 99999.*opsinputs_cxwriter_populatecx.*Stash code not recognized: 99999")
 ADD_WRITER_TEST(NAME     cxwriter_globalnamelist_surface
                 LABELS   cxwriter globalnamelist
                 YAML     cxwriter_globalnamelist_surface.yaml

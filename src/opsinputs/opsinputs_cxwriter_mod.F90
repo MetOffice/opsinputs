@@ -610,6 +610,8 @@ do i = 1, size(CxFields)
   GeoVarName = opsinputs_cxfields_unknown
 
   select case (CxField)
+    case (IMDI)
+      cycle
 
     ! Surface variables
 
@@ -911,6 +913,8 @@ end if
 do iCxField = 1, size(CxFields)
   CxField = CxFields(iCxField)
   select case (CxField)
+    case (IMDI)
+      cycle
 
     ! Surface variables
 
