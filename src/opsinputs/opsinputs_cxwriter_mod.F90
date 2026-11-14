@@ -226,7 +226,7 @@ case ("debug")
 case ("verbose")
   GeneralMode = VerboseMode
 case default
-  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("GeneralMode not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -286,7 +286,7 @@ case ("cp")
 case ("wave")
   self % FH_VertCoord = FH_VertCoord_Wave
 case default
-  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_VertCoord not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -311,7 +311,7 @@ case ("lamnowrapeq")
 case ("lamwrapeq")
   self % FH_HorizGrid = FH_HorizGrid_LamWrapEq
 case default
-  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_HorizGrid not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -326,7 +326,7 @@ case ("arakawac")
 case ("endgame")
   self % FH_GridStagger = FH_GridStagger_EndGame
 case default
-  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_GridStagger not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -343,7 +343,7 @@ case ("sst")
 case ("wave")
   self % FH_ObsFileType = FH_ObsFileType_Wave
 case default
-  write (ErrorMessage, '("FH_ObsFileType code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_ObsFileType not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -357,7 +357,7 @@ select case (ops_to_lower_case(StringValue))
 case ("atmos")
   self % FH_SubModel = FH_SubModel_Atmos
 case default
-  write (ErrorMessage, '("FH_SubModel code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_SubModel not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return
@@ -439,7 +439,7 @@ case ("ocean")
 case ("sst")
   ModelType = ModelType_SST
 case default
-  write (ErrorMessage, '("model_type code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("model_type not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_cxwriter_create = .false.
   return

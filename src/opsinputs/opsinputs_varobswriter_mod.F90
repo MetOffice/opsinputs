@@ -269,7 +269,7 @@ case ("debug")
 case ("verbose")
   GeneralMode = VerboseMode
 case default
-  write (ErrorMessage, '("GeneralMode code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("GeneralMode not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -354,7 +354,7 @@ case ("cp")
 case ("wave")
   self % FH_VertCoord = FH_VertCoord_Wave
 case default
-  write (ErrorMessage, '("FH_VertCoord code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_VertCoord not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -379,7 +379,7 @@ case ("lamnowrapeq")
 case ("lamwrapeq")
   self % FH_HorizGrid = FH_HorizGrid_LamWrapEq
 case default
-  write (ErrorMessage, '("FH_HorizGrid code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_HorizGrid not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -394,7 +394,7 @@ case ("arakawac")
 case ("endgame")
   self % FH_GridStagger = FH_GridStagger_EndGame
 case default
-  write (ErrorMessage, '("FH_GridStagger code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_GridStagger not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -412,7 +412,7 @@ case ("ocean")
 case ("wave")
   self % FH_SubModel = FH_SubModel_Wave
 case default
-  write (ErrorMessage, '("FH_SubModel code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("FH_SubModel not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -436,7 +436,7 @@ case ("generic")
   write (ErrorMessage, '("IC_GroundGPSOperator set to IC_GroundGPSOperatorGeneric: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
 case default
-  write (ErrorMessage, '("IC_GroundGPSOperator code not recognised: ",A)') StringValue
+  write (ErrorMessage, '("IC_GroundGPSOperator not recognized: ",A)') StringValue
   call gen_warn(RoutineName, ErrorMessage)
   opsinputs_varobswriter_create = .false.
   return
@@ -1207,7 +1207,7 @@ do iVarField = 1, nVarFields
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % HeightCOG, "HeightCOG", Ob % Header % NumObsLocal, Ob % HeightCOG)
     case default
-      write (ErrorMessage, "(A,I0)") "VarField code not recognised ", VarFields(iVarField)
+      write (ErrorMessage, "(A,I0)") "Varfield not recognized: ", VarFields(iVarField)
       call gen_warn(RoutineName, ErrorMessage)
       cycle
   end select

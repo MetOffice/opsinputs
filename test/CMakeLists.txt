@@ -68,7 +68,7 @@ function( ADD_WRITER_TEST )
   set_tests_properties( ${PROJECT_NAME}_${_PAR_NAME} PROPERTIES FIXTURES_REQUIRED CleanOutputDir )
   if(NOT _PAR_EXPECTED_WARNINGS)
     set_tests_properties( ${PROJECT_NAME}_${_PAR_NAME} PROPERTIES
-      FAIL_REGULAR_EXPRESSION "[Vv]ar[Ff]ield (code )?not recogni[sz]ed;Stash code not recognized" )
+      FAIL_REGULAR_EXPRESSION "Varfield not recognized;Stash code not recognized" )
   endif()
 endfunction()
 
@@ -468,7 +468,7 @@ ADD_WRITER_TEST(NAME     varobswriter_unknown_varfield
                 YAML     varobswriter_unknown_varfield.yaml
                 NAMELIST VarObsWriterNamelists_unknown/Surface.nl
                 DATA     003_VarField_rh_Surface.nc4
-                EXPECTED_WARNINGS "opsinputs_varobswriter_populateobservations.*VarField code not recognised 13")
+                EXPECTED_WARNINGS "opsinputs_varobswriter_populateobservations.*Varfield not recognized: 13")
 ADD_WRITER_TEST(NAME     varobswriter_globalnamelist_sternamwr
                 LABELS   varobswriter globalnamelist
                 YAML     varobswriter_globalnamelist_sternamwr.yaml
