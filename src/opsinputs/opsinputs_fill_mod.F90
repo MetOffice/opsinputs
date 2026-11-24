@@ -225,11 +225,13 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate El2 and Hdr. The variables can either have no channel suffix (in which case
-!>   \p El2 will have only a single row) or have suffixes representing the indices specified in
-!>   \p Channels.
+!>   used to populate El2 and Hdr. The variables can have suffixes representing the indices
+!>   specified in \p Channels. If \p JediVarHasChannels is false, the exact variable name is used
+!>   for each output channel.
 !> \param[in] JediGroupName
 !>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -239,7 +241,8 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
-  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, JediGroupName, PackPGEs)
+  Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, JediGroupName, &
+  JediVarHasChannels, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -253,6 +256,7 @@ type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediGroupName
+logical, intent(in)                             :: JediVarHasChannels
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
@@ -287,7 +291,8 @@ end if
 MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
-JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
+JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+  JediVarName, Channels, JediVarHasChannels)
 
 if (obsspace_has(ObsSpace, JediGroupName, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
@@ -517,10 +522,13 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups) used
 !>   to populate El2 and Hdr. If each JEDI location needs to be mapped to a separate OPS
-!>   observation, the variables can either have no channel suffix (in which case \p El2 will have
-!>   only a single row) or have suffixes representing the indices specified in \p Channels.
+!>   observation, the variables can have suffixes representing the indices specified in
+!>   \p Channels. If \p JediVarHasChannels is false, the exact variable name is used for each
+!>   output channel.
 !> \param[in] JediGroupName
 !>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel. Defaults to true.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -531,7 +539,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, VarobsLength, JediVarName, &
-  JediGroupName, PackPGEs)
+  JediGroupName, PackPGEs, JediVarHasChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -547,8 +555,14 @@ integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediGroupName
 logical, optional, intent(in)                      :: PackPGEs
+logical, optional, intent(in)                      :: JediVarHasChannels
+
+! Local declarations:
+logical :: JediVarHasChannelsLocal
 
 ! Body:
+JediVarHasChannelsLocal = .true.
+if (present(JediVarHasChannels)) JediVarHasChannelsLocal = JediVarHasChannels
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
@@ -557,7 +571,7 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
-    ObsErrors, JediVarName, JediGroupName, PackPGEs)
+    ObsErrors, JediVarName, JediGroupName, JediVarHasChannelsLocal, PackPGEs)
 end if
 
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
@@ -1022,16 +1036,18 @@ end subroutine opsinputs_fill_fillreal
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
+!>   have suffixes representing the indices specified in \p Channels, or can be unchannelized
+!>   when \p JediVarHasChannels is false.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Real2. This can represent either a single
-!>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
-!>   of variables with suffixes corresponding to the indices specified in \p Channels.
+!>   Name of the JEDI variable used to populate \p Real2. This can represent a set of variables
+!>   with suffixes corresponding to the indices specified in \p Channels. If
+!>   \p JediVarHasChannels is false, the exact variable name is used for each output channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel.
 !> \param[in] compressVarChannels
 !>   Whether to apply var channel compression (No NaN spaces between channels)
 !> \param[in] sizeOfVarobsArray
@@ -1044,7 +1060,7 @@ end subroutine opsinputs_fill_fillreal
 !> are not found.
 subroutine opsinputs_fill_fillreal2d_norecords( &
   Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, &
-  JediVarGroup, compressVarChannels, sizeOfVarobsArray, varChannels)
+  JediVarGroup, JediVarHasChannels, compressVarChannels, sizeOfVarobsArray, varChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1056,6 +1072,7 @@ type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
+logical, intent(in)                                  :: JediVarHasChannels
 logical, optional, intent(in)                       :: compressVarChannels
 integer(integer64), optional, intent(in)            :: sizeOfVarobsArray
 integer(c_int), optional, intent(in)                :: varChannels(:)
@@ -1081,7 +1098,8 @@ if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
 
-JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
+JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+  JediVarName, Channels, JediVarHasChannels)
 
 !take into account offsetting of 2nd dimension if required
 !designed to be used to pack where multiple satellite instruments expected
@@ -1243,26 +1261,29 @@ end subroutine opsinputs_fill_fillreal2d_records
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
+!>   have suffixes representing the indices specified in \p Channels, or can be unchannelized
+!>   when \p JediVarHasChannels is false.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] VarobsLength
 !>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. If each JEDI location needs to be mapped
-!>   to a separate OPS observation, this can represent either a single variable with no channel
-!>   suffix (in which case \p Real2 will have only a single row) or a set of variables with
-!>   suffixes corresponding to the indices specified in \p Channels.
+!>   to a separate OPS observation, this can represent a set of variables with suffixes
+!>   corresponding to the indices specified in \p Channels. If \p JediVarHasChannels is false,
+!>   the exact variable name is used for each output channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel. Defaults to true.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillreal2d( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, &
-  VarobsLength, JediVarName, JediVarGroup, compressVarChannels, sizeOfVarobsArray, varChannels)
+  VarobsLength, JediVarName, JediVarGroup, compressVarChannels, sizeOfVarobsArray, varChannels, &
+  JediVarHasChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -1278,9 +1299,11 @@ character(len=*), intent(in)                        :: JediVarGroup
 logical, optional, intent(in)                       :: compressVarChannels
 integer(integer64), optional, intent(in)            :: sizeOfVarobsArray
 integer(c_int), optional, intent(in)                :: varChannels(:)
+logical, optional, intent(in)                       :: JediVarHasChannels
 
 ! local variables
 logical               :: compressChannels
+logical               :: JediVarHasChannelsLocal
 integer(integer64)    :: sizeOfVarobsArray_local
 integer(c_int), allocatable :: localvarChannels(:)
 
@@ -1290,6 +1313,9 @@ compressChannels = .true.
 if (present(compressVarChannels)) then
   compressChannels = compressVarChannels
 end if
+
+JediVarHasChannelsLocal = .true.
+if (present(JediVarHasChannels)) JediVarHasChannelsLocal = JediVarHasChannels
 
 if (present(varChannels)) then
   allocate(localvarChannels(size(varChannels)))
@@ -1308,11 +1334,13 @@ else
   if (allocated(localvarChannels)) then
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, compressChannels, sizeOfVarobsArray_local, varChannels)
+      JediVarName, JediVarGroup, JediVarHasChannelsLocal, compressChannels, &
+      sizeOfVarobsArray_local, varChannels)
   else
     call opsinputs_fill_fillreal2d_norecords( &
       Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Real2, ObsSpace, Channels, &
-      JediVarName, JediVarGroup, compressChannels, sizeOfVarobsArray_local)
+      JediVarName, JediVarGroup, JediVarHasChannelsLocal, compressChannels, &
+      sizeOfVarobsArray_local)
   end if
 end if
 
@@ -2100,24 +2128,27 @@ end subroutine opsinputs_fill_filltimeoffsets
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
+!>   have suffixes representing the indices specified in \p Channels, or can be unchannelized
+!>   when \p JediVarHasChannels is false.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Real2. This can represent either a single
-!>   variable with no channel suffix (in which case \p Real2 will have only a single row) or a set
-!>   of variables with suffixes corresponding to the indices specified in \p Channels.
+!>   Name of the JEDI variable used to populate \p Real2. This can represent a set of variables
+!>   with suffixes corresponding to the indices specified in \p Channels. If
+!>   \p JediVarHasChannels is false, the exact variable name is used for each output channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d_norecords( &
-  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, ReferenceTime)
+  Hdr, OpsVarName, NumObs, Real2, ObsSpace, Channels, JediVarName, JediVarGroup, JediVarHasChannels, &
+  ReferenceTime)
 use datetime_mod, only: datetime
 implicit none
 
@@ -2130,6 +2161,7 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
+logical, intent(in)                             :: JediVarHasChannels
 type(datetime), intent(in)                      :: ReferenceTime
 
 ! Local declarations:
@@ -2142,7 +2174,8 @@ integer                                         :: iChannel
 
 MissingDouble = missing_value(0.0_c_double)
 
-JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
+JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+  JediVarName, Channels, JediVarHasChannels)
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
@@ -2268,28 +2301,30 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Real2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
+!>   have suffixes representing the indices specified in \p Channels, or can be unchannelized
+!>   when \p JediVarHasChannels is false.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] VarobsLength
 !>   Length of varobs profile.
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. If each JEDI location needs to be mapped
-!>   to a separate OPS observation, this can represent either a single variable with no channel
-!>   suffix (in which case \p Real2 will have only a single row) or a set of variables with
-!>   suffixes corresponding to the indices specified in \p Channels.
+!>   to a separate OPS observation, this can represent a set of variables with suffixes
+!>   corresponding to the indices specified in \p Channels. If \p JediVarHasChannels is false,
+!>   the exact variable name is used for each output channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel. Defaults to true.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_filltimeoffsets2d( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, Real2, ObsSpace, Channels, VarobsLength, JediVarName, JediVarGroup, &
-  ReferenceTime)
+  ReferenceTime, JediVarHasChannels)
 use datetime_mod, only: datetime
 implicit none
 
@@ -2304,8 +2339,14 @@ integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
 type(datetime), intent(in)                         :: ReferenceTime
+logical, optional, intent(in)                      :: JediVarHasChannels
+
+! Local declarations:
+logical :: JediVarHasChannelsLocal
 
 ! Body:
+JediVarHasChannelsLocal = .true.
+if (present(JediVarHasChannels)) JediVarHasChannelsLocal = JediVarHasChannels
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_filltimeoffsets2d_records(Hdr, OpsVarName, &
@@ -2316,7 +2357,7 @@ else
   call opsinputs_fill_filltimeoffsets2d_norecords(Hdr, OpsVarName, &
                                                   JediToOpsLayoutMapping % NumOpsObs, Real2, &
                                                   ObsSpace, Channels, JediVarName, JediVarGroup, &
-                                                  ReferenceTime)
+                                                  JediVarHasChannelsLocal, ReferenceTime)
 end if
 
 end subroutine opsinputs_fill_filltimeoffsets2d
@@ -2339,22 +2380,25 @@ end subroutine opsinputs_fill_filltimeoffsets2d
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variable. The variable can
-!>   have either no channel suffix (in which case \p Coord2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
+!>   have suffixes representing the indices specified in \p Channels, or can be unchannelized
+!>   when \p JediVarHasChannels is false.
 !> \param[in] Channels
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
-!>   Name of the JEDI variable used to populate \p Coord2. This can represent either a single
-!>   variable with no channel suffix (in which case \p Coord2 will have only a single row) or a set
-!>   of variables with suffixes corresponding to the indices specified in \p Channels.
+!>   Name of the JEDI variable used to populate \p Coord2. This can represent a set of variables
+!>   with suffixes corresponding to the indices specified in \p Channels. If
+!>   \p JediVarHasChannels is false, the exact variable name is used for each output channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Coord2.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillcoord2d_norecords( &
-  Hdr, OpsVarName, NumObs, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, NumObs, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup, &
+  JediVarHasChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -2366,6 +2410,7 @@ type(c_ptr), value, intent(in)                  :: ObsSpace
 integer(c_int), intent(in)                      :: Channels(:)
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediVarGroup
+logical, intent(in)                             :: JediVarHasChannels
 
 ! Local declarations:
 real(kind=c_double)                             :: VarValue(NumObs)
@@ -2377,7 +2422,8 @@ integer                                         :: iChannel
 
 MissingDouble = missing_value(0.0_c_double)
 
-JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels(JediVarName, Channels)
+JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
+  JediVarName, Channels, JediVarHasChannels)
 
 if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
@@ -2418,7 +2464,6 @@ end subroutine opsinputs_fill_fillcoord2d_norecords
 !>   Name of the JEDI variable used to populate \p Coord2.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Coord2.
-!>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
@@ -2485,17 +2530,20 @@ end subroutine opsinputs_fill_fillcoord2d_records
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Coord2. If each JEDI location needs to be mapped
-!>   to a separate OPS observation, this can represent either a single variable with no channel
-!>   suffix (in which case \p Coord2 will have only a single row) or a set of variables with
-!>   suffixes corresponding to the indices specified in \p Channels.
+!>   to a separate OPS observation, this can represent a set of variables with suffixes
+!>   corresponding to the indices specified in \p Channels. If \p JediVarHasChannels is false,
+!>   the exact variable name is used for each output channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Coord2.
+!> \param[in] JediVarHasChannels
+!>   If false, use \p JediVarName for every output channel. Defaults to true.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillcoord2d( &
-  Hdr, OpsVarName, JediToOpsLayoutMapping, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup)
+  Hdr, OpsVarName, JediToOpsLayoutMapping, Coord2, ObsSpace, Channels, JediVarName, JediVarGroup, &
+  JediVarHasChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -2507,8 +2555,14 @@ type(c_ptr), value, intent(in)                     :: ObsSpace
 integer(c_int), intent(in)                         :: Channels(:)
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediVarGroup
+logical, optional, intent(in)                     :: JediVarHasChannels
+
+! Local declarations:
+logical :: JediVarHasChannelsLocal
 
 ! Body:
+JediVarHasChannelsLocal = .true.
+if (present(JediVarHasChannels)) JediVarHasChannelsLocal = JediVarHasChannels
 
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillcoord2d_records( &
@@ -2516,7 +2570,7 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
 else
   call opsinputs_fill_fillcoord2d_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, Coord2, ObsSpace, Channels, &
-    JediVarName, JediVarGroup)
+    JediVarName, JediVarGroup, JediVarHasChannelsLocal)
 end if
 
 end subroutine opsinputs_fill_fillcoord2d
@@ -2549,20 +2603,27 @@ end function opsinputs_fill_varnames_with_levels
 ! ------------------------------------------------------------------------------
 
 !> Return an array containing the names of JEDI variables storing individual channels of the
-!> variable \p VarName. If the list of channels is empty, this means the variable in question is
-!> 1D and hence the returned array contains just the single string \p VarName.
-function opsinputs_fill_varnames_with_channels(VarName, Channels) result(VarNames)
+!> variable \p VarName. If \p JediVarHasChannels is false, the exact variable name is repeated
+!> for each channel in the result.
+function opsinputs_fill_varnames_with_channels(VarName, Channels, JediVarHasChannels) result(VarNames)
 implicit none
 ! Subroutine arguments:
 character(len=*), intent(in)                   :: VarName
 integer(c_int), intent(in)                     :: Channels(:)
+logical, optional, intent(in)                  :: JediVarHasChannels
 
 ! Local declarations:
 character(len=max_varname_with_channel_length) :: VarNames(max(size(Channels), 1))
 integer                                        :: ichan
+logical                                        :: useChannelSuffixes
+
+useChannelSuffixes = .true.
+if (present(JediVarHasChannels)) useChannelSuffixes = JediVarHasChannels
 
 if (size(Channels) == 0) then
   VarNames(1) = VarName
+else if (.not. useChannelSuffixes) then
+  VarNames = VarName
 else
   do ichan = 1, size(Channels)
     write (VarNames(ichan),'(A,"_",I0)') VarName, Channels(ichan)

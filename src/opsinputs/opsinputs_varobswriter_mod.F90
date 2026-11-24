@@ -765,9 +765,10 @@ else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call Ops_DeAlloc(Ob % Header % SatId, "SatId", Ob % SatId)
 end if
 
+! Match the ObsGroup output: read the 1D pressure once per output channel.
 call opsinputs_fill_fillcoord2d( &
   Ob % Header % PlevelsA, "PlevelsA", JediToOpsLayoutMapping, Ob % PlevelsA, &
-   ObsSpace, self % channels, "pressure", "MetaData")
+   ObsSpace, self % channels, "pressure", "MetaData", JediVarHasChannels = .false.)
 
 GPSRO_TPD = self % AccountForGPSROTangentPointDrift
 if (Ob % header % ObsGroup == ObsGroupGPSRO .and. GPSRO_TPD) then
@@ -1036,19 +1037,23 @@ do iVarField = 1, nVarFields
       ! fixes the problem.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % RadialVelocSO, "RadialVelocSO", JediToOpsLayoutMapping, Ob % RadialVelocSO, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue", &
+         JediVarHasChannels = .false.)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % RadialVelocity, "RadialVelocity", JediToOpsLayoutMapping, Ob % RadialVelocity, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue", &
+         JediVarHasChannels = .false.)
     case (VarField_Reflectivity)
        ! Write DerivedObsValue/reflectivity to both Ob % ReflectivitySO and Ob % Reflectivity.
        ! See the explanation given for RadialVelocity above.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % ReflectivitySO, "ReflectivitySO", JediToOpsLayoutMapping, Ob % ReflectivitySO, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue")
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue", &
+         JediVarHasChannels = .false.)
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % Reflectivity, "Reflectivity", JediToOpsLayoutMapping, Ob % Reflectivity, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue")
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue", &
+         JediVarHasChannels = .false.)
     case (VarField_ReflectivityR)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivityR, "ReflectivityR", Ob % Header % NumObsLocal, Ob % ReflectivityR)
@@ -1058,15 +1063,18 @@ do iVarField = 1, nVarFields
     case (VarField_RadarBeamElev)
       call opsinputs_fill_fillreal2d( &
          Ob % Header % RadarBeamElev, "RadarBeamElev", JediToOpsLayoutMapping, Ob % RadarBeamElev, &
-         ObsSpace, self % channels, self % VarobsLength, "beamTiltAngle", "MetaData")
+         ObsSpace, self % channels, self % VarobsLength, "beamTiltAngle", "MetaData", &
+         JediVarHasChannels = .false.)
     case (VarField_RadarObRange)
       call opsinputs_fill_fillreal2d( &
          Ob % Header % RadarObRange, "RadarObRange", JediToOpsLayoutMapping, Ob % RadarObRange, &
-         ObsSpace, self % channels, self % VarobsLength, "gateRange", "MetaData")
+         ObsSpace, self % channels, self % VarobsLength, "gateRange", "MetaData", &
+         JediVarHasChannels = .false.)
     case (VarField_RadarObAzim)
       call opsinputs_fill_fillreal2d( &
          Ob % Header % RadarObAzim, "RadarObAzim", JediToOpsLayoutMapping, Ob % RadarObAzim, &
-         ObsSpace, self % channels, self % VarobsLength, "beamAzimuthAngle", "MetaData")
+         ObsSpace, self % channels, self % VarobsLength, "beamAzimuthAngle", "MetaData", &
+         JediVarHasChannels = .false.)
     case (VarField_RadIdent)
       call opsinputs_fill_fillinteger2d( &
          Ob % Header % RadIdent, "RadIdent", JediToOpsLayoutMapping, Ob % RadIdent, &
@@ -1074,7 +1082,8 @@ do iVarField = 1, nVarFields
     case (VarField_RadAltAboveMSL)
       call opsinputs_fill_fillreal2d( &
          Ob % Header % RadAltAboveMSL, "RadAltAboveMSL", JediToOpsLayoutMapping, Ob % RadAltAboveMSL, &
-         ObsSpace, self % channels, self % VarobsLength, "stationElevation", "MetaData")
+         ObsSpace, self % channels, self % VarobsLength, "stationElevation", "MetaData", &
+         JediVarHasChannels = .false.)
     case (VarField_RadNoiseLvl)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RadNoiseLvl, "RadNoiseLvl", Ob % Header % NumObsLocal, Ob % RadNoiseLvl)
@@ -1136,7 +1145,8 @@ do iVarField = 1, nVarFields
       ! However multiple wavelength options could be added in future.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "aerosolOpticalDepth", "ObsValue")
+        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "aerosolOpticalDepth", "ObsValue", &
+        JediVarHasChannels = .false.)
       ! NAODWaves is used by the Ops_VarobPGEs subroutine.
       if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
@@ -1157,15 +1167,18 @@ do iVarField = 1, nVarFields
     case (VarField_LevelTime)
       call opsinputs_fill_filltimeoffsets2d( &
         Ob % Header % level_time, "level_time", JediToOpsLayoutMapping, Ob % level_time, &
-        ObsSpace, self % channels, self % VarobsLength, "dateTime", "MetaData", self % validitytime)
+        ObsSpace, self % channels, self % VarobsLength, "dateTime", "MetaData", self % validitytime, &
+        JediVarHasChannels = .false.)
     case (VarField_LevelLat)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % level_lat, "level_lat", JediToOpsLayoutMapping, Ob % level_lat, &
-        ObsSpace, self % channels, self % VarobsLength, "latitude", "MetaData")
+        ObsSpace, self % channels, self % VarobsLength, "latitude", "MetaData", &
+        JediVarHasChannels = .false.)
     case (VarField_LevelLon)
       call opsinputs_fill_fillreal2d( &
         Ob % Header % level_lon, "level_lon", JediToOpsLayoutMapping, Ob % level_lon, &
-        ObsSpace, self % channels, self % VarobsLength, "longitude", "MetaData")
+        ObsSpace, self % channels, self % VarobsLength, "longitude", "MetaData", &
+        JediVarHasChannels = .false.)
     case (VarField_RainAccum)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % RainAccum, "RainAccum", Ob % Header % NumObsLocal, Ob % RainAccum)
