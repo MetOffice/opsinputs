@@ -688,8 +688,8 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
 !>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can
-!>   have either no channel suffix (in which case \p El2 will have only a single row) or suffixes
-!>   representing the indices specified in \p Channels.
+!>   have suffixes representing the indices specified in \p Channels. If
+!>   \p JediVarHasChannels is false, the exact variable name is used for each output channel.
 !> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
@@ -707,13 +707,15 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !>   they are needed for non-simulated variables. If necessary, it could be modified to retrieve
 !>   them from the same group of JEDI variables, GrossErrorProbability, as
 !>   opsinputs_fill_fillelementtype2dfromnormalvariable).
+!> \param[in] JediVarHasChannels
+!>   Optional; defaults to true. If false, use the exact variable name for every output channel.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromnormalvariable( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, &
-  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs)
+  JediValueVarName, JediValueGroup, JediErrorVarName, JediErrorGroup, PackPGEs, JediVarHasChannels)
 implicit none
 
 ! Subroutine arguments:
@@ -728,9 +730,11 @@ character(len=*), intent(in)                    :: JediValueGroup
 character(len=*), optional, intent(in)          :: JediErrorVarName
 character(len=*), optional, intent(in)          :: JediErrorGroup
 logical, optional, intent(in)                   :: PackPGEs
+logical, optional, intent(in)                   :: JediVarHasChannels
 
 ! Local declarations:
 logical                                         :: DoPackPGEs
+logical                                         :: JediVarHasChannelsLocal
 real(kind=c_double)                             :: ObsValue(NumObs)
 real(kind=c_float)                              :: ObsError(NumObs)
 real(kind=c_double)                             :: MissingDouble
@@ -757,13 +761,16 @@ else
   DoPackPGEs = .true.
 end if
 
+JediVarHasChannelsLocal = .true.
+if (present(JediVarHasChannels)) JediVarHasChannelsLocal = JediVarHasChannels
+
 MissingDouble = missing_value(0.0_c_double)
 
 JediValueVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-  JediValueVarName, Channels)
+  JediValueVarName, Channels, JediVarHasChannelsLocal)
 if (present(JediErrorVarName)) then
   JediErrorVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-    JediErrorVarName, Channels)
+    JediErrorVarName, Channels, JediVarHasChannelsLocal)
 end if
 
 if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) then
@@ -771,13 +778,31 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
   call Ops_Alloc(Hdr, OpsVarName, NumObs, El2, &
                  num_levels = int(size(JediValueVarNamesWithChannels), kind=integer64))
 
+  if (.not. JediVarHasChannelsLocal) then
+    call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1), ObsValue)
+    if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
+      if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(1))) then
+        call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(1), ObsError)
+      else
+        write (ErrorMessage, '("Variable ",A,"/",A," not found")') &
+          JediErrorGroup, JediErrorVarNamesWithChannels(1)
+        call gen_warn(RoutineName, ErrorMessage)
+        ObsError(:) = MissingDouble
+      end if
+    else
+      ObsError(:) = MissingDouble
+    end if
+  end if
+
   do iChannel = 1, size(JediValueVarNamesWithChannels)
     ! Retrieve data from JEDI:
     ! - observation value
-    call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(iChannel), &
-                         ObsValue)
+    if (JediVarHasChannelsLocal) then
+      call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(iChannel), &
+                           ObsValue)
+    end if
     ! - observation error
-    if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
+    if (JediVarHasChannelsLocal .and. present(JediErrorVarName) .and. present(JediErrorGroup)) then
       if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel))) then
         call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
                              ObsError)
@@ -787,7 +812,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
         call gen_warn(RoutineName, ErrorMessage)
         ObsError(:) = MissingDouble
       end if
-    else
+    else if (JediVarHasChannelsLocal) then
       ObsError(:) = MissingDouble
     end if
 
@@ -1104,8 +1129,13 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  num_levels = int(numchans, kind=integer64))
+  if (.not. JediVarHasChannels) then
+    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1), VarValue)
+  end if
   do iChannel = 1, size(JediVarNamesWithChannels)
-    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    if (JediVarHasChannels) then
+      call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    end if
     arrayindex = iChannel
 
     ! if VAR channels have been assigned then jopa channels will be mapped to these var channels
@@ -2167,10 +2197,16 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Real2, &
                  num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
-  do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI
+  if (.not. JediVarHasChannels) then
     call opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
-      ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), ReferenceTime, VarValue)
+      ObsSpace, JediVarGroup, JediVarNamesWithChannels(1), ReferenceTime, VarValue)
+  end if
+  do iChannel = 1, size(JediVarNamesWithChannels)
+    if (JediVarHasChannels) then
+      ! Retrieve data from JEDI
+      call opsinputs_obsspace_get_db_datetime_offset_in_seconds( &
+        ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), ReferenceTime, VarValue)
+    end if
 
     ! Fill the OPS data structures
     where (VarValue /= MissingDouble)
@@ -2415,10 +2451,15 @@ if (obsspace_has(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
   call Ops_Alloc(Hdr, OpsVarName, NumObs, Coord2, &
                  num_levels = int(size(JediVarNamesWithChannels), kind=integer64))
+  if (.not. JediVarHasChannels) then
+    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(1), VarValue)
+  end if
 
   do iChannel = 1, size(JediVarNamesWithChannels)
-    ! Retrieve data from JEDI
-    call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    if (JediVarHasChannels) then
+      ! Retrieve data from JEDI
+      call obsspace_get_db(ObsSpace, JediVarGroup, JediVarNamesWithChannels(iChannel), VarValue)
+    end if
 
     ! Fill the OPS data structures
     where (VarValue /= MissingDouble)

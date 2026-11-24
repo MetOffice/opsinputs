@@ -765,7 +765,7 @@ else if (obsspace_has(ObsSpace, "MetaData", "satelliteIdentifier")) then
   call Ops_DeAlloc(Ob % Header % SatId, "SatId", Ob % SatId)
 end if
 
-! Match the ObsGroup output: read the 1D pressure once per output channel.
+! Match the ObsGroup output by filling each output-channel pressure level from the 1D variable.
 call opsinputs_fill_fillcoord2d( &
   Ob % Header % PlevelsA, "PlevelsA", JediToOpsLayoutMapping, Ob % PlevelsA, &
    ObsSpace, self % channels, "pressure", "MetaData", JediVarHasChannels = .false.)
@@ -1125,7 +1125,8 @@ do iVarField = 1, nVarFields
        else
          call opsinputs_fill_fillelementtype2dfromnormalvariable( &
            Ob % Header % ImpactParam, "ImpactParam", Ob % Header % NumObsLocal, Ob % ImpactParam, &
-           ObsSpace, self % channels, "impactParameterRO", "MetaData", PackPGEs = .false.)
+           ObsSpace, self % channels, "impactParameterRO", "MetaData", PackPGEs = .false., &
+           JediVarHasChannels = .false.)
        end if
     case (VarField_RO_Rad_Curv)
       call opsinputs_fill_fillelementtypefromnormalvariable( &
