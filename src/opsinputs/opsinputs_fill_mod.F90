@@ -226,12 +226,9 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
 !>   used to populate El2 and Hdr. The variables can have suffixes representing the indices
-!>   specified in \p Channels. If \p JediVarHasChannels is false, the exact variable name is used
-!>   for each output channel.
+!>   specified in \p Channels.
 !> \param[in] JediGroupName
 !>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
-!> \param[in] JediVarHasChannels
-!>   If false, use \p JediVarName for every output channel.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -242,7 +239,7 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
   Hdr, OpsVarName, NumObs, El2, ObsSpace, Channels, Flags, ObsErrors, JediVarName, JediGroupName, &
-  JediVarHasChannels, PackPGEs)
+  PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -256,7 +253,6 @@ type(c_ptr), value, intent(in)                  :: Flags
 type(c_ptr), value, intent(in)                  :: ObsErrors
 character(len=*), intent(in)                    :: JediVarName
 character(len=*), intent(in)                    :: JediGroupName
-logical, intent(in)                             :: JediVarHasChannels
 logical, optional, intent(in)                   :: PackPGEs
 
 ! Local declarations:
@@ -292,7 +288,7 @@ MissingDouble = missing_value(0.0_c_double)
 MissingFloat  = missing_value(0.0_c_float)
 
 JediVarNamesWithChannels = opsinputs_fill_varnames_with_channels( &
-  JediVarName, Channels, JediVarHasChannels)
+  JediVarName, Channels)
 
 if (obsspace_has(ObsSpace, JediGroupName, JediVarNamesWithChannels(1))) then
   ! Allocate OPS data structures
@@ -523,12 +519,9 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups) used
 !>   to populate El2 and Hdr. If each JEDI location needs to be mapped to a separate OPS
 !>   observation, the variables can have suffixes representing the indices specified in
-!>   \p Channels. If \p JediVarHasChannels is false, the exact variable name is used for each
-!>   output channel.
+!>   \p Channels.
 !> \param[in] JediGroupName
 !>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
-!> \param[in] JediVarHasChannels
-!>   If false, use \p JediVarName for every output channel. Defaults to true.
 !> \param[in] PackPGEs
 !>   Optional; true by default. If set to false, PGEs won't be stored in packed form.
 !>   The Ops_VarobPGEs subroutine expects PGEs to be stored in packed form for most varobs fields,
@@ -539,7 +532,7 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> are not found.
 subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
   Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Channels, Flags, ObsErrors, VarobsLength, JediVarName, &
-  JediGroupName, PackPGEs, JediVarHasChannels)
+  JediGroupName, PackPGEs)
 implicit none
 
 ! Subroutine arguments:
@@ -555,15 +548,8 @@ integer(integer64), intent(in)                     :: VarobsLength
 character(len=*), intent(in)                       :: JediVarName
 character(len=*), intent(in)                       :: JediGroupName
 logical, optional, intent(in)                      :: PackPGEs
-logical, optional, intent(in)                      :: JediVarHasChannels
-
-! Local declarations:
-logical :: JediVarHasChannelsLocal
 
 ! Body:
-JediVarHasChannelsLocal = .true.
-if (present(JediVarHasChannels)) JediVarHasChannelsLocal = JediVarHasChannels
-
 if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_records( &
     Hdr, OpsVarName, JediToOpsLayoutMapping, El2, ObsSpace, Flags, &
@@ -571,7 +557,7 @@ if (JediToOpsLayoutMapping % ConvertRecordsToMultilevelObs) then
 else
   call opsinputs_fill_fillelementtype2dfromsimulatedvariable_norecords( &
     Hdr, OpsVarName, JediToOpsLayoutMapping % NumOpsObs, El2, ObsSpace, Channels, Flags, &
-    ObsErrors, JediVarName, JediGroupName, JediVarHasChannelsLocal, PackPGEs)
+    ObsErrors, JediVarName, JediGroupName, PackPGEs)
 end if
 
 end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable
@@ -1072,7 +1058,7 @@ type(c_ptr), value, intent(in)                      :: ObsSpace
 integer(c_int), intent(in)                          :: Channels(:)
 character(len=*), intent(in)                        :: JediVarName
 character(len=*), intent(in)                        :: JediVarGroup
-logical, intent(in)                                  :: JediVarHasChannels
+logical, intent(in)                                 :: JediVarHasChannels
 logical, optional, intent(in)                       :: compressVarChannels
 integer(integer64), optional, intent(in)            :: sizeOfVarobsArray
 integer(c_int), optional, intent(in)                :: varChannels(:)
@@ -1275,7 +1261,7 @@ end subroutine opsinputs_fill_fillreal2d_records
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] JediVarHasChannels
-!>   If false, use \p JediVarName for every output channel. Defaults to true.
+!>   Optional; defaults to true. If false, use \p JediVarName for every output channel.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -2317,7 +2303,7 @@ end subroutine opsinputs_fill_filltimeoffsets2d_records
 !> \param[in] ReferenceTime
 !>   Reference time. JEDI datetimes will be converted into offsets from this time.
 !> \param[in] JediVarHasChannels
-!>   If false, use \p JediVarName for every output channel. Defaults to true.
+!>   Optional; defaults to true. If false, use \p JediVarName for every output channel.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -2536,7 +2522,7 @@ end subroutine opsinputs_fill_fillcoord2d_records
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Coord2.
 !> \param[in] JediVarHasChannels
-!>   If false, use \p JediVarName for every output channel. Defaults to true.
+!>   Optional; defaults to true. If false, use \p JediVarName for every output channel.
 !>
 !> \note This function returns early (without a warning) if the specified JEDI variable is not found.
 !> We rely on warnings printed by the OPS code whenever data needed to output a requested varfield
@@ -2603,8 +2589,9 @@ end function opsinputs_fill_varnames_with_levels
 ! ------------------------------------------------------------------------------
 
 !> Return an array containing the names of JEDI variables storing individual channels of the
-!> variable \p VarName. If \p JediVarHasChannels is false, the exact variable name is repeated
-!> for each channel in the result.
+!> variable \p VarName. If \p Channels is empty, the result contains the unsuffixed variable name
+!> once. If \p JediVarHasChannels is false, the exact variable name is repeated for each channel.
+!> \p JediVarHasChannels is optional and defaults to true.
 function opsinputs_fill_varnames_with_channels(VarName, Channels, JediVarHasChannels) result(VarNames)
 implicit none
 ! Subroutine arguments:

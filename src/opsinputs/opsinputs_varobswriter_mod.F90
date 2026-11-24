@@ -1037,23 +1037,19 @@ do iVarField = 1, nVarFields
       ! fixes the problem.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % RadialVelocSO, "RadialVelocSO", JediToOpsLayoutMapping, Ob % RadialVelocSO, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue", &
-         JediVarHasChannels = .false.)
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % RadialVelocity, "RadialVelocity", JediToOpsLayoutMapping, Ob % RadialVelocity, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue", &
-         JediVarHasChannels = .false.)
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "radialVelocity", "ObsValue")
     case (VarField_Reflectivity)
        ! Write DerivedObsValue/reflectivity to both Ob % ReflectivitySO and Ob % Reflectivity.
        ! See the explanation given for RadialVelocity above.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % ReflectivitySO, "ReflectivitySO", JediToOpsLayoutMapping, Ob % ReflectivitySO, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue", &
-         JediVarHasChannels = .false.)
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue")
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
          Ob % Header % Reflectivity, "Reflectivity", JediToOpsLayoutMapping, Ob % Reflectivity, &
-         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue", &
-         JediVarHasChannels = .false.)
+         ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "reflectivity", "ObsValue")
     case (VarField_ReflectivityR)
       ! TODO(someone): handle this varfield
       ! call Ops_Alloc(Ob % Header % ReflectivityR, "ReflectivityR", Ob % Header % NumObsLocal, Ob % ReflectivityR)
@@ -1145,8 +1141,7 @@ do iVarField = 1, nVarFields
       ! However multiple wavelength options could be added in future.
       call opsinputs_fill_fillelementtype2dfromsimulatedvariable( &
         Ob % Header % AOD, "AOD", JediToOpsLayoutMapping, Ob % AOD, &
-        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "aerosolOpticalDepth", "ObsValue", &
-        JediVarHasChannels = .false.)
+        ObsSpace, self % channels, Flags, ObsErrors, self % VarobsLength, "aerosolOpticalDepth", "ObsValue")
       ! NAODWaves is used by the Ops_VarobPGEs subroutine.
       if (Ob % Header % AOD % Present) NAODWaves = Ob % Header % AOD % NumLev
     case (VarField_BriTempVarError)
