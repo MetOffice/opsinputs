@@ -225,8 +225,9 @@ end subroutine opsinputs_fill_fillelementtypefromsimulatedvariable
 !>   Pointer to a ioda::ObsDataVector<float> object containing observation errors.
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups)
-!>   used to populate El2 and Hdr. The variables can have suffixes representing the indices
-!>   specified in \p Channels.
+!>   used to populate El2 and Hdr. The variables can either have no channel suffix (in which case
+!>   \p El2 will have only a single row) or have suffixes representing the indices specified in
+!>   \p Channels.
 !> \param[in] JediGroupName
 !>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
 !> \param[in] PackPGEs
@@ -518,8 +519,8 @@ end subroutine opsinputs_fill_fillelementtype2dfromsimulatedvariable_records
 !> \param[in] JediVarName
 !>   Name of the JEDI variables (in the ObsValue, ObsError and GrossErrorProbability groups) used
 !>   to populate El2 and Hdr. If each JEDI location needs to be mapped to a separate OPS
-!>   observation, the variables can have suffixes representing the indices specified in
-!>   \p Channels.
+!>   observation, the variables can either have no channel suffix (in which case \p El2 will have
+!>   only a single row) or have suffixes representing the indices specified in \p Channels.
 !> \param[in] JediGroupName
 !>    Name of the JEDI Variable group, for example, ObsValue or BiasCorrObsValue.
 !> \param[in] PackPGEs
@@ -687,9 +688,10 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can
-!>   have suffixes representing the indices specified in \p Channels. If
-!>   \p JediVarHasChannels is false, the exact variable name is used for each output channel.
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can 
+!>   have either no channel suffix (when no channel numbers are provided, in which case \p El2 
+!>   will have only a single row) or suffixes representing the indices specified in \p Channels.
+!>   If \p JediVarHasChannels is false, the exact variable name is used for each output channel.
 !> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediValueVarName
 !>   Name of the JEDI variable containing observation values.
@@ -800,20 +802,20 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
     if (JediVarHasChannelsLocal) then
       call obsspace_get_db(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(iChannel), &
                            ObsValue)
-    end if
-    ! - observation error
-    if (JediVarHasChannelsLocal .and. present(JediErrorVarName) .and. present(JediErrorGroup)) then
-      if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel))) then
-        call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
-                             ObsError)
-      else
-        write (ErrorMessage, '("Variable ",A,"/",A," not found")') &
-          JediErrorGroup, JediErrorVarNamesWithChannels(iChannel)
-        call gen_warn(RoutineName, ErrorMessage)
+      ! - observation error
+      if (present(JediErrorVarName) .and. present(JediErrorGroup)) then
+        if (obsspace_has(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel))) then
+          call obsspace_get_db(ObsSpace, JediErrorGroup, JediErrorVarNamesWithChannels(iChannel), &
+                               ObsError)
+        else
+          write (ErrorMessage, '("Variable ",A,"/",A," not found")') &
+            JediErrorGroup, JediErrorVarNamesWithChannels(iChannel)
+          call gen_warn(RoutineName, ErrorMessage)
+          ObsError(:) = MissingDouble
+        end if
+      else 
         ObsError(:) = MissingDouble
       end if
-    else if (JediVarHasChannelsLocal) then
-      ObsError(:) = MissingDouble
     end if
 
     ! Fill the OPS data structures
@@ -1053,8 +1055,10 @@ end subroutine opsinputs_fill_fillreal
 !>   Indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. This can represent a set of variables
-!>   with suffixes corresponding to the indices specified in \p Channels. If
-!>   \p JediVarHasChannels is false, the exact variable name is used for each output channel.
+!>   with suffixes corresponding to the indices specified in \p Channels, or a single variable
+!>   with no channel suffix (in which case Real2 will have a single row) when no channels are 
+!>   specified. If \p JediVarHasChannels is false, the exact variable name is used for each output 
+!>   channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
 !> \param[in] JediVarHasChannels
