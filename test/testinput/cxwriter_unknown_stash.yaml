@@ -1,0 +1,29 @@
+time window:
+  begin: 2018-01-01T00:00:00Z
+  end: 2018-01-01T01:00:00Z
+
+observations:
+  - obs space:
+      name: Aircraft
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/dummy.nc4
+      simulated variables: [dummy]
+    geovals:
+      filename: Data/cx_globalnamelist_aircraft.nc4
+    obs filters:
+    - filter: Cx Writer
+      namelist_directory: testinput/CxWriterNamelists_unknown
+      general_mode: debug
+    - filter: Cx Checker
+      expected_surface_variables: ["1"]
+      expected_upper_air_variables: []
+      expected_main_table_columns:
+      - - ["17.10"]
+        - ["**********"]
+        - ["17.30"]
+        - ["17.40"]
+    HofX: ObsValue
+    benchmarkFlag: 1000
+    flaggedBenchmark: 0
