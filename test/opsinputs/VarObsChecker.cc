@@ -3,6 +3,7 @@
  *
  */
 
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
 #include <map>
@@ -86,7 +87,8 @@ VarObsChecker::VarObsChecker(ioda::ObsSpace & obsdb, const Parameters_ & params,
 {
   oops::Log::trace() << "VarObsChecker constructor starting" << std::endl;
   ASSERT_MSG(!parameters_.expectedHeaderFields.value().empty() ||
-             !parameters_.expectedMainTableColumns.value().empty(),
+             !parameters_.expectedMainTableColumns.value().empty() ||
+             !parameters_.expectedVarfields.value().empty(),
              "No VarObs file components to check have been specified");
 }
 
@@ -189,6 +191,8 @@ void VarObsChecker::checkHeader(const std::map<std::string, std::string> &header
 }
 
 void VarObsChecker::checkMainTable(const MainTable &mainTable) const {
+  // Check whether the named columns are present with precisely the values
+  // specified and no others. Other columns may also be present.
   for (const std::pair<const std::string, std::vector<std::string>> &expectedNameAndValues :
        parameters_.expectedMainTableColumns.value()) {
     const std::vector<std::string> &values = mainTable[expectedNameAndValues.first];
@@ -197,6 +201,17 @@ void VarObsChecker::checkMainTable(const MainTable &mainTable) const {
       str << "Column '" << expectedNameAndValues.first << "':\n  received: " << values
           << "\n  expected: " << expectedNameAndValues.second;
       throw std::runtime_error(str.str());
+    }
+  }
+  // Check whether the specified field numbers are present somewhere in the
+  // "field" column (ignoring other field numbers present and their ordering)
+  if (!parameters_.expectedVarfields.value().empty()) {
+    const std::vector<std::string> fields = mainTable["field"];
+    for (const std::string &expectedVarfield : parameters_.expectedVarfields.value()) {
+      if (std::find(fields.begin(), fields.end(), expectedVarfield) == fields.end()) {
+        throw std::runtime_error("Varfield '" + expectedVarfield +
+                                 "' not found in VarObs data table");
+      }
     }
   }
 }

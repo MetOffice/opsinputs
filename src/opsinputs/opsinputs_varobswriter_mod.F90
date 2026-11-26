@@ -160,6 +160,7 @@ private
   logical            :: FillObsTypeFromOpsSubType
   logical            :: VarobsLengthIsIC_PLevels
   logical            :: StationIDIntToString
+  logical            :: OutputVarBCPredictors
 
   character(len=100) :: latitudeName
   character(len=100) :: longitudeName
@@ -327,8 +328,8 @@ call f_conf % get_or_die("size_of_varobs_array", self % size_of_varobs_array)
 call f_conf % get_or_die("compress_var_channels", self % compressVarChannels)
 
 ! Updates the varbc flag passedaround by a module in OPS
-call f_conf % get_or_die("output_varbc_predictors", BoolValue)
-VarBC = BoolValue
+call f_conf % get_or_die("output_varbc_predictors", self % OutputVarBCPredictors)
+VarBC = self % OutputVarBCPredictors
 
 call f_conf % get_or_die ("latitude_name", StringValue)
 self % latitudeName = StringValue
@@ -568,6 +569,7 @@ type(UM_header_type)                        :: CxHeader
 integer(integer64)                          :: NumVarObsTotal
 
 ! Body:
+VarBC = self % OutputVarBCPredictors
 GeneralMode = self % GeneralMode
 self % ObsDiags => obsdiags
 
@@ -610,6 +612,7 @@ character(len=80)                        :: ErrorMessage
 character(len=*), parameter              :: RoutineName = "opsinputs_varobswriter_addrequiredgeovars"
 
 ! Body:
+VarBC = self % OutputVarBCPredictors
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 
 do i = 1, size(VarFields)
@@ -722,6 +725,7 @@ logical, save                                         :: FillNumChans = .false.
 
 ! Get the list of varfields to populate
 
+VarBC = self % OutputVarBCPredictors
 call Ops_ReadVarobsControlNL(self % obsgroup, VarFields)
 nVarFields = size(VarFields)
 
