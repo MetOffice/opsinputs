@@ -688,8 +688,8 @@ end subroutine opsinputs_fill_fillelementtypefromnormalvariable
 !> \param[inout] El2
 !>   Pointer to the array to be populated.
 !> \param[in] ObsSpace
-!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can 
-!>   have either no channel suffix (when no channel numbers are provided, in which case \p El2 
+!>   Pointer to ioda::ObsSpace object containing the specified JEDI variables. The variables can
+!>   have either no channel suffix (when no channel numbers are provided, in which case \p El2
 !>   will have only a single row) or suffixes representing the indices specified in \p Channels.
 !> \param[in] Channel indices returned by ioda::ObsSpace::obsvariables().channels().
 !> \param[in] JediValueVarName
@@ -788,7 +788,7 @@ if (obsspace_has(ObsSpace, JediValueGroup, JediValueVarNamesWithChannels(1))) th
         call gen_warn(RoutineName, ErrorMessage)
         ObsError(:) = MissingDouble
       end if
-    else 
+    else
       ObsError(:) = MissingDouble
     end if
 
@@ -1030,8 +1030,8 @@ end subroutine opsinputs_fill_fillreal
 !> \param[in] JediVarName
 !>   Name of the JEDI variable used to populate \p Real2. This can represent a set of variables
 !>   with suffixes corresponding to the indices specified in \p Channels, or a single variable
-!>   with no channel suffix (in which case Real2 will have a single row) when no channels are 
-!>   specified. If \p JediVarHasChannels is false, the exact variable name is used for each output 
+!>   with no channel suffix (in which case Real2 will have a single row) when no channels are
+!>   specified. If \p JediVarHasChannels is false, the exact variable name is used for each output
 !>   channel.
 !> \param[in] JediGroup
 !>   Group name of the JEDI variable used to populate \p Real2.
